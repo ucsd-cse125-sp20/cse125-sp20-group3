@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>Status Reports</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+  html {
+    scroll-behavior: smooth;
+  }
+
+  h1 {
+    padding-top: 1.5rem;
+  }
+
+  h3 {
+    font-weight: bold;
+  }
+
+  html,
+  body,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Roboto", sans-serif;
+  }
+
+  h3 {
+    font-size: 1.2em;
+  }
+
+  .w3-sidebar {
+    z-index: 3;
+    width: 250px;
+    top: 43px;
+    bottom: 0;
+    height: inherit;
+  }
+
+  hr {
+    display: block;
+    height: 6px;
+    width: 70px;
+    background-color: black;
+    margin-left: 0;
+    border: 0;
+  }
+
+  table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  td,
+  th {
+    border: 1px solid #ddd;
+    text-align: center;
+    padding: 8px;
+  }
+
+  tr:nth-child(even) {
+    background-color: #eee;
+  }
+
+  .w3-black,
+  .w3-hover-black:hover {
+    transition: 0.25s;
+  }
+</style>
+
+<body>
+
+  <!-- Navbar -->
+  <div class="w3-top">
+    <div class="w3-bar w3-theme w3-top w3-left-align w3-large">
+      <a class="w3-bar-item w3-button w3-right w3-hide-large w3-hover-white w3-large w3-theme-l1"
+        href="javascript:void(0)" onclick="open_sidebar()"><i class="fa fa-bars"></i></a>
+      <a href="#" class="w3-bar-item w3-button w3-hover-white">Home</a>
+      <a href="./index.html" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Specifications</a>
+      <a href="#" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Weekly Status Reports</a>
+      <a href="./media.html" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Media</a>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <nav class="w3-sidebar w3-bar-block w3-collapse w3-large w3-theme-l5 w3-animate-left" id="sidebar">
+    <a href="javascript:void(0)" onclick="close_sidebar()"
+      class="w3-right w3-xlarge w3-padding-large w3-hover-black w3-hide-large" title="Close Menu">
+      <i class="fa fa-remove"></i>
+    </a>
+    <h4 class="w3-bar-item"><b>Sections</b></h4>
+    <a class="w3-bar-item w3-button w3-hover-black" href="#">Week 2</a>
+    <a class="w3-bar-item w3-button w3-hover-black" href="#">Week 3</a>
+    <a class="w3-bar-item w3-button w3-hover-black" href="#">Week 4</a>
+    <a class="w3-bar-item w3-button w3-hover-black" href="#">Week 5</a>
+    <a class="w3-bar-item w3-button w3-hover-black" href="#">Week 6</a>
+    <a class="w3-bar-item w3-button w3-hover-black" href="#">Week 7</a>
+    <a class="w3-bar-item w3-button w3-hover-black" href="#">Week 8</a>
+    <a class="w3-bar-item w3-button w3-hover-black" href="#">Week 9</a>
+    <a class="w3-bar-item w3-button w3-hover-black" href="#">Week 10</a>
+  </nav>
+
+  <!-- Overlay effect when opening sidebar on small screens -->
+  <div class="w3-overlay w3-hide-large" onclick="close_sidebar()" style="cursor:pointer" title="close side menu"
+    id="overlay"></div>
+
+  <!-- Main content: shift it to the right by 250 pixels when the sidebar is visible -->
+  <div class="w3-main" style="margin-left:300px">
+    <div class="w3-row w3-padding-32" id="sec-desc">
+      <div class="w3-twothird w3-container">
+        <h1>Weekly Status Reports: Coming soon</h1>
+      </div>
+    </div>
+
+    <!-- END MAIN -->
+  </div>
+  <script src="./sidebar.js"></script>
+
+</body>
+
+</html>

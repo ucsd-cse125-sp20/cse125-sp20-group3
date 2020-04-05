@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>Project Specs</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+  html {
+    scroll-behavior: smooth;
+  }
+
+  h1 {
+    padding-top: 1.5rem;
+  }
+
+  h3 {
+    font-weight: bold;
+  }
+
+  html,
+  body,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Roboto", sans-serif;
+  }
+
+  h3 {
+    font-size: 1.2em;
+  }
+
+  .w3-sidebar {
+    z-index: 3;
+    width: 250px;
+    top: 43px;
+    bottom: 0;
+    height: inherit;
+  }
+
+  hr {
+    display: block;
+    height: 6px;
+    width: 70px;
+    background-color: black;
+    margin-left: 0;
+    border: 0;
+  }
+
+  table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  td,
+  th {
+    border: 1px solid #ddd;
+    text-align: center;
+    padding: 8px;
+  }
+
+  tr:nth-child(even) {
+    background-color: #eee;
+  }
+
+  .w3-black,
+  .w3-hover-black:hover {
+    transition: 0.25s;
+  }
+</style>
+
+<body>
+
+  <!-- Navbar -->
+  <div class="w3-top">
+    <div class="w3-bar w3-theme w3-top w3-left-align w3-large">
+      <a class="w3-bar-item w3-button w3-right w3-hide-large w3-hover-white w3-large w3-theme-l1"
+        href="javascript:void(0)" onclick="open_sidebar()"><i class="fa fa-bars"></i></a>
+      <a href="#" class="w3-bar-item w3-button w3-hover-white">Home</a>
+      <a href="#" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Specifications</a>
+      <a href="./status-reports.html" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Weekly Status
+        Reports</a>
+      <a href="./media.html" class="w3-bar-item w3-button w3-hide-small w3-hover-white">Media</a>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <nav class="w3-sidebar w3-bar-block w3-collapse w3-large w3-theme-l5 w3-animate-left" id="sidebar">
+    <a href="javascript:void(0)" onclick="close_sidebar()"
+      class="w3-right w3-xlarge w3-padding-large w3-hover-black w3-hide-large" title="Close Menu">
+      <i class="fa fa-remove"></i>
+    </a>
+    <h4 class="w3-bar-item"><b>Sections</b></h4>
+    <a class="w3-bar-item w3-button w3-hover-black" href="#sec-desc">Project Description</a>
+    <a class="w3-bar-item w3-button w3-hover-black" href="#sec-grp-mng">Group Management</a>
+    <a class="w3-bar-item w3-button w3-hover-black" href="#sec-proj-dev">Project Development</a>
+    <a class="w3-bar-item w3-button w3-hover-black" href="#sec-schedule">Project Schedule</a>
+  </nav>
+
+  <!-- Overlay effect when opening sidebar on small screens -->
+  <div class="w3-overlay w3-hide-large" onclick="close_sidebar()" style="cursor:pointer" title="close side menu"
+    id="overlay"></div>
+
+  <!-- Main content: shift it to the right by 250 pixels when the sidebar is visible -->
+  <div class="w3-main" style="margin-left:300px">
+    <div class="w3-row w3-padding-32" id="sec-desc">
+      <div class="w3-twothird w3-container">
+        <h1>Project Description</h1>
+        <hr>
+        <h2>Overview</h2>
+        <p>The game that we plan to build is going to be a multiplayer third-person tower defense game
+          with resources and crafting elements. Player are split into teams with the goal destroying
+          the enemy base while defending their own. Players can craft turrets and game units that
+          help them intrude into the enemy base. The team that destroys the enemy's base first wins.
+          Our game will combine aspects of sandbox survival, tower defense, and moba styles of
+          gameplay into one competitive game.
+        </p>
+        <h2>Features</h2>
+        <h3>Must have</h3>
+        <ul>
+          <li>Main menu while in game that allows player to change settings or quit</li>
+          <li>Map</li>
+          <li>player controls (mouse and keyboard)</li>
+          <li>towers</li>
+          <li>units that fight for you</li>
+          <li>team bases</li>
+          <li>currency in absence of resources</li>
+          <li>Be able to run on Windows</li>
+        </ul>
+        <h3>Should have</h3>
+        <ul>
+          <li>Resource collection & crafting system</li>
+          <li>game lobby to be able to select teams and start match</li>
+        </ul>
+        <h3>Could have</h3>
+        <ul>
+          <li>player combat, health, respawn</li>
+          <li>procedural map generation</li>
+          <li>map skins</li>
+          <li>player classes</li>
+          <li>cross-platform</li>
+        </ul>
+      </div>
+      <!-- <div class="w3-third w3-container">
+        <p class="w3-border w3-padding-large w3-padding-32 w3-center">AD</p>
+        <p class="w3-border w3-padding-large w3-padding-32 w3-center">AD</p>
+      </div> -->
+    </div>
+
+    <div class="w3-row w3-padding-32" id="sec-grp-mng">
+      <div class="w3-twothird w3-container">
+        <h1>Group Management</h1>
+        <hr>
+        <h3>Members</h3>
+        <ul>
+          <li>Kevin Huang</li>
+          <li>Charles Li</li>
+          <li>Jiajian Fu</li>
+          <li>Hao Luo</li>
+          <li>Aditi Guar</li>
+          <li>Esther Zhao</li>
+        </ul>
+        <h3>Roles in group management</h3>
+        <p>We decided not to have a single project manager and instead we will all
+          keep eachother accountable. We believe that
+          this will be manageable given the small team size of 6 members. Instead, we
+          have sub-team "leaders" such that they specialize in a certain area of
+          development.
+        </p>
+        <h3>Communication & Collaboration</h3>
+        <p>Our decisions will be decided through democracy (majority consensus). We will
+          communicate mainly through Discord, where we have different channels set up for
+          the four sectors of game development. We decided to use Discord because it has the
+          organization of Slack and the voice and video call capabilities like Zoom all in
+          one central place. For collaboration, we will use Github for vesion control, and
+          VSCode for pair programming sessions through the live share feature.
+        </p>
+        <h3>Dealing with schedule-slips</h3>
+        <p>To stay on schedule, we plan to follow our proposed <a href="#sec-schedule">schedule</a>
+          closely. If we are not meeting deadlines, we will set up a team meeting to discuss
+          the next steps and determine what is blocking us from meeting specific deadlines. Then,
+          we can revise the schedule to better reflect the current realistic state of progress.
+          If anyone has blockers, they will notify the entire team to see if others can help out.
+        </p>
+        <h3>Weekly group status reports</h3>
+        <p>We plan to have a round-robin system where we rotate the person or pair responsible
+          for the deliverables that week.
+        </p>
+      </div>
+    </div>
+
+    <div class="w3-row w3-padding-32" id="sec-proj-dev">
+      <div class="w3-twothird w3-container">
+        <h1>Project Development</h1>
+        <hr>
+        <h3>Sub-teams</h3>
+        <table>
+          <tr>
+            <th>Design/Art/3-D Modeling</th>
+            <th>Client Graphics</th>
+            <th>Network</th>
+            <th>Server-side Game Logic</th>
+          </tr>
+          <tr>
+            <td>Esther Zhao, Kevin Huang</td>
+            <td>Kevin Huang, Charles Li, Esther Zhao</td>
+            <td>Hao Luo, Jiajian Fu, Aditi Guar, Charles Li</td>
+            <td>Aditi Guar, Jiajian Fu, Charles Li, Hao Luo</td>
+          </tr>
+        </table>
+        <p>Given the time constraint of 10 weeks, our group thought that it would be best to
+          specialize <b>without compartmentalization</b>. This means that we will divide roles based on
+          initial expertise in one of the 4 main areas of development, but we will all work
+          cross functionally and help each other out. The roles set are not fixed, and everyone
+          can jump in to help out the other areas so that everyone has a chance to learn something
+          new! (i.e. working on graphics with no prior graphics experience).
+        </p>
+        <h3>Tools</h3>
+        <p>We will be using VSCode live share, Visual Studio to develop in C++. We plan to use
+          either Trello or Jira for task tracking. For concept art and design, we will use ProCreate
+          and Adobe Creative Cloud. For generating 3-D models and assets, we plan to use Blender, which
+          is a free 3-D modeling software. For graphics, we plan to use OpenGL or the Forge.
+        </p>
+        <h3>Testing</h3>
+        <p>For testing, we plan to do gameplay testing through running the game.</p>
+        <h3>Documentation</h3>
+        <p>For internal documentation, we will thoroughly comment code such that someone who
+          did not write the code could easily understand it. If inline comments alone do not convey
+          the necessary information to understand the code and set-up, then we will use our
+          designated Google Drive or Hackmd.io workspace to write out longer explanations.
+          For external player documentation, we will write out a tutorial guide on our website,
+          and implement a help menu in game.
+        </p>
+      </div>
+    </div>
+
+    <div class="w3-row w3-padding-32" id="sec-schedule">
+      <div class="w3-twothird w3-container">
+        <h1>Schedule</h1>
+        <hr>
+        <table>
+          <tr>
+            <th style="width: 5.1em;"></th>
+            <th>Design/Art</th>
+            <th>Graphics/Client</th>
+            <th>Network</th>
+            <th>Game Logic/Server</th>
+            <th>Key Milestones</th>
+          </tr>
+          <tr>
+            <td>Week 2</td>
+            <td>General concept art & style research</td>
+            <td>Pick graphics backbone. Setup client, create menu</td>
+            <td>Establish simple connection between clients and server</td>
+            <td>Refine and flesh out initial ideas</td>
+            <td>Decide on game genre and basic ideas</td>
+          </tr>
+          <tr>
+            <td>Week 3</td>
+            <td>Concept art, Start modeling basic MVP units</td>
+            <td>Input handling and integrating with server</td>
+            <td>Packet design, integrate with graphics client</td>
+            <td>Implement player controls and movement</td>
+            <td>server/client communication</td>
+          </tr>
+          <tr>
+            <td>Week 4</td>
+            <td>Preliminary UI Design, more basic modeling</td>
+            <td>Graphics pipeline and asset integration, optimization</td>
+            <td>Optimize protocol</td>
+            <td>Set up gameplay, towers, units, state management</td>
+            <td>MVP mostly fleshed out</td>
+          </tr>
+          <tr>
+            <td>Week 5</td>
+            <td>Final UI draft, Basic environment modeling, Finish up unit modeling</td>
+            <td>Animation, particles, optimization</td>
+            <td>Continue optimizing protocol</td>
+            <td>Diversify the variety of units and towers, embellish resources, crafting system</td>
+            <td>MVP should be playable</td>
+          </tr>
+          <tr>
+            <td>Week 6</td>
+            <td>Environment modeling</td>
+            <td>animation/UI</td>
+            <td></td>
+            <td>Add player combat</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Week 7</td>
+            <td>Environment modelling polish, music, sound effects</td>
+            <td>Cool shaders, UI</td>
+            <td></td>
+            <td>Map generation, testing</td>
+            <td>Functional with UI</td>
+          </tr>
+          <tr>
+            <td>Week 8</td>
+            <td>Music/sound</td>
+            <td>Cool shaders</td>
+            <td></td>
+            <td>testing</td>
+            <td></td>
+          </tr>
+          <tr>
+            <td>Week 9</td>
+            <td>Spec freeze/alpha testing</td>
+            <td>Spec freeze/alpha testing</td>
+            <td>Spec freeze/alpha testing</td>
+            <td>Spec freeze/alpha testing</td>
+            <td>Have game be deliverable, test and fix bugs</td>
+          </tr>
+          <tr>
+            <td>Week 10</td>
+            <td>beta testing</td>
+            <td>beta testing</td>
+            <td>beta testing</td>
+            <td>beta testing</td>
+            <td>Create external documentation</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- END MAIN -->
+  </div>
+  <script src="./sidebar.js"></script>
+
+</body>
+
+</html>

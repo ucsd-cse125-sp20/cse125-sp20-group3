@@ -726,6 +726,8 @@ void Application::Update(float deltaTime)
 	gUniformDataSky = gUniformData;
 	gUniformDataSky.mProjectView = projMat * viewMat;
 
+	player->update(deltaTime);
+
 	/************************************************************************/
 	// Update GUI
 	/************************************************************************/
@@ -793,14 +795,6 @@ void Application::Draw()
 	cmdBindVertexBuffer(cmd, 1, &pSkyBoxVertexBuffer, &skyboxVbStride, NULL);
 	cmdDraw(cmd, 36, 0);
 	cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);
-
-	//////// draw planets
-	//cmdBeginGpuTimestampQuery(cmd, gGpuProfileToken, "Draw Planets");
-	//cmdBindPipeline(cmd, pSpherePipeline);
-	//cmdBindDescriptorSet(cmd, gFrameIndex * 2 + 1, pDescriptorSetUniforms);
-	//cmdBindVertexBuffer(cmd, 1, &pSphereVertexBuffer, &sphereVbStride, NULL);
-	//cmdDrawInstanced(cmd, gNumberOfSpherePoints / 6, 0, gNumPlanets, 0);
-	//cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);
 
 
 	player->draw(cmd);

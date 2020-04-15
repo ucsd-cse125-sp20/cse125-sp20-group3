@@ -94,7 +94,6 @@ void OBJObject::parse(const char* objFilename) {
 				nInds.push_back(in0 - 1);
 				nInds.push_back(in1 - 1);
 				nInds.push_back(in2 - 1);
-				//printf("%u/%u/%u %u/%u/%u %u/%u/%u\n", iv0, it0, in0, iv1, it1, in1, iv2, it2, in2);
 			}
 		}
 	}

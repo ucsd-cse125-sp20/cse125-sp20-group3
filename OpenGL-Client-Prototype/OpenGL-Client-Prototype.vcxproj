@@ -161,6 +161,7 @@
     <ClInclude Include="shader.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Window.h" />
+    <ClCompile Include="network_connection.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="network_connection.cpp" />

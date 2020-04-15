@@ -6,6 +6,7 @@
 
 int __cdecl main(void) 
 {
+    std::cout << "starting..." << std::endl;
     WSADATA wsaData;
     int iResult;
 
@@ -35,6 +36,7 @@ int __cdecl main(void)
     float drag = 0.1;
     float deltaTime = 0.001f;
 
+    std::cout << "server started" << std::endl;
 
     // Receive until the peer shuts down the connection
     do {

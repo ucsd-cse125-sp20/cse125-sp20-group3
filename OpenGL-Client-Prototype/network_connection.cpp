@@ -8,6 +8,7 @@
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
 
 // Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib
 #pragma comment (lib, "Ws2_32.lib")
@@ -16,6 +17,8 @@
 
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
+
+#include "network_connection.h"
 
 int set_up_server_socket(WSADATA *WSAData_ptr, SOCKET *ListenSocket_ptr, SOCKET *ClientSocket_ptr,
     int *iResult_ptr, struct addrinfo *result, struct addrinfo *hints_ptr)
@@ -30,6 +33,9 @@ int set_up_server_socket(WSADATA *WSAData_ptr, SOCKET *ListenSocket_ptr, SOCKET 
     // struct addrinfo hints = *hints_ptr;
     
     // Initialize Winsock
+
+
+    std::cout << "1" << std::endl;
     *iResult_ptr = WSAStartup(MAKEWORD(2,2), WSAData_ptr);
     if (*iResult_ptr != 0) {
         printf("WSAStartup failed with error: %d\n", *iResult_ptr);
@@ -42,6 +48,8 @@ int set_up_server_socket(WSADATA *WSAData_ptr, SOCKET *ListenSocket_ptr, SOCKET 
     hints_ptr->ai_protocol = IPPROTO_TCP;
     hints_ptr->ai_flags = AI_PASSIVE;
 
+
+    std::cout << "2" << std::endl;
     // Resolve the server address and port
     *iResult_ptr = getaddrinfo(NULL, DEFAULT_PORT, hints_ptr, &result);
     if ( *iResult_ptr != 0 ) {
@@ -49,6 +57,8 @@ int set_up_server_socket(WSADATA *WSAData_ptr, SOCKET *ListenSocket_ptr, SOCKET 
         WSACleanup();
         return 1;
     }
+
+    std::cout << "3" << std::endl;
 
     // Create a SOCKET for connecting to server
     *ListenSocket_ptr = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
@@ -58,6 +68,8 @@ int set_up_server_socket(WSADATA *WSAData_ptr, SOCKET *ListenSocket_ptr, SOCKET 
         WSACleanup();
         return 1;
     }
+
+    std::cout << "4" << std::endl;
 
     // Setup the TCP listening socket
     *iResult_ptr = bind( *ListenSocket_ptr, result->ai_addr, (int)result->ai_addrlen);
@@ -71,6 +83,8 @@ int set_up_server_socket(WSADATA *WSAData_ptr, SOCKET *ListenSocket_ptr, SOCKET 
 
     freeaddrinfo(result);
 
+
+    std::cout << "5" << std::endl;
     *iResult_ptr = listen(*ListenSocket_ptr, SOMAXCONN);
     if (*iResult_ptr == SOCKET_ERROR) {
         printf("listen failed with error: %d\n", WSAGetLastError());
@@ -79,8 +93,12 @@ int set_up_server_socket(WSADATA *WSAData_ptr, SOCKET *ListenSocket_ptr, SOCKET 
         return 1;
     }
 
+    std::cout << "6" << std::endl;
+
     // Accept a client socket
     *ClientSocket_ptr = accept(*ListenSocket_ptr, NULL, NULL);
+
+    std::cout << "6.5" << std::endl;
     if (*ClientSocket_ptr == INVALID_SOCKET) {
         printf("accept failed with error: %d\n", WSAGetLastError());
         closesocket(*ListenSocket_ptr);
@@ -90,6 +108,10 @@ int set_up_server_socket(WSADATA *WSAData_ptr, SOCKET *ListenSocket_ptr, SOCKET 
 
     // No longer need server socket
     closesocket(*ListenSocket_ptr);
+
+
+    std::cout << "7" << std::endl;
+    return 0;
 }
 
 int set_up_client_socket(char* server_name, WSADATA *wsaData_ptr, SOCKET *ConnectSocket_ptr, 
@@ -108,6 +130,8 @@ int set_up_client_socket(char* server_name, WSADATA *wsaData_ptr, SOCKET *Connec
         return 1;
     }
 
+    std::cout << "1" << std::endl;
+
     ZeroMemory( hints_ptr, sizeof(*hints_ptr) );
     hints_ptr->ai_family = AF_UNSPEC;
     hints_ptr->ai_socktype = SOCK_STREAM;
@@ -121,6 +145,7 @@ int set_up_client_socket(char* server_name, WSADATA *wsaData_ptr, SOCKET *Connec
         return 1;
     }
 
+    std::cout << "2" << std::endl;
     // Attempt to connect to an address until one succeeds
     for(ptr=result; ptr != NULL ;ptr=ptr->ai_next) {
 
@@ -143,6 +168,8 @@ int set_up_client_socket(char* server_name, WSADATA *wsaData_ptr, SOCKET *Connec
         break;
     }
 
+    std::cout << "3" << std::endl;
+
     freeaddrinfo(result);
 
     if (*ConnectSocket_ptr == INVALID_SOCKET) {
@@ -150,6 +177,8 @@ int set_up_client_socket(char* server_name, WSADATA *wsaData_ptr, SOCKET *Connec
         WSACleanup();
         return 1;
     }
+
+    std::cout << "4" << std::endl;
 
     return 0;
 }

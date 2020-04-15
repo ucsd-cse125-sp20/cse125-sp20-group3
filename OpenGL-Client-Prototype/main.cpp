@@ -1,5 +1,5 @@
 #include "main.h"
-#include "network_connection.cpp"
+#include "network_connection.h"
 
 void errorCallback(int error, const char* description)
 {
@@ -48,11 +48,13 @@ int main(int argc, char** argv)
 	// NETWORK INITIALIZATION
 
 	// Validate the parameters
-	if (argc != 2) {
-		// printf("usage: %s server-name\n", argv[0]);
-		std::cout << "usage: " << argv[0] << " server-name" << std::endl;
-		return 1;
-	}
+	//if (argc != 2) {
+	//	// printf("usage: %s server-name\n", argv[0]);
+	//	std::cout << "usage: " << argv[0] << " server-name" << std::endl;
+	//	return 1;
+	//}
+
+	char serverName[] = "localhost";
 
 	WSADATA wsaData;
 	SOCKET ConnectSocket = INVALID_SOCKET;
@@ -64,7 +66,7 @@ int main(int argc, char** argv)
 	int iResult;
 	int recvbuflen = DEFAULT_BUFLEN;
 
-	int connection_result = set_up_client_socket(argv[1], &wsaData, &ConnectSocket, result, ptr, &hints, &iResult);
+	int connection_result = set_up_client_socket(serverName, &wsaData, &ConnectSocket, result, ptr, &hints, &iResult);
 	if (connection_result == 1)
 	{
 		return 1;
@@ -135,7 +137,7 @@ int main(int argc, char** argv)
 			temp += "0";
 		}
 
-		sprintf(sendbuf, "%s", temp.c_str());
+		sprintf_s(sendbuf, 5, "%s", temp.c_str());
 
 		// Read user input ----------------------------------------------------
 		/*std::cout << "Enter message to sent: " << std::endl;
@@ -180,6 +182,8 @@ int main(int argc, char** argv)
 		// End of receive result from the server ------------------------------
 
 		// Start updating -----------------------------------------------------
+
+		std::cout << "Renderring" << std::endl;
 
 		// Idle callback. Updating objects, etc. can be done here.
 		Window::idleCallback();

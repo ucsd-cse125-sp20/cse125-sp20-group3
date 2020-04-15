@@ -26,6 +26,16 @@ int __cdecl main(void)
         return 1;
     }
 
+    // Game State data
+    float currPosX = 0;
+    float currPosY = 0;
+    float currVelX = 0;
+    float currVelY = 0;
+    float acceleration = 1;
+    float drag = 0.1;
+    float deltaTime = 0.001f;
+
+
     // Receive until the peer shuts down the connection
     do {
         ZeroMemory( recvbuf, sizeof(recvbuf) );
@@ -35,6 +45,32 @@ int __cdecl main(void)
             // printf("Message recieved: %s\n", recvbuf);
             std::cout<<"Bytes received: "<<iResult<<std::endl;
             std::cout<<"Message received: "<<recvbuf<<std::endl;
+
+
+            // Process data
+            currVelX -= drag * currVelX;
+            currVelY -= drag * currVelY;
+            if (recvbuf[0] == '1') {
+                currVelY += acceleration * deltaTime;
+            }
+            if (recvbuf[1] == '1') {
+                currVelX -= acceleration * deltaTime;
+            }
+            if (recvbuf[2] == '1') {
+                currVelY -= acceleration * deltaTime;
+            }
+            if (recvbuf[3] == '1') {
+                currVelX += acceleration * deltaTime;
+            }
+
+            if (currVelX * currVelX + currVelY * currVelY > 0.01) {
+                currPosX += currVelX;
+                currPosY += currVelY;
+            }
+
+            float* f_buf = (float*)sendbuf;
+            f_buf[0] = currPosX;
+            f_buf[1] = currPosY;
 
 
             iSendResult = send( ClientSocket, sendbuf, iResult, 0 );

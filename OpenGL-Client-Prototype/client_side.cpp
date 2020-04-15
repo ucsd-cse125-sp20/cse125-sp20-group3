@@ -84,6 +84,8 @@ int __cdecl main(int argc, char **argv)
         }
         // End of receive result from server ----------------------------------
 
+        //
+
     }
 
     // shutdown the connection since no more data will be sent

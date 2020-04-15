@@ -9,7 +9,7 @@ OBJObject* player;
 OBJObject* ground;
 std::vector<OBJObject*> others;
 
-glm::vec3 currPos = glm::vec3(0);
+glm::vec3 Window::currPos = glm::vec3(0);
 glm::vec3 currVelocity = glm::vec3(0);
 float acceleration = 1;
 float drag = 0.1;
@@ -17,8 +17,8 @@ float lastTime = glfwGetTime();
 
 glm::vec3 cameraOffset = glm::vec3(0, -5, 10);
 
-glm::vec3 eye = currPos + cameraOffset; // Camera position.
-glm::vec3 center = currPos; // The point we are looking at.
+glm::vec3 eye = Window::currPos + cameraOffset; // Camera position.
+glm::vec3 center = Window::currPos; // The point we are looking at.
 glm::vec3 up(0, 1, 0); // The up direction of the camera.
 float fovy = 60;
 float nearPlane = 1;
@@ -29,7 +29,7 @@ glm::mat4 Window::projection; // Projection matrix.
 GLuint program; // The shader program
 
 
-char keys[GLFW_KEY_LAST];
+char Window::keys[GLFW_KEY_LAST];
 
 
 bool Window::initializeProgram() {
@@ -167,6 +167,7 @@ void Window::resizeCallback(GLFWwindow* window, int w, int h) {
 }
 
 void Window::idleCallback() {
+	/*
 	float currTime = glfwGetTime();
 	float deltaTime = currTime - lastTime;
 	lastTime = currTime;
@@ -185,15 +186,15 @@ void Window::idleCallback() {
 		currVelocity.x += acceleration * deltaTime;
 	}
 	//printf("%f %f %f\n", currVelocity.x, currVelocity.y, currVelocity.z);
-	
-	if (glm::length(currVelocity) > 0.01) {
-		currPos += currVelocity;
-		player->setPositionDirection(currPos, currVelocity);
+	*/
+	//if (glm::length(currVelocity) > 0.01) {
+		//currPos += currVelocity;
+		player->setPositionDirection(Window::currPos, glm::vec3(1, 0, 0));
 
 		eye = currPos + cameraOffset;
 		center = currPos;
 		Window::view = glm::lookAt(eye, center, up);
-	}
+	//}
 }
 
 void Window::displayCallback(GLFWwindow* window) {

@@ -29,6 +29,9 @@ public:
 	static glm::mat4 view;
 	static glm::mat4 projection;
 
+	static char keys[GLFW_KEY_LAST];
+	static glm::vec3 currPos;
+
 	// Initializes your shader program(s) and uniform variable locations
 	static bool initializeProgram();
 	// Initialize your OBJ objects here

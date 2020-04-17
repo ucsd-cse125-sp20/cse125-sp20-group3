@@ -154,20 +154,23 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Client.h" />
     <ClInclude Include="Cube.h" />
+    <ClInclude Include="macros.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="OBJObject.h" />
+    <ClInclude Include="Server.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Window.h" />
-    <ClCompile Include="network_connection.h" />
+    <ClCompile Include="Client.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="network_connection.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OBJObject.cpp" />
+    <ClCompile Include="Server.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="Window.cpp" />

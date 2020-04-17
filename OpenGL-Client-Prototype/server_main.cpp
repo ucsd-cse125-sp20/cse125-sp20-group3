@@ -6,7 +6,7 @@
 #include <iostream>
 #include "Server.h"
 
-int __cdecl main(void) 
+int __cdecl main(void)
 {
     std::cout << "starting..." << std::endl;
     int iResult;
@@ -30,6 +30,11 @@ int __cdecl main(void)
 
     // Receive until the peer shuts down the connection
     do {
+        //Standard server game loop logic:
+        // Receive input from all clients
+        // Update game states
+        // send updated state to all clients
+        // wait until end of time
         ZeroMemory( recvbuf, RECV_BUFLEN );
         iResult = server->recvData(recvbuf, RECV_BUFLEN, 0);
         if (iResult > 0) {
@@ -38,7 +43,7 @@ int __cdecl main(void)
             std::cout<<"Bytes received: "<<iResult<<std::endl;
             std::cout<<"Message received: "<<recvbuf<<std::endl;
 
-            // Process data
+            // Process data and update game states
             currVelX -= drag * currVelX;
             currVelY -= drag * currVelY;
             if (recvbuf[0] == '1') {
@@ -58,7 +63,7 @@ int __cdecl main(void)
                 currPosX += currVelX;
                 currPosY += currVelY;
             }
-			
+
             float* f_buf = (float*)sendbuf;
             //f_buf[0] = currPosX;
             //f_buf[1] = currPosY;
@@ -72,10 +77,10 @@ int __cdecl main(void)
             // printf("Bytes sent: %d\n", iSendResult);
             std::cout << "Bytes sent: "<< iSendResult << std::endl;
         }
-		else if (iResult == 0) {
-			// printf("Connection closing...\n");
-			std::cout << "Nothing received" << std::endl;
-		}
+        else if (iResult == 0) {
+                // printf("Connection closing...\n");
+                std::cout << "Nothing received" << std::endl;
+        }
         else  {
             return 1;
         }

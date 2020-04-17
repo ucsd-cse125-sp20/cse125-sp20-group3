@@ -91,8 +91,12 @@ int main(int argc, char** argv)
 	if (!Window::initializeObjects()) exit(EXIT_FAILURE);
 
 	// Loop while GLFW window should stay open.
-	while (!glfwWindowShouldClose(window))
+        while (!glfwWindowShouldClose(window))
 	{
+                //send input to server
+                //receive updated state from server
+                //update local game state
+                //render world
 		std::string temp = "";
 
 		if (((Window::keys[GLFW_KEY_W]) & 0xF) == GLFW_PRESS) {
@@ -173,7 +177,7 @@ int main(int argc, char** argv)
 		// Main render display callback. Rendering of objects is done here.
 		Window::displayCallback(window);
 	}
-	
+
 	// shutdown the connection since no more data will be sent
     iResult = client->closeConnection(SD_SEND);
     if (iResult == -1) {

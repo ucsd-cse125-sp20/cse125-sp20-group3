@@ -44,6 +44,11 @@ OBJObject::OBJObject(std::string objFilename)	: pointSize(2) {
 	glBindVertexArray(0);
 }
 
+OBJObject::OBJObject() {
+	//server-side objects don't need to parse files for models, so this constructor exists to allow objects
+	//to skip the model parsing process
+}
+
 OBJObject::~OBJObject()
 {
 	// Delete the VBO and the VAO.
@@ -181,12 +186,7 @@ void OBJObject::draw(GLuint program)
 
 void OBJObject::update()
 {
-
-}
-
-void OBJObject::updatePointSize(GLfloat size)
-{
-
+	
 }
 
 void OBJObject::spin(float deg)

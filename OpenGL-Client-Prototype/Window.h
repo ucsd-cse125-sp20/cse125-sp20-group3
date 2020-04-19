@@ -21,7 +21,8 @@
 #include "Cube.h"
 #include "OBJObject.h"
 #include "shader.h"
-
+#include "player.h"
+#include "Camera.h"
 
 class Window
 {
@@ -48,6 +49,9 @@ public:
 	static void displayCallback(GLFWwindow*);
 	// Add your key press event handling here
 	static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+	
+	//temp function to test communication
+	static void updatePlayerPos(char bits[]);
 };
 
 #endif

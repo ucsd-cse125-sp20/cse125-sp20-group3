@@ -1,36 +1,31 @@
 #include "Window.h"
 
 int width, height;
-std::string windowTitle("GLFW Starter Project");
+std::string windowTitle("CSE 125 SP20 Group 3");
 
 int randos = 50;
 
-OBJObject* player;
+Player* player;
+Camera* cam;
 OBJObject* ground;
 std::vector<OBJObject*> others;
 
-glm::vec3 Window::currPos = glm::vec3(0);
-glm::vec3 currVelocity = glm::vec3(0);
 float acceleration = 1;
 float drag = 0.1;
 float lastTime = glfwGetTime();
 
-glm::vec3 cameraOffset = glm::vec3(0, -5, 10);
-
-glm::vec3 eye = Window::currPos + cameraOffset; // Camera position.
-glm::vec3 center = Window::currPos; // The point we are looking at.
+glm::vec3 eye(0, 0, 2); // Camera position.
+glm::vec3 center(0, 0, 0); // The point we are looking at.
 glm::vec3 up(0, 1, 0); // The up direction of the camera.
 float fovy = 60;
 float nearPlane = 1;
 float farPlane = 1000;
-glm::mat4 Window::view = glm::lookAt(eye, center, up); // View matrix, defined by eye, center and up.
+glm::mat4 Window::view;// = glm::lookAt(eye, center, up); // View matrix, defined by eye, center and up.
 glm::mat4 Window::projection; // Projection matrix.
 
 GLuint program; // The shader program
 
-
 char Window::keys[GLFW_KEY_LAST];
-
 
 bool Window::initializeProgram() {
 	// Create a shader program with a vertex shader and a fragment shader.
@@ -51,10 +46,11 @@ bool Window::initializeProgram() {
 
 bool Window::initializeObjects() {
 	// initialize player
-	player = new OBJObject("Assets/SpinningBox/SpinningBox.obj");
+	player = new Player("Assets/SpinningBox/SpinningBox.obj");
 	player->setColor(glm::vec3(0.5, 0, 1));
 	player->loadTexure("Assets/SpinningBox/SpinningBox_tex.jpg");
-
+	cam = new Camera(player);
+	/*
 	// randomly add in some other boxes
 	float randoRange = 50;
 	for (int i = 0; i < randos; i++) {
@@ -76,11 +72,13 @@ bool Window::initializeObjects() {
 			others.push_back(other);
 		}
 	}
-	printf("%d\n", others.size());
+	//printf("%d\n", others.size());
+	*/
 
 	// Initialize ground
 	ground = new OBJObject("Assets/Ground/Ground.obj");
 	ground->loadTexure("Assets/Ground/Ground_tex.jpg");
+	ground->setScaleRot(glm::vec3(1, 1, 1), 90.f, glm::vec3(1, 0, 0));
 
 	return true;
 }
@@ -103,18 +101,6 @@ GLFWwindow* Window::createWindow(int width, int height) {
 
 	// 4x antialiasing.
 	glfwWindowHint(GLFW_SAMPLES, 4);
-
-#ifdef __APPLE__ 
-	// Apple implements its own version of OpenGL and requires special treatments
-	// to make it uses modern OpenGL.
-
-	// Ensure that minimum OpenGL version is 3.3
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	// Enable forward compatibility and allow a modern OpenGL context
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
 
 	// Create the GLFW window.
 	GLFWwindow* window = glfwCreateWindow(width, height, windowTitle.c_str(), NULL, NULL);
@@ -151,10 +137,6 @@ GLFWwindow* Window::createWindow(int width, int height) {
 }
 
 void Window::resizeCallback(GLFWwindow* window, int w, int h) {
-#ifdef __APPLE__
-	// In case your Mac has a retina display.
-	glfwGetFramebufferSize(window, &width, &height);
-#endif
 	width = w;
 	height = h;
 
@@ -187,19 +169,18 @@ void Window::idleCallback() {
 	}
 	//printf("%f %f %f\n", currVelocity.x, currVelocity.y, currVelocity.z);
 	*/
-	//if (glm::length(currVelocity) > 0.01) {
-		//currPos += currVelocity;
-		player->setPositionDirection(Window::currPos, glm::vec3(1, 0, 0));
 
-		eye = currPos + cameraOffset;
-		center = currPos;
-		Window::view = glm::lookAt(eye, center, up);
+		//eye = currPos + cameraOffset;
+		//center = currPos;
+		//Window::view = glm::lookAt(eye, center, up);
 	//}
+	player->update();
 }
 
 void Window::displayCallback(GLFWwindow* window) {
 	// Clear the color and depth buffers.
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	Window::view = cam->getView();
 
 	// Render the object.
 	player->draw(program);
@@ -221,4 +202,12 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 	if (action == GLFW_PRESS && key == GLFW_KEY_ESCAPE) {
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
+}
+
+void Window::updatePlayerPos(char bits[]) {
+	if (bits[0] == '1') player->setTranslate(glm::vec3(0, 0, -1));
+	else if (bits[1] == '1') player->setTranslate(glm::vec3(-1, 0, 0));
+	else if (bits[2] == '1') player->setTranslate(glm::vec3(0, 0, 1));
+	else if (bits[3] == '1') player->setTranslate(glm::vec3(1, 0, 0));
+	else player->setTranslate(glm::vec3(0, 0, 0));
 }

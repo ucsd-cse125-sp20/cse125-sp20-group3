@@ -28,6 +28,7 @@ private:
 	GLfloat pointSize;
 public:
 	OBJObject(std::string objFilename);
+	OBJObject();
 	~OBJObject();
 
 	void loadTexure(std::string filename);

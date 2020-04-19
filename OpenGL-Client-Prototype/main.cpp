@@ -65,13 +65,13 @@ int main(int argc, char** argv)
 
 	// Send an initial buffer
 	std::string imclient(sendbuf);
-	std::cout << "sending " << imclient << std::endl;
+	//std::cout << "sending " << imclient << std::endl;
 	iResult = client->sendData(sendbuf, (int)strlen(sendbuf), 0);
 	if (iResult == -1) {
 		return 1;
 	}
 	// printf("Bytes Sent: %ld\n", iResult);
-	std::cout << "Bytes Sent " << iResult << std::endl;
+	//std::cout << "Bytes Sent " << iResult << std::endl;
 
 	// -------- GRAPHICS INITIALIZATION
 
@@ -134,12 +134,12 @@ int main(int argc, char** argv)
 
 		// Send user input to server ------------------------------------------
 		std::string s(sendbuf);
-		std::cout << "sending " << s << std::endl;
+		//std::cout << "sending " << s << std::endl;
 		iResult = client->sendData(sendbuf, (int)strlen(sendbuf), 0);
 		if (iResult == -1) {
 			return 1;
 		}
-		std::cout << "Bytes Sent " << iResult << std::endl;
+		//std::cout << "Bytes Sent " << iResult << std::endl;
 		// End of send user input to server -----------------------------------
 
 		// Receive result from server -----------------------------------------
@@ -148,13 +148,15 @@ int main(int argc, char** argv)
 		if (iResult > 0) {
 			// printf("Bytes received: %d\n", iResult);
 			// printf("Message recived: %s\n", recvbuf);
-			std::cout << "Bytes received: " << iResult << std::endl;
-			std::cout << "Message received: " << recvbuf << std::endl;
+			//std::cout << "Bytes received: " << iResult << std::endl;
+			//std::cout << "Message received: " << recvbuf << std::endl;
 
 			//float* f_buf = (float *)(recvbuf);
 			//float x = f_buf[0];
 			//float y = f_buf[1];
 			//Window::currPos = glm::vec3(x, y, 0);
+
+			Window::updatePlayerPos(recvbuf);
 		}
 		else if (iResult == 0)
 		{
@@ -169,7 +171,7 @@ int main(int argc, char** argv)
 
 		// Start updating -----------------------------------------------------
 
-		std::cout << "Rendering" << std::endl;
+		//std::cout << "Rendering" << std::endl;
 
 		// Idle callback. Updating objects, etc. can be done here.
 		Window::idleCallback();

@@ -68,6 +68,11 @@ int __cdecl main(void)
             //f_buf[0] = currPosX;
             //f_buf[1] = currPosY;
 
+			sendbuf[0] = recvbuf[0];
+			sendbuf[1] = recvbuf[1];
+			sendbuf[2] = recvbuf[2];
+			sendbuf[3] = recvbuf[3];
+			sendbuf[4] = '\0';
 			std::string s(sendbuf);
 			std::cout << "sending " << s << std::endl;
             iSendResult = server->sendData(sendbuf, (int)strlen(sendbuf), 0);

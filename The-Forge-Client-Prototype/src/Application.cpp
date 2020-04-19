@@ -1,6 +1,3 @@
-#include "Application.h"
-
-
 /*
  * Copyright (c) 2018-2020 The Forge Interactive Inc.
  *
@@ -23,24 +20,19 @@
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
-*/
+ */
 
-// Unit Test for testing transformations using a solar system.
-// Tests the basic mat4 transformations, such as scaling, rotation, and translation.
-
-#define MAX_PLANETS 20    // Does not affect test, just for allocating space in uniform block. Must match with shader.
-#define IMAGE_COUNT 3
+#include "Application.h"
 
 #include "../The-Forge/Common_3/ThirdParty/OpenSource/EASTL/vector.h"
 #include "../The-Forge/Common_3/ThirdParty/OpenSource/EASTL/string.h"
 #include "../The-Forge/Common_3/ThirdParty/OpenSource/EASTL/unordered_map.h"
 
-//Interfaces
+ //Interfaces
 #include "../The-Forge/Common_3/OS/Interfaces/ICameraController.h"
 #include "../The-Forge/Common_3/OS/Interfaces/ILog.h"
 #include "../The-Forge/Common_3/OS/Interfaces/IFileSystem.h"
 #include "../The-Forge/Common_3/OS/Interfaces/ITime.h"
-#include "../The-Forge/Common_3/OS/Interfaces/IInput.h"
 #include "../The-Forge/Middleware_3/UI/AppUI.h"
 #include "../The-Forge/Common_3/Renderer/IRenderer.h"
 #include "../The-Forge/Common_3/Renderer/IResourceLoader.h"
@@ -48,104 +40,351 @@
 
 //Math
 #include "../The-Forge/Common_3/OS/Math/MathTypes.h"
-
-#include "../The-Forge/Common_3/ThirdParty/OpenSource/cgltf/GLTFLoader.h"
-
 #include "../The-Forge/Common_3/OS/Interfaces/IMemory.h"    // Must be last include in cpp file
 
-/// Demo structures
-struct PlanetInfoStruct
-{
-	uint  mParentIndex;
-	vec4  mColor;
-	float mYOrbitSpeed;    // Rotation speed around parent
-	float mZOrbitSpeed;
-	float mRotationSpeed;    // Rotation speed around self
-	mat4  mTranslationMat;
-	mat4  mScaleMat;
-	mat4  mSharedMat;    // Matrix to pass down to children
-};
 
-struct UniformBlock
-{
-	mat4 mProjectView;
-	mat4 mToWorldMat[MAX_PLANETS];
-	vec4 mColor[MAX_PLANETS];
+//--------------------------------------------------------------------------------------------
+// GLOBAL DEFINTIONS
+//--------------------------------------------------------------------------------------------
 
-	// Point Light Information
-	vec3 mLightPosition;
-	vec3 mLightColor;
-};
+uint32_t Application::gFrameIndex = 0;
+uint32_t Application::gImageCount = 3;
 
-mat4 Application::projMat;
-mat4 Application::viewMat;
-uint32_t Application::gImageCount = IMAGE_COUNT;
-float* pSpherePoints;
-const int      gSphereResolution = 30;    // Increase for higher resolution spheres
-const float    gSphereDiameter = 0.5f;
-const uint     gNumPlanets = 11;        // Sun, Mercury -> Neptune, Pluto, Moon
-const uint     gTimeOffset = 600000;    // For visually better starting locations
-const float    gRotSelfScale = 0.0004f;
-const float    gRotOrbitYScale = 0.001f;
-const float    gRotOrbitZScale = 0.00001f;
+const uint32_t		gLightCount = 3;
+const uint32_t		gTotalLightCount = gLightCount + 1;
 
-OBJObject* player;
+// Model Quantization Settings
+int					gCurrentLod = 0;
+int					gMaxLod = 5;
+
+bool				bToggleFXAA = true;
+bool				bVignetting = true;
+bool				bToggleVSync = false;
+bool				bScreenShotMode = false;
+
+ProfileToken   gGpuProfileToken;
+Texture* Application::pTextureBlack = NULL;
+//--------------------------------------------------------------------------------------------
+// PRE PROCESSORS
+//--------------------------------------------------------------------------------------------
+
+#define SHADOWMAP_MSAA_SAMPLES 1
+
+#if defined(TARGET_IOS) || defined(__ANDROID__)
+#define SHADOWMAP_RES 1024u
+#else
+#define SHADOWMAP_RES 2048u
+#endif
+
+#if !defined(TARGET_IOS) && !defined(__ANDROID__) && !defined(ORBIS)
+#define USE_BASIS 1
+#endif
+
+//--------------------------------------------------------------------------------------------
+// STRUCT DEFINTIONS
+//--------------------------------------------------------------------------------------------
+
+// MOVED
+
+//--------------------------------------------------------------------------------------------
+// RENDERING PIPELINE DATA
+//--------------------------------------------------------------------------------------------
 
 Renderer* pRenderer = NULL;
 
 Queue* pGraphicsQueue = NULL;
+
 CmdPool* pCmdPool = NULL;
 Cmd** ppCmds = NULL;
 
 SwapChain* pSwapChain = NULL;
+
+RenderTarget* pForwardRT = NULL;
+RenderTarget* pPostProcessRT = NULL;
 RenderTarget* pDepthBuffer = NULL;
+RenderTarget* pShadowRT = NULL;
+
 Fence* pRenderCompleteFences[IMAGE_COUNT] = { NULL };
+
 Semaphore* pImageAcquiredSemaphore = NULL;
 Semaphore* pRenderCompleteSemaphores[IMAGE_COUNT] = { NULL };
 
-Shader* pSphereShader = NULL;
-Buffer* pSphereVertexBuffer = NULL;
-Pipeline* pSpherePipeline = NULL;
+Shader* pShaderZPass = NULL;
+Shader* pShaderZPass_NonOptimized = NULL;
+Shader* pMeshOptDemoShader = NULL;
+Shader* pFloorShader = NULL;
+Shader* pVignetteShader = NULL;
+Shader* pFXAAShader = NULL;
+Shader* pWaterMarkShader = NULL;
 
-Shader* pSimpleShader = NULL;
-RootSignature* pSimpleRootSignature = NULL;
-DescriptorSet* pDescTexture = { NULL };
-DescriptorSet* pDescUniforms = { NULL };
+Pipeline* pPipelineShadowPass = NULL;
+Pipeline* pPipelineShadowPass_NonOPtimized = NULL;
+Pipeline* pMeshOptDemoPipeline = NULL;
+Pipeline* pFloorPipeline = NULL;
+Pipeline* pVignettePipeline = NULL;
+Pipeline* pFXAAPipeline = NULL;
+Pipeline* pWaterMarkPipeline = NULL;
 
-Shader* pSkyBoxDrawShader = NULL;
-Buffer* pSkyBoxVertexBuffer = NULL;
-Pipeline* pSkyBoxDrawPipeline = NULL;
-RootSignature* pRootSignature = NULL;
-Sampler* pSamplerSkyBox = NULL;
-Texture* pSkyBoxTextures[6];
-DescriptorSet* pDescriptorSetTexture = { NULL };
-DescriptorSet* pDescriptorSetUniforms = { NULL };
-VirtualJoystickUI gVirtualJoystick;
+RootSignature* pRootSignatureShadow = NULL;
+RootSignature* pRootSignatureShaded = NULL;
+RootSignature* pRootSignaturePostEffects = NULL;
 
-Buffer* pProjViewUniformBuffer[IMAGE_COUNT] = { NULL };
-Buffer* pSkyboxUniformBuffer[IMAGE_COUNT] = { NULL };
+DescriptorSet* pDescriptorSetVignette;
+DescriptorSet* pDescriptorSetFXAA;
+DescriptorSet* pDescriptorSetWatermark;
+DescriptorSet* pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_COUNT];
+DescriptorSet* pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_COUNT];
 
-uint32_t Application::gFrameIndex = 0;
-ProfileToken gGpuProfileToken = PROFILE_INVALID_TOKEN;
+VirtualJoystickUI   gVirtualJoystick = {};
 
-int              gNumberOfSpherePoints;
-UniformBlock     gUniformData;
-UniformBlock     gUniformDataSky;
-PlanetInfoStruct gPlanetInfoData[gNumPlanets];
+Buffer* pUniformBuffer[IMAGE_COUNT] = { NULL };
+Buffer* pShadowUniformBuffer[IMAGE_COUNT] = { NULL };
+Buffer* pFloorUniformBuffer[IMAGE_COUNT] = { NULL };
+
+Buffer* TriangularVB = NULL;
+Buffer* pFloorVB = NULL;
+Buffer* pFloorIB = NULL;
+Buffer* WaterMarkVB = NULL;
+
+Sampler* pDefaultSampler = NULL;
+Sampler* pBilinearClampSampler = NULL;
+
+Application::UniformBlock		gUniformData;
+Application::UniformBlock_Floor	gFloorUniformBlock;
+Application::UniformBlock_Shadow gShadowUniformData;
+
+//--------------------------------------------------------------------------------------------
+// THE FORGE OBJECTS
+//--------------------------------------------------------------------------------------------
 
 ICameraController* pCameraController = NULL;
+ICameraController* pLightView = NULL;
 
-/// UI
-UIApp gAppUI;
+GuiComponent* pGuiWindow;
+GuiComponent* pGuiGraphics;
 
-const char* pSkyBoxImageFileNames[] = { "Skybox_right1",  "Skybox_left2",  "Skybox_top3",
-										"Skybox_bottom4", "Skybox_front5", "Skybox_back6" };
+IWidget* pSelectLodWidget = NULL;
+
+UIApp				gAppUI;
+eastl::vector<uint32_t>	gDropDownWidgetData;
+eastl::vector<PathHandle> gModelFiles;
+
+Input inputHandler;
+
+#if defined(__ANDROID__) || defined(__LINUX__)
+uint32_t			modelToLoadIndex = 0;
+uint32_t			guiModelToLoadIndex = 0;
+#endif
+
+const wchar_t* gMissingTextureString = L"MissingTexture";
+
+const char* gDefaultModelFile = "SpinningBox.gltf";
+PathHandle					    gModelFile;
+PathHandle					    gGuiModelToLoad;
+
+const uint			gBackroundColor = { 0xb2b2b2ff };
+static uint			gLightColor[gTotalLightCount] = { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffff66 };
+static float		gLightColorIntensity[gTotalLightCount] = { 2.0f, 0.2f, 0.2f, 0.25f };
+static float2		gLightDirection = { -122.0f, 222.0f };
+
+vec3 cameraOffset(0, 10, -5);
+
+GLTFObject* player;
+float rot = 0;
+
+float currPosX = 0;
+float currPosY = 0;
+float currVelX = 0;
+float currVelY = 0;
+float acceleration = 1;
+float drag = 0.1f;
 
 TextDrawDesc gFrameTimeDraw = TextDrawDesc(0, 0xff00ffff, 18);
 
+std::vector<GLTFObject*> others;
+
+
+Application::Application()
+{
+#ifdef TARGET_IOS
+	mSettings.mContentScaleFactor = 1.f;
+#endif
+}
+
+bool Application::InitShaderResources()
+{
+	// shader
+
+	ShaderLoadDesc FloorShader = {};
+
+	FloorShader.mStages[0] = { "floor.vert", NULL, 0, RD_SHADER_SOURCES };
+
+	addShader(pRenderer, &FloorShader, &pShaderZPass_NonOptimized);
+
+#if defined(__ANDROID__)
+	FloorShader.mStages[1] = { "floorMOBILE.frag", NULL, 0, RD_SHADER_SOURCES };
+#else
+	FloorShader.mStages[1] = { "floor.frag", NULL, 0, RD_SHADER_SOURCES };
+#endif
+
+	addShader(pRenderer, &FloorShader, &pFloorShader);
+
+	ShaderLoadDesc MeshOptDemoShader = {};
+
+	MeshOptDemoShader.mStages[0] = { "basic.vert", NULL, 0, RD_SHADER_SOURCES };
+
+	addShader(pRenderer, &MeshOptDemoShader, &pShaderZPass);
+
+#if defined(__ANDROID__)
+	MeshOptDemoShader.mStages[1] = { "basicMOBILE.frag", NULL, 0, RD_SHADER_SOURCES };
+#else
+	MeshOptDemoShader.mStages[1] = { "basic.frag", NULL, 0, RD_SHADER_SOURCES };
+#endif
+
+	addShader(pRenderer, &MeshOptDemoShader, &pMeshOptDemoShader);
+
+	ShaderLoadDesc VignetteShader = {};
+
+	VignetteShader.mStages[0] = { "Triangular.vert", NULL, 0, RD_SHADER_SOURCES };
+	VignetteShader.mStages[1] = { "vignette.frag", NULL, 0, RD_SHADER_SOURCES };
+
+	addShader(pRenderer, &VignetteShader, &pVignetteShader);
+
+	ShaderLoadDesc FXAAShader = {};
+
+	FXAAShader.mStages[0] = { "Triangular.vert", NULL, 0, RD_SHADER_SOURCES };
+	FXAAShader.mStages[1] = { "FXAA.frag", NULL, 0, RD_SHADER_SOURCES };
+
+	addShader(pRenderer, &FXAAShader, &pFXAAShader);
+
+	ShaderLoadDesc WaterMarkShader = {};
+
+	WaterMarkShader.mStages[0] = { "watermark.vert", NULL, 0, RD_SHADER_SOURCES };
+	WaterMarkShader.mStages[1] = { "watermark.frag", NULL, 0, RD_SHADER_SOURCES };
+
+	addShader(pRenderer, &WaterMarkShader, &pWaterMarkShader);
+
+	const char* pStaticSamplerNames[] = { "clampMiplessLinearSampler" };
+	Sampler* pStaticSamplers[] = { pBilinearClampSampler };
+	Shader* shaders[] = { pShaderZPass, pShaderZPass_NonOptimized };
+	RootSignatureDesc rootDesc = {};
+	rootDesc.mStaticSamplerCount = 1;
+	rootDesc.ppStaticSamplerNames = pStaticSamplerNames;
+	rootDesc.ppStaticSamplers = pStaticSamplers;
+	rootDesc.mShaderCount = 2;
+	rootDesc.ppShaders = shaders;
+
+	addRootSignature(pRenderer, &rootDesc, &pRootSignatureShadow);
+
+	Shader* demoShaders[] = { pMeshOptDemoShader, pFloorShader };
+
+	rootDesc.mShaderCount = 2;
+	rootDesc.ppShaders = demoShaders;
+
+	addRootSignature(pRenderer, &rootDesc, &pRootSignatureShaded);
+
+	Shader* postShaders[] = { pVignetteShader, pFXAAShader, pWaterMarkShader };
+	rootDesc.mShaderCount = 3;
+	rootDesc.ppShaders = postShaders;
+
+	addRootSignature(pRenderer, &rootDesc, &pRootSignaturePostEffects);
+
+	if (!AddDescriptorSets())
+		return false;
+
+	return true;
+}
+
+bool Application::InitModelDependentResources()
+{
+	if (!GLTFObject::LoadModel(player, pRenderer, pDefaultSampler, gModelFile))
+		return false;
+
+	for (auto other : others) {
+		if (!GLTFObject::LoadModel(other, pRenderer, pDefaultSampler, gModelFile))
+			return false;
+	}
+
+	if (!InitShaderResources())
+		return false;
+
+	waitForAllResourceLoads();
+
+	PrepareDescriptorSets();
+
+	return true;
+}
+
+void Application::setRenderTarget(Cmd* cmd, uint32_t count, RenderTarget** pDestinationRenderTargets, RenderTarget* pDepthStencilTarget, LoadActionsDesc* loadActions)
+{
+	if (count == 0 && pDestinationRenderTargets == NULL && pDepthStencilTarget == NULL)
+		cmdBindRenderTargets(cmd, 0, NULL, NULL, NULL, NULL, NULL, -1, -1);
+	else
+	{
+		cmdBindRenderTargets(cmd, count, pDestinationRenderTargets, pDepthStencilTarget, loadActions, NULL, NULL, -1, -1);
+		// sets the rectangles to match with first attachment, I know that it's not very portable.
+		RenderTarget* pSizeTarget = pDepthStencilTarget ? pDepthStencilTarget : pDestinationRenderTargets[0];
+		cmdSetViewport(cmd, 0.0f, 0.0f, (float)pSizeTarget->mWidth, (float)pSizeTarget->mHeight, 0.0f, 1.0f);
+		cmdSetScissor(cmd, 0, 0, pSizeTarget->mWidth, pSizeTarget->mHeight);
+	}
+}
+
+void Application::drawShadowMap(Cmd* cmd)
+{
+
+	RenderTargetBarrier barriers[] =
+	{
+		{ pShadowRT, RESOURCE_STATE_DEPTH_WRITE },
+	};
+	cmdResourceBarrier(cmd, 0, NULL, 0, NULL, 1, barriers);
+
+	LoadActionsDesc loadActions = {};
+	loadActions.mLoadActionDepth = LOAD_ACTION_CLEAR;
+	loadActions.mClearDepth = pShadowRT->mClearValue;
+	cmdBeginGpuTimestampQuery(cmd, gGpuProfileToken, "Draw Shadow Map");
+	// Start render pass and apply load actions
+	setRenderTarget(cmd, 0, NULL, pShadowRT, &loadActions);
+
+	cmdBindPipeline(cmd, pPipelineShadowPass_NonOPtimized);
+	cmdBindDescriptorSet(cmd, 0, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_NONE]);
+	cmdBindDescriptorSet(cmd, Application::gFrameIndex, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+
+	const uint32_t stride = sizeof(float) * 5;
+	cmdBindVertexBuffer(cmd, 1, &pFloorVB, &stride, NULL);
+	cmdBindIndexBuffer(cmd, pFloorIB, INDEX_TYPE_UINT16, 0);
+
+	cmdDrawIndexed(cmd, 6, 0, 0);
+
+	cmdBindPipeline(cmd, pPipelineShadowPass);
+	
+	/*/ Update uniform buffers
+	gUniformData.mModel = gCurrentAsset->model;
+	shaderCbv = { pShadowUniformBuffer[Application::gFrameIndex] };
+	beginUpdateResource(&shaderCbv);
+	*(UniformBlock*)shaderCbv.pMappedData = gUniformData;
+	endUpdateResource(&shaderCbv, NULL);
+	*/
+
+	// Update uniform buffers
+	gShadowUniformData.mModel = player->model;
+	BufferUpdateDesc shaderCbv = { pShadowUniformBuffer[Application::gFrameIndex] };
+	beginUpdateResource(&shaderCbv);
+	*(UniformBlock_Shadow*)shaderCbv.pMappedData = gShadowUniformData;
+	endUpdateResource(&shaderCbv, NULL);
+
+	player->draw(cmd, pRootSignatureShadow, false);
+
+	setRenderTarget(cmd, 0, NULL, NULL, NULL);
+
+	cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);
+}
 
 bool Application::Init()
 {
+#if defined(TARGET_IOS)
+	fsRegisterUTIForExtension("dyn.ah62d4rv4ge80s5dyq2", "gltf");
+#endif
+
 	// FILE PATHS
 	PathHandle programDirectory = fsCopyProgramDirectoryPath();
 	if (!fsPlatformUsesBundledResources())
@@ -172,6 +411,7 @@ bool Application::Init()
 	queueDesc.mType = QUEUE_TYPE_GRAPHICS;
 	queueDesc.mFlag = QUEUE_FLAG_INIT_MICROPROFILE;
 	addQueue(pRenderer, &queueDesc, &pGraphicsQueue);
+
 	CmdPoolDesc cmdPoolDesc = {};
 	cmdPoolDesc.pQueue = pGraphicsQueue;
 	addCmdPool(pRenderer, &cmdPoolDesc, &pCmdPool);
@@ -188,224 +428,177 @@ bool Application::Init()
 
 	initResourceLoaderInterface(pRenderer);
 
-	// Loads Skybox Textures
-	for (int i = 0; i < 6; ++i)
-	{
-		PathHandle textureFilePath = fsCopyPathInResourceDirectory(RD_TEXTURES, pSkyBoxImageFileNames[i]);
-		TextureLoadDesc textureDesc = {};
-		textureDesc.pFilePath = textureFilePath;
-		textureDesc.ppTexture = &pSkyBoxTextures[i];
-		addResource(&textureDesc, NULL, LOAD_PRIORITY_NORMAL);
-	}
-
-	if (!gVirtualJoystick.Init(pRenderer, "circlepad", RD_TEXTURES))
-	{
-		LOGF(LogLevel::eERROR, "Could not initialize Virtual Joystick.");
-		return false;
-	}
-
-
-
-	if (!InitializeShaderPrograms()) return false;
-
-	if (!InitializeObjects()) return false;
-
-
-
 	if (!gAppUI.Init(pRenderer))
 		return false;
 
 	gAppUI.LoadFont("TitilliumText/TitilliumText-Bold.otf", RD_BUILTIN_FONTS);
 
-	CameraMotionParameters cmp{ 160.0f, 600.0f, 200.0f };
-	vec3                   camPos{ 48.0f, 48.0f, 20.0f };
-	vec3                   lookAt{ vec3(0) };
-
-	pCameraController = createFpsCameraController(camPos, lookAt);
-
-	pCameraController->setMotionParameters(cmp);
-
-	if (!initInputSystem(pWindow))
-		return false;
-
-	// Initialize microprofiler and it's UI.
 	initProfiler();
 
-	// Gpu profiler can only be added after initProfile.
 	gGpuProfileToken = addGpuProfiler(pRenderer, pGraphicsQueue, "GpuProfiler");
-	player->profile(gGpuProfileToken);
 
-	// App Actions
-	InputActionDesc actionDesc = { InputBindings::BUTTON_DUMP, [](InputActionContext* ctx) { dumpProfileData(((IApp*)ctx->pUserData)->GetName()); return true; }, this };
-	addInputAction(&actionDesc);
-	actionDesc = { InputBindings::BUTTON_FULLSCREEN, [](InputActionContext* ctx) { toggleFullscreen(((IApp*)ctx->pUserData)->pWindow); return true; }, this };
-	addInputAction(&actionDesc);
-	actionDesc = { InputBindings::BUTTON_EXIT, [](InputActionContext* ctx) { requestShutdown(); return true; } };
-	addInputAction(&actionDesc);
-	actionDesc =
+#if defined(__ANDROID__) || defined(TARGET_IOS)
+	if (!gVirtualJoystick.Init(pRenderer, "circlepad", RD_TEXTURES))
 	{
-		InputBindings::BUTTON_ANY, [](InputActionContext* ctx)
-		{
-			bool capture = gAppUI.OnButton(ctx->mBinding, ctx->mBool, ctx->pPosition);
-			setEnableCaptureInput(capture && INPUT_ACTION_PHASE_CANCELED != ctx->mPhase);
-			return true;
-		}, this
+		LOGF(LogLevel::eERROR, "Could not initialize Virtual Joystick.");
+		return false;
+	}
+#endif
+
+	SamplerDesc defaultSamplerDesc = {
+		FILTER_LINEAR, FILTER_LINEAR, MIPMAP_MODE_LINEAR,
+		ADDRESS_MODE_REPEAT, ADDRESS_MODE_REPEAT, ADDRESS_MODE_REPEAT
 	};
-	addInputAction(&actionDesc);
-	typedef bool (*CameraInputHandler)(InputActionContext* ctx, uint32_t index);
-	static CameraInputHandler onCameraInput = [](InputActionContext* ctx, uint32_t index)
+	addSampler(pRenderer, &defaultSamplerDesc, &pDefaultSampler);
+
+	SamplerDesc samplerClampDesc = {
+		FILTER_LINEAR, FILTER_LINEAR, MIPMAP_MODE_LINEAR,
+		ADDRESS_MODE_CLAMP_TO_EDGE, ADDRESS_MODE_CLAMP_TO_EDGE, ADDRESS_MODE_CLAMP_TO_EDGE
+	};
+	addSampler(pRenderer, &samplerClampDesc, &pBilinearClampSampler);
+
+	float floorPoints[] = {
+		-1.0f, 0.0f, 1.0f, -1.0f, -1.0f,
+		-1.0f, 0.0f, -1.0f, -1.0f, 1.0f,
+		1.0f, 0.0f, -1.0f, 1.0f, 1.0f,
+		1.0f, 0.0f, 1.0f, 1.0f, -1.0f,
+	};
+
+	BufferLoadDesc floorVbDesc = {};
+	floorVbDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_VERTEX_BUFFER;
+	floorVbDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_GPU_ONLY;
+	floorVbDesc.mDesc.mSize = sizeof(float) * 5 * 4;
+	floorVbDesc.pData = floorPoints;
+	floorVbDesc.ppBuffer = &pFloorVB;
+	addResource(&floorVbDesc, NULL, LOAD_PRIORITY_NORMAL);
+
+	uint16_t floorIndices[] =
 	{
-		if (!gAppUI.IsFocused() && *ctx->pCaptured)
+		0, 1, 3,
+		3, 1, 2
+	};
+
+	BufferLoadDesc indexBufferDesc = {};
+	indexBufferDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_INDEX_BUFFER;
+	indexBufferDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_GPU_ONLY;
+	indexBufferDesc.mDesc.mFlags = BUFFER_CREATION_FLAG_OWN_MEMORY_BIT;
+	indexBufferDesc.mDesc.mSize = sizeof(uint16_t) * 6;
+	indexBufferDesc.pData = floorIndices;
+	indexBufferDesc.ppBuffer = &pFloorIB;
+	addResource(&indexBufferDesc, NULL, LOAD_PRIORITY_NORMAL);
+
+	float screenTriangularPoints[] =
+	{
+		-1.0f,  3.0f, 0.5f, 0.0f, -1.0f,
+		-1.0f, -1.0f, 0.5f, 0.0f, 1.0f,
+		3.0f, -1.0f, 0.5f, 2.0f, 1.0f,
+	};
+
+	BufferLoadDesc screenQuadVbDesc = {};
+	screenQuadVbDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_VERTEX_BUFFER;
+	screenQuadVbDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_GPU_ONLY;
+	screenQuadVbDesc.mDesc.mSize = sizeof(float) * 5 * 3;
+	screenQuadVbDesc.pData = screenTriangularPoints;
+	screenQuadVbDesc.ppBuffer = &TriangularVB;
+	addResource(&screenQuadVbDesc, NULL, LOAD_PRIORITY_NORMAL);
+
+	TextureDesc defaultTextureDesc = {};
+	defaultTextureDesc.mArraySize = 1;
+	defaultTextureDesc.mDepth = 1;
+	defaultTextureDesc.mFormat = TinyImageFormat_R8G8B8A8_UNORM;
+	defaultTextureDesc.mWidth = 4;
+	defaultTextureDesc.mHeight = 4;
+	defaultTextureDesc.mMipLevels = 1;
+	defaultTextureDesc.mSampleCount = SAMPLE_COUNT_1;
+	defaultTextureDesc.mStartState = RESOURCE_STATE_COMMON;
+	defaultTextureDesc.mDescriptors = DESCRIPTOR_TYPE_TEXTURE;
+	defaultTextureDesc.mFlags = TEXTURE_CREATION_FLAG_OWN_MEMORY_BIT;
+	defaultTextureDesc.pDebugName = gMissingTextureString;
+	TextureLoadDesc defaultLoadDesc = {};
+	defaultLoadDesc.pDesc = &defaultTextureDesc;
+	RawImageData idata = {};
+	unsigned char blackData[64];
+	memset(blackData, 0, sizeof(unsigned char) * 64);
+
+	idata.mArraySize = 1;
+	idata.mDepth = defaultTextureDesc.mDepth;
+	idata.mWidth = defaultTextureDesc.mWidth;
+	idata.mHeight = defaultTextureDesc.mHeight;
+	idata.mFormat = defaultTextureDesc.mFormat;
+	idata.mMipLevels = defaultTextureDesc.mMipLevels;
+	idata.pRawData = (uint8_t*)blackData;
+	defaultLoadDesc.pRawImageData = &idata;
+
+	defaultLoadDesc.ppTexture = &pTextureBlack;
+	addResource(&defaultLoadDesc, NULL, LOAD_PRIORITY_NORMAL);
+
+#if defined(__ANDROID__) || defined(__LINUX__)
+	// Get list of Models
+	eastl::vector<eastl::string> filesToLoad;
+	eastl::vector<PathHandle> filesToLoadFullPath;
+	PathHandle meshDirectory = fsCopyPathForResourceDirectory(RD_MESHES);
+	eastl::vector<PathHandle> filesInDirectory = fsGetFilesWithExtension(meshDirectory, "gltf");
+
+	//reduce duplicated filenames
+	for (size_t i = 0; i < filesInDirectory.size(); ++i)
+	{
+		const PathHandle& file = filesInDirectory[i];
+
+		eastl::string tempfile(fsGetPathAsNativeString(file));
+
+		const char* first = strstr(tempfile.c_str(), "PQPM");
+
+		bool bAlreadyLoaded = false;
+
+		if (first != NULL)
 		{
-			gVirtualJoystick.OnMove(index, ctx->mPhase != INPUT_ACTION_PHASE_CANCELED, ctx->pPosition);
-			index ? pCameraController->onRotate(ctx->mFloat2) : pCameraController->onMove(ctx->mFloat2);
+			for (size_t j = 0; j < filesToLoad.size(); ++j)
+			{
+				if (strstr(tempfile.c_str(), filesToLoad[j].c_str()) != NULL)
+				{
+					bAlreadyLoaded = true;
+					break;
+				}
+			}
+
+			if (!bAlreadyLoaded)
+			{
+				int gap = first - tempfile.c_str();
+				tempfile.resize(gap);
+				filesToLoad.push_back(tempfile);
+				filesToLoadFullPath.push_back(file);
+			}
 		}
-		return true;
-	};
-	actionDesc = { InputBindings::FLOAT_RIGHTSTICK, [](InputActionContext* ctx) { return onCameraInput(ctx, 1); }, NULL, 20.0f, 200.0f, 0.5f };
-	addInputAction(&actionDesc);
-	actionDesc = { InputBindings::FLOAT_LEFTSTICK, [](InputActionContext* ctx) { return onCameraInput(ctx, 0); }, NULL, 20.0f, 200.0f, 1.0f };
-	addInputAction(&actionDesc);
-	actionDesc = { InputBindings::BUTTON_NORTH, [](InputActionContext* ctx) { pCameraController->resetView(); return true; } };
-	addInputAction(&actionDesc);
-
-	waitForAllResourceLoads();
-
-	// Need to free memory;
-	conf_free(pSpherePoints);
-
-	// Prepare descriptor sets
-	DescriptorData params[6] = {};
-	params[0].pName = "RightText";
-	params[0].ppTextures = &pSkyBoxTextures[0];
-	params[1].pName = "LeftText";
-	params[1].ppTextures = &pSkyBoxTextures[1];
-	params[2].pName = "TopText";
-	params[2].ppTextures = &pSkyBoxTextures[2];
-	params[3].pName = "BotText";
-	params[3].ppTextures = &pSkyBoxTextures[3];
-	params[4].pName = "FrontText";
-	params[4].ppTextures = &pSkyBoxTextures[4];
-	params[5].pName = "BackText";
-	params[5].ppTextures = &pSkyBoxTextures[5];
-	updateDescriptorSet(pRenderer, 0, pDescriptorSetTexture, 6, params);
-
-	for (uint32_t i = 0; i < Application::gImageCount; ++i)
-	{
-		DescriptorData params[1] = {};
-		params[0].pName = "uniformBlock";
-		params[0].ppBuffers = &pSkyboxUniformBuffer[i];
-		updateDescriptorSet(pRenderer, i * 2 + 0, pDescriptorSetUniforms, 1, params);
-
-		params[0].pName = "uniformBlock";
-		params[0].ppBuffers = &pProjViewUniformBuffer[i];
-		updateDescriptorSet(pRenderer, i * 2 + 1, pDescriptorSetUniforms, 1, params);
+		else
+		{
+			filesToLoad.push_back(tempfile);
+			filesToLoadFullPath.push_back(file);
+		}
 	}
 
-	player->prep(pRenderer);
+	size_t modelFileCount = filesToLoadFullPath.size();
 
-	return true;
-}
+	eastl::vector<const char*> modelFileNames(modelFileCount);
+	gModelFiles.resize(modelFileCount);
+	gDropDownWidgetData.resize(modelFileCount);
 
-bool Application::InitializeShaderPrograms() {
+	for (size_t i = 0; i < modelFileCount; ++i)
+	{
+		const PathHandle& file = filesToLoadFullPath[i];
 
+		gModelFiles[i] = file;
+		modelFileNames[i] = fsGetPathFileName(gModelFiles[i]).buffer;
+		gDropDownWidgetData[i] = (uint32_t)i;
+	}
 
-	ShaderLoadDesc skyShader = {};
-	skyShader.mStages[0] = { "skybox.vert", NULL, 0, RD_SHADER_SOURCES };
-	skyShader.mStages[1] = { "skybox.frag", NULL, 0, RD_SHADER_SOURCES };
-	ShaderLoadDesc basicShader = {};
-	basicShader.mStages[0] = { "basic.vert", NULL, 0, RD_SHADER_SOURCES };
-	basicShader.mStages[1] = { "basic.frag", NULL, 0, RD_SHADER_SOURCES };
-	ShaderLoadDesc simpleShader = {};
-	simpleShader.mStages[0] = { "shader.vert", NULL, 0, RD_SHADER_SOURCES };
-	simpleShader.mStages[1] = { "shader.frag", NULL, 0, RD_SHADER_SOURCES };
+	gModelFile = gModelFiles[0];
+	gGuiModelToLoad = gModelFiles[0];
 
-	addShader(pRenderer, &skyShader, &pSkyBoxDrawShader);
-	addShader(pRenderer, &basicShader, &pSphereShader);
-	addShader(pRenderer, &simpleShader, &pSimpleShader);
-
-	SamplerDesc samplerDesc = { FILTER_LINEAR,
-								FILTER_LINEAR,
-								MIPMAP_MODE_NEAREST,
-								ADDRESS_MODE_CLAMP_TO_EDGE,
-								ADDRESS_MODE_CLAMP_TO_EDGE,
-								ADDRESS_MODE_CLAMP_TO_EDGE };
-	addSampler(pRenderer, &samplerDesc, &pSamplerSkyBox);
-
-	Shader* shaders[] = { pSphereShader, pSkyBoxDrawShader };
-	const char* pStaticSamplers[] = { "uSampler0" };
-	RootSignatureDesc rootDesc = {};
-	rootDesc.mStaticSamplerCount = 1;
-	rootDesc.ppStaticSamplerNames = pStaticSamplers;
-	rootDesc.ppStaticSamplers = &pSamplerSkyBox;
-	rootDesc.mShaderCount = 2;
-	rootDesc.ppShaders = shaders;
-	addRootSignature(pRenderer, &rootDesc, &pRootSignature);
-
-	DescriptorSetDesc desc = { pRootSignature, DESCRIPTOR_UPDATE_FREQ_NONE, 1 };
-	addDescriptorSet(pRenderer, &desc, &pDescriptorSetTexture);
-	desc = { pRootSignature, DESCRIPTOR_UPDATE_FREQ_PER_FRAME, Application::gImageCount * 2 };
-	addDescriptorSet(pRenderer, &desc, &pDescriptorSetUniforms);
-
-	rootDesc.mShaderCount = 1;
-	rootDesc.ppShaders = &pSimpleShader;
-	addRootSignature(pRenderer, &rootDesc, &pSimpleRootSignature);
-
-	desc = { pSimpleRootSignature, DESCRIPTOR_UPDATE_FREQ_PER_FRAME, 1 };
-	addDescriptorSet(pRenderer, &desc, &pDescTexture);
-	desc = { pSimpleRootSignature, DESCRIPTOR_UPDATE_FREQ_PER_FRAME, Application::gImageCount };
-	addDescriptorSet(pRenderer, &desc, &pDescUniforms);
-
-	return true;
-}
-
-bool Application::InitializeObjects() {// Generate sphere vertex buffer
-	generateSpherePoints(&pSpherePoints, &gNumberOfSpherePoints, gSphereResolution, gSphereDiameter);
-
-	uint64_t       sphereDataSize = gNumberOfSpherePoints * sizeof(float);
-	BufferLoadDesc sphereVbDesc = {};
-	sphereVbDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_VERTEX_BUFFER;
-	sphereVbDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_GPU_ONLY;
-	sphereVbDesc.mDesc.mSize = sphereDataSize;
-	sphereVbDesc.pData = pSpherePoints;
-	sphereVbDesc.ppBuffer = &pSphereVertexBuffer;
-	addResource(&sphereVbDesc, NULL, LOAD_PRIORITY_NORMAL);
-
-	//Generate sky box vertex buffer
-	float skyBoxPoints[] = {
-		10.0f,  -10.0f, -10.0f, 6.0f,    // -z
-		-10.0f, -10.0f, -10.0f, 6.0f,   -10.0f, 10.0f,  -10.0f, 6.0f,   -10.0f, 10.0f,
-		-10.0f, 6.0f,   10.0f,  10.0f,  -10.0f, 6.0f,   10.0f,  -10.0f, -10.0f, 6.0f,
-
-		-10.0f, -10.0f, 10.0f,  2.0f,    //-x
-		-10.0f, -10.0f, -10.0f, 2.0f,   -10.0f, 10.0f,  -10.0f, 2.0f,   -10.0f, 10.0f,
-		-10.0f, 2.0f,   -10.0f, 10.0f,  10.0f,  2.0f,   -10.0f, -10.0f, 10.0f,  2.0f,
-
-		10.0f,  -10.0f, -10.0f, 1.0f,    //+x
-		10.0f,  -10.0f, 10.0f,  1.0f,   10.0f,  10.0f,  10.0f,  1.0f,   10.0f,  10.0f,
-		10.0f,  1.0f,   10.0f,  10.0f,  -10.0f, 1.0f,   10.0f,  -10.0f, -10.0f, 1.0f,
-
-		-10.0f, -10.0f, 10.0f,  5.0f,    // +z
-		-10.0f, 10.0f,  10.0f,  5.0f,   10.0f,  10.0f,  10.0f,  5.0f,   10.0f,  10.0f,
-		10.0f,  5.0f,   10.0f,  -10.0f, 10.0f,  5.0f,   -10.0f, -10.0f, 10.0f,  5.0f,
-
-		-10.0f, 10.0f,  -10.0f, 3.0f,    //+y
-		10.0f,  10.0f,  -10.0f, 3.0f,   10.0f,  10.0f,  10.0f,  3.0f,   10.0f,  10.0f,
-		10.0f,  3.0f,   -10.0f, 10.0f,  10.0f,  3.0f,   -10.0f, 10.0f,  -10.0f, 3.0f,
-
-		10.0f,  -10.0f, 10.0f,  4.0f,    //-y
-		10.0f,  -10.0f, -10.0f, 4.0f,   -10.0f, -10.0f, -10.0f, 4.0f,   -10.0f, -10.0f,
-		-10.0f, 4.0f,   -10.0f, -10.0f, 10.0f,  4.0f,   10.0f,  -10.0f, 10.0f,  4.0f,
-	};
-
-	uint64_t       skyBoxDataSize = 4 * 6 * 6 * sizeof(float);
-	BufferLoadDesc skyboxVbDesc = {};
-	skyboxVbDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_VERTEX_BUFFER;
-	skyboxVbDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_GPU_ONLY;
-	skyboxVbDesc.mDesc.mSize = skyBoxDataSize;
-	skyboxVbDesc.pData = skyBoxPoints;
-	skyboxVbDesc.ppBuffer = &pSkyBoxVertexBuffer;
-	addResource(&skyboxVbDesc, NULL, LOAD_PRIORITY_NORMAL);
+#else
+	PathHandle fullModelPath = fsCopyPathInResourceDirectory(RD_MESHES, gDefaultModelFile);
+	gModelFile = fullModelPath;
+	gGuiModelToLoad = fullModelPath;
+#endif
 
 	BufferLoadDesc ubDesc = {};
 	ubDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -415,159 +608,308 @@ bool Application::InitializeObjects() {// Generate sphere vertex buffer
 	ubDesc.pData = NULL;
 	for (uint32_t i = 0; i < Application::gImageCount; ++i)
 	{
-		ubDesc.ppBuffer = &pProjViewUniformBuffer[i];
-		addResource(&ubDesc, NULL, LOAD_PRIORITY_NORMAL);
-		ubDesc.ppBuffer = &pSkyboxUniformBuffer[i];
+		ubDesc.ppBuffer = &pUniformBuffer[i];
 		addResource(&ubDesc, NULL, LOAD_PRIORITY_NORMAL);
 	}
 
-	// Setup planets (Rotation speeds are relative to Earth's, some values randomly given)
+	BufferLoadDesc subDesc = {};
+	subDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	subDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_CPU_TO_GPU;
+	subDesc.mDesc.mSize = sizeof(UniformBlock_Shadow);
+	subDesc.mDesc.mFlags = BUFFER_CREATION_FLAG_PERSISTENT_MAP_BIT;
+	subDesc.pData = NULL;
+	for (uint32_t i = 0; i < Application::gImageCount; ++i)
+	{
+		subDesc.ppBuffer = &pShadowUniformBuffer[i];
+		addResource(&subDesc, NULL, LOAD_PRIORITY_NORMAL);
+	}
 
-	// Sun
-	gPlanetInfoData[0].mParentIndex = 0;
-	gPlanetInfoData[0].mYOrbitSpeed = 0;    // Earth years for one orbit
-	gPlanetInfoData[0].mZOrbitSpeed = 0;
-	gPlanetInfoData[0].mRotationSpeed = 24.0f;    // Earth days for one rotation
-	gPlanetInfoData[0].mTranslationMat = mat4::identity();
-	gPlanetInfoData[0].mScaleMat = mat4::scale(vec3(10.0f));
-	gPlanetInfoData[0].mColor = vec4(0.9f, 0.6f, 0.1f, 0.0f);
+	ubDesc = {};
+	ubDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	ubDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_CPU_TO_GPU;
+	ubDesc.mDesc.mSize = sizeof(UniformBlock);
+	ubDesc.mDesc.mFlags = BUFFER_CREATION_FLAG_PERSISTENT_MAP_BIT;
+	ubDesc.pData = NULL;
+	for (uint32_t i = 0; i < Application::gImageCount; ++i)
+	{
+		ubDesc.ppBuffer = &pFloorUniformBuffer[i];
+		addResource(&ubDesc, NULL, LOAD_PRIORITY_NORMAL);
+	}
+	/************************************************************************/
+	// GUI
+	/************************************************************************/
+	/*
+	GuiDesc guiDesc = {};
+	guiDesc.mStartSize = vec2(300.0f, 250.0f);
+	guiDesc.mStartPosition = vec2(100.0f, guiDesc.mStartSize.getY());
+	pGuiWindow = gAppUI.AddGuiComponent(GetName(), &guiDesc);
 
-	// Mercury
-	gPlanetInfoData[1].mParentIndex = 0;
-	gPlanetInfoData[1].mYOrbitSpeed = 0.5f;
-	gPlanetInfoData[1].mZOrbitSpeed = 0.0f;
-	gPlanetInfoData[1].mRotationSpeed = 58.7f;
-	gPlanetInfoData[1].mTranslationMat = mat4::translation(vec3(10.0f, 0, 0));
-	gPlanetInfoData[1].mScaleMat = mat4::scale(vec3(1.0f));
-	gPlanetInfoData[1].mColor = vec4(0.7f, 0.3f, 0.1f, 1.0f);
+#if !defined(TARGET_IOS) && !defined(_DURANGO)
+	pGuiWindow->AddWidget(CheckboxWidget("Toggle VSync", &bToggleVSync));
+#endif
 
-	// Venus
-	gPlanetInfoData[2].mParentIndex = 0;
-	gPlanetInfoData[2].mYOrbitSpeed = 0.8f;
-	gPlanetInfoData[2].mZOrbitSpeed = 0.0f;
-	gPlanetInfoData[2].mRotationSpeed = 243.0f;
-	gPlanetInfoData[2].mTranslationMat = mat4::translation(vec3(20.0f, 0, 5));
-	gPlanetInfoData[2].mScaleMat = mat4::scale(vec3(2));
-	gPlanetInfoData[2].mColor = vec4(0.8f, 0.6f, 0.1f, 1.0f);
+#if defined(__ANDROID__) || defined(__LINUX__)
+	pGuiWindow->AddWidget(DropdownWidget("Models", &guiModelToLoadIndex, modelFileNames.data(), gDropDownWidgetData.data(), (uint32_t)gModelFiles.size()));
+#else
+	pGuiWindow->AddWidget(SeparatorWidget());
 
-	// Earth
-	gPlanetInfoData[3].mParentIndex = 0;
-	gPlanetInfoData[3].mYOrbitSpeed = 1.0f;
-	gPlanetInfoData[3].mZOrbitSpeed = 0.0f;
-	gPlanetInfoData[3].mRotationSpeed = 1.0f;
-	gPlanetInfoData[3].mTranslationMat = mat4::translation(vec3(30.0f, 0, 0));
-	gPlanetInfoData[3].mScaleMat = mat4::scale(vec3(4));
-	gPlanetInfoData[3].mColor = vec4(0.3f, 0.2f, 0.8f, 1.0f);
+	ButtonWidget loadModelButtonWidget("Load Model                                      ");
+	loadModelButtonWidget.pOnEdited = Application::LoadNewModel;
+	pGuiWindow->AddWidget(loadModelButtonWidget);
 
-	// Mars
-	gPlanetInfoData[4].mParentIndex = 0;
-	gPlanetInfoData[4].mYOrbitSpeed = 2.0f;
-	gPlanetInfoData[4].mZOrbitSpeed = 0.0f;
-	gPlanetInfoData[4].mRotationSpeed = 1.1f;
-	gPlanetInfoData[4].mTranslationMat = mat4::translation(vec3(40.0f, 0, 0));
-	gPlanetInfoData[4].mScaleMat = mat4::scale(vec3(3));
-	gPlanetInfoData[4].mColor = vec4(0.9f, 0.3f, 0.1f, 1.0f);
+	pGuiWindow->AddWidget(SeparatorWidget());
 
-	// Jupiter
-	gPlanetInfoData[5].mParentIndex = 0;
-	gPlanetInfoData[5].mYOrbitSpeed = 11.0f;
-	gPlanetInfoData[5].mZOrbitSpeed = 0.0f;
-	gPlanetInfoData[5].mRotationSpeed = 0.4f;
-	gPlanetInfoData[5].mTranslationMat = mat4::translation(vec3(50.0f, 0, 0));
-	gPlanetInfoData[5].mScaleMat = mat4::scale(vec3(8));
-	gPlanetInfoData[5].mColor = vec4(0.6f, 0.4f, 0.4f, 1.0f);
+	//ButtonWidget loadLODButtonWidget("Load Model LOD");
+	//loadLODButtonWidget.pOnEdited = GLTFViewer::LoadLOD;
+	//pGuiWindow->AddWidget(loadLODButtonWidget);
+#endif
 
-	// Saturn
-	gPlanetInfoData[6].mParentIndex = 0;
-	gPlanetInfoData[6].mYOrbitSpeed = 29.4f;
-	gPlanetInfoData[6].mZOrbitSpeed = 0.0f;
-	gPlanetInfoData[6].mRotationSpeed = 0.5f;
-	gPlanetInfoData[6].mTranslationMat = mat4::translation(vec3(60.0f, 0, 0));
-	gPlanetInfoData[6].mScaleMat = mat4::scale(vec3(6));
-	gPlanetInfoData[6].mColor = vec4(0.7f, 0.7f, 0.5f, 1.0f);
+	pSelectLodWidget = pGuiWindow->AddWidget(SliderIntWidget("LOD", &gCurrentLod, 0, gMaxLod));
+	*/
+	////////////////////////////////////////////////////////////////////////////////////////////
+	/*
+	guiDesc = {};
+	guiDesc.mStartSize = vec2(400.0f, 250.0f);
+	guiDesc.mStartPosition = vec2(mSettings.mWidth - guiDesc.mStartSize.getX(), guiDesc.mStartSize.getY());
+	pGuiGraphics = gAppUI.AddGuiComponent("Graphics Options", &guiDesc);
 
-	// Uranus
-	gPlanetInfoData[7].mParentIndex = 0;
-	gPlanetInfoData[7].mYOrbitSpeed = 84.07f;
-	gPlanetInfoData[7].mZOrbitSpeed = 0.0f;
-	gPlanetInfoData[7].mRotationSpeed = 0.8f;
-	gPlanetInfoData[7].mTranslationMat = mat4::translation(vec3(70.0f, 0, 0));
-	gPlanetInfoData[7].mScaleMat = mat4::scale(vec3(7));
-	gPlanetInfoData[7].mColor = vec4(0.4f, 0.4f, 0.6f, 1.0f);
+	pGuiGraphics->AddWidget(CheckboxWidget("Enable FXAA", &bToggleFXAA));
+	pGuiGraphics->AddWidget(CheckboxWidget("Enable Vignetting", &bVignetting));
 
-	// Neptune
-	gPlanetInfoData[8].mParentIndex = 0;
-	gPlanetInfoData[8].mYOrbitSpeed = 164.81f;
-	gPlanetInfoData[8].mZOrbitSpeed = 0.0f;
-	gPlanetInfoData[8].mRotationSpeed = 0.9f;
-	gPlanetInfoData[8].mTranslationMat = mat4::translation(vec3(80.0f, 0, 0));
-	gPlanetInfoData[8].mScaleMat = mat4::scale(vec3(8));
-	gPlanetInfoData[8].mColor = vec4(0.5f, 0.2f, 0.9f, 1.0f);
+	pGuiGraphics->AddWidget(SeparatorWidget());
 
-	// Pluto - Not a planet XDD
-	gPlanetInfoData[9].mParentIndex = 0;
-	gPlanetInfoData[9].mYOrbitSpeed = 247.7f;
-	gPlanetInfoData[9].mZOrbitSpeed = 1.0f;
-	gPlanetInfoData[9].mRotationSpeed = 7.0f;
-	gPlanetInfoData[9].mTranslationMat = mat4::translation(vec3(90.0f, 0, 0));
-	gPlanetInfoData[9].mScaleMat = mat4::scale(vec3(1.0f));
-	gPlanetInfoData[9].mColor = vec4(0.7f, 0.5f, 0.5f, 1.0f);
+	CollapsingHeaderWidget LightWidgets("Light Options", false, false);
+	LightWidgets.AddSubWidget(SliderFloatWidget("Light Azimuth", &gLightDirection.x, float(-180.0f), float(180.0f), float(0.001f)));
+	LightWidgets.AddSubWidget(SliderFloatWidget("Light Elevation", &gLightDirection.y, float(210.0f), float(330.0f), float(0.001f)));
 
-	// Moon
-	gPlanetInfoData[10].mParentIndex = 3;
-	gPlanetInfoData[10].mYOrbitSpeed = 1.0f;
-	gPlanetInfoData[10].mZOrbitSpeed = 200.0f;
-	gPlanetInfoData[10].mRotationSpeed = 27.0f;
-	gPlanetInfoData[10].mTranslationMat = mat4::translation(vec3(5.0f, 0, 0));
-	gPlanetInfoData[10].mScaleMat = mat4::scale(vec3(1));
-	gPlanetInfoData[10].mColor = vec4(0.3f, 0.3f, 0.4f, 1.0f);
+	LightWidgets.AddSubWidget(SeparatorWidget());
 
-	player = conf_new(OBJObject, "../../../../Assets/Blender/SpinningBox/SpinningBox.obj", pSimpleRootSignature, pDescUniforms);
-	player->setScaleRot(vec3(20), 0, vec3(1, 0, 0));
+	CollapsingHeaderWidget LightColor1Picker("Main Light Color");
+	LightColor1Picker.AddSubWidget(ColorPickerWidget("Main Light Color", &gLightColor[0]));
+	LightWidgets.AddSubWidget(LightColor1Picker);
+
+	CollapsingHeaderWidget LightColor1Intensity("Main Light Intensity");
+	LightColor1Intensity.AddSubWidget(SliderFloatWidget("Main Light Intensity", &gLightColorIntensity[0], 0.0f, 5.0f, 0.001f));
+	LightWidgets.AddSubWidget(LightColor1Intensity);
+
+	LightWidgets.AddSubWidget(SeparatorWidget());
+
+	CollapsingHeaderWidget LightColor2Picker("Light2 Color");
+	LightColor2Picker.AddSubWidget(ColorPickerWidget("Light2 Color", &gLightColor[1]));
+	LightWidgets.AddSubWidget(LightColor2Picker);
+
+	CollapsingHeaderWidget LightColor2Intensity("Light2 Intensity");
+	LightColor2Intensity.AddSubWidget(SliderFloatWidget("Light2 Intensity", &gLightColorIntensity[1], 0.0f, 5.0f, 0.001f));
+	LightWidgets.AddSubWidget(LightColor2Intensity);
+
+	LightWidgets.AddSubWidget(SeparatorWidget());
+
+	CollapsingHeaderWidget LightColor3Picker("Light3 Color");
+	LightColor3Picker.AddSubWidget(ColorPickerWidget("Light3 Color", &gLightColor[2]));
+	LightWidgets.AddSubWidget(LightColor3Picker);
+
+	CollapsingHeaderWidget LightColor3Intensity("Light3 Intensity");
+	LightColor3Intensity.AddSubWidget(SliderFloatWidget("Light3 Intensity", &gLightColorIntensity[2], 0.0f, 5.0f, 0.001f));
+	LightWidgets.AddSubWidget(LightColor3Intensity);
+
+	LightWidgets.AddSubWidget(SeparatorWidget());
+
+	CollapsingHeaderWidget AmbientLightColorPicker("Ambient Light Color");
+	AmbientLightColorPicker.AddSubWidget(ColorPickerWidget("Ambient Light Color", &gLightColor[3]));
+	LightWidgets.AddSubWidget(AmbientLightColorPicker);
+
+	CollapsingHeaderWidget LightColor4Intensity("Ambient Light Intensity");
+	LightColor4Intensity.AddSubWidget(SliderFloatWidget("Light Intensity", &gLightColorIntensity[3], 0.0f, 5.0f, 0.001f));
+	LightWidgets.AddSubWidget(LightColor4Intensity);
+
+	LightWidgets.AddSubWidget(SeparatorWidget());
+
+	pGuiGraphics->AddWidget(LightWidgets);
+	*/
+
+	// Scene Initialization Initialization
+
+
+	CameraMotionParameters cmp{ 1.0f, 120.0f, 40.0f };
+	vec3                   camPos{ 3.0f, 2.5f, -4.0f };
+	vec3                   lookAt{ 0.0f, 0.4f, 0.0f };
+
+	pLightView = createGuiCameraController(camPos, lookAt);
+	pCameraController = createFpsCameraController(normalize(camPos) * 3.0f, lookAt);
+	pCameraController->setMotionParameters(cmp);
+
+	if (!Input::Init(pWindow, &gAppUI, this)) return false;
+
+	player = conf_new(GLTFObject);
+
+	float randoRange = 5;
+	for (int i = 0; i < 1; i++) {
+		float x = -randoRange + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * randoRange)));
+		float y = -randoRange + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * randoRange)));
+		float r = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX));
+		float g = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX));
+		float b = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX));
+		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
+		float s = 0.5f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.5f));
+
+		vec3 position = vec3(x, 0, y);
+		if (sqrt(x * x + y * y) > 1.5f) {
+			auto other = conf_new(GLTFObject);
+			other->setTranslate(position);
+			other->setScaleRot(vec3(s), rot, vec3(0, 1, 0));
+			//other->setColor(glm::vec3(r, g, b));
+			others.push_back(other);
+		}
+	}
 
 	return true;
+}
+
+bool Application::AddDescriptorSets()
+{
+	DescriptorSetDesc setDesc = { pRootSignaturePostEffects, DESCRIPTOR_UPDATE_FREQ_NONE, 1 };
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetVignette);
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetFXAA);
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetWatermark);
+
+	setDesc = { pRootSignatureShadow, DESCRIPTOR_UPDATE_FREQ_NONE, 1 };
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_NONE]);
+	setDesc = { pRootSignatureShadow, DESCRIPTOR_UPDATE_FREQ_PER_FRAME, Application::gImageCount };
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+
+	setDesc = { pRootSignatureShaded, DESCRIPTOR_UPDATE_FREQ_NONE, 1 };
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_NONE]);
+	setDesc = { pRootSignatureShaded, DESCRIPTOR_UPDATE_FREQ_PER_FRAME, Application::gImageCount };
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+
+	return true;
+}
+
+void Application::RemoveDescriptorSets()
+{
+	removeDescriptorSet(pRenderer, pDescriptorSetVignette);
+	removeDescriptorSet(pRenderer, pDescriptorSetFXAA);
+	removeDescriptorSet(pRenderer, pDescriptorSetWatermark);
+	removeDescriptorSet(pRenderer, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_NONE]);
+	removeDescriptorSet(pRenderer, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+	removeDescriptorSet(pRenderer, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_NONE]);
+	removeDescriptorSet(pRenderer, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+}
+
+void Application::PrepareDescriptorSets()
+{
+	// Shadow
+	{
+		DescriptorData params[2] = {};
+		if (player->pNodeTransformsBuffer)
+		{
+			params[0].pName = "modelToWorldMatrices";
+			params[0].ppBuffers = &player->pNodeTransformsBuffer;
+			updateDescriptorSet(pRenderer, 0, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_NONE], 1, params);
+		}
+
+		params[0].pName = "sceneTexture";
+		params[0].ppTextures = &pForwardRT->pTexture;
+		updateDescriptorSet(pRenderer, 0, pDescriptorSetVignette, 1, params);
+
+		params[0].pName = "sceneTexture";
+		params[0].ppTextures = &pPostProcessRT->pTexture;
+		updateDescriptorSet(pRenderer, 0, pDescriptorSetFXAA, 1, params);
+
+		params[0].pName = "sceneTexture";
+		params[0].ppTextures = &pTextureBlack;
+		updateDescriptorSet(pRenderer, 0, pDescriptorSetWatermark, 1, params);
+
+		for (uint32_t i = 0; i < Application::gImageCount; ++i)
+		{
+			DescriptorData params[2] = {};
+			params[0].pName = "cbPerPass";
+			params[0].ppBuffers = &pShadowUniformBuffer[i];
+			updateDescriptorSet(pRenderer, i, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_FRAME], 1, params);
+		}
+	}
+	// Shading
+	{
+		DescriptorData params[3] = {};
+		params[0].pName = "ShadowTexture";
+		params[0].ppTextures = &pShadowRT->pTexture;
+		if (player->pNodeTransformsBuffer)
+		{
+			params[1].pName = "modelToWorldMatrices";
+			params[1].ppBuffers = &player->pNodeTransformsBuffer;
+		}
+		updateDescriptorSet(pRenderer, 0, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_NONE], player->pNodeTransformsBuffer ? 2 : 1, params);
+
+		for (uint32_t i = 0; i < Application::gImageCount; ++i)
+		{
+			params[0].pName = "cbPerPass";
+			params[0].ppBuffers = &pUniformBuffer[i];
+			updateDescriptorSet(pRenderer, i, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME], 1, params);
+		}
+	}
+
+	player->createMaterialResources(pRootSignatureShaded, /* bindlessTexturesSamplersSet = */ NULL);
+
+	for (auto other : others) {
+		other->createMaterialResources(pRootSignatureShaded, /* bindlessTexturesSamplersSet = */ NULL);
+	}
+}
+
+void Application::RemoveShaderResources()
+{
+	RemoveDescriptorSets();
+
+	removeShader(pRenderer, pShaderZPass);
+	removeShader(pRenderer, pShaderZPass_NonOptimized);
+	removeShader(pRenderer, pVignetteShader);
+	removeShader(pRenderer, pFloorShader);
+	removeShader(pRenderer, pMeshOptDemoShader);
+	removeShader(pRenderer, pFXAAShader);
+	removeShader(pRenderer, pWaterMarkShader);
+
+	removeRootSignature(pRenderer, pRootSignatureShadow);
+	removeRootSignature(pRenderer, pRootSignatureShaded);
+	removeRootSignature(pRenderer, pRootSignaturePostEffects);
+}
+
+void Application::RemoveModelDependentResources()
+{
+	RemoveShaderResources();
+
+	player->removeResources();
+	conf_free(player);
+	player = conf_new(GLTFObject);
+
+	for (auto other : others) {
+		other->removeResources();
+		conf_free(other);
+		other = conf_new(GLTFObject);
+	}
 }
 
 void Application::Exit()
 {
 	waitQueueIdle(pGraphicsQueue);
 
-	exitInputSystem();
+	Input::Exit();
+
+	exitProfiler();
 
 	destroyCameraController(pCameraController);
+	destroyCameraController(pLightView);
 
+#if defined(TARGET_IOS) || defined(__ANDROID__)
 	gVirtualJoystick.Exit();
+#endif
 
 	gAppUI.Exit();
 
-	// Exit profile
-	exitProfiler();
-
 	for (uint32_t i = 0; i < Application::gImageCount; ++i)
 	{
-		removeResource(pProjViewUniformBuffer[i]);
-		removeResource(pSkyboxUniformBuffer[i]);
+		removeResource(pShadowUniformBuffer[i]);
+		removeResource(pUniformBuffer[i]);
+		removeResource(pFloorUniformBuffer[i]);
 	}
-
-	removeDescriptorSet(pRenderer, pDescriptorSetTexture);
-	removeDescriptorSet(pRenderer, pDescriptorSetUniforms);
-
-	removeDescriptorSet(pRenderer, pDescTexture);
-	removeDescriptorSet(pRenderer, pDescUniforms);
-
-	removeResource(pSphereVertexBuffer);
-	removeResource(pSkyBoxVertexBuffer);
-	conf_delete(player);
-
-	for (uint i = 0; i < 6; ++i)
-		removeResource(pSkyBoxTextures[i]);
-
-	removeSampler(pRenderer, pSamplerSkyBox);
-	removeShader(pRenderer, pSphereShader);
-	removeShader(pRenderer, pSkyBoxDrawShader);
-	removeShader(pRenderer, pSimpleShader);
-	removeRootSignature(pRenderer, pRootSignature);
-	removeRootSignature(pRenderer, pSimpleRootSignature);
 
 	for (uint32_t i = 0; i < Application::gImageCount; ++i)
 	{
@@ -579,14 +921,208 @@ void Application::Exit()
 	removeCmd_n(pRenderer, Application::gImageCount, ppCmds);
 	removeCmdPool(pRenderer, pCmdPool);
 
+	removeSampler(pRenderer, pDefaultSampler);
+	removeSampler(pRenderer, pBilinearClampSampler);
+
+	removeResource(TriangularVB);
+
+	removeResource(pFloorVB);
+	removeResource(pFloorIB);
+
+	removeResource(pTextureBlack);
+
 	exitResourceLoaderInterface(pRenderer);
 	removeQueue(pRenderer, pGraphicsQueue);
 	removeRenderer(pRenderer);
+
+#if defined(__linux__) || defined(__ANDROID__)
+	gModelFiles.set_capacity(0);
+	gDropDownWidgetData.set_capacity(0);
+#endif
+
+	gModelFile = NULL;
+	gGuiModelToLoad = NULL;
+
+	conf_free(player);
+
+	for (auto other : others) {
+		conf_free(other);
+	}
+}
+
+void Application::LoadPipelines()
+{
+	PipelineDesc desc = {};
+
+	/************************************************************************/
+	// Setup the resources needed for shadow map
+	/************************************************************************/
+	RasterizerStateDesc rasterizerStateDesc = {};
+	rasterizerStateDesc.mCullMode = CULL_MODE_BACK;
+
+	DepthStateDesc depthStateDesc = {};
+	depthStateDesc.mDepthTest = true;
+	depthStateDesc.mDepthWrite = true;
+	depthStateDesc.mDepthFunc = CMP_GEQUAL;
+
+	BlendStateDesc blendStateAlphaDesc = {};
+	blendStateAlphaDesc.mSrcFactors[0] = BC_SRC_ALPHA;
+	blendStateAlphaDesc.mDstFactors[0] = BC_ONE_MINUS_SRC_ALPHA;
+	blendStateAlphaDesc.mBlendModes[0] = BM_ADD;
+	blendStateAlphaDesc.mSrcAlphaFactors[0] = BC_ONE;
+	blendStateAlphaDesc.mDstAlphaFactors[0] = BC_ZERO;
+	blendStateAlphaDesc.mBlendAlphaModes[0] = BM_ADD;
+	blendStateAlphaDesc.mMasks[0] = ALL;
+	blendStateAlphaDesc.mRenderTargetMask = BLEND_STATE_TARGET_0;
+	blendStateAlphaDesc.mIndependentBlend = false;
+
+	{
+		desc = {};
+		desc.mType = PIPELINE_TYPE_GRAPHICS;
+		GraphicsPipelineDesc& shadowMapPipelineSettings = desc.mGraphicsDesc;
+		shadowMapPipelineSettings.mPrimitiveTopo = PRIMITIVE_TOPO_TRI_LIST;
+		shadowMapPipelineSettings.mRenderTargetCount = 0;
+		shadowMapPipelineSettings.pDepthState = &depthStateDesc;
+		shadowMapPipelineSettings.mDepthStencilFormat = pShadowRT->mFormat;
+		shadowMapPipelineSettings.mSampleCount = pShadowRT->mSampleCount;
+		shadowMapPipelineSettings.mSampleQuality = pShadowRT->mSampleQuality;
+		shadowMapPipelineSettings.pRootSignature = pRootSignatureShadow;
+		shadowMapPipelineSettings.pRasterizerState = &rasterizerStateDesc;
+		shadowMapPipelineSettings.pShaderProgram = pShaderZPass;
+		shadowMapPipelineSettings.pVertexLayout = &GLTFObject::pVertexLayoutModel;
+		addPipeline(pRenderer, &desc, &pPipelineShadowPass);
+	}
+
+	{
+		desc = {};
+		desc.mType = PIPELINE_TYPE_GRAPHICS;
+		GraphicsPipelineDesc& pipelineSettings = desc.mGraphicsDesc;
+		pipelineSettings.mPrimitiveTopo = PRIMITIVE_TOPO_TRI_LIST;
+		pipelineSettings.mRenderTargetCount = 1;
+		pipelineSettings.pDepthState = &depthStateDesc;
+		pipelineSettings.mDepthStencilFormat = pDepthBuffer->mFormat;
+		pipelineSettings.pBlendState = &blendStateAlphaDesc;
+		pipelineSettings.pColorFormats = &pForwardRT->mFormat;
+		pipelineSettings.mSampleCount = pForwardRT->mSampleCount;
+		pipelineSettings.mSampleQuality = pForwardRT->mSampleQuality;
+		pipelineSettings.pRootSignature = pRootSignatureShaded;
+		pipelineSettings.pVertexLayout = &GLTFObject::pVertexLayoutModel;
+		pipelineSettings.pRasterizerState = &rasterizerStateDesc;
+		pipelineSettings.pShaderProgram = pMeshOptDemoShader;
+		addPipeline(pRenderer, &desc, &pMeshOptDemoPipeline);
+	}
+
+	VertexLayout screenTriangle_VertexLayout = {};
+
+	screenTriangle_VertexLayout.mAttribCount = 2;
+	screenTriangle_VertexLayout.mAttribs[0].mSemantic = SEMANTIC_POSITION;
+	screenTriangle_VertexLayout.mAttribs[0].mFormat = TinyImageFormat_R32G32B32_SFLOAT;
+	screenTriangle_VertexLayout.mAttribs[0].mBinding = 0;
+	screenTriangle_VertexLayout.mAttribs[0].mLocation = 0;
+	screenTriangle_VertexLayout.mAttribs[0].mOffset = 0;
+	screenTriangle_VertexLayout.mAttribs[1].mSemantic = SEMANTIC_TEXCOORD0;
+	screenTriangle_VertexLayout.mAttribs[1].mFormat = TinyImageFormat_R32G32_SFLOAT;
+	screenTriangle_VertexLayout.mAttribs[1].mBinding = 0;
+	screenTriangle_VertexLayout.mAttribs[1].mLocation = 1;
+	screenTriangle_VertexLayout.mAttribs[1].mOffset = 3 * sizeof(float);
+
+	{
+		desc = {};
+		desc.mType = PIPELINE_TYPE_GRAPHICS;
+		GraphicsPipelineDesc& shadowMapPipelineSettings = desc.mGraphicsDesc;
+		shadowMapPipelineSettings.mPrimitiveTopo = PRIMITIVE_TOPO_TRI_LIST;
+		shadowMapPipelineSettings.mRenderTargetCount = 0;
+		shadowMapPipelineSettings.pDepthState = &depthStateDesc;
+		shadowMapPipelineSettings.mDepthStencilFormat = pShadowRT->mFormat;
+		shadowMapPipelineSettings.mSampleCount = pShadowRT->mSampleCount;
+		shadowMapPipelineSettings.mSampleQuality = pShadowRT->mSampleQuality;
+		shadowMapPipelineSettings.pRootSignature = pRootSignatureShadow;
+		shadowMapPipelineSettings.pRasterizerState = &rasterizerStateDesc;
+		shadowMapPipelineSettings.pShaderProgram = pShaderZPass_NonOptimized;
+		shadowMapPipelineSettings.pVertexLayout = &screenTriangle_VertexLayout;
+		addPipeline(pRenderer, &desc, &pPipelineShadowPass_NonOPtimized);
+	}
+
+	{
+		desc = {};
+		desc.mType = PIPELINE_TYPE_GRAPHICS;
+		GraphicsPipelineDesc& pipelineSettings = desc.mGraphicsDesc;
+		pipelineSettings.mPrimitiveTopo = PRIMITIVE_TOPO_TRI_LIST;
+		pipelineSettings.mRenderTargetCount = 1;
+		pipelineSettings.pDepthState = &depthStateDesc;
+		pipelineSettings.mDepthStencilFormat = pDepthBuffer->mFormat;
+		pipelineSettings.pBlendState = &blendStateAlphaDesc;
+		pipelineSettings.pColorFormats = &pForwardRT->mFormat;
+		pipelineSettings.mSampleCount = pForwardRT->mSampleCount;
+		pipelineSettings.mSampleQuality = pForwardRT->mSampleQuality;
+		pipelineSettings.pRootSignature = pRootSignatureShaded;
+		pipelineSettings.pVertexLayout = &screenTriangle_VertexLayout;
+		pipelineSettings.pRasterizerState = &rasterizerStateDesc;
+		pipelineSettings.pShaderProgram = pFloorShader;
+		addPipeline(pRenderer, &desc, &pFloorPipeline);
+	}
+
+	{
+		desc = {};
+		desc.mType = PIPELINE_TYPE_GRAPHICS;
+		GraphicsPipelineDesc& pipelineSettings = desc.mGraphicsDesc;
+		pipelineSettings.mPrimitiveTopo = PRIMITIVE_TOPO_TRI_LIST;
+		pipelineSettings.mRenderTargetCount = 1;
+		pipelineSettings.pDepthState = NULL;
+		pipelineSettings.pBlendState = &blendStateAlphaDesc;
+		pipelineSettings.pColorFormats = &pPostProcessRT->mFormat;
+		pipelineSettings.mSampleCount = pPostProcessRT->mSampleCount;
+		pipelineSettings.mSampleQuality = pPostProcessRT->mSampleQuality;
+		pipelineSettings.pRootSignature = pRootSignaturePostEffects;
+		pipelineSettings.pVertexLayout = &screenTriangle_VertexLayout;
+		pipelineSettings.pRasterizerState = &rasterizerStateDesc;
+		pipelineSettings.pShaderProgram = pVignetteShader;
+		addPipeline(pRenderer, &desc, &pVignettePipeline);
+	}
+
+	{
+		desc = {};
+		desc.mType = PIPELINE_TYPE_GRAPHICS;
+		GraphicsPipelineDesc& pipelineSettings = desc.mGraphicsDesc;
+		pipelineSettings.mPrimitiveTopo = PRIMITIVE_TOPO_TRI_LIST;
+		pipelineSettings.mRenderTargetCount = 1;
+		pipelineSettings.pDepthState = NULL;
+		pipelineSettings.pBlendState = NULL;
+		pipelineSettings.pColorFormats = &pSwapChain->ppRenderTargets[0]->mFormat;
+		pipelineSettings.mSampleCount = pSwapChain->ppRenderTargets[0]->mSampleCount;
+		pipelineSettings.mSampleQuality = pSwapChain->ppRenderTargets[0]->mSampleQuality;
+		pipelineSettings.pRootSignature = pRootSignaturePostEffects;
+		pipelineSettings.pVertexLayout = &screenTriangle_VertexLayout;
+		pipelineSettings.pRasterizerState = &rasterizerStateDesc;
+		pipelineSettings.pShaderProgram = pFXAAShader;
+		addPipeline(pRenderer, &desc, &pFXAAPipeline);
+	}
+
+	{
+		desc = {};
+		desc.mType = PIPELINE_TYPE_GRAPHICS;
+		GraphicsPipelineDesc& pipelineSettings = desc.mGraphicsDesc;
+		pipelineSettings.mPrimitiveTopo = PRIMITIVE_TOPO_TRI_LIST;
+		pipelineSettings.mRenderTargetCount = 1;
+		pipelineSettings.pDepthState = NULL;
+		pipelineSettings.pBlendState = &blendStateAlphaDesc;
+		pipelineSettings.pColorFormats = &pSwapChain->ppRenderTargets[0]->mFormat;
+		pipelineSettings.mSampleCount = pSwapChain->ppRenderTargets[0]->mSampleCount;
+		pipelineSettings.mSampleQuality = pSwapChain->ppRenderTargets[0]->mSampleQuality;
+		pipelineSettings.pRootSignature = pRootSignaturePostEffects;
+		pipelineSettings.pVertexLayout = &screenTriangle_VertexLayout;
+		pipelineSettings.pRasterizerState = &rasterizerStateDesc;
+		pipelineSettings.pShaderProgram = pWaterMarkShader;
+		addPipeline(pRenderer, &desc, &pWaterMarkPipeline);
+	}
 }
 
 bool Application::Load()
 {
 	if (!addSwapChain())
+		return false;
+
+	if (!addRenderTargets())
 		return false;
 
 	if (!addDepthBuffer())
@@ -595,232 +1131,516 @@ bool Application::Load()
 	if (!gAppUI.Load(pSwapChain->ppRenderTargets))
 		return false;
 
+#if defined(TARGET_IOS) || defined(__ANDROID__)
 	if (!gVirtualJoystick.Load(pSwapChain->ppRenderTargets[0]))
 		return false;
+#endif
 
 	loadProfilerUI(&gAppUI, mSettings.mWidth, mSettings.mHeight);
 
-	//layout and pipeline for sphere draw
-	VertexLayout vertexLayout = {};
-	vertexLayout.mAttribCount = 2;
-	vertexLayout.mAttribs[0].mSemantic = SEMANTIC_POSITION;
-	vertexLayout.mAttribs[0].mFormat = TinyImageFormat_R32G32B32_SFLOAT;
-	vertexLayout.mAttribs[0].mBinding = 0;
-	vertexLayout.mAttribs[0].mLocation = 0;
-	vertexLayout.mAttribs[0].mOffset = 0;
-	vertexLayout.mAttribs[1].mSemantic = SEMANTIC_NORMAL;
-	vertexLayout.mAttribs[1].mFormat = TinyImageFormat_R32G32B32_SFLOAT;
-	vertexLayout.mAttribs[1].mBinding = 0;
-	vertexLayout.mAttribs[1].mLocation = 1;
-	vertexLayout.mAttribs[1].mOffset = 3 * sizeof(float);
+	InitModelDependentResources();
 
-	RasterizerStateDesc rasterizerStateDesc = {};
-	rasterizerStateDesc.mCullMode = CULL_MODE_NONE;
+	LoadPipelines();
 
-	RasterizerStateDesc sphereRasterizerStateDesc = {};
-	sphereRasterizerStateDesc.mCullMode = CULL_MODE_FRONT;
+	float wmHeight = min(mSettings.mWidth, mSettings.mHeight) * 0.09f;
+	float wmWidth = wmHeight * 2.8077f;
 
-	DepthStateDesc depthStateDesc = {};
-	depthStateDesc.mDepthTest = true;
-	depthStateDesc.mDepthWrite = true;
-	depthStateDesc.mDepthFunc = CMP_GEQUAL;
+	float widthGap = wmWidth * 2.0f / (float)mSettings.mWidth;
+	float heightGap = wmHeight * 2.0f / (float)mSettings.mHeight;
 
-	PipelineDesc desc = {};
-	desc.mType = PIPELINE_TYPE_GRAPHICS;
-	GraphicsPipelineDesc& pipelineSettings = desc.mGraphicsDesc;
-	pipelineSettings.mPrimitiveTopo = PRIMITIVE_TOPO_TRI_LIST;
-	pipelineSettings.mRenderTargetCount = 1;
-	pipelineSettings.pDepthState = &depthStateDesc;
-	pipelineSettings.pColorFormats = &pSwapChain->ppRenderTargets[0]->mFormat;
-	pipelineSettings.mSampleCount = pSwapChain->ppRenderTargets[0]->mSampleCount;
-	pipelineSettings.mSampleQuality = pSwapChain->ppRenderTargets[0]->mSampleQuality;
-	pipelineSettings.mDepthStencilFormat = pDepthBuffer->mFormat;
-	pipelineSettings.pRootSignature = pRootSignature;
-	pipelineSettings.pShaderProgram = pSphereShader;
-	pipelineSettings.pVertexLayout = &vertexLayout;
-	pipelineSettings.pRasterizerState = &sphereRasterizerStateDesc;
-	addPipeline(pRenderer, &desc, &pSpherePipeline);
+	float pixelGap = 80.0f;
+	float widthRight = 1.0f - pixelGap / (float)mSettings.mWidth;
+	float heightDown = -1.0f + pixelGap / (float)mSettings.mHeight;
 
-	//layout and pipeline for skybox draw
-	vertexLayout = {};
-	vertexLayout.mAttribCount = 1;
-	vertexLayout.mAttribs[0].mSemantic = SEMANTIC_POSITION;
-	vertexLayout.mAttribs[0].mFormat = TinyImageFormat_R32G32B32A32_SFLOAT;
-	vertexLayout.mAttribs[0].mBinding = 0;
-	vertexLayout.mAttribs[0].mLocation = 0;
-	vertexLayout.mAttribs[0].mOffset = 0;
+	float screenWaterMarkPoints[] = {
+		widthRight - widthGap,	heightDown + heightGap, 0.5f, 0.0f, 0.0f,
+		widthRight - widthGap,	heightDown,				0.5f, 0.0f, 1.0f,
+		widthRight,				heightDown + heightGap, 0.5f, 1.0f, 0.0f,
 
-	pipelineSettings.pDepthState = NULL;
-	pipelineSettings.pRasterizerState = &rasterizerStateDesc;
-	pipelineSettings.pShaderProgram = pSkyBoxDrawShader;
-	addPipeline(pRenderer, &desc, &pSkyBoxDrawPipeline);
+		widthRight,				heightDown + heightGap, 0.5f, 1.0f, 0.0f,
+		widthRight - widthGap,	heightDown,				0.5f, 0.0f, 1.0f,
+		widthRight,				heightDown,				0.5f, 1.0f, 1.0f
+	};
 
-	player->load(pRenderer, pSwapChain->ppRenderTargets[0], pDepthBuffer, pSimpleShader);
+	BufferLoadDesc screenQuadVbDesc = {};
+	screenQuadVbDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_VERTEX_BUFFER;
+	screenQuadVbDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_GPU_ONLY;
+	screenQuadVbDesc.mDesc.mSize = sizeof(float) * 5 * 6;
+	screenQuadVbDesc.pData = screenWaterMarkPoints;
+	screenQuadVbDesc.ppBuffer = &WaterMarkVB;
+	addResource(&screenQuadVbDesc, NULL, LOAD_PRIORITY_NORMAL);
 
 	return true;
+}
+
+void Application::RemovePipelines()
+{
+	removePipeline(pRenderer, pPipelineShadowPass_NonOPtimized);
+	removePipeline(pRenderer, pPipelineShadowPass);
+	removePipeline(pRenderer, pVignettePipeline);
+	removePipeline(pRenderer, pFloorPipeline);
+	removePipeline(pRenderer, pMeshOptDemoPipeline);
+	removePipeline(pRenderer, pFXAAPipeline);
+	removePipeline(pRenderer, pWaterMarkPipeline);
 }
 
 void Application::Unload()
 {
 	waitQueueIdle(pGraphicsQueue);
+	waitForFences(pRenderer, Application::gImageCount, pRenderCompleteFences);
+
+	RemoveModelDependentResources();
 
 	unloadProfilerUI();
 	gAppUI.Unload();
 
+#if defined(TARGET_IOS) || defined(__ANDROID__)
 	gVirtualJoystick.Unload();
+#endif
 
-	removePipeline(pRenderer, pSkyBoxDrawPipeline);
-	removePipeline(pRenderer, pSpherePipeline);
-	player->unload(pRenderer);
+	removeResource(WaterMarkVB);
+
+	RemovePipelines();
 
 	removeSwapChain(pRenderer, pSwapChain);
+
+	removeRenderTarget(pRenderer, pPostProcessRT);
+	removeRenderTarget(pRenderer, pForwardRT);
 	removeRenderTarget(pRenderer, pDepthBuffer);
+	removeRenderTarget(pRenderer, pShadowRT);
 }
 
 void Application::Update(float deltaTime)
 {
-	updateInputSystem(mSettings.mWidth, mSettings.mHeight);
+	Input::Update(mSettings.mWidth, mSettings.mHeight);
+
+#if !defined(__ANDROID__) && !defined(TARGET_IOS) && !defined(_DURANGO)
+	if (pSwapChain->mEnableVsync != bToggleVSync)
+	{
+		waitQueueIdle(pGraphicsQueue);
+		::toggleVSync(pRenderer, &pSwapChain);
+	}
+#endif
 
 	pCameraController->update(deltaTime);
 	/************************************************************************/
 	// Scene Update
 	/************************************************************************/
-	static float currentTime = 0.0f;
-	currentTime += deltaTime * 1000.0f;
-
-	// update camera with time
-	viewMat = pCameraController->getViewMatrix();
-
+	mat4 viewMat = pCameraController->getViewMatrix();
 	const float aspectInverse = (float)mSettings.mHeight / (float)mSettings.mWidth;
-	const float horizontal_fov = PI / 2.0f;
-	projMat = mat4::perspective(horizontal_fov, aspectInverse, 1000.0f, 0.1f);
+	const float horizontal_fov = PI / 3.0f;
+	mat4 projMat = mat4::perspectiveReverseZ(horizontal_fov, aspectInverse, 0.001f, 1000.0f);
 	gUniformData.mProjectView = projMat * viewMat;
+	gUniformData.mModel = mat4::identity();
+	gUniformData.mCameraPosition = vec4(pCameraController->getViewPosition(), 1.0f);
 
-	// point light parameters
-	gUniformData.mLightPosition = vec3(0, 0, 0);
-	gUniformData.mLightColor = vec3(0.9f, 0.9f, 0.7f);    // Pale Yellow
-
-	// update planet transformations
-	for (unsigned int i = 0; i < gNumPlanets; i++)
+	for (uint i = 0; i < gTotalLightCount; ++i)
 	{
-		mat4 rotSelf, rotOrbitY, rotOrbitZ, trans, scale, parentMat;
-		rotSelf = rotOrbitY = rotOrbitZ = trans = scale = parentMat = mat4::identity();
-		if (gPlanetInfoData[i].mRotationSpeed > 0.0f)
-			rotSelf = mat4::rotationY(gRotSelfScale * (currentTime + gTimeOffset) / gPlanetInfoData[i].mRotationSpeed);
-		if (gPlanetInfoData[i].mYOrbitSpeed > 0.0f)
-			rotOrbitY = mat4::rotationY(gRotOrbitYScale * (currentTime + gTimeOffset) / gPlanetInfoData[i].mYOrbitSpeed);
-		if (gPlanetInfoData[i].mZOrbitSpeed > 0.0f)
-			rotOrbitZ = mat4::rotationZ(gRotOrbitZScale * (currentTime + gTimeOffset) / gPlanetInfoData[i].mZOrbitSpeed);
-		if (gPlanetInfoData[i].mParentIndex > 0)
-			parentMat = gPlanetInfoData[gPlanetInfoData[i].mParentIndex].mSharedMat;
+		gUniformData.mLightColor[i] = vec4(float((gLightColor[i] >> 24) & 0xff),
+			float((gLightColor[i] >> 16) & 0xff),
+			float((gLightColor[i] >> 8) & 0xff),
+			float((gLightColor[i] >> 0) & 0xff)) / 255.0f;
 
-		trans = gPlanetInfoData[i].mTranslationMat;
-		scale = gPlanetInfoData[i].mScaleMat;
-
-		gPlanetInfoData[i].mSharedMat = parentMat * rotOrbitY * trans;
-		gUniformData.mToWorldMat[i] = parentMat * rotOrbitY * rotOrbitZ * trans * rotSelf * scale;
-		gUniformData.mColor[i] = gPlanetInfoData[i].mColor;
+		gUniformData.mLightColor[i].setW(gLightColorIntensity[i]);
 	}
 
-	viewMat.setTranslation(vec3(0));
-	gUniformDataSky = gUniformData;
-	gUniformDataSky.mProjectView = projMat * viewMat;
+	float Azimuth = (PI / 180.0f) * gLightDirection.x;
+	float Elevation = (PI / 180.0f) * (gLightDirection.y - 180.0f);
 
-	player->update(deltaTime);
+	vec3 sunDirection = normalize(vec3(cosf(Azimuth) * cosf(Elevation), sinf(Elevation), sinf(Azimuth) * cosf(Elevation)));
+
+	gUniformData.mLightDirection[0] = vec4(sunDirection, 0.0f);
+	// generate 2nd, 3rd light from the main light
+	gUniformData.mLightDirection[1] = vec4(-sunDirection.getX(), sunDirection.getY(), -sunDirection.getZ(), 0.0f);
+	gUniformData.mLightDirection[2] = vec4(-sunDirection.getX(), -sunDirection.getY(), -sunDirection.getZ(), 0.0f);
+
+	gFloorUniformBlock.projViewMat = gUniformData.mProjectView;
+	gFloorUniformBlock.worldMat = mat4::scale(vec3(50.0f));
+	gFloorUniformBlock.screenSize = vec4((float)mSettings.mWidth, (float)mSettings.mHeight, 1.0f / mSettings.mWidth, bVignetting ? 1.0f : 0.0f);
+
+	//rot += 0.001f;
+	//player->setScaleRot(vec3(0.2f), rot, vec3(0.0f, 1.0f, 0.0f));
+
+	currVelX -= drag * currVelX;
+	currVelY -= drag * currVelY;
+	if (Input::inputs[InputEnum::INPUT_UP] > 0.0f) {
+		currVelY += acceleration * deltaTime;
+	}
+	if (Input::inputs[InputEnum::INPUT_LEFT] > 0.0f) {
+		currVelX -= acceleration * deltaTime;
+	}
+	if (Input::inputs[InputEnum::INPUT_DOWN] > 0.0f) {
+		currVelY -= acceleration * deltaTime;
+	}
+	if (Input::inputs[InputEnum::INPUT_RIGHT] > 0.0f) {
+		currVelX += acceleration * deltaTime;
+	}
+
+	if (sqrt(currVelX * currVelX + currVelY * currVelY) > 0.01) {
+		currPosX += currVelX;
+		currPosY += currVelY;
+
+		player->setPositionDirection(vec3(currPosX, 0, currPosY), vec3(currVelX, 0, currVelY));
+	}
+
+	pCameraController->moveTo(player->getPosition() + cameraOffset);
+	pCameraController->lookAt(player->getPosition() + vec3(0, 0.4f, 0));
 
 	/************************************************************************/
-	// Update GUI
+	// Light Matrix Update - for shadow map
 	/************************************************************************/
-	gAppUI.Update(deltaTime);
+
+	vec3 lightPos = sunDirection * 4.0f;
+	pLightView->moveTo(lightPos);
+	pLightView->lookAt(vec3(0.0f));
+
+	mat4 lightView = pLightView->getViewMatrix();
+	//perspective as spotlight, for future use. TODO: Use a frustum fitting algorithm to maximise effective resolution!
+	const float shadowRange = 2.7f;
+	//const float shadowHalfRange = shadowRange * 0.5f;
+	mat4 lightProjMat = mat4::orthographicReverseZ(-shadowRange, shadowRange, -shadowRange, shadowRange, shadowRange * 0.5f, shadowRange * 4.0f);
+
+	gShadowUniformData.ViewProj = lightProjMat * lightView;
+	gUniformData.mShadowLightViewProj = gShadowUniformData.ViewProj;
+
+	/************************************************************************/
+	/************************************************************************/
+
+	//gAppUI.Update(deltaTime);
+}
+
+void Application::PostDrawUpdate()
+{
+
+#if defined(__ANDROID__) || defined(__LINUX__)
+	if (guiModelToLoadIndex != modelToLoadIndex)
+	{
+		modelToLoadIndex = guiModelToLoadIndex;
+		gGuiModelToLoad = gModelFiles[modelToLoadIndex];
+	}
+#endif
+	if (!fsPathsEqual(gGuiModelToLoad, gModelFile))
+	{
+		if (fsFileExists(gGuiModelToLoad))
+		{
+			gModelFile = gGuiModelToLoad;
+
+			Unload();
+			Load();
+		}
+		else
+		{
+			gGuiModelToLoad = gModelFile;
+		}
+	}
+	gCurrentLod = min(gCurrentLod, gMaxLod);
+}
+
+void Application::SelectModelFunc(const Path* path, void* pathPtr) {
+	PathHandle* outputPath = (PathHandle*)pathPtr;
+
+	if (path) {
+		*outputPath = fsCopyPath(path);
+	}
+}
+
+void Application::LoadNewModel()
+{
+	eastl::vector<const char*> extFilter;
+	extFilter.push_back("gltf");
+	extFilter.push_back("glb");
+
+	PathHandle meshDir = fsCopyPathForResourceDirectory(RD_MESHES);
+
+	fsShowOpenFileDialog("Select model to load", meshDir, SelectModelFunc, &gGuiModelToLoad, "Model File", &extFilter[0], extFilter.size());
+}
+
+void Application::LoadLOD()
+{
+	waitQueueIdle(pGraphicsQueue);
+
+	eastl::vector<const char*> extFilter;
+	extFilter.push_back("gltf");
+	extFilter.push_back("glb");
+
+	PathHandle meshDir = fsCopyPathForResourceDirectory(RD_MESHES);
+
+	fsShowOpenFileDialog("Select model to load", meshDir, SelectModelFunc, &gGuiModelToLoad, "Model File", &extFilter[0], extFilter.size());
 }
 
 void Application::Draw()
 {
-	acquireNextImage(pRenderer, pSwapChain, pImageAcquiredSemaphore, NULL, &gFrameIndex);
-
-	RenderTarget* pRenderTarget = pSwapChain->ppRenderTargets[gFrameIndex];
-	Semaphore* pRenderCompleteSemaphore = pRenderCompleteSemaphores[gFrameIndex];
-	Fence* pRenderCompleteFence = pRenderCompleteFences[gFrameIndex];
+	acquireNextImage(pRenderer, pSwapChain, pImageAcquiredSemaphore, NULL, &Application::gFrameIndex);
 
 	// Stall if CPU is running "Swap Chain Buffer Count" frames ahead of GPU
+	Fence* pNextFence = pRenderCompleteFences[Application::gFrameIndex];
 	FenceStatus fenceStatus;
-	getFenceStatus(pRenderer, pRenderCompleteFence, &fenceStatus);
+	getFenceStatus(pRenderer, pNextFence, &fenceStatus);
 	if (fenceStatus == FENCE_STATUS_INCOMPLETE)
-		waitForFences(pRenderer, 1, &pRenderCompleteFence);
+		waitForFences(pRenderer, 1, &pNextFence);
 
 	// Update uniform buffers
-	BufferUpdateDesc viewProjCbv = { pProjViewUniformBuffer[gFrameIndex] };
-	beginUpdateResource(&viewProjCbv);
-	*(UniformBlock*)viewProjCbv.pMappedData = gUniformData;
-	endUpdateResource(&viewProjCbv, NULL);
+	BufferUpdateDesc shaderCbv = { pUniformBuffer[Application::gFrameIndex] };
+	beginUpdateResource(&shaderCbv);
+	*(UniformBlock*)shaderCbv.pMappedData = gUniformData;
+	endUpdateResource(&shaderCbv, NULL);
 
-	BufferUpdateDesc skyboxViewProjCbv = { pSkyboxUniformBuffer[gFrameIndex] };
-	beginUpdateResource(&skyboxViewProjCbv);
-	*(UniformBlock*)skyboxViewProjCbv.pMappedData = gUniformDataSky;
-	endUpdateResource(&skyboxViewProjCbv, NULL);
+	RenderTarget* pRenderTarget = NULL;
 
-	Cmd* cmd = ppCmds[gFrameIndex];
+	Semaphore* pRenderCompleteSemaphore = pRenderCompleteSemaphores[Application::gFrameIndex];
+	Fence* pRenderCompleteFence = pRenderCompleteFences[Application::gFrameIndex];
+
+	vec4 bgColor = vec4(float((gBackroundColor >> 24) & 0xff),
+		float((gBackroundColor >> 16) & 0xff),
+		float((gBackroundColor >> 8) & 0xff),
+		float((gBackroundColor >> 0) & 0xff)) / 255.0f;
+
+
+	Cmd* cmd = ppCmds[Application::gFrameIndex];
 	beginCmd(cmd);
 
 	cmdBeginGpuFrameProfile(cmd, gGpuProfileToken);
 
+	drawShadowMap(cmd);
+
+	{
+		LoadActionsDesc loadActions = {};
+		loadActions.mLoadActionsColor[0] = LOAD_ACTION_CLEAR;
+		loadActions.mClearColorValues[0].r = bgColor.getX();
+		loadActions.mClearColorValues[0].g = bgColor.getY();
+		loadActions.mClearColorValues[0].b = bgColor.getZ();
+		loadActions.mClearColorValues[0].a = bgColor.getW();
+		loadActions.mLoadActionDepth = LOAD_ACTION_CLEAR;
+		loadActions.mClearDepth.depth = 0.0f;
+		loadActions.mClearDepth.stencil = 0;
+
+		cmdBeginGpuTimestampQuery(cmd, gGpuProfileToken, "Draw Floor");
+
+		pRenderTarget = pForwardRT;
+
+		RenderTargetBarrier barriers[] =
+		{
+			{ pRenderTarget, RESOURCE_STATE_RENDER_TARGET },
+			{ pDepthBuffer, RESOURCE_STATE_DEPTH_WRITE },
+			{ pShadowRT, RESOURCE_STATE_SHADER_RESOURCE }
+		};
+		cmdResourceBarrier(cmd, 0, NULL, 0, NULL, 3, barriers);
+
+		cmdBindRenderTargets(cmd, 1, &pRenderTarget, pDepthBuffer, &loadActions, NULL, NULL, -1, -1);
+		cmdSetViewport(cmd, 0.0f, 0.0f, (float)pRenderTarget->mWidth, (float)pRenderTarget->mHeight, 0.0f, 1.0f);
+		cmdSetScissor(cmd, 0, 0, pRenderTarget->mWidth, pRenderTarget->mHeight);
+
+		cmdBindPipeline(cmd, pFloorPipeline);
+
+		// Update uniform buffers
+		BufferUpdateDesc Cb = { pFloorUniformBuffer[Application::gFrameIndex] };
+		beginUpdateResource(&Cb);
+		*(UniformBlock_Floor*)Cb.pMappedData = gFloorUniformBlock;
+		endUpdateResource(&Cb, NULL);
+
+		cmdBindDescriptorSet(cmd, 0, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_NONE]);
+		cmdBindDescriptorSet(cmd, Application::gFrameIndex, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+
+		const uint32_t stride = sizeof(float) * 5;
+		cmdBindVertexBuffer(cmd, 1, &pFloorVB, &stride, NULL);
+		cmdBindIndexBuffer(cmd, pFloorIB, INDEX_TYPE_UINT16, 0);
+
+		cmdDrawIndexed(cmd, 6, 0, 0);
+
+		cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);
+	}
+
+	//// draw scene
+
+	{
+		cmdBeginGpuTimestampQuery(cmd, gGpuProfileToken, "Draw Scene");
+
+		cmdSetViewport(cmd, 0.0f, 0.0f, (float)pRenderTarget->mWidth, (float)pRenderTarget->mHeight, 0.0f, 1.0f);
+		cmdSetScissor(cmd, 0, 0, pRenderTarget->mWidth, pRenderTarget->mHeight);
+
+
+
+		for (auto other : others) {
+			cmdBindPipeline(cmd, pMeshOptDemoPipeline);
+
+			gUniformData.mModel = other->model;
+			BufferUpdateDesc shaderCbv = { pUniformBuffer[Application::gFrameIndex] };
+			beginUpdateResource(&shaderCbv);
+			*(UniformBlock*)shaderCbv.pMappedData = gUniformData;
+			endUpdateResource(&shaderCbv, NULL);
+
+			cmdBindDescriptorSet(cmd, 0, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_NONE]);
+			cmdBindDescriptorSet(cmd, Application::gFrameIndex, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+			other->draw(cmd, pRootSignatureShaded, true);
+		}
+
+		cmdBindPipeline(cmd, pMeshOptDemoPipeline);
+
+
+
+
+
+		// Update uniform buffers
+		gUniformData.mModel = player->model;
+		BufferUpdateDesc shaderCbv = { pUniformBuffer[Application::gFrameIndex] };
+		beginUpdateResource(&shaderCbv);
+		*(UniformBlock*)shaderCbv.pMappedData = gUniformData;
+		endUpdateResource(&shaderCbv, NULL);
+
+		cmdBindDescriptorSet(cmd, 0, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_NONE]);
+		cmdBindDescriptorSet(cmd, Application::gFrameIndex, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+		player->draw(cmd, pRootSignatureShaded, true);
+
+
+
+		// Update uniform buffers
+		//gUniformData.mModel = player->model * mat4::translation(vec3(1, 0, 0));
+		shaderCbv = { pUniformBuffer[Application::gFrameIndex] };
+		beginUpdateResource(&shaderCbv);
+		*(UniformBlock*)shaderCbv.pMappedData = gUniformData;
+		endUpdateResource(&shaderCbv, NULL);
+
+		cmdBindPipeline(cmd, pMeshOptDemoPipeline);
+		cmdBindDescriptorSet(cmd, 0, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_NONE]);
+		cmdBindDescriptorSet(cmd, Application::gFrameIndex, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+		//player->draw(cmd, pRootSignatureShaded, true);
+
+
+
+		cmdBindRenderTargets(cmd, 0, NULL, 0, NULL, NULL, NULL, -1, -1);
+
+		cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);
+	}
+
+	pRenderTarget = pPostProcessRT;
 	RenderTargetBarrier barriers[] = {
 		{ pRenderTarget, RESOURCE_STATE_RENDER_TARGET },
-		{ pDepthBuffer, RESOURCE_STATE_DEPTH_WRITE },
+		{ pForwardRT, RESOURCE_STATE_SHADER_RESOURCE }
 	};
+
 	cmdResourceBarrier(cmd, 0, NULL, 0, NULL, 2, barriers);
 
-	// simply record the screen cleaning command
-	LoadActionsDesc loadActions = {};
-	loadActions.mLoadActionsColor[0] = LOAD_ACTION_CLEAR;
-	loadActions.mClearColorValues[0].r = 1.0f;
-	loadActions.mClearColorValues[0].g = 1.0f;
-	loadActions.mClearColorValues[0].b = 0.0f;
-	loadActions.mClearColorValues[0].a = 0.0f;
-	loadActions.mLoadActionDepth = LOAD_ACTION_CLEAR;
-	loadActions.mClearDepth.depth = 0.0f;
-	loadActions.mClearDepth.stencil = 0;
-	cmdBindRenderTargets(cmd, 1, &pRenderTarget, pDepthBuffer, &loadActions, NULL, NULL, -1, -1);
-	cmdSetViewport(cmd, 0.0f, 0.0f, (float)pRenderTarget->mWidth, (float)pRenderTarget->mHeight, 0.0f, 1.0f);
-	cmdSetScissor(cmd, 0, 0, pRenderTarget->mWidth, pRenderTarget->mHeight);
+	if (bVignetting)
+	{
+		LoadActionsDesc loadActions = {};
+		loadActions.mLoadActionsColor[0] = LOAD_ACTION_LOAD;
+		loadActions.mLoadActionDepth = LOAD_ACTION_DONTCARE;
+		loadActions.mLoadActionStencil = LOAD_ACTION_LOAD;
 
-	const uint32_t sphereVbStride = sizeof(float) * 6;
-	const uint32_t skyboxVbStride = sizeof(float) * 4;
+		cmdBeginGpuTimestampQuery(cmd, gGpuProfileToken, "Draw Vignetting");
 
-	// draw skybox
-	cmdBeginGpuTimestampQuery(cmd, gGpuProfileToken, "Draw skybox");
-	cmdBindPipeline(cmd, pSkyBoxDrawPipeline);
-	cmdBindDescriptorSet(cmd, 0, pDescriptorSetTexture);
-	cmdBindDescriptorSet(cmd, gFrameIndex * 2 + 0, pDescriptorSetUniforms);
-	cmdBindVertexBuffer(cmd, 1, &pSkyBoxVertexBuffer, &skyboxVbStride, NULL);
-	cmdDraw(cmd, 36, 0);
-	cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);
+		cmdBindRenderTargets(cmd, 1, &pRenderTarget, NULL, &loadActions, NULL, NULL, -1, -1);
+		cmdSetViewport(cmd, 0.0f, 0.0f, (float)pRenderTarget->mWidth, (float)pRenderTarget->mHeight, 0.0f, 1.0f);
+		cmdSetScissor(cmd, 0, 0, pRenderTarget->mWidth, pRenderTarget->mHeight);
+
+		cmdBindPipeline(cmd, pVignettePipeline);
+
+		cmdBindDescriptorSet(cmd, 0, pDescriptorSetVignette);
+
+		const uint32_t stride = sizeof(float) * 5;
+		cmdBindVertexBuffer(cmd, 1, &TriangularVB, &stride, NULL);
+		cmdDraw(cmd, 3, 0);
+
+		cmdBindRenderTargets(cmd, 0, NULL, 0, NULL, NULL, NULL, -1, -1);
+
+		cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);
+	}
+
+	pRenderTarget = pSwapChain->ppRenderTargets[Application::gFrameIndex];
+	{
+		RenderTargetBarrier barriers[] =
+		{
+			{ pRenderTarget, RESOURCE_STATE_RENDER_TARGET },
+			{ pPostProcessRT, RESOURCE_STATE_SHADER_RESOURCE }
+		};
+		cmdResourceBarrier(cmd, 0, NULL, 0, NULL, 2, barriers);
+
+		LoadActionsDesc loadActions = {};
+		loadActions.mLoadActionsColor[0] = LOAD_ACTION_CLEAR;
+		loadActions.mClearColorValues[0].r = 0.0f;
+		loadActions.mClearColorValues[0].g = 0.0f;
+		loadActions.mClearColorValues[0].b = 0.0f;
+		loadActions.mClearColorValues[0].a = 0.0f;
+		loadActions.mLoadActionDepth = LOAD_ACTION_DONTCARE;
+
+		cmdBindRenderTargets(cmd, 1, &pRenderTarget, NULL, &loadActions, NULL, NULL, -1, -1);
+		cmdSetViewport(cmd, 0.0f, 0.0f, (float)pRenderTarget->mWidth, (float)pRenderTarget->mHeight, 0.0f, 1.0f);
+		cmdSetScissor(cmd, 0, 0, pRenderTarget->mWidth, pRenderTarget->mHeight);
+
+		cmdBeginGpuTimestampQuery(cmd, gGpuProfileToken, "FXAA");
+
+		cmdBindPipeline(cmd, pFXAAPipeline);
+
+		FXAAINFO FXAAinfo;
+		FXAAinfo.ScreenSize = vec2((float)mSettings.mWidth, (float)mSettings.mHeight);
+		FXAAinfo.Use = bToggleFXAA ? 1 : 0;
+
+		cmdBindDescriptorSet(cmd, 0, bVignetting ? pDescriptorSetFXAA : pDescriptorSetVignette);
+		cmdBindPushConstants(cmd, pRootSignaturePostEffects, "FXAARootConstant", &FXAAinfo);
+
+		const uint32_t stride = sizeof(float) * 5;
+		cmdBindVertexBuffer(cmd, 1, &TriangularVB, &stride, NULL);
+		cmdDraw(cmd, 3, 0);
+
+		cmdBindRenderTargets(cmd, 0, NULL, 0, NULL, NULL, NULL, -1, -1);
+
+		cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);
+	}
 
 
-	player->draw(cmd);
+	if (bScreenShotMode)
+	{
+		cmdBindRenderTargets(cmd, 1, &pRenderTarget, NULL, NULL, NULL, NULL, -1, -1);
+		cmdSetViewport(cmd, 0.0f, 0.0f, (float)pRenderTarget->mWidth, (float)pRenderTarget->mHeight, 0.0f, 1.0f);
+		cmdSetScissor(cmd, 0, 0, pRenderTarget->mWidth, pRenderTarget->mHeight);
 
+		cmdBeginGpuTimestampQuery(cmd, gGpuProfileToken, "Draw Water Mark");
 
-	loadActions = {};
-	loadActions.mLoadActionsColor[0] = LOAD_ACTION_LOAD;
-	cmdBindRenderTargets(cmd, 1, &pRenderTarget, NULL, &loadActions, NULL, NULL, -1, -1);
-	cmdBeginGpuTimestampQuery(cmd, gGpuProfileToken, "Draw UI");
+		cmdBindPipeline(cmd, pWaterMarkPipeline);
 
-	gVirtualJoystick.Draw(cmd, { 1.0f, 1.0f, 1.0f, 1.0f });
+		cmdBindDescriptorSet(cmd, 0, pDescriptorSetVignette);
 
-	cmdDrawCpuProfile(cmd, float2(8, 15), &gFrameTimeDraw);
-#if !defined(__ANDROID__)
-	cmdDrawGpuProfile(cmd, float2(8, 40), gGpuProfileToken, &gFrameTimeDraw);
+		const uint32_t stride = sizeof(float) * 5;
+		cmdBindVertexBuffer(cmd, 1, &WaterMarkVB, &stride, NULL);
+		cmdDraw(cmd, 6, 0);
+
+		cmdBindRenderTargets(cmd, 0, NULL, 0, NULL, NULL, NULL, -1, -1);
+		cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);
+	}
+
+	if (!bScreenShotMode)
+	{
+		cmdBeginGpuTimestampQuery(cmd, gGpuProfileToken, "Draw UI");
+		static HiresTimer gTimer;
+		gTimer.GetUSec(true);
+
+		LoadActionsDesc loadActions = {};
+		loadActions.mLoadActionsColor[0] = LOAD_ACTION_LOAD;
+
+		cmdBindRenderTargets(cmd, 1, &pRenderTarget, NULL, &loadActions, NULL, NULL, -1, -1);
+#if defined(TARGET_IOS) || defined(__ANDROID__)
+		//gVirtualJoystick.Draw(cmd, { 1.0f, 1.0f, 1.0f, 1.0f });
 #endif
 
-	cmdDrawProfilerUI();
+		cmdDrawCpuProfile(cmd, float2(8.0f, 15.0f), &gFrameTimeDraw);
+#if !defined(__ANDROID__)
+		cmdDrawGpuProfile(cmd, float2(8, 40), gGpuProfileToken);
+#endif
 
-	gAppUI.Draw(cmd);
-	cmdBindRenderTargets(cmd, 0, NULL, NULL, NULL, NULL, NULL, -1, -1);
-	cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);
+		cmdDrawProfilerUI();
 
-	barriers[0] = { pRenderTarget, RESOURCE_STATE_PRESENT };
-	cmdResourceBarrier(cmd, 0, NULL, 0, NULL, 1, barriers);
+		gAppUI.Gui(pGuiWindow);
+		gAppUI.Gui(pGuiGraphics);
 
+		gAppUI.Draw(cmd);
+
+		cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);
+	}
+
+	cmdBindRenderTargets(cmd, 0, NULL, 0, NULL, NULL, NULL, -1, -1);
+
+	RenderTargetBarrier finalBarriers = { pRenderTarget, RESOURCE_STATE_PRESENT };
+	cmdResourceBarrier(cmd, 0, NULL, 0, NULL, 1, &finalBarriers);
 	cmdEndGpuFrameProfile(cmd, gGpuProfileToken);
 	endCmd(cmd);
 
@@ -834,14 +1654,19 @@ void Application::Draw()
 	submitDesc.pSignalFence = pRenderCompleteFence;
 	queueSubmit(pGraphicsQueue, &submitDesc);
 	QueuePresentDesc presentDesc = {};
-	presentDesc.mIndex = gFrameIndex;
+	presentDesc.mIndex = Application::gFrameIndex;
 	presentDesc.mWaitSemaphoreCount = 1;
-	presentDesc.pSwapChain = pSwapChain;
 	presentDesc.ppWaitSemaphores = &pRenderCompleteSemaphore;
+	presentDesc.pSwapChain = pSwapChain;
 	presentDesc.mSubmitDone = true;
 	queuePresent(pGraphicsQueue, &presentDesc);
+
 	flipProfiler();
+
+	PostDrawUpdate();
 }
+
+const char* Application::GetName() { return "08_GltfViewer"; }
 
 bool Application::addSwapChain()
 {
@@ -852,11 +1677,52 @@ bool Application::addSwapChain()
 	swapChainDesc.mWidth = mSettings.mWidth;
 	swapChainDesc.mHeight = mSettings.mHeight;
 	swapChainDesc.mImageCount = Application::gImageCount;
+
 	swapChainDesc.mColorFormat = getRecommendedSwapchainFormat(true);
 	swapChainDesc.mEnableVsync = false;
+
 	::addSwapChain(pRenderer, &swapChainDesc, &pSwapChain);
 
 	return pSwapChain != NULL;
+}
+
+bool Application::addRenderTargets()
+{
+	RenderTargetDesc RT = {};
+	RT.mArraySize = 1;
+	RT.mDepth = 1;
+	RT.mFormat = TinyImageFormat_R8G8B8A8_UNORM;
+
+	vec4 bgColor = vec4(float((gBackroundColor >> 24) & 0xff),
+		float((gBackroundColor >> 16) & 0xff),
+		float((gBackroundColor >> 8) & 0xff),
+		float((gBackroundColor >> 0) & 0xff)) / 255.0f;
+
+	RT.mClearValue.r = bgColor.getX();
+	RT.mClearValue.g = bgColor.getY();
+	RT.mClearValue.b = bgColor.getZ();
+	RT.mClearValue.a = bgColor.getW();
+
+	RT.mWidth = mSettings.mWidth;
+	RT.mHeight = mSettings.mHeight;
+
+	RT.mSampleCount = SAMPLE_COUNT_1;
+	RT.mSampleQuality = 0;
+	RT.pDebugName = L"Render Target";
+	addRenderTarget(pRenderer, &RT, &pForwardRT);
+
+	RT = {};
+	RT.mArraySize = 1;
+	RT.mDepth = 1;
+	RT.mFormat = TinyImageFormat_R8G8B8A8_UNORM;
+	RT.mWidth = mSettings.mWidth;
+	RT.mHeight = mSettings.mHeight;
+	RT.mSampleCount = SAMPLE_COUNT_1;
+	RT.mSampleQuality = 0;
+	RT.pDebugName = L"Post Process Render Target";
+	addRenderTarget(pRenderer, &RT, &pPostProcessRT);
+
+	return pForwardRT != NULL && pPostProcessRT != NULL;
 }
 
 bool Application::addDepthBuffer()
@@ -875,7 +1741,41 @@ bool Application::addDepthBuffer()
 	depthRT.mFlags = TEXTURE_CREATION_FLAG_ON_TILE;
 	addRenderTarget(pRenderer, &depthRT, &pDepthBuffer);
 
-	return pDepthBuffer != NULL;
+	/************************************************************************/
+	// Shadow Map Render Target
+	/************************************************************************/
+
+	RenderTargetDesc shadowRTDesc = {};
+	shadowRTDesc.mArraySize = 1;
+	shadowRTDesc.mClearValue.depth = 0.0f;
+	shadowRTDesc.mClearValue.stencil = 0;
+	shadowRTDesc.mDepth = 1;
+	shadowRTDesc.mFormat = TinyImageFormat_D32_SFLOAT;
+	shadowRTDesc.mWidth = SHADOWMAP_RES;
+	shadowRTDesc.mHeight = SHADOWMAP_RES;
+	shadowRTDesc.mSampleCount = (SampleCount)SHADOWMAP_MSAA_SAMPLES;
+	shadowRTDesc.mSampleQuality = 0;    // don't need higher quality sample patterns as the texture will be blurred heavily
+	shadowRTDesc.pDebugName = L"Shadow Map RT";
+
+	addRenderTarget(pRenderer, &shadowRTDesc, &pShadowRT);
+
+	return pDepthBuffer != NULL && pShadowRT != NULL;
+}
+
+void Application::RecenterCameraView(float maxDistance, vec3 lookAt = vec3(0))
+{
+	vec3 p = pCameraController->getViewPosition();
+	vec3 d = p - lookAt;
+
+	float lenSqr = lengthSqr(d);
+	if (lenSqr > (maxDistance * maxDistance))
+	{
+		d *= (maxDistance / sqrtf(lenSqr));
+	}
+
+	p = d + lookAt;
+	pCameraController->moveTo(p);
+	pCameraController->lookAt(lookAt);
 }
 
 

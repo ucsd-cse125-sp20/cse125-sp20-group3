@@ -1,79 +1,80 @@
 #version 450 core
 
-/*
- * Copyright (c) 2018-2020 The Forge Interactive Inc.
- * 
- * This file is part of The-Forge
- * (see https://github.com/ConfettiFX/The-Forge).
- * 
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- * 
- *   http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
-*/
+precision highp float;
+precision highp int; 
+vec4 MulMat(mat4 lhs, vec4 rhs)
+{
+    vec4 dst;
+	dst[0] = lhs[0][0]*rhs[0] + lhs[0][1]*rhs[1] + lhs[0][2]*rhs[2] + lhs[0][3]*rhs[3];
+	dst[1] = lhs[1][0]*rhs[0] + lhs[1][1]*rhs[1] + lhs[1][2]*rhs[2] + lhs[1][3]*rhs[3];
+	dst[2] = lhs[2][0]*rhs[0] + lhs[2][1]*rhs[1] + lhs[2][2]*rhs[2] + lhs[2][3]*rhs[3];
+	dst[3] = lhs[3][0]*rhs[0] + lhs[3][1]*rhs[1] + lhs[3][2]*rhs[2] + lhs[3][3]*rhs[3];
+    return dst;
+}
 
-#ifdef PREDEFINED_MACRO
-#include "stdmacro_defs.inc"
-#endif
 
-// Shader for simple shading with a point light
-// for planets in Unit Test 12 - Transformations
+layout(location = 0) in vec3 POSITION;
+layout(location = 1) in vec3 NORMAL;
+layout(location = 2) in vec2 TEXCOORD0;
+layout(location = 0) out vec3 vertOutput_POSITION;
+layout(location = 1) out vec3 vertOutput_NORMAL;
+layout(location = 2) out vec2 vertOutput_TEXCOORD0;
 
-#define MAX_PLANETS 20
-
-layout(location = 0) in vec4 Position;
-layout(location = 1) in vec4 Normal;
-
-layout(location = 0) out vec4 Color;
-
-layout (std140, UPDATE_FREQ_PER_FRAME, binding=0) uniform uniformBlock {
-	uniform mat4 mvp;
-    uniform mat4 toWorld[MAX_PLANETS];
-    uniform vec4 color[MAX_PLANETS];
-
-    // Point Light Information
-    uniform vec3 lightPosition;
-    uniform vec3 lightColor;
+struct VsIn
+{
+    vec3 position;
+    vec3 normal;
+    vec2 texCoord;
+};
+layout(row_major, set = 1, binding = 0) uniform cbPerPass
+{
+    mat4 projView;
+    mat4 shadowLightViewProj;
+    vec4 camPos;
+    vec4 lightColor[4];
+    vec4 lightDirection[3];
 };
 
-void main ()
+layout(row_major, push_constant) uniform cbRootConstants_Block
 {
-	mat4 tempMat = mvp * toWorld[gl_InstanceIndex];
-	gl_Position = tempMat * vec4(Position.xyz, 1.0f);
-	
-	vec4 normal = normalize(toWorld[gl_InstanceIndex] * vec4(Normal.xyz, 0.0f));
-	vec4 pos = toWorld[gl_InstanceIndex] * vec4(Position.xyz, 1.0f);
-	
-	float lightIntensity = 1.0f;
-    float quadraticCoeff = 1.2;
-    float ambientCoeff = 0.4;
-	
-	vec3 lightDir;
+    uint nodeIndex;
+} cbRootConstants;
 
-    if (color[gl_InstanceIndex].w == 0) // Special case for Sun, so that it is lit from its top
-        lightDir = vec3(0.0f, 1.0f, 0.0f);
-    else
-        lightDir = normalize(lightPosition - pos.xyz);
-	
-    float distance = length(lightDir);
-    float attenuation = 1.0 / (quadraticCoeff * distance * distance);
-    float intensity = lightIntensity * attenuation;
+layout(row_major, set = 0, binding = 0) buffer modelToWorldMatrices
+{
+    mat4 modelToWorldMatrices_Data[];
+};
 
-    vec3 baseColor = color[gl_InstanceIndex].xyz;
-    vec3 blendedColor = lightColor * baseColor * lightIntensity;
-    vec3 diffuse = blendedColor * max(dot(normal.xyz, lightDir), 0.0);
-    vec3 ambient = baseColor * ambientCoeff;
-    Color = vec4(diffuse + ambient, 1.0);
+struct PsIn
+{
+    vec3 pos;
+    vec3 normal;
+    vec2 texCoord;
+    vec4 position;
+};
+
+PsIn HLSLmain(VsIn In)
+{
+    mat4 modelToWorld = modelToWorldMatrices_Data[cbRootConstants.nodeIndex];
+    PsIn Out;
+    vec4 inPos = vec4(In.position.xyz, 1.0);
+    vec3 inNormal = In.normal;
+    vec4 worldPosition = MulMat(modelToWorld,inPos);
+    ((Out).position = MulMat(projView,worldPosition));
+    ((Out).pos = (worldPosition).xyz);
+    ((Out).normal = normalize(MulMat(modelToWorld, vec4(inNormal, 0)).xyz));
+    ((Out).texCoord = vec2(((In).texCoord).xy));
+    return Out;
+}
+void main()
+{
+    VsIn In;
+    In.position = POSITION;
+    In.normal = NORMAL;
+    In.texCoord = TEXCOORD0;
+    PsIn result = HLSLmain(In);
+    vertOutput_POSITION = result.pos;
+    vertOutput_NORMAL = result.normal;
+    vertOutput_TEXCOORD0 = result.texCoord;
+    gl_Position = result.position;
 }

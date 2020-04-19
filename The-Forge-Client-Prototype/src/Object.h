@@ -7,16 +7,11 @@
 
 class Object
 {
-protected:
-	mat4 model = mat4::identity();
-	vec3 color = vec3(1.0f, 1.0f, 1.0f);
 public:
-	mat4 getModel() { return model; }
-	vec3 getColor() { return color; }
-	void setColor(vec3 c) { color = c; }
+	mat4 model = mat4::identity();
 
-	virtual void draw(Cmd* commands) = 0;
 	virtual void update(float deltaTime) = 0;
+	virtual void draw(Cmd* commands) = 0;
 };
 
 #endif

@@ -28,6 +28,7 @@ public:
 	};
 
 private:
+	vec3 color;
 
 	std::vector<VertexData> points;
 	int size;

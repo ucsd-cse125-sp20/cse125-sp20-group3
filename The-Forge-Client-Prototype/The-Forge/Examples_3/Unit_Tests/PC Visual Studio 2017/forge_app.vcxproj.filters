@@ -21,7 +21,10 @@
     <ClCompile Include="..\..\..\..\src\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\OBJObject.cpp">
+    <ClCompile Include="..\..\..\..\src\GLTFObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\Input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -32,10 +35,43 @@
     <None Include="..\..\..\..\src\Shaders\D3D12\basic.vert">
       <Filter>Shaders\D3D12</Filter>
     </None>
+    <None Include="..\..\..\..\src\Shaders\D3D12\floor.frag">
+      <Filter>Shaders\D3D12</Filter>
+    </None>
+    <None Include="..\..\..\..\src\Shaders\D3D12\floor.vert">
+      <Filter>Shaders\D3D12</Filter>
+    </None>
+    <None Include="..\..\..\..\src\Shaders\D3D12\FXAA.frag">
+      <Filter>Shaders\D3D12</Filter>
+    </None>
     <None Include="..\..\..\..\src\Shaders\D3D12\profile.frag">
       <Filter>Shaders\D3D12</Filter>
     </None>
     <None Include="..\..\..\..\src\Shaders\D3D12\profile.vert">
+      <Filter>Shaders\D3D12</Filter>
+    </None>
+    <None Include="..\..\..\..\src\Shaders\D3D12\shader.frag">
+      <Filter>Shaders\D3D12</Filter>
+    </None>
+    <None Include="..\..\..\..\src\Shaders\D3D12\shader.vert">
+      <Filter>Shaders\D3D12</Filter>
+    </None>
+    <None Include="..\..\..\..\src\Shaders\D3D12\Triangular.vert">
+      <Filter>Shaders\D3D12</Filter>
+    </None>
+    <None Include="..\..\..\..\src\Shaders\D3D12\vignette.frag">
+      <Filter>Shaders\D3D12</Filter>
+    </None>
+    <None Include="..\..\..\..\src\Shaders\D3D12\watermark.frag">
+      <Filter>Shaders\D3D12</Filter>
+    </None>
+    <None Include="..\..\..\..\src\Shaders\D3D12\watermark.vert">
+      <Filter>Shaders\D3D12</Filter>
+    </None>
+    <None Include="..\..\..\..\src\Shaders\D3D12\zPass.vert">
+      <Filter>Shaders\D3D12</Filter>
+    </None>
+    <None Include="..\..\..\..\src\Shaders\D3D12\zPassFloor.vert">
       <Filter>Shaders\D3D12</Filter>
     </None>
     <None Include="..\..\..\..\src\Shaders\Vulkan\basic.frag">
@@ -44,29 +80,47 @@
     <None Include="..\..\..\..\src\Shaders\Vulkan\basic.vert">
       <Filter>Shaders\Vulkan</Filter>
     </None>
+    <None Include="..\..\..\..\src\Shaders\Vulkan\basicMOBILE.frag">
+      <Filter>Shaders\Vulkan</Filter>
+    </None>
+    <None Include="..\..\..\..\src\Shaders\Vulkan\floor.frag">
+      <Filter>Shaders\Vulkan</Filter>
+    </None>
+    <None Include="..\..\..\..\src\Shaders\Vulkan\floor.vert">
+      <Filter>Shaders\Vulkan</Filter>
+    </None>
+    <None Include="..\..\..\..\src\Shaders\Vulkan\floorMOBILE.frag">
+      <Filter>Shaders\Vulkan</Filter>
+    </None>
+    <None Include="..\..\..\..\src\Shaders\Vulkan\FXAA.frag">
+      <Filter>Shaders\Vulkan</Filter>
+    </None>
     <None Include="..\..\..\..\src\Shaders\Vulkan\profile.frag">
       <Filter>Shaders\Vulkan</Filter>
     </None>
     <None Include="..\..\..\..\src\Shaders\Vulkan\profile.vert">
       <Filter>Shaders\Vulkan</Filter>
     </None>
-    <None Include="..\..\..\..\src\Shaders\D3D12\skybox.frag">
-      <Filter>Shaders\D3D12</Filter>
-    </None>
-    <None Include="..\..\..\..\src\Shaders\D3D12\skybox.vert">
-      <Filter>Shaders\D3D12</Filter>
-    </None>
-    <None Include="..\..\..\..\src\Shaders\Vulkan\skybox.frag">
+    <None Include="..\..\..\..\src\Shaders\Vulkan\stdmacro_defs.inc">
       <Filter>Shaders\Vulkan</Filter>
     </None>
-    <None Include="..\..\..\..\src\Shaders\Vulkan\skybox.vert">
+    <None Include="..\..\..\..\src\Shaders\Vulkan\Triangular.vert">
       <Filter>Shaders\Vulkan</Filter>
     </None>
-    <None Include="..\..\..\..\src\Shaders\D3D12\shader.frag">
-      <Filter>Shaders\D3D12</Filter>
+    <None Include="..\..\..\..\src\Shaders\Vulkan\vignette.frag">
+      <Filter>Shaders\Vulkan</Filter>
     </None>
-    <None Include="..\..\..\..\src\Shaders\D3D12\shader.vert">
-      <Filter>Shaders\D3D12</Filter>
+    <None Include="..\..\..\..\src\Shaders\Vulkan\watermark.frag">
+      <Filter>Shaders\Vulkan</Filter>
+    </None>
+    <None Include="..\..\..\..\src\Shaders\Vulkan\watermark.vert">
+      <Filter>Shaders\Vulkan</Filter>
+    </None>
+    <None Include="..\..\..\..\src\Shaders\Vulkan\zPass.vert">
+      <Filter>Shaders\Vulkan</Filter>
+    </None>
+    <None Include="..\..\..\..\src\Shaders\Vulkan\zPassFloor.vert">
+      <Filter>Shaders\Vulkan</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -76,10 +130,13 @@
     <ClInclude Include="..\..\..\..\src\Object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\OBJObject.h">
+    <ClInclude Include="..\..\..\..\src\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\Application.h">
+    <ClInclude Include="..\..\..\..\src\GLTFObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\Input.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

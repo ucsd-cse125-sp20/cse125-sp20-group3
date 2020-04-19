@@ -65,7 +65,7 @@
                     }
                 }
             ],
-            "name" : "jump_and_spin.003",
+            "name" : "action",
             "samplers" : [
                 {
                     "input" : 7,
@@ -151,7 +151,7 @@
                     }
                 }
             ],
-            "name" : "action",
+            "name" : "jump_and_spin.003",
             "samplers" : [
                 {
                     "input" : 7,

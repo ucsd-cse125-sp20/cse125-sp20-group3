@@ -28,28 +28,47 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\Application.cpp" />
-    <ClCompile Include="..\..\..\..\src\OBJObject.cpp" />
+    <ClCompile Include="..\..\..\..\src\GLTFObject.cpp" />
+    <ClCompile Include="..\..\..\..\src\Input.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\src\Shaders\D3D12\basic.frag" />
     <None Include="..\..\..\..\src\Shaders\D3D12\basic.vert" />
+    <None Include="..\..\..\..\src\Shaders\D3D12\floor.frag" />
+    <None Include="..\..\..\..\src\Shaders\D3D12\floor.vert" />
+    <None Include="..\..\..\..\src\Shaders\D3D12\FXAA.frag" />
     <None Include="..\..\..\..\src\Shaders\D3D12\profile.frag" />
     <None Include="..\..\..\..\src\Shaders\D3D12\profile.vert" />
     <None Include="..\..\..\..\src\Shaders\D3D12\shader.frag" />
     <None Include="..\..\..\..\src\Shaders\D3D12\shader.vert" />
-    <None Include="..\..\..\..\src\Shaders\D3D12\skybox.frag" />
-    <None Include="..\..\..\..\src\Shaders\D3D12\skybox.vert" />
+    <None Include="..\..\..\..\src\Shaders\D3D12\Triangular.vert" />
+    <None Include="..\..\..\..\src\Shaders\D3D12\vignette.frag" />
+    <None Include="..\..\..\..\src\Shaders\D3D12\watermark.frag" />
+    <None Include="..\..\..\..\src\Shaders\D3D12\watermark.vert" />
+    <None Include="..\..\..\..\src\Shaders\D3D12\zPass.vert" />
+    <None Include="..\..\..\..\src\Shaders\D3D12\zPassFloor.vert" />
     <None Include="..\..\..\..\src\Shaders\Vulkan\basic.frag" />
     <None Include="..\..\..\..\src\Shaders\Vulkan\basic.vert" />
+    <None Include="..\..\..\..\src\Shaders\Vulkan\basicMOBILE.frag" />
+    <None Include="..\..\..\..\src\Shaders\Vulkan\floor.frag" />
+    <None Include="..\..\..\..\src\Shaders\Vulkan\floor.vert" />
+    <None Include="..\..\..\..\src\Shaders\Vulkan\floorMOBILE.frag" />
+    <None Include="..\..\..\..\src\Shaders\Vulkan\FXAA.frag" />
     <None Include="..\..\..\..\src\Shaders\Vulkan\profile.frag" />
     <None Include="..\..\..\..\src\Shaders\Vulkan\profile.vert" />
-    <None Include="..\..\..\..\src\Shaders\Vulkan\skybox.frag" />
-    <None Include="..\..\..\..\src\Shaders\Vulkan\skybox.vert" />
+    <None Include="..\..\..\..\src\Shaders\Vulkan\stdmacro_defs.inc" />
+    <None Include="..\..\..\..\src\Shaders\Vulkan\Triangular.vert" />
+    <None Include="..\..\..\..\src\Shaders\Vulkan\vignette.frag" />
+    <None Include="..\..\..\..\src\Shaders\Vulkan\watermark.frag" />
+    <None Include="..\..\..\..\src\Shaders\Vulkan\watermark.vert" />
+    <None Include="..\..\..\..\src\Shaders\Vulkan\zPass.vert" />
+    <None Include="..\..\..\..\src\Shaders\Vulkan\zPassFloor.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\Application.h" />
+    <ClInclude Include="..\..\..\..\src\GLTFObject.h" />
+    <ClInclude Include="..\..\..\..\src\Input.h" />
     <ClInclude Include="..\..\..\..\src\Object.h" />
-    <ClInclude Include="..\..\..\..\src\OBJObject.h" />
     <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\cgltf\cgltf.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

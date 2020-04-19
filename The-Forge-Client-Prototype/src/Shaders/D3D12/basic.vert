@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2020 The Forge Interactive Inc.
+ * Copyright (c) 2018 Kostas Anagnostou (https://twitter.com/KostasAAA).
  * 
  * This file is part of The-Forge
  * (see https://github.com/ConfettiFX/The-Forge).
@@ -22,62 +22,55 @@
  * under the License.
 */
 
-// Shader for simple shading with a point light
-// for planets in Unit Test 12 - Transformations
-
-#define MAX_PLANETS 20
-
-cbuffer uniformBlock : register(b0, UPDATE_FREQ_PER_FRAME)
+struct VsIn
 {
-	float4x4 mvp;
-    float4x4 toWorld[MAX_PLANETS];
-    float4 color[MAX_PLANETS];
-
-    // Point Light Information
-    float3 lightPosition;
-    float3 lightColor;
+	float3 position          : POSITION;
+	float3 normal            : NORMAL;
+	float2 texCoord          : TEXCOORD0;
+	// uint4 baseColor         : COLOR;
+	// uint2 metallicRoughness : TEXCOORD1;
+	// uint2 alphaSettings     : TEXCOORD2;
 };
 
-struct VSInput
+cbuffer cbPerPass : register(b0, UPDATE_FREQ_PER_FRAME)
 {
-    float4 Position : POSITION;
-    float4 Normal : NORMAL;
+	float4x4	projView;
+	float4x4	sceneToWorld;
+	float4x4	shadowLightViewProj;
+	float4      camPos;
+	float4      lightColor[4];
+	float4      lightDirection[3];
+}
+
+cbuffer cbRootConstants {
+	uint nodeIndex;
 };
 
-struct VSOutput {
-	float4 Position : SV_POSITION;
-    float4 Color : COLOR;
+StructuredBuffer<float4x4> modelToWorldMatrices : register(t0, UPDATE_FREQ_NONE);
+
+struct PsIn
+{    
+    float3 pos               : POSITION;
+	float3 normal	         : NORMAL;
+	float2 texCoord          : TEXCOORD0;
+    float4 position          : SV_Position;
 };
 
-VSOutput main(VSInput input, uint InstanceID : SV_InstanceID)
+PsIn main(VsIn In)
 {
-    VSOutput result;
-    float4x4 tempMat = mul(mvp, toWorld[InstanceID]);
-    result.Position = mul(tempMat, input.Position);
+	//float4x4 modelToWorld = modelToWorldMatrices[nodeIndex];
+	float4x4 modelToWorld = mul(sceneToWorld, modelToWorldMatrices[nodeIndex]);
 
-    float4 normal = normalize(mul(toWorld[InstanceID], float4(input.Normal.xyz, 0.0f))); // Assume uniform scaling
-    float4 pos = mul(toWorld[InstanceID], float4(input.Position.xyz, 1.0f));
+	PsIn Out;
+	float4 inPos = float4(In.position.xyz, 1.0f);
+	float3 inNormal = mul(modelToWorld, float4(In.normal, 0)).xyz;
+	float4 worldPosition = mul(modelToWorld, inPos);
+	Out.position = mul(projView, worldPosition);
+	
+	Out.pos = worldPosition.xyz;
+	Out.normal = normalize(inNormal);
+	
+	Out.texCoord = float2(In.texCoord.xy);
 
-    float lightIntensity = 1.0f;
-    float quadraticCoeff = 1.2;
-    float ambientCoeff = 0.4;
-
-    float3 lightDir;
-
-    if (color[InstanceID].w == 0) // Special case for Sun, so that it is lit from its top
-        lightDir = float3(0.0f, 1.0f, 0.0f);
-    else
-        lightDir = normalize(lightPosition - pos.xyz);
-
-    float distance = length(lightDir);
-    float attenuation = 1.0 / (quadraticCoeff * distance * distance);
-    float intensity = lightIntensity * attenuation;
-
-    float3 baseColor = color[InstanceID].xyz;
-    float3 blendedColor = mul(lightColor * baseColor, lightIntensity);
-    float3 diffuse = mul(blendedColor, max(dot(normal.xyz, lightDir), 0.0));
-    float3 ambient = mul(baseColor, ambientCoeff);
-    result.Color = float4(diffuse + ambient, 1.0);
-
-    return result;
+	return Out;
 }

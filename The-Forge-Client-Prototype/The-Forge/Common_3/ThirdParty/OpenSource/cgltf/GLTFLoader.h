@@ -157,7 +157,7 @@ typedef struct GLTFContainer
 } GLTFContainer;
 static_assert(sizeof(GLTFContainer) % 16 == 0, "GLTFContainer size must be a multiple of 16");
 
-static void gltfGetTextureView(const cgltf_data* scene, GLTFTextureView* textureView, cgltf_texture_view* sourceView)
+static inline void gltfGetTextureView(const cgltf_data* scene, GLTFTextureView* textureView, cgltf_texture_view* sourceView)
 {
 	if (sourceView->texture)
 	{
@@ -257,7 +257,7 @@ static inline FilterType gltfConvertFilter(cgltf_int filter)
 	}
 }
 
-static SamplerDesc convertCGLTFSamplerToSamplerDesc(cgltf_sampler sampler)
+static inline SamplerDesc convertCGLTFSamplerToSamplerDesc(cgltf_sampler sampler)
 {
 	SamplerDesc desc = {};
 	desc.mAddressU = gltfConvertWrapMode(sampler.wrap_s);
@@ -292,7 +292,7 @@ typedef enum GLTFFlags
 	GLTF_FLAG_CALCULATE_BOUNDS = 0x2,
 } GLTFFlags;
 
-static uint32_t gltfLoadContainer(const Path* pPath, GLTFFlags flags, GLTFContainer** ppGLTF)
+static inline uint32_t gltfLoadContainer(const Path* pPath, GLTFFlags flags, GLTFContainer** ppGLTF)
 {
 	FileStream* file = fsOpenFile(pPath, FM_READ_BINARY);
 	if (!file)
@@ -734,14 +734,14 @@ static uint32_t gltfLoadContainer(const Path* pPath, GLTFFlags flags, GLTFContai
 	return result;
 }
 
-static void gltfUnloadContainer(GLTFContainer* pGLTF)
+static inline void gltfUnloadContainer(GLTFContainer* pGLTF)
 {
 	ASSERT(pGLTF);
 	cgltf_free(pGLTF->pHandle);
 	conf_free(pGLTF);
 }
 
-static Path* gltfFindTexturePath(const Path* path, const cgltf_image* image)
+static inline Path* gltfFindTexturePath(const Path* path, const cgltf_image* image)
 {
 	// First, check whether the texture exists with the specified extension in the scene directory (as per glTF spec).
 	Path* candidatePath = fsAppendPathComponent(path, image->uri);
@@ -767,7 +767,7 @@ static Path* gltfFindTexturePath(const Path* path, const cgltf_image* image)
 	return candidatePath;
 }
 
-void gltfLoadTextureAtIndex(GLTFContainer* pGLTF, const Path* path, size_t index, bool isSRGB, struct SyncToken* token, Texture** ppOutTexture)
+void inline gltfLoadTextureAtIndex(GLTFContainer* pGLTF, const Path* path, size_t index, bool isSRGB, struct SyncToken* token, Texture** ppOutTexture)
 {
 	if (!pGLTF)
 	{

@@ -123,15 +123,29 @@ struct GLTFMaterialData
 	GLTFTextureProperties mEmissiveTextureProperties;
 };
 
+struct InstanceData
+{
+	float4x4	sceneToWorld;
+	//float3		baseColor;
+};
+
+//cbuffer cbRootConstants : register(b2) {
+//	uint nodeIndex;
+//	uint instanceIndex;
+//	uint modelIndex;
+//};
+
+//StructuredBuffer<InstanceData> instanceBuffer : register(t0, UPDATE_FREQ_PER_BATCH);
+
 cbuffer cbMaterialData : register(b0, UPDATE_FREQ_PER_DRAW) {
 	GLTFMaterialData materialData;
 };
 
-Texture2D baseColorMap			: register(t0, UPDATE_FREQ_PER_DRAW);
-Texture2D normalMap				: register(t1, UPDATE_FREQ_PER_DRAW);
-Texture2D metallicRoughnessMap	: register(t2, UPDATE_FREQ_PER_DRAW);
-Texture2D occlusionMap			: register(t3, UPDATE_FREQ_PER_DRAW);
-Texture2D emissiveMap			: register(t4, UPDATE_FREQ_PER_DRAW);
+Texture2D baseColorMap			: register(t2, UPDATE_FREQ_PER_DRAW);
+Texture2D normalMap				: register(t3, UPDATE_FREQ_PER_DRAW);
+Texture2D metallicRoughnessMap	: register(t4, UPDATE_FREQ_PER_DRAW);
+Texture2D occlusionMap			: register(t5, UPDATE_FREQ_PER_DRAW);
+Texture2D emissiveMap			: register(t6, UPDATE_FREQ_PER_DRAW);
 Texture2D ShadowTexture		    : register(t14, UPDATE_FREQ_NONE);
 
 SamplerState baseColorSampler			: register(s0, UPDATE_FREQ_PER_DRAW);
@@ -432,11 +446,12 @@ PSOut main(PsIn input) : SV_TARGET
 	// AO
 	result *= ao;
 
-	result *= CalcPCFShadowFactor(input.pos);
+	//result *= CalcPCFShadowFactor(input.pos);
 
 	// Ambeint Light
 	result += baseColor.rgb * lightColor[3].rgb * lightColor[3].a;
 	result += emissive;
+	//result *= instanceBuffer[instanceIndex].baseColor;
 	
 	// Tonemap and gamma correct
 	// result = result/(result+float3(1.0, 1.0, 1.0));

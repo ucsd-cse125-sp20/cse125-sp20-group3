@@ -1,5 +1,7 @@
 #include "GLTFObject.h"
 
+// Initialize static variables
+
 VertexLayout GLTFObject::pVertexLayoutModel = {
 	3,
 	{
@@ -8,6 +10,12 @@ VertexLayout GLTFObject::pVertexLayoutModel = {
 		{SEMANTIC_TEXCOORD0, 0, NULL, TinyImageFormat_R32G32_SFLOAT, 2, 0, 6 * sizeof(float), 0}
 	}
 };
+
+int GLTFObject::instanceCount = 0;
+int GLTFObject::modelCount = 0;
+bool GLTFObject::countingInstances = false;
+Buffer* GLTFObject::pNodeTransformsBuffer = NULL;
+
 
 void GLTFObject::Init(const Path* path, Renderer* renderer, Sampler* defaultSampler)
 {
@@ -26,7 +34,7 @@ void GLTFObject::Init(const Path* path, Renderer* renderer, Sampler* defaultSamp
 	if (pData->mNodeCount)
 		createNodeTransformsBuffer();
 
-	// Missing texture handling (Might need to move
+	// Missing texture handling (Might need to move)
 	TextureDesc defaultTextureDesc = {};
 	defaultTextureDesc.mArraySize = 1;
 	defaultTextureDesc.mDepth = 1;
@@ -138,34 +146,91 @@ void GLTFObject::updateTransform(size_t nodeIndex, mat4* nodeTransforms, bool* n
 
 void GLTFObject::createNodeTransformsBuffer()
 {
-	
-		bool* nodeTransformsInited = (bool*)alloca(sizeof(bool) * pData->mNodeCount);
-		memset(nodeTransformsInited, 0, sizeof(bool) * pData->mNodeCount);
+	bool* nodeTransformsInited = (bool*)alloca(sizeof(bool) * pData->mNodeCount);
+	memset(nodeTransformsInited, 0, sizeof(bool) * pData->mNodeCount);
 
-		mat4* nodeTransforms = (mat4*)alloca(sizeof(mat4) * pData->mNodeCount);
+	mat4* nodeTransforms = (mat4*)alloca(sizeof(mat4) * MAX_GLTF_MODELS * MAX_GLTF_NODES);
 
-		for (uint32_t i = 0; i < pData->mNodeCount; ++i)
+	for (uint32_t i = 0; i < pData->mNodeCount; ++i)
+	{
+		updateTransform(i, nodeTransforms, nodeTransformsInited);
+	}
+
+	// Scale and centre the model.
+
+	Point3 modelBounds[2] = { Point3(FLT_MAX), Point3(-FLT_MAX) };
+	size_t nodeIndex = 0;
+	for (uint32_t n = 0; n < pData->mNodeCount; ++n)
+	{
+		GLTFNode& node = pData->pNodes[n];
+
+		if (node.mMeshIndex != UINT_MAX)
 		{
-			updateTransform(i, nodeTransforms, nodeTransformsInited);
+			for (uint32_t i = 0; i < node.mMeshCount; ++i)
+			{
+				Point3 minBound = pData->pMeshes[node.mMeshIndex + i].mMin;
+				Point3 maxBound = pData->pMeshes[node.mMeshIndex + i].mMax;
+				Point3 localPoints[] = {
+					Point3(minBound.getX(), minBound.getY(), minBound.getZ()),
+					Point3(minBound.getX(), minBound.getY(), maxBound.getZ()),
+					Point3(minBound.getX(), maxBound.getY(), minBound.getZ()),
+					Point3(minBound.getX(), maxBound.getY(), maxBound.getZ()),
+					Point3(maxBound.getX(), minBound.getY(), minBound.getZ()),
+					Point3(maxBound.getX(), minBound.getY(), maxBound.getZ()),
+					Point3(maxBound.getX(), maxBound.getY(), minBound.getZ()),
+					Point3(maxBound.getX(), maxBound.getY(), maxBound.getZ()),
+				};
+				for (size_t j = 0; j < 8; j += 1)
+				{
+					vec4 worldPoint = nodeTransforms[nodeIndex] * localPoints[j];
+					modelBounds[0] = minPerElem(modelBounds[0], Point3(worldPoint.getXYZ()));
+					modelBounds[1] = maxPerElem(modelBounds[1], Point3(worldPoint.getXYZ()));
+				}
+			}
 		}
-		Vector3 scaleVector = Vector3(1, 1, -1);
-		mat4 translateScale = mat4::scale(scaleVector);
+		nodeIndex += 1;
+	}
 
-		for (uint32_t i = 0; i < pData->mNodeCount; ++i)
-		{
-			nodeTransforms[i] = translateScale * nodeTransforms[i];
-		}
+	const float targetSize = 1.0;
+
+	vec3 modelSize = modelBounds[1] - modelBounds[0];
+	float largestDim = max(modelSize.getX(), max(modelSize.getY(), modelSize.getZ()));
+	Point3 modelCentreBase = Point3(
+		0.5f * (modelBounds[0].getX() + modelBounds[1].getX()),
+		modelBounds[0].getY(),
+		0.5f * (modelBounds[0].getZ() + modelBounds[1].getZ()));
+	Vector3 scaleVector = Vector3(1);
+	scaleVector.setZ(-scaleVector.getZ());
+	mat4 translateScale = mat4::scale(scaleVector) * mat4::translation(Vector3(modelCentreBase));
+
+	for (uint32_t i = 0; i < pData->mNodeCount; ++i)
+	{
+		nodeTransforms[i] = translateScale * nodeTransforms[i];
+	}
+
+	modelID = modelCount++;
 		
+	if (!pNodeTransformsBuffer) {
 		BufferLoadDesc nodeTransformsBufferLoadDesc = {};
 		nodeTransformsBufferLoadDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_CPU_TO_GPU;
 		nodeTransformsBufferLoadDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_BUFFER;
 		nodeTransformsBufferLoadDesc.mDesc.mStructStride = sizeof(mat4);
-		nodeTransformsBufferLoadDesc.mDesc.mElementCount = pData->mNodeCount;
-		nodeTransformsBufferLoadDesc.mDesc.mSize = pData->mNodeCount * sizeof(mat4);
+		nodeTransformsBufferLoadDesc.mDesc.mElementCount = MAX_GLTF_MODELS * MAX_GLTF_NODES;
+		nodeTransformsBufferLoadDesc.mDesc.mSize = MAX_GLTF_MODELS * MAX_GLTF_NODES * sizeof(mat4);
 		nodeTransformsBufferLoadDesc.pData = nodeTransforms;
 		nodeTransformsBufferLoadDesc.mDesc.pDebugName = L"GLTF Node Transforms Buffer";
 		nodeTransformsBufferLoadDesc.ppBuffer = &pNodeTransformsBuffer;
 		addResource(&nodeTransformsBufferLoadDesc, NULL, LOAD_PRIORITY_NORMAL);
+	}
+	else {
+		BufferUpdateDesc bufferUpdate = { pNodeTransformsBuffer };
+		beginUpdateResource(&bufferUpdate);
+		mat4* bufferedNodeTransforms = (mat4*)bufferUpdate.pMappedData;
+		for (uint32_t i = 0; i < pData->mNodeCount; ++i) {
+			bufferedNodeTransforms[modelID * MAX_GLTF_NODES + i] = nodeTransforms[i];
+		}
+		endUpdateResource(&bufferUpdate, NULL);
+	}
 }
 
 void GLTFObject::updateTextureProperties(const GLTFTextureView& textureView, GLTFTextureProperties& textureProperties)
@@ -383,8 +448,10 @@ void GLTFObject::removeResources()
 	if (pMaterialBuffer)
 		removeResource(pMaterialBuffer);
 
-	if (pNodeTransformsBuffer)
+	if (pNodeTransformsBuffer) {
 		removeResource(pNodeTransformsBuffer);
+		pNodeTransformsBuffer = NULL;
+	}
 
 	pData = NULL;
 	pMaterialBuffer = NULL;
@@ -394,18 +461,29 @@ void GLTFObject::removeResources()
 
 void GLTFObject::update(float deltaTime)
 {
-
+	if (!countingInstances) {
+		countingInstances = true;
+		instanceCount = 1;
+	}
+	instanceID = instanceCount++;
 }
 
 void GLTFObject::draw(Cmd* cmd, RootSignature* rootSignature, bool useMaterial)
 {
+	countingInstances = false;
+
 	cmdBindVertexBuffer(cmd, 1, &pGeom->pVertexBuffers[0], &pGeom->mVertexStrides[0], NULL);
 	cmdBindIndexBuffer(cmd, pGeom->pIndexBuffer, pGeom->mIndexType, 0);
 
 	MeshPushConstants pushConstants = {};
+	pushConstants.nodeIndex = 0;
+	pushConstants.instanceIndex = instanceID;
+	pushConstants.modelIndex = modelID;
 
 	for (uint32_t n = 0; n < pData->mNodeCount; ++n)
 	{
+		//printf("%d %d %d %d\n", pushConstants.instanceIndex, pushConstants.nodeIndex, pushConstants.modelIndex, pGeom->mVertexCount);
+
 		GLTFNode& node = pData->pNodes[n];
 		if (node.mMeshIndex != UINT_MAX)
 		{
@@ -439,9 +517,9 @@ void GLTFObject::setPositionDirection(vec3 position, vec3 direction, vec3 up) {
 	vec3 forward = normalize(direction);
 	vec3 right = cross(forward, up);
 
-	model[0] = vec4(forward, 0);
+	model[0] = vec4(right, 0);
 	model[1] = vec4(up, 0);
-	model[2] = vec4(right, 0);
+	model[2] = vec4(-forward, 0);
 	model[3] = vec4(position, 1);
 }
 
@@ -452,6 +530,11 @@ void GLTFObject::setPositionDirection(vec3 position, vec3 direction) {
 void GLTFObject::setPositionDirection(vec2 position, float angle)
 {
 	
+}
+
+void GLTFObject::applyTransform(mat4 transform)
+{
+	model = transform * model;
 }
 
 vec3 GLTFObject::getPosition()

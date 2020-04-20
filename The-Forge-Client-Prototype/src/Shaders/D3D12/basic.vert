@@ -22,6 +22,8 @@
  * under the License.
 */
 
+#define MAX_GLTF_NODES 100
+
 struct VsIn
 {
 	float3 position          : POSITION;
@@ -42,11 +44,21 @@ cbuffer cbPerPass : register(b0, UPDATE_FREQ_PER_FRAME)
 	float4      lightDirection[3];
 }
 
-cbuffer cbRootConstants {
-	uint nodeIndex;
+struct InstanceData
+{
+	float4x4	sceneToWorld;
+	//float3		baseColor;
 };
 
-StructuredBuffer<float4x4> modelToWorldMatrices : register(t0, UPDATE_FREQ_NONE);
+cbuffer cbRootConstants : register(b2) {
+	uint nodeIndex;
+    uint instanceIndex;
+	uint modelIndex;
+};
+
+StructuredBuffer<InstanceData> instanceBuffer : register(t0, UPDATE_FREQ_PER_BATCH);
+
+StructuredBuffer<float4x4> modelToSceneMatrices : register(t1, UPDATE_FREQ_NONE);
 
 struct PsIn
 {    
@@ -58,9 +70,11 @@ struct PsIn
 
 PsIn main(VsIn In)
 {
-	//float4x4 modelToWorld = modelToWorldMatrices[nodeIndex];
-	float4x4 modelToWorld = mul(sceneToWorld, modelToWorldMatrices[nodeIndex]);
-
+	//float4x4 modelToWorld = mul(sceneToWorld, modelToSceneMatrices[nodeIndex]);
+	//float4x4 modelToWorld = sceneToWorld;
+	float4x4 modelToWorld = mul(instanceBuffer[instanceIndex].sceneToWorld, modelToSceneMatrices[modelIndex * 100 + nodeIndex]);
+	//modelToWorld = instanceBuffer[instanceIndex].sceneToWorld * modelToSceneMatrices[modelIndex * MAX_GLTF_NODES + nodeIndex];
+	
 	PsIn Out;
 	float4 inPos = float4(In.position.xyz, 1.0f);
 	float3 inNormal = mul(modelToWorld, float4(In.normal, 0)).xyz;

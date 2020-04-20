@@ -19,25 +19,14 @@
         {
             "mesh" : 0,
             "name" : "Cube",
-            "skin" : 0,
-            "translation" : [
-                0,
-                1,
-                0
-            ]
+            "skin" : 0
         },
         {
             "children" : [
                 1,
                 0
             ],
-            "name" : "Armature",
-            "rotation" : [
-                0,
-                0.70710688829422,
-                0,
-                0.7071067094802856
-            ]
+            "name" : "Armature"
         }
     ],
     "animations" : [
@@ -65,7 +54,7 @@
                     }
                 }
             ],
-            "name" : "action",
+            "name" : "jump_and_spin.003",
             "samplers" : [
                 {
                     "input" : 7,
@@ -73,14 +62,14 @@
                     "output" : 8
                 },
                 {
-                    "input" : 7,
-                    "interpolation" : "LINEAR",
-                    "output" : 9
+                    "input" : 9,
+                    "interpolation" : "CUBICSPLINE",
+                    "output" : 10
                 },
                 {
-                    "input" : 7,
-                    "interpolation" : "LINEAR",
-                    "output" : 10
+                    "input" : 11,
+                    "interpolation" : "CUBICSPLINE",
+                    "output" : 12
                 }
             ]
         },
@@ -113,17 +102,17 @@
                 {
                     "input" : 7,
                     "interpolation" : "LINEAR",
-                    "output" : 11
-                },
-                {
-                    "input" : 7,
-                    "interpolation" : "LINEAR",
-                    "output" : 12
-                },
-                {
-                    "input" : 7,
-                    "interpolation" : "LINEAR",
                     "output" : 13
+                },
+                {
+                    "input" : 9,
+                    "interpolation" : "CUBICSPLINE",
+                    "output" : 14
+                },
+                {
+                    "input" : 11,
+                    "interpolation" : "CUBICSPLINE",
+                    "output" : 15
                 }
             ]
         },
@@ -151,22 +140,22 @@
                     }
                 }
             ],
-            "name" : "jump_and_spin.003",
+            "name" : "action",
             "samplers" : [
                 {
                     "input" : 7,
                     "interpolation" : "LINEAR",
-                    "output" : 14
-                },
-                {
-                    "input" : 7,
-                    "interpolation" : "LINEAR",
-                    "output" : 15
-                },
-                {
-                    "input" : 7,
-                    "interpolation" : "LINEAR",
                     "output" : 16
+                },
+                {
+                    "input" : 9,
+                    "interpolation" : "CUBICSPLINE",
+                    "output" : 17
+                },
+                {
+                    "input" : 11,
+                    "interpolation" : "CUBICSPLINE",
+                    "output" : 18
                 }
             ]
         }
@@ -231,12 +220,12 @@
             "count" : 24,
             "max" : [
                 1,
-                1,
+                2,
                 1
             ],
             "min" : [
                 -1,
-                -1,
+                0,
                 -1
             ],
             "type" : "VEC3"
@@ -298,26 +287,38 @@
         {
             "bufferView" : 9,
             "componentType" : 5126,
-            "count" : 72,
-            "type" : "VEC4"
+            "count" : 4,
+            "max" : [
+                3
+            ],
+            "min" : [
+                0.041666666666666664
+            ],
+            "type" : "SCALAR"
         },
         {
             "bufferView" : 10,
             "componentType" : 5126,
-            "count" : 72,
-            "type" : "VEC3"
+            "count" : 12,
+            "type" : "VEC4"
         },
         {
             "bufferView" : 11,
             "componentType" : 5126,
-            "count" : 72,
-            "type" : "VEC3"
+            "count" : 9,
+            "max" : [
+                3
+            ],
+            "min" : [
+                0.041666666666666664
+            ],
+            "type" : "SCALAR"
         },
         {
             "bufferView" : 12,
             "componentType" : 5126,
-            "count" : 72,
-            "type" : "VEC4"
+            "count" : 27,
+            "type" : "VEC3"
         },
         {
             "bufferView" : 13,
@@ -328,19 +329,31 @@
         {
             "bufferView" : 14,
             "componentType" : 5126,
-            "count" : 72,
-            "type" : "VEC3"
+            "count" : 12,
+            "type" : "VEC4"
         },
         {
             "bufferView" : 15,
             "componentType" : 5126,
-            "count" : 72,
-            "type" : "VEC4"
+            "count" : 27,
+            "type" : "VEC3"
         },
         {
             "bufferView" : 16,
             "componentType" : 5126,
             "count" : 72,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 17,
+            "componentType" : 5126,
+            "count" : 12,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 18,
+            "componentType" : 5126,
+            "count" : 27,
             "type" : "VEC3"
         }
     ],
@@ -392,48 +405,58 @@
         },
         {
             "buffer" : 0,
-            "byteLength" : 1152,
+            "byteLength" : 16,
             "byteOffset" : 2632
         },
         {
             "buffer" : 0,
-            "byteLength" : 864,
-            "byteOffset" : 3784
+            "byteLength" : 192,
+            "byteOffset" : 2648
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 36,
+            "byteOffset" : 2840
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 324,
+            "byteOffset" : 2876
         },
         {
             "buffer" : 0,
             "byteLength" : 864,
-            "byteOffset" : 4648
+            "byteOffset" : 3200
         },
         {
             "buffer" : 0,
-            "byteLength" : 1152,
-            "byteOffset" : 5512
+            "byteLength" : 192,
+            "byteOffset" : 4064
         },
         {
             "buffer" : 0,
-            "byteLength" : 864,
-            "byteOffset" : 6664
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 864,
-            "byteOffset" : 7528
-        },
-        {
-            "buffer" : 0,
-            "byteLength" : 1152,
-            "byteOffset" : 8392
+            "byteLength" : 324,
+            "byteOffset" : 4256
         },
         {
             "buffer" : 0,
             "byteLength" : 864,
-            "byteOffset" : 9544
+            "byteOffset" : 4580
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 192,
+            "byteOffset" : 5444
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 324,
+            "byteOffset" : 5636
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 10408,
+            "byteLength" : 5960,
             "uri" : "SpinningBox.bin"
         }
     ]

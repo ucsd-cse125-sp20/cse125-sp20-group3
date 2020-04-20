@@ -11,14 +11,19 @@
 
 #include "Object.h"
 
+#define MAX_GLTF_NODES 100
+#define MAX_GLTF_MODELS 50
+
 class GLTFObject
 {
 public:
-	Texture* pTextureBlack = NULL;
+	Texture* pTextureBlack;
 
 	struct MeshPushConstants
 	{
 		uint32_t nodeIndex;
+		uint32_t instanceIndex;
+		uint32_t modelIndex;
 	};
 
 	struct GLTFTextureProperties
@@ -55,14 +60,25 @@ public:
 	eastl::vector<Texture*> mTextures;
 	eastl::vector<Sampler*> mSamplers;
 	DescriptorSet* pMaterialSet = NULL;
-	Buffer* pNodeTransformsBuffer = NULL;
+	static Buffer* pNodeTransformsBuffer;
 	Buffer* pMaterialBuffer = NULL;
 	Sampler* pDefaultSampler = NULL;
 
 	mat4 model = mat4::identity();
+	vec3 baseColor = vec3(1);
+
 	mat4* initialNodeTransforms, * nodeTransforms;
 
 	static VertexLayout pVertexLayoutModel;
+
+
+	int instanceID;
+	static int instanceCount;
+	static bool countingInstances;
+	static int modelCount;
+	int modelID;
+
+
 
 	static bool LoadModel(GLTFObject* asset, Renderer* renderer, Sampler* sampler, const Path* modelFilePath);
 
@@ -89,6 +105,8 @@ public:
 	void setPositionDirection(vec3 position, vec3 direction, vec3 up);
 	void setPositionDirection(vec3 position, vec3 direction);
 	void setPositionDirection(vec2 position, float angle);
+
+	void applyTransform(mat4 transform);
 
 	vec3 getPosition();
 };

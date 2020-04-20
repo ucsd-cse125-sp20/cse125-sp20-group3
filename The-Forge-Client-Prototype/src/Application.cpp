@@ -81,12 +81,6 @@ Texture* Application::pTextureBlack = NULL;
 #endif
 
 //--------------------------------------------------------------------------------------------
-// STRUCT DEFINTIONS
-//--------------------------------------------------------------------------------------------
-
-// MOVED
-
-//--------------------------------------------------------------------------------------------
 // RENDERING PIPELINE DATA
 //--------------------------------------------------------------------------------------------
 
@@ -138,6 +132,7 @@ DescriptorSet* pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_COUNT];
 VirtualJoystickUI   gVirtualJoystick = {};
 
 Buffer* pUniformBuffer[IMAGE_COUNT] = { NULL };
+Buffer* pInstanceBuffer[IMAGE_COUNT] = { NULL };
 Buffer* pShadowUniformBuffer[IMAGE_COUNT] = { NULL };
 Buffer* pFloorUniformBuffer[IMAGE_COUNT] = { NULL };
 
@@ -152,6 +147,7 @@ Sampler* pBilinearClampSampler = NULL;
 Application::UniformBlock		gUniformData;
 Application::UniformBlock_Floor	gFloorUniformBlock;
 Application::UniformBlock_Shadow gShadowUniformData;
+eastl::vector<Application::UniformBlock_Instance> instanceData;
 
 //--------------------------------------------------------------------------------------------
 // THE FORGE OBJECTS
@@ -178,16 +174,23 @@ uint32_t			guiModelToLoadIndex = 0;
 
 const wchar_t* gMissingTextureString = L"MissingTexture";
 
-const char* gDefaultModelFile = "SpinningBox.gltf";
-PathHandle					    gModelFile;
-PathHandle					    gGuiModelToLoad;
-
 const uint			gBackroundColor = { 0xb2b2b2ff };
 static uint			gLightColor[gTotalLightCount] = { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffff66 };
 static float		gLightColorIntensity[gTotalLightCount] = { 2.0f, 0.2f, 0.2f, 0.25f };
 static float2		gLightDirection = { -122.0f, 222.0f };
 
-vec3 cameraOffset(0, 10, -5);
+vec3 cameraOffset(0, 20, -10);
+
+const char* gDefaultModelFile = "WeirdBox.gltf";
+PathHandle gModelFile;
+
+const char* gOtherModelFile = "Kyubey.gltf";
+PathHandle gOtherFile;
+
+const char* gGroundModelFile = "Ground.gltf";
+PathHandle gGroundFile;
+
+GLTFObject* ground;
 
 GLTFObject* player;
 float rot = 0;
@@ -202,6 +205,7 @@ float drag = 0.1f;
 TextDrawDesc gFrameTimeDraw = TextDrawDesc(0, 0xff00ffff, 18);
 
 std::vector<GLTFObject*> others;
+int numOthers = 20;
 
 
 Application::Application()
@@ -297,13 +301,16 @@ bool Application::InitShaderResources()
 
 bool Application::InitModelDependentResources()
 {
+	for (auto other : others) {
+		if (!GLTFObject::LoadModel(other, pRenderer, pDefaultSampler, gOtherFile))
+			return false;
+	}
+
 	if (!GLTFObject::LoadModel(player, pRenderer, pDefaultSampler, gModelFile))
 		return false;
 
-	for (auto other : others) {
-		if (!GLTFObject::LoadModel(other, pRenderer, pDefaultSampler, gModelFile))
-			return false;
-	}
+	if (!GLTFObject::LoadModel(ground, pRenderer, pDefaultSampler, gGroundFile))
+		return false;
 
 	if (!InitShaderResources())
 		return false;
@@ -348,6 +355,7 @@ void Application::drawShadowMap(Cmd* cmd)
 	cmdBindPipeline(cmd, pPipelineShadowPass_NonOPtimized);
 	cmdBindDescriptorSet(cmd, 0, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_NONE]);
 	cmdBindDescriptorSet(cmd, Application::gFrameIndex, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+	cmdBindDescriptorSet(cmd, Application::gFrameIndex, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
 
 	const uint32_t stride = sizeof(float) * 5;
 	cmdBindVertexBuffer(cmd, 1, &pFloorVB, &stride, NULL);
@@ -532,73 +540,11 @@ bool Application::Init()
 	defaultLoadDesc.ppTexture = &pTextureBlack;
 	addResource(&defaultLoadDesc, NULL, LOAD_PRIORITY_NORMAL);
 
-#if defined(__ANDROID__) || defined(__LINUX__)
-	// Get list of Models
-	eastl::vector<eastl::string> filesToLoad;
-	eastl::vector<PathHandle> filesToLoadFullPath;
-	PathHandle meshDirectory = fsCopyPathForResourceDirectory(RD_MESHES);
-	eastl::vector<PathHandle> filesInDirectory = fsGetFilesWithExtension(meshDirectory, "gltf");
 
-	//reduce duplicated filenames
-	for (size_t i = 0; i < filesInDirectory.size(); ++i)
-	{
-		const PathHandle& file = filesInDirectory[i];
 
-		eastl::string tempfile(fsGetPathAsNativeString(file));
-
-		const char* first = strstr(tempfile.c_str(), "PQPM");
-
-		bool bAlreadyLoaded = false;
-
-		if (first != NULL)
-		{
-			for (size_t j = 0; j < filesToLoad.size(); ++j)
-			{
-				if (strstr(tempfile.c_str(), filesToLoad[j].c_str()) != NULL)
-				{
-					bAlreadyLoaded = true;
-					break;
-				}
-			}
-
-			if (!bAlreadyLoaded)
-			{
-				int gap = first - tempfile.c_str();
-				tempfile.resize(gap);
-				filesToLoad.push_back(tempfile);
-				filesToLoadFullPath.push_back(file);
-			}
-		}
-		else
-		{
-			filesToLoad.push_back(tempfile);
-			filesToLoadFullPath.push_back(file);
-		}
-	}
-
-	size_t modelFileCount = filesToLoadFullPath.size();
-
-	eastl::vector<const char*> modelFileNames(modelFileCount);
-	gModelFiles.resize(modelFileCount);
-	gDropDownWidgetData.resize(modelFileCount);
-
-	for (size_t i = 0; i < modelFileCount; ++i)
-	{
-		const PathHandle& file = filesToLoadFullPath[i];
-
-		gModelFiles[i] = file;
-		modelFileNames[i] = fsGetPathFileName(gModelFiles[i]).buffer;
-		gDropDownWidgetData[i] = (uint32_t)i;
-	}
-
-	gModelFile = gModelFiles[0];
-	gGuiModelToLoad = gModelFiles[0];
-
-#else
-	PathHandle fullModelPath = fsCopyPathInResourceDirectory(RD_MESHES, gDefaultModelFile);
-	gModelFile = fullModelPath;
-	gGuiModelToLoad = fullModelPath;
-#endif
+	gModelFile = fsCopyPathInResourceDirectory(RD_MESHES, gDefaultModelFile);
+	gOtherFile = fsCopyPathInResourceDirectory(RD_MESHES, gOtherModelFile);
+	gGroundFile = fsCopyPathInResourceDirectory(RD_MESHES, gGroundModelFile);
 
 	BufferLoadDesc ubDesc = {};
 	ubDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -610,6 +556,22 @@ bool Application::Init()
 	{
 		ubDesc.ppBuffer = &pUniformBuffer[i];
 		addResource(&ubDesc, NULL, LOAD_PRIORITY_NORMAL);
+	}
+
+	BufferLoadDesc ibDesc = {};
+	ibDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_BUFFER;
+	ibDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_GPU_ONLY;
+	ibDesc.mDesc.mFlags = BUFFER_CREATION_FLAG_NONE;
+	ibDesc.mDesc.mSize = sizeof(UniformBlock_Instance) * MAX_INSTANCES;
+	ibDesc.mDesc.mFirstElement = 0;
+	ibDesc.mDesc.mElementCount = MAX_INSTANCES;
+	ibDesc.mDesc.mStructStride = sizeof(UniformBlock_Instance) - 1;
+	ibDesc.mDesc.pCounterBuffer = NULL;
+	ibDesc.pData = instanceData.data();
+	for (uint32_t i = 0; i < Application::gImageCount; ++i)
+	{
+		ibDesc.ppBuffer = &pInstanceBuffer[i];
+		addResource(&ibDesc, NULL, LOAD_PRIORITY_NORMAL);
 	}
 
 	BufferLoadDesc subDesc = {};
@@ -635,97 +597,6 @@ bool Application::Init()
 		ubDesc.ppBuffer = &pFloorUniformBuffer[i];
 		addResource(&ubDesc, NULL, LOAD_PRIORITY_NORMAL);
 	}
-	/************************************************************************/
-	// GUI
-	/************************************************************************/
-	/*
-	GuiDesc guiDesc = {};
-	guiDesc.mStartSize = vec2(300.0f, 250.0f);
-	guiDesc.mStartPosition = vec2(100.0f, guiDesc.mStartSize.getY());
-	pGuiWindow = gAppUI.AddGuiComponent(GetName(), &guiDesc);
-
-#if !defined(TARGET_IOS) && !defined(_DURANGO)
-	pGuiWindow->AddWidget(CheckboxWidget("Toggle VSync", &bToggleVSync));
-#endif
-
-#if defined(__ANDROID__) || defined(__LINUX__)
-	pGuiWindow->AddWidget(DropdownWidget("Models", &guiModelToLoadIndex, modelFileNames.data(), gDropDownWidgetData.data(), (uint32_t)gModelFiles.size()));
-#else
-	pGuiWindow->AddWidget(SeparatorWidget());
-
-	ButtonWidget loadModelButtonWidget("Load Model                                      ");
-	loadModelButtonWidget.pOnEdited = Application::LoadNewModel;
-	pGuiWindow->AddWidget(loadModelButtonWidget);
-
-	pGuiWindow->AddWidget(SeparatorWidget());
-
-	//ButtonWidget loadLODButtonWidget("Load Model LOD");
-	//loadLODButtonWidget.pOnEdited = GLTFViewer::LoadLOD;
-	//pGuiWindow->AddWidget(loadLODButtonWidget);
-#endif
-
-	pSelectLodWidget = pGuiWindow->AddWidget(SliderIntWidget("LOD", &gCurrentLod, 0, gMaxLod));
-	*/
-	////////////////////////////////////////////////////////////////////////////////////////////
-	/*
-	guiDesc = {};
-	guiDesc.mStartSize = vec2(400.0f, 250.0f);
-	guiDesc.mStartPosition = vec2(mSettings.mWidth - guiDesc.mStartSize.getX(), guiDesc.mStartSize.getY());
-	pGuiGraphics = gAppUI.AddGuiComponent("Graphics Options", &guiDesc);
-
-	pGuiGraphics->AddWidget(CheckboxWidget("Enable FXAA", &bToggleFXAA));
-	pGuiGraphics->AddWidget(CheckboxWidget("Enable Vignetting", &bVignetting));
-
-	pGuiGraphics->AddWidget(SeparatorWidget());
-
-	CollapsingHeaderWidget LightWidgets("Light Options", false, false);
-	LightWidgets.AddSubWidget(SliderFloatWidget("Light Azimuth", &gLightDirection.x, float(-180.0f), float(180.0f), float(0.001f)));
-	LightWidgets.AddSubWidget(SliderFloatWidget("Light Elevation", &gLightDirection.y, float(210.0f), float(330.0f), float(0.001f)));
-
-	LightWidgets.AddSubWidget(SeparatorWidget());
-
-	CollapsingHeaderWidget LightColor1Picker("Main Light Color");
-	LightColor1Picker.AddSubWidget(ColorPickerWidget("Main Light Color", &gLightColor[0]));
-	LightWidgets.AddSubWidget(LightColor1Picker);
-
-	CollapsingHeaderWidget LightColor1Intensity("Main Light Intensity");
-	LightColor1Intensity.AddSubWidget(SliderFloatWidget("Main Light Intensity", &gLightColorIntensity[0], 0.0f, 5.0f, 0.001f));
-	LightWidgets.AddSubWidget(LightColor1Intensity);
-
-	LightWidgets.AddSubWidget(SeparatorWidget());
-
-	CollapsingHeaderWidget LightColor2Picker("Light2 Color");
-	LightColor2Picker.AddSubWidget(ColorPickerWidget("Light2 Color", &gLightColor[1]));
-	LightWidgets.AddSubWidget(LightColor2Picker);
-
-	CollapsingHeaderWidget LightColor2Intensity("Light2 Intensity");
-	LightColor2Intensity.AddSubWidget(SliderFloatWidget("Light2 Intensity", &gLightColorIntensity[1], 0.0f, 5.0f, 0.001f));
-	LightWidgets.AddSubWidget(LightColor2Intensity);
-
-	LightWidgets.AddSubWidget(SeparatorWidget());
-
-	CollapsingHeaderWidget LightColor3Picker("Light3 Color");
-	LightColor3Picker.AddSubWidget(ColorPickerWidget("Light3 Color", &gLightColor[2]));
-	LightWidgets.AddSubWidget(LightColor3Picker);
-
-	CollapsingHeaderWidget LightColor3Intensity("Light3 Intensity");
-	LightColor3Intensity.AddSubWidget(SliderFloatWidget("Light3 Intensity", &gLightColorIntensity[2], 0.0f, 5.0f, 0.001f));
-	LightWidgets.AddSubWidget(LightColor3Intensity);
-
-	LightWidgets.AddSubWidget(SeparatorWidget());
-
-	CollapsingHeaderWidget AmbientLightColorPicker("Ambient Light Color");
-	AmbientLightColorPicker.AddSubWidget(ColorPickerWidget("Ambient Light Color", &gLightColor[3]));
-	LightWidgets.AddSubWidget(AmbientLightColorPicker);
-
-	CollapsingHeaderWidget LightColor4Intensity("Ambient Light Intensity");
-	LightColor4Intensity.AddSubWidget(SliderFloatWidget("Light Intensity", &gLightColorIntensity[3], 0.0f, 5.0f, 0.001f));
-	LightWidgets.AddSubWidget(LightColor4Intensity);
-
-	LightWidgets.AddSubWidget(SeparatorWidget());
-
-	pGuiGraphics->AddWidget(LightWidgets);
-	*/
 
 	// Scene Initialization Initialization
 
@@ -742,25 +613,25 @@ bool Application::Init()
 
 	player = conf_new(GLTFObject);
 
-	float randoRange = 5;
-	for (int i = 0; i < 1; i++) {
+	float randoRange = 20;
+	for (int i = 0; i < numOthers; i++) {
 		float x = -randoRange + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * randoRange)));
 		float y = -randoRange + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * randoRange)));
 		float r = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX));
 		float g = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX));
 		float b = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX));
 		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
-		float s = 0.5f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.5f));
+		float s = 0.5f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 0.5f));
 
 		vec3 position = vec3(x, 0, y);
-		if (sqrt(x * x + y * y) > 1.5f) {
-			auto other = conf_new(GLTFObject);
-			other->setTranslate(position);
-			other->setScaleRot(vec3(s), rot, vec3(0, 1, 0));
-			//other->setColor(glm::vec3(r, g, b));
-			others.push_back(other);
-		}
+		auto other = conf_new(GLTFObject);
+		other->setTranslate(position);
+		other->setScaleRot(vec3(s), rot, vec3(0, 1, 0));
+		other->baseColor = vec3(r, g, b);
+		others.push_back(other);
 	}
+
+	ground = conf_new(GLTFObject);
 
 	return true;
 }
@@ -776,11 +647,15 @@ bool Application::AddDescriptorSets()
 	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_NONE]);
 	setDesc = { pRootSignatureShadow, DESCRIPTOR_UPDATE_FREQ_PER_FRAME, Application::gImageCount };
 	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+	setDesc = { pRootSignatureShadow, DESCRIPTOR_UPDATE_FREQ_PER_BATCH, Application::gImageCount };
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
 
 	setDesc = { pRootSignatureShaded, DESCRIPTOR_UPDATE_FREQ_NONE, 1 };
 	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_NONE]);
 	setDesc = { pRootSignatureShaded, DESCRIPTOR_UPDATE_FREQ_PER_FRAME, Application::gImageCount };
 	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+	setDesc = { pRootSignatureShaded, DESCRIPTOR_UPDATE_FREQ_PER_BATCH, Application::gImageCount };
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
 
 	return true;
 }
@@ -801,10 +676,10 @@ void Application::PrepareDescriptorSets()
 	// Shadow
 	{
 		DescriptorData params[2] = {};
-		if (player->pNodeTransformsBuffer)
+		if (GLTFObject::pNodeTransformsBuffer)
 		{
-			params[0].pName = "modelToWorldMatrices";
-			params[0].ppBuffers = &player->pNodeTransformsBuffer;
+			params[0].pName = "modelToSceneMatrices";
+			params[0].ppBuffers = &GLTFObject::pNodeTransformsBuffer;
 			updateDescriptorSet(pRenderer, 0, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_NONE], 1, params);
 		}
 
@@ -822,10 +697,13 @@ void Application::PrepareDescriptorSets()
 
 		for (uint32_t i = 0; i < Application::gImageCount; ++i)
 		{
-			DescriptorData params[2] = {};
 			params[0].pName = "cbPerPass";
 			params[0].ppBuffers = &pShadowUniformBuffer[i];
 			updateDescriptorSet(pRenderer, i, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_FRAME], 1, params);
+
+			params[0].pName = "instanceBuffer";
+			params[0].ppBuffers = &pInstanceBuffer[i];
+			updateDescriptorSet(pRenderer, i, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_BATCH], 1, params);
 		}
 	}
 	// Shading
@@ -833,22 +711,27 @@ void Application::PrepareDescriptorSets()
 		DescriptorData params[3] = {};
 		params[0].pName = "ShadowTexture";
 		params[0].ppTextures = &pShadowRT->pTexture;
-		if (player->pNodeTransformsBuffer)
+		if (GLTFObject::pNodeTransformsBuffer)
 		{
-			params[1].pName = "modelToWorldMatrices";
-			params[1].ppBuffers = &player->pNodeTransformsBuffer;
+			params[1].pName = "modelToSceneMatrices";
+			params[1].ppBuffers = &GLTFObject::pNodeTransformsBuffer;
 		}
-		updateDescriptorSet(pRenderer, 0, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_NONE], player->pNodeTransformsBuffer ? 2 : 1, params);
+		updateDescriptorSet(pRenderer, 0, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_NONE], GLTFObject::pNodeTransformsBuffer ? 2 : 1, params);
 
 		for (uint32_t i = 0; i < Application::gImageCount; ++i)
 		{
 			params[0].pName = "cbPerPass";
 			params[0].ppBuffers = &pUniformBuffer[i];
 			updateDescriptorSet(pRenderer, i, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME], 1, params);
+
+			params[0].pName = "instanceBuffer";
+			params[0].ppBuffers = &pInstanceBuffer[i];
+			updateDescriptorSet(pRenderer, i, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_BATCH], 1, params);
 		}
 	}
 
 	player->createMaterialResources(pRootSignatureShaded, /* bindlessTexturesSamplersSet = */ NULL);
+	ground->createMaterialResources(pRootSignatureShaded, /* bindlessTexturesSamplersSet = */ NULL);
 
 	for (auto other : others) {
 		other->createMaterialResources(pRootSignatureShaded, /* bindlessTexturesSamplersSet = */ NULL);
@@ -877,12 +760,16 @@ void Application::RemoveModelDependentResources()
 	RemoveShaderResources();
 
 	player->removeResources();
-	conf_free(player);
+	conf_delete(player);
 	player = conf_new(GLTFObject);
+
+	ground->removeResources();
+	conf_delete(ground);
+	ground = conf_new(GLTFObject);
 
 	for (auto other : others) {
 		other->removeResources();
-		conf_free(other);
+		conf_delete(other);
 		other = conf_new(GLTFObject);
 	}
 }
@@ -908,6 +795,7 @@ void Application::Exit()
 	{
 		removeResource(pShadowUniformBuffer[i]);
 		removeResource(pUniformBuffer[i]);
+		removeResource(pInstanceBuffer[i]);
 		removeResource(pFloorUniformBuffer[i]);
 	}
 
@@ -941,12 +829,12 @@ void Application::Exit()
 #endif
 
 	gModelFile = NULL;
-	gGuiModelToLoad = NULL;
 
-	conf_free(player);
+	conf_delete(player);
+	conf_delete(ground);
 
 	for (auto other : others) {
-		conf_free(other);
+		conf_delete(other);
 	}
 }
 
@@ -1286,6 +1174,15 @@ void Application::Update(float deltaTime)
 	pCameraController->moveTo(player->getPosition() + cameraOffset);
 	pCameraController->lookAt(player->getPosition() + vec3(0, 0.4f, 0));
 
+
+	for (auto other : others) {
+		other->applyTransform(mat4::translation(other->getPosition()) * mat4::rotationY(0.003f) * mat4::translation(-other->getPosition()));
+		other->update(deltaTime);
+	}
+	player->update(deltaTime);
+	ground->update(deltaTime);
+
+
 	/************************************************************************/
 	// Light Matrix Update - for shadow map
 	/************************************************************************/
@@ -1319,20 +1216,6 @@ void Application::PostDrawUpdate()
 		gGuiModelToLoad = gModelFiles[modelToLoadIndex];
 	}
 #endif
-	if (!fsPathsEqual(gGuiModelToLoad, gModelFile))
-	{
-		if (fsFileExists(gGuiModelToLoad))
-		{
-			gModelFile = gGuiModelToLoad;
-
-			Unload();
-			Load();
-		}
-		else
-		{
-			gGuiModelToLoad = gModelFile;
-		}
-	}
 	gCurrentLod = min(gCurrentLod, gMaxLod);
 }
 
@@ -1342,30 +1225,6 @@ void Application::SelectModelFunc(const Path* path, void* pathPtr) {
 	if (path) {
 		*outputPath = fsCopyPath(path);
 	}
-}
-
-void Application::LoadNewModel()
-{
-	eastl::vector<const char*> extFilter;
-	extFilter.push_back("gltf");
-	extFilter.push_back("glb");
-
-	PathHandle meshDir = fsCopyPathForResourceDirectory(RD_MESHES);
-
-	fsShowOpenFileDialog("Select model to load", meshDir, SelectModelFunc, &gGuiModelToLoad, "Model File", &extFilter[0], extFilter.size());
-}
-
-void Application::LoadLOD()
-{
-	waitQueueIdle(pGraphicsQueue);
-
-	eastl::vector<const char*> extFilter;
-	extFilter.push_back("gltf");
-	extFilter.push_back("glb");
-
-	PathHandle meshDir = fsCopyPathForResourceDirectory(RD_MESHES);
-
-	fsShowOpenFileDialog("Select model to load", meshDir, SelectModelFunc, &gGuiModelToLoad, "Model File", &extFilter[0], extFilter.size());
 }
 
 void Application::Draw()
@@ -1401,8 +1260,7 @@ void Application::Draw()
 
 	cmdBeginGpuFrameProfile(cmd, gGpuProfileToken);
 
-	drawShadowMap(cmd);
-
+	//drawShadowMap(cmd);
 	{
 		LoadActionsDesc loadActions = {};
 		loadActions.mLoadActionsColor[0] = LOAD_ACTION_CLEAR;
@@ -1440,12 +1298,13 @@ void Application::Draw()
 
 		cmdBindDescriptorSet(cmd, 0, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_NONE]);
 		cmdBindDescriptorSet(cmd, Application::gFrameIndex, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+		cmdBindDescriptorSet(cmd, Application::gFrameIndex, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
 
 		const uint32_t stride = sizeof(float) * 5;
 		cmdBindVertexBuffer(cmd, 1, &pFloorVB, &stride, NULL);
 		cmdBindIndexBuffer(cmd, pFloorIB, INDEX_TYPE_UINT16, 0);
 
-		cmdDrawIndexed(cmd, 6, 0, 0);
+		//cmdDrawIndexed(cmd, 6, 0, 0);
 
 		cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);
 	}
@@ -1455,57 +1314,41 @@ void Application::Draw()
 	{
 		cmdBeginGpuTimestampQuery(cmd, gGpuProfileToken, "Draw Scene");
 
-		cmdSetViewport(cmd, 0.0f, 0.0f, (float)pRenderTarget->mWidth, (float)pRenderTarget->mHeight, 0.0f, 1.0f);
-		cmdSetScissor(cmd, 0, 0, pRenderTarget->mWidth, pRenderTarget->mHeight);
 
-
-
-		for (auto other : others) {
-			cmdBindPipeline(cmd, pMeshOptDemoPipeline);
-
-			gUniformData.mModel = other->model;
-			BufferUpdateDesc shaderCbv = { pUniformBuffer[Application::gFrameIndex] };
-			beginUpdateResource(&shaderCbv);
-			*(UniformBlock*)shaderCbv.pMappedData = gUniformData;
-			endUpdateResource(&shaderCbv, NULL);
-
-			cmdBindDescriptorSet(cmd, 0, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_NONE]);
-			cmdBindDescriptorSet(cmd, Application::gFrameIndex, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
-			other->draw(cmd, pRootSignatureShaded, true);
-		}
-
-		cmdBindPipeline(cmd, pMeshOptDemoPipeline);
-
-
-
-
-
-		// Update uniform buffers
-		gUniformData.mModel = player->model;
-		BufferUpdateDesc shaderCbv = { pUniformBuffer[Application::gFrameIndex] };
-		beginUpdateResource(&shaderCbv);
-		*(UniformBlock*)shaderCbv.pMappedData = gUniformData;
-		endUpdateResource(&shaderCbv, NULL);
-
-		cmdBindDescriptorSet(cmd, 0, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_NONE]);
-		cmdBindDescriptorSet(cmd, Application::gFrameIndex, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
-		player->draw(cmd, pRootSignatureShaded, true);
-
-
-
-		// Update uniform buffers
-		//gUniformData.mModel = player->model * mat4::translation(vec3(1, 0, 0));
 		shaderCbv = { pUniformBuffer[Application::gFrameIndex] };
 		beginUpdateResource(&shaderCbv);
 		*(UniformBlock*)shaderCbv.pMappedData = gUniformData;
 		endUpdateResource(&shaderCbv, NULL);
 
+
+
+		shaderCbv = { pInstanceBuffer[Application::gFrameIndex] };
+		beginUpdateResource(&shaderCbv);
+		UniformBlock_Instance* instanceArr = (UniformBlock_Instance*)shaderCbv.pMappedData;
+		instanceArr[player->instanceID].mModel = player->model;
+		instanceArr[ground->instanceID].mModel = ground->model;
+		//instanceArr[player->instanceID].baseColor = player->baseColor;
+		for (auto other : others) {
+			instanceArr[other->instanceID].mModel = other->model;
+			//instanceArr[other->instanceID].baseColor = other->baseColor;
+		}
+		endUpdateResource(&shaderCbv, NULL);
+
+		cmdBindRenderTargets(cmd, 1, &pRenderTarget, pDepthBuffer, NULL, NULL, NULL, -1, -1);
+		cmdSetViewport(cmd, 0.0f, 0.0f, (float)pRenderTarget->mWidth, (float)pRenderTarget->mHeight, 0.0f, 1.0f);
+		cmdSetScissor(cmd, 0, 0, pRenderTarget->mWidth, pRenderTarget->mHeight);
+
 		cmdBindPipeline(cmd, pMeshOptDemoPipeline);
 		cmdBindDescriptorSet(cmd, 0, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_NONE]);
 		cmdBindDescriptorSet(cmd, Application::gFrameIndex, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
-		//player->draw(cmd, pRootSignatureShaded, true);
-
-
+		cmdBindDescriptorSet(cmd, Application::gFrameIndex, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
+		
+		for (auto other : others) {
+			other->draw(cmd, pRootSignatureShaded, true);
+		}
+		player->draw(cmd, pRootSignatureShaded, true);
+		ground->draw(cmd, pRootSignatureShaded, true);
+		
 
 		cmdBindRenderTargets(cmd, 0, NULL, 0, NULL, NULL, NULL, -1, -1);
 

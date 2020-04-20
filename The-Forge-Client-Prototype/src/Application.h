@@ -9,6 +9,7 @@
 
 #define IMAGE_COUNT 3
 #define LIGHT_COUNT 3
+#define MAX_INSTANCES 50
 
 class Application : public IApp
 {
@@ -24,6 +25,12 @@ public:
 		vec4 mCameraPosition;
 		vec4 mLightColor[LIGHT_COUNT + 1];
 		vec4 mLightDirection[LIGHT_COUNT];
+	};
+
+	struct UniformBlock_Instance
+	{
+		mat4 mModel;
+		//vec3 baseColor;
 	};
 
 	struct UniformBlock_Shadow

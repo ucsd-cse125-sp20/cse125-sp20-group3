@@ -12,8 +12,8 @@ VertexLayout GLTFObject::pVertexLayoutModel = {
 };
 
 int GLTFObject::instanceCount = 0;
-int GLTFObject::modelCount = 0;
 bool GLTFObject::countingInstances = false;
+int GLTFObject::modelCount = 0;
 Buffer* GLTFObject::pNodeTransformsBuffer = NULL;
 
 
@@ -500,6 +500,11 @@ void GLTFObject::draw(Cmd* cmd, RootSignature* rootSignature, bool useMaterial)
 
 		pushConstants.nodeIndex += 1;
 	}
+}
+
+void GLTFObject::draw(Cmd* cmd)
+{
+	draw(cmd, defaultRootSignature, true);
 }
 
 void GLTFObject::setTranslate(vec3 position) {

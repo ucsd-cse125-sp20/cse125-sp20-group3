@@ -28,8 +28,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\Application.cpp" />
+    <ClCompile Include="..\..\..\..\src\Geode.cpp" />
     <ClCompile Include="..\..\..\..\src\GLTFObject.cpp" />
     <ClCompile Include="..\..\..\..\src\Input.cpp" />
+    <ClCompile Include="..\..\..\..\src\Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\src\Shaders\D3D12\basic.frag" />
@@ -66,9 +68,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\Application.h" />
+    <ClInclude Include="..\..\..\..\src\Geode.h" />
     <ClInclude Include="..\..\..\..\src\GLTFObject.h" />
     <ClInclude Include="..\..\..\..\src\Input.h" />
+    <ClInclude Include="..\..\..\..\src\Node.h" />
     <ClInclude Include="..\..\..\..\src\Object.h" />
+    <ClInclude Include="..\..\..\..\src\Transform.h" />
     <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\cgltf\cgltf.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

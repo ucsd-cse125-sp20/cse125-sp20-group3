@@ -14,7 +14,7 @@
 #define MAX_GLTF_NODES 100
 #define MAX_GLTF_MODELS 50
 
-class GLTFObject
+class GLTFObject : public Object
 {
 public:
 	Texture* pTextureBlack;
@@ -64,6 +64,8 @@ public:
 	Buffer* pMaterialBuffer = NULL;
 	Sampler* pDefaultSampler = NULL;
 
+	RootSignature* defaultRootSignature = NULL;
+
 	mat4 model = mat4::identity();
 	vec3 baseColor = vec3(1);
 
@@ -98,6 +100,7 @@ public:
 
 	void update(float deltaTime);
 	void draw(Cmd* cmd, RootSignature* rootSignature, bool useMaterial);
+	void draw(Cmd* cmd);
 
 	void setTranslate(vec3 position);
 	void setScaleRot(vec3 scale, float deg, vec3 axis);

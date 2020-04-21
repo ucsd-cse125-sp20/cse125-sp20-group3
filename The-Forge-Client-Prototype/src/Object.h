@@ -8,8 +8,6 @@
 class Object
 {
 public:
-	mat4 model = mat4::identity();
-
 	virtual void update(float deltaTime) = 0;
 	virtual void draw(Cmd* commands) = 0;
 };

@@ -147,7 +147,7 @@ Sampler* pBilinearClampSampler = NULL;
 Application::UniformBlock		gUniformData;
 Application::UniformBlock_Floor	gFloorUniformBlock;
 Application::UniformBlock_Shadow gShadowUniformData;
-eastl::vector<Application::UniformBlock_Instance> instanceData;
+std::vector<Application::UniformBlock_Instance> instanceData;
 
 //--------------------------------------------------------------------------------------------
 // THE FORGE OBJECTS
@@ -205,7 +205,7 @@ float drag = 0.1f;
 TextDrawDesc gFrameTimeDraw = TextDrawDesc(0, 0xff00ffff, 18);
 
 std::vector<GLTFObject*> others;
-int numOthers = 0;
+int numOthers = 10;
 
 
 Application::Application()
@@ -362,14 +362,6 @@ void Application::drawShadowMap(Cmd* cmd)
 	cmdDrawIndexed(cmd, 6, 0, 0);
 
 	cmdBindPipeline(cmd, pPipelineShadowPass);
-	
-	/*/ Update uniform buffers
-	gUniformData.mModel = gCurrentAsset->model;
-	shaderCbv = { pShadowUniformBuffer[Application::gFrameIndex] };
-	beginUpdateResource(&shaderCbv);
-	*(UniformBlock*)shaderCbv.pMappedData = gUniformData;
-	endUpdateResource(&shaderCbv, NULL);
-	*/
 
 	// Update uniform buffers
 	gShadowUniformData.mModel = player->model;
@@ -768,16 +760,13 @@ void Application::RemoveModelDependentResources()
 
 	player->removeResources();
 	conf_delete(player);
-	player = conf_new(GLTFObject);
 
 	ground->removeResources();
 	conf_delete(ground);
-	ground = conf_new(GLTFObject);
 
 	for (auto other : others) {
 		other->removeResources();
 		conf_delete(other);
-		other = conf_new(GLTFObject);
 	}
 }
 
@@ -838,13 +827,8 @@ void Application::Exit()
 #endif
 
 	gModelFile = NULL;
-
-	conf_delete(player);
-	conf_delete(ground);
-
-	for (auto other : others) {
-		conf_delete(other);
-	}
+	gOtherFile = NULL;
+	gGroundFile = NULL;
 }
 
 void Application::LoadPipelines()

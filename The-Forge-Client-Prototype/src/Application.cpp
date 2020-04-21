@@ -205,7 +205,7 @@ float drag = 0.1f;
 TextDrawDesc gFrameTimeDraw = TextDrawDesc(0, 0xff00ffff, 18);
 
 std::vector<GLTFObject*> others;
-int numOthers = 20;
+int numOthers = 0;
 
 
 Application::Application()
@@ -316,8 +316,6 @@ bool Application::InitModelDependentResources()
 		return false;
 
 	waitForAllResourceLoads();
-
-	PrepareDescriptorSets();
 
 	return true;
 }
@@ -611,6 +609,9 @@ bool Application::Init()
 
 	if (!Input::Init(pWindow, &gAppUI, this)) return false;
 
+
+
+
 	player = conf_new(GLTFObject);
 
 	float randoRange = 20;
@@ -632,6 +633,10 @@ bool Application::Init()
 	}
 
 	ground = conf_new(GLTFObject);
+
+
+	// Initialize models
+	InitModelDependentResources();
 
 	return true;
 }
@@ -667,8 +672,10 @@ void Application::RemoveDescriptorSets()
 	removeDescriptorSet(pRenderer, pDescriptorSetWatermark);
 	removeDescriptorSet(pRenderer, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_NONE]);
 	removeDescriptorSet(pRenderer, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+	removeDescriptorSet(pRenderer, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
 	removeDescriptorSet(pRenderer, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_NONE]);
 	removeDescriptorSet(pRenderer, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+	removeDescriptorSet(pRenderer, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
 }
 
 void Application::PrepareDescriptorSets()
@@ -781,6 +788,8 @@ void Application::Exit()
 	Input::Exit();
 
 	exitProfiler();
+
+	RemoveModelDependentResources();
 
 	destroyCameraController(pCameraController);
 	destroyCameraController(pLightView);
@@ -1026,7 +1035,7 @@ bool Application::Load()
 
 	loadProfilerUI(&gAppUI, mSettings.mWidth, mSettings.mHeight);
 
-	InitModelDependentResources();
+	PrepareDescriptorSets();
 
 	LoadPipelines();
 
@@ -1076,8 +1085,6 @@ void Application::Unload()
 {
 	waitQueueIdle(pGraphicsQueue);
 	waitForFences(pRenderer, Application::gImageCount, pRenderCompleteFences);
-
-	RemoveModelDependentResources();
 
 	unloadProfilerUI();
 	gAppUI.Unload();

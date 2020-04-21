@@ -1,7 +1,7 @@
 #undef UNICODE
 
 //#include "network_connection.cpp"
-#include "macros.h"
+#include "../common/macros.h"
 #include <string>
 #include <iostream>
 #include "Server.h"

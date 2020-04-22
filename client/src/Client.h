@@ -1,8 +1,12 @@
-#define WIN32_LEAN_AND_MEAN
-
 #pragma once
 
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+
+#ifndef _WIN32_WINNT
 #define _WIN32_WINNT  0x501
+#endif
 
 #include "../../common/macros.h"
 #include <windows.h>
@@ -10,6 +14,7 @@
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <iostream>
 #include <string>
 
 // Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib

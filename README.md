@@ -12,3 +12,7 @@
 The backbone of the client uses [The Forge](https://github.com/ConfettiFX/The-Forge). To build the project, use Visual Studio 2017/2019 with Windows SDK 10.0.17763.0 installed. I haven't worked out non-IDE build methods as of yet
 
 The-Forge/edit.bat in should open visual studio.
+
+# Notes
+
+Since there are a multitude of file headers, in order to compile Client.h correctly, WIN32_LEAN_AND_MEAN must be defined in the preprocessor. to do this, go to Project Properties => C/C++ => Preprocessor => Definitions => WIN32_LEAN_AND_MEAN for the corresponding configuration.

@@ -60,9 +60,9 @@
     ],
     "images" : [
         {
-            "mimeType" : "image/png",
+            "mimeType" : "image/jpeg",
             "name" : "Ground_tex",
-            "uri" : "Ground_tex.png"
+            "uri" : "Ground_tex.jpg"
         }
     ],
     "accessors" : [

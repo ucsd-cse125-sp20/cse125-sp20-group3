@@ -5,10 +5,12 @@
 
 #include "Client.h"
 
+
 #include "Input.h"
 
 #include "GLTFGeode.h"
 #include "Transform.h"
+
 
 #define IMAGE_COUNT 3
 #define LIGHT_COUNT 3
@@ -59,10 +61,10 @@ public:
     static mat4 projMat, viewMat;
 
 	Application();
+
     static bool InitShaderResources();
     static bool InitSceneResources();
-    static void setRenderTarget(Cmd* cmd, uint32_t count, RenderTarget** pDestinationRenderTargets, RenderTarget* pDepthStencilTarget, LoadActionsDesc* loadActions);
-    static void drawShadowMap(Cmd* cmd);
+
     bool Init();
 	static bool AddDescriptorSets();
 	static void RemoveDescriptorSets();
@@ -77,14 +79,16 @@ public:
 	void Update(float deltaTime);
 	void PostDrawUpdate();
 	static void SelectModelFunc(const Path* path, void* pathPtr);
-	static void LoadNewModel();
-	static void LoadLOD();
 	void Draw();
+
+	static void setRenderTarget(Cmd* cmd, uint32_t count, RenderTarget** pDestinationRenderTargets, RenderTarget* pDepthStencilTarget, LoadActionsDesc* loadActions);
+	static void drawShadowMap(Cmd* cmd);
+
 	const char* GetName();
+
 	bool addSwapChain();
 	bool addRenderTargets();
 	bool addDepthBuffer();
-	void RecenterCameraView(float maxDistance, vec3 lookAt);
 };
 
 #endif

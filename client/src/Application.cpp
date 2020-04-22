@@ -60,7 +60,6 @@ int					gMaxLod = 5;
 bool				bToggleFXAA = true;
 bool				bVignetting = true;
 bool				bToggleVSync = false;
-bool				bScreenShotMode = false;
 
 ProfileToken   gGpuProfileToken;
 Texture* Application::pTextureBlack = NULL;
@@ -109,7 +108,6 @@ Shader* pMeshOptDemoShader = NULL;
 Shader* pFloorShader = NULL;
 Shader* pVignetteShader = NULL;
 Shader* pFXAAShader = NULL;
-Shader* pWaterMarkShader = NULL;
 
 Pipeline* pPipelineShadowPass = NULL;
 Pipeline* pPipelineShadowPass_NonOPtimized = NULL;
@@ -117,7 +115,6 @@ Pipeline* pMeshOptDemoPipeline = NULL;
 Pipeline* pFloorPipeline = NULL;
 Pipeline* pVignettePipeline = NULL;
 Pipeline* pFXAAPipeline = NULL;
-Pipeline* pWaterMarkPipeline = NULL;
 
 RootSignature* pRootSignatureShadow = NULL;
 RootSignature* pRootSignatureShaded = NULL;
@@ -125,7 +122,6 @@ RootSignature* pRootSignaturePostEffects = NULL;
 
 DescriptorSet* pDescriptorSetVignette;
 DescriptorSet* pDescriptorSetFXAA;
-DescriptorSet* pDescriptorSetWatermark;
 DescriptorSet* pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_COUNT];
 DescriptorSet* pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_COUNT];
 
@@ -139,7 +135,6 @@ Buffer* pFloorUniformBuffer[IMAGE_COUNT] = { NULL };
 Buffer* TriangularVB = NULL;
 Buffer* pFloorVB = NULL;
 Buffer* pFloorIB = NULL;
-Buffer* WaterMarkVB = NULL;
 
 Sampler* pDefaultSampler = NULL;
 Sampler* pBilinearClampSampler = NULL;
@@ -259,13 +254,6 @@ bool Application::InitShaderResources()
 
 	addShader(pRenderer, &FXAAShader, &pFXAAShader);
 
-	ShaderLoadDesc WaterMarkShader = {};
-
-	WaterMarkShader.mStages[0] = { "watermark.vert", NULL, 0, RD_SHADER_SOURCES };
-	WaterMarkShader.mStages[1] = { "watermark.frag", NULL, 0, RD_SHADER_SOURCES };
-
-	addShader(pRenderer, &WaterMarkShader, &pWaterMarkShader);
-
 	const char* pStaticSamplerNames[] = { "clampMiplessLinearSampler" };
 	Sampler* pStaticSamplers[] = { pBilinearClampSampler };
 	Shader* shaders[] = { pShaderZPass, pShaderZPass_NonOptimized };
@@ -285,8 +273,8 @@ bool Application::InitShaderResources()
 
 	addRootSignature(pRenderer, &rootDesc, &pRootSignatureShaded);
 
-	Shader* postShaders[] = { pVignetteShader, pFXAAShader, pWaterMarkShader };
-	rootDesc.mShaderCount = 3;
+	Shader* postShaders[] = { pVignetteShader, pFXAAShader };
+	rootDesc.mShaderCount = 2;
 	rootDesc.ppShaders = postShaders;
 
 	addRootSignature(pRenderer, &rootDesc, &pRootSignaturePostEffects);
@@ -622,7 +610,6 @@ bool Application::AddDescriptorSets()
 	DescriptorSetDesc setDesc = { pRootSignaturePostEffects, DESCRIPTOR_UPDATE_FREQ_NONE, 1 };
 	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetVignette);
 	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetFXAA);
-	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetWatermark);
 
 	setDesc = { pRootSignatureShadow, DESCRIPTOR_UPDATE_FREQ_NONE, 1 };
 	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_NONE]);
@@ -645,10 +632,11 @@ void Application::RemoveDescriptorSets()
 {
 	removeDescriptorSet(pRenderer, pDescriptorSetVignette);
 	removeDescriptorSet(pRenderer, pDescriptorSetFXAA);
-	removeDescriptorSet(pRenderer, pDescriptorSetWatermark);
+
 	removeDescriptorSet(pRenderer, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_NONE]);
 	removeDescriptorSet(pRenderer, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
 	removeDescriptorSet(pRenderer, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
+
 	removeDescriptorSet(pRenderer, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_NONE]);
 	removeDescriptorSet(pRenderer, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
 	removeDescriptorSet(pRenderer, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
@@ -673,10 +661,6 @@ void Application::PrepareDescriptorSets()
 		params[0].pName = "sceneTexture";
 		params[0].ppTextures = &pPostProcessRT->pTexture;
 		updateDescriptorSet(pRenderer, 0, pDescriptorSetFXAA, 1, params);
-
-		params[0].pName = "sceneTexture";
-		params[0].ppTextures = &pTextureBlack;
-		updateDescriptorSet(pRenderer, 0, pDescriptorSetWatermark, 1, params);
 
 		for (uint32_t i = 0; i < Application::gImageCount; ++i)
 		{
@@ -728,7 +712,6 @@ void Application::RemoveShaderResources()
 	removeShader(pRenderer, pFloorShader);
 	removeShader(pRenderer, pMeshOptDemoShader);
 	removeShader(pRenderer, pFXAAShader);
-	removeShader(pRenderer, pWaterMarkShader);
 
 	removeRootSignature(pRenderer, pRootSignatureShadow);
 	removeRootSignature(pRenderer, pRootSignatureShaded);
@@ -947,24 +930,6 @@ void Application::LoadPipelines()
 		pipelineSettings.pShaderProgram = pFXAAShader;
 		addPipeline(pRenderer, &desc, &pFXAAPipeline);
 	}
-
-	{
-		desc = {};
-		desc.mType = PIPELINE_TYPE_GRAPHICS;
-		GraphicsPipelineDesc& pipelineSettings = desc.mGraphicsDesc;
-		pipelineSettings.mPrimitiveTopo = PRIMITIVE_TOPO_TRI_LIST;
-		pipelineSettings.mRenderTargetCount = 1;
-		pipelineSettings.pDepthState = NULL;
-		pipelineSettings.pBlendState = &blendStateAlphaDesc;
-		pipelineSettings.pColorFormats = &pSwapChain->ppRenderTargets[0]->mFormat;
-		pipelineSettings.mSampleCount = pSwapChain->ppRenderTargets[0]->mSampleCount;
-		pipelineSettings.mSampleQuality = pSwapChain->ppRenderTargets[0]->mSampleQuality;
-		pipelineSettings.pRootSignature = pRootSignaturePostEffects;
-		pipelineSettings.pVertexLayout = &screenTriangle_VertexLayout;
-		pipelineSettings.pRasterizerState = &rasterizerStateDesc;
-		pipelineSettings.pShaderProgram = pWaterMarkShader;
-		addPipeline(pRenderer, &desc, &pWaterMarkPipeline);
-	}
 }
 
 bool Application::Load()
@@ -992,34 +957,6 @@ bool Application::Load()
 
 	LoadPipelines();
 
-	float wmHeight = min(mSettings.mWidth, mSettings.mHeight) * 0.09f;
-	float wmWidth = wmHeight * 2.8077f;
-
-	float widthGap = wmWidth * 2.0f / (float)mSettings.mWidth;
-	float heightGap = wmHeight * 2.0f / (float)mSettings.mHeight;
-
-	float pixelGap = 80.0f;
-	float widthRight = 1.0f - pixelGap / (float)mSettings.mWidth;
-	float heightDown = -1.0f + pixelGap / (float)mSettings.mHeight;
-
-	float screenWaterMarkPoints[] = {
-		widthRight - widthGap,	heightDown + heightGap, 0.5f, 0.0f, 0.0f,
-		widthRight - widthGap,	heightDown,				0.5f, 0.0f, 1.0f,
-		widthRight,				heightDown + heightGap, 0.5f, 1.0f, 0.0f,
-
-		widthRight,				heightDown + heightGap, 0.5f, 1.0f, 0.0f,
-		widthRight - widthGap,	heightDown,				0.5f, 0.0f, 1.0f,
-		widthRight,				heightDown,				0.5f, 1.0f, 1.0f
-	};
-
-	BufferLoadDesc screenQuadVbDesc = {};
-	screenQuadVbDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_VERTEX_BUFFER;
-	screenQuadVbDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_GPU_ONLY;
-	screenQuadVbDesc.mDesc.mSize = sizeof(float) * 5 * 6;
-	screenQuadVbDesc.pData = screenWaterMarkPoints;
-	screenQuadVbDesc.ppBuffer = &WaterMarkVB;
-	addResource(&screenQuadVbDesc, NULL, LOAD_PRIORITY_NORMAL);
-
 	return true;
 }
 
@@ -1031,7 +968,6 @@ void Application::RemovePipelines()
 	removePipeline(pRenderer, pFloorPipeline);
 	removePipeline(pRenderer, pMeshOptDemoPipeline);
 	removePipeline(pRenderer, pFXAAPipeline);
-	removePipeline(pRenderer, pWaterMarkPipeline);
 }
 
 void Application::Unload()
@@ -1045,8 +981,6 @@ void Application::Unload()
 #if defined(TARGET_IOS) || defined(__ANDROID__)
 	gVirtualJoystick.Unload();
 #endif
-
-	removeResource(WaterMarkVB);
 
 	RemovePipelines();
 
@@ -1385,28 +1319,6 @@ void Application::Draw()
 		cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);
 	}
 
-
-	if (bScreenShotMode)
-	{
-		cmdBindRenderTargets(cmd, 1, &pRenderTarget, NULL, NULL, NULL, NULL, -1, -1);
-		cmdSetViewport(cmd, 0.0f, 0.0f, (float)pRenderTarget->mWidth, (float)pRenderTarget->mHeight, 0.0f, 1.0f);
-		cmdSetScissor(cmd, 0, 0, pRenderTarget->mWidth, pRenderTarget->mHeight);
-
-		cmdBeginGpuTimestampQuery(cmd, gGpuProfileToken, "Draw Water Mark");
-
-		cmdBindPipeline(cmd, pWaterMarkPipeline);
-
-		cmdBindDescriptorSet(cmd, 0, pDescriptorSetVignette);
-
-		const uint32_t stride = sizeof(float) * 5;
-		cmdBindVertexBuffer(cmd, 1, &WaterMarkVB, &stride, NULL);
-		cmdDraw(cmd, 6, 0);
-
-		cmdBindRenderTargets(cmd, 0, NULL, 0, NULL, NULL, NULL, -1, -1);
-		cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);
-	}
-
-	if (!bScreenShotMode)
 	{
 		cmdBeginGpuTimestampQuery(cmd, gGpuProfileToken, "Draw UI");
 		static HiresTimer gTimer;
@@ -1558,22 +1470,6 @@ bool Application::addDepthBuffer()
 	addRenderTarget(pRenderer, &shadowRTDesc, &pShadowRT);
 
 	return pDepthBuffer != NULL && pShadowRT != NULL;
-}
-
-void Application::RecenterCameraView(float maxDistance, vec3 lookAt = vec3(0))
-{
-	vec3 p = pCameraController->getViewPosition();
-	vec3 d = p - lookAt;
-
-	float lenSqr = lengthSqr(d);
-	if (lenSqr > (maxDistance * maxDistance))
-	{
-		d *= (maxDistance / sqrtf(lenSqr));
-	}
-
-	p = d + lookAt;
-	pCameraController->moveTo(p);
-	pCameraController->lookAt(lookAt);
 }
 
 

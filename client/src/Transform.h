@@ -12,8 +12,6 @@ public:
 	Transform(mat4 transformation);
 	~Transform();
 
-	void unload() override;
-
 	void addChild(Node* child);
 	void removeChild(Node* child);
 

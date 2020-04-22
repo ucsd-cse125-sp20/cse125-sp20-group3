@@ -8,7 +8,5 @@
 class Node : public Object
 {
 public:
-	virtual void unload() = 0;
-
 	virtual void updateTransformBuffer(BufferUpdateDesc& desc, mat4 parentTransform) = 0;
 };

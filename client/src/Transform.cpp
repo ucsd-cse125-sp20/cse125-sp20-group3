@@ -7,16 +7,6 @@ Transform::Transform(mat4 transformation)
 
 Transform::~Transform()
 {
-	for (auto child : children) {
-		conf_delete(child);
-	}
-}
-
-void Transform::unload()
-{
-	for (auto child : children) {
-		child->unload();
-	}
 }
 
 void Transform::addChild(Node* child)

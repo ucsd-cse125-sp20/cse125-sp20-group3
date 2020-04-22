@@ -53,12 +53,6 @@
     <None Include="..\..\..\..\src\Shaders\D3D12\basic.vert">
       <Filter>Shaders\D3D12</Filter>
     </None>
-    <None Include="..\..\..\..\src\Shaders\D3D12\floor.frag">
-      <Filter>Shaders\D3D12</Filter>
-    </None>
-    <None Include="..\..\..\..\src\Shaders\D3D12\floor.vert">
-      <Filter>Shaders\D3D12</Filter>
-    </None>
     <None Include="..\..\..\..\src\Shaders\D3D12\FXAA.frag">
       <Filter>Shaders\D3D12</Filter>
     </None>

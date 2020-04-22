@@ -123,20 +123,6 @@ struct GLTFMaterialData
 	GLTFTextureProperties mEmissiveTextureProperties;
 };
 
-struct InstanceData
-{
-	float4x4	sceneToWorld;
-	//float3		baseColor;
-};
-
-//cbuffer cbRootConstants : register(b2) {
-//	uint nodeIndex;
-//	uint instanceIndex;
-//	uint modelIndex;
-//};
-
-//StructuredBuffer<InstanceData> instanceBuffer : register(t0, UPDATE_FREQ_PER_BATCH);
-
 cbuffer cbMaterialData : register(b0, UPDATE_FREQ_PER_DRAW) {
 	GLTFMaterialData materialData;
 };
@@ -446,7 +432,8 @@ PSOut main(PsIn input) : SV_TARGET
 	// AO
 	result *= ao;
 
-	//result *= CalcPCFShadowFactor(input.pos);
+	// TODO fix shadows later
+	result += CalcPCFShadowFactor(input.pos) - CalcPCFShadowFactor(input.pos);
 
 	// Ambeint Light
 	result += baseColor.rgb * lightColor[3].rgb * lightColor[3].a;

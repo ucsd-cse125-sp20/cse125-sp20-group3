@@ -20,8 +20,6 @@ class Application : public IApp
 {
 public:
 
-	static Texture* pTextureBlack;
-
 	struct UniformBlock
 	{
 		mat4 mProjectView;
@@ -32,22 +30,10 @@ public:
 		vec4 mLightDirection[LIGHT_COUNT];
 	};
 
-	struct UniformBlock_Instance
-	{
-		mat4 mModel;
-	};
-
 	struct UniformBlock_Shadow
 	{
 		mat4 ViewProj;
 		mat4 mModel;
-	};
-
-	struct UniformBlock_Floor
-	{
-		mat4	worldMat;
-		mat4	projViewMat;
-		vec4	screenSize;
 	};
 
 	struct FXAAINFO
@@ -62,33 +48,31 @@ public:
 
 	Application();
 
+	static bool InitSceneResources();
+	static void RemoveSceneResources();
     static bool InitShaderResources();
-    static bool InitSceneResources();
+	static void RemoveShaderResources();
 
     bool Init();
-	static bool AddDescriptorSets();
-	static void RemoveDescriptorSets();
-	static void PrepareDescriptorSets();
-	static void RemoveShaderResources();
-	static void RemoveSceneResources();
 	void Exit();
+
+	static void PrepareDescriptorSets();
 	static void LoadPipelines();
-	bool Load();
 	static void RemovePipelines();
+	bool Load();
 	void Unload();
+
 	void Update(float deltaTime);
-	void PostDrawUpdate();
-	static void SelectModelFunc(const Path* path, void* pathPtr);
 	void Draw();
 
 	static void setRenderTarget(Cmd* cmd, uint32_t count, RenderTarget** pDestinationRenderTargets, RenderTarget* pDepthStencilTarget, LoadActionsDesc* loadActions);
 	static void drawShadowMap(Cmd* cmd);
 
-	const char* GetName();
-
 	bool addSwapChain();
 	bool addRenderTargets();
 	bool addDepthBuffer();
+
+	const char* Application::GetName() { return "client"; }
 };
 
 #endif

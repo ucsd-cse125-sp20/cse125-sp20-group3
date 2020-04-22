@@ -29,8 +29,6 @@ public:
 
 	void setProgram(GeodeShaderDesc desc);
 
-	void unload() override;
-
 	void update(float deltaTime) override;
 	void updateTransformBuffer(BufferUpdateDesc& desc, mat4 parentTransform);
 	void draw(Cmd* cmd) override;

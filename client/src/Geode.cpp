@@ -28,10 +28,6 @@ void Geode::setProgram(GeodeShaderDesc desc)
 	}
 }
 
-void Geode::unload()
-{
-}
-
 void Geode::update(float deltaTime)
 {
 	obj->update(deltaTime);

@@ -15,7 +15,7 @@ public:
 
 	void createMaterialResources(RootSignature* pRootSignature, DescriptorSet* pBindlessTexturesSamplersSet);
 
-	void unload() override;
+	void unload();
 
 	void draw(Cmd* cmd) override;
 };

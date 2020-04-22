@@ -38,8 +38,6 @@
   <ItemGroup>
     <None Include="..\..\..\..\src\Shaders\D3D12\basic.frag" />
     <None Include="..\..\..\..\src\Shaders\D3D12\basic.vert" />
-    <None Include="..\..\..\..\src\Shaders\D3D12\floor.frag" />
-    <None Include="..\..\..\..\src\Shaders\D3D12\floor.vert" />
     <None Include="..\..\..\..\src\Shaders\D3D12\FXAA.frag" />
     <None Include="..\..\..\..\src\Shaders\D3D12\profile.frag" />
     <None Include="..\..\..\..\src\Shaders\D3D12\profile.vert" />

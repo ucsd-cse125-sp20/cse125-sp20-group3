@@ -62,7 +62,6 @@ bool				bVignetting = true;
 bool				bToggleVSync = false;
 
 ProfileToken   gGpuProfileToken;
-Texture* Application::pTextureBlack = NULL;
 //--------------------------------------------------------------------------------------------
 // PRE PROCESSORS
 //--------------------------------------------------------------------------------------------
@@ -103,16 +102,12 @@ Semaphore* pImageAcquiredSemaphore = NULL;
 Semaphore* pRenderCompleteSemaphores[IMAGE_COUNT] = { NULL };
 
 Shader* pShaderZPass = NULL;
-Shader* pShaderZPass_NonOptimized = NULL;
 Shader* pMeshOptDemoShader = NULL;
-Shader* pFloorShader = NULL;
 Shader* pVignetteShader = NULL;
 Shader* pFXAAShader = NULL;
 
 Pipeline* pPipelineShadowPass = NULL;
-Pipeline* pPipelineShadowPass_NonOPtimized = NULL;
 Pipeline* pMeshOptDemoPipeline = NULL;
-Pipeline* pFloorPipeline = NULL;
 Pipeline* pVignettePipeline = NULL;
 Pipeline* pFXAAPipeline = NULL;
 
@@ -140,9 +135,8 @@ Sampler* pDefaultSampler = NULL;
 Sampler* pBilinearClampSampler = NULL;
 
 Application::UniformBlock		gUniformData;
-Application::UniformBlock_Floor	gFloorUniformBlock;
 Application::UniformBlock_Shadow gShadowUniformData;
-std::vector<Application::UniformBlock_Instance> instanceData;
+std::vector<mat4> instanceData;
 
 //--------------------------------------------------------------------------------------------
 // THE FORGE OBJECTS
@@ -201,6 +195,13 @@ GLTFGeode* player;
 GLTFGeode* ground;
 GLTFGeode* other;
 
+std::vector<Transform*> transformNodes;
+std::vector<GLTFGeode*> gltfGeodes;
+
+// ============================================================================
+// ==============================================[ CODE STARTS HERE ]==========
+// ============================================================================
+
 Application::Application()
 {
 #ifdef TARGET_IOS
@@ -208,82 +209,9 @@ Application::Application()
 #endif
 }
 
-bool Application::InitShaderResources()
-{
-	// shader
-
-	ShaderLoadDesc FloorShader = {};
-
-	FloorShader.mStages[0] = { "floor.vert", NULL, 0, RD_SHADER_SOURCES };
-
-	addShader(pRenderer, &FloorShader, &pShaderZPass_NonOptimized);
-
-#if defined(__ANDROID__)
-	FloorShader.mStages[1] = { "floorMOBILE.frag", NULL, 0, RD_SHADER_SOURCES };
-#else
-	FloorShader.mStages[1] = { "floor.frag", NULL, 0, RD_SHADER_SOURCES };
-#endif
-
-	addShader(pRenderer, &FloorShader, &pFloorShader);
-
-	ShaderLoadDesc MeshOptDemoShader = {};
-
-	MeshOptDemoShader.mStages[0] = { "basic.vert", NULL, 0, RD_SHADER_SOURCES };
-
-	addShader(pRenderer, &MeshOptDemoShader, &pShaderZPass);
-
-#if defined(__ANDROID__)
-	MeshOptDemoShader.mStages[1] = { "basicMOBILE.frag", NULL, 0, RD_SHADER_SOURCES };
-#else
-	MeshOptDemoShader.mStages[1] = { "basic.frag", NULL, 0, RD_SHADER_SOURCES };
-#endif
-
-	addShader(pRenderer, &MeshOptDemoShader, &pMeshOptDemoShader);
-
-	ShaderLoadDesc VignetteShader = {};
-
-	VignetteShader.mStages[0] = { "Triangular.vert", NULL, 0, RD_SHADER_SOURCES };
-	VignetteShader.mStages[1] = { "vignette.frag", NULL, 0, RD_SHADER_SOURCES };
-
-	addShader(pRenderer, &VignetteShader, &pVignetteShader);
-
-	ShaderLoadDesc FXAAShader = {};
-
-	FXAAShader.mStages[0] = { "Triangular.vert", NULL, 0, RD_SHADER_SOURCES };
-	FXAAShader.mStages[1] = { "FXAA.frag", NULL, 0, RD_SHADER_SOURCES };
-
-	addShader(pRenderer, &FXAAShader, &pFXAAShader);
-
-	const char* pStaticSamplerNames[] = { "clampMiplessLinearSampler" };
-	Sampler* pStaticSamplers[] = { pBilinearClampSampler };
-	Shader* shaders[] = { pShaderZPass, pShaderZPass_NonOptimized };
-	RootSignatureDesc rootDesc = {};
-	rootDesc.mStaticSamplerCount = 1;
-	rootDesc.ppStaticSamplerNames = pStaticSamplerNames;
-	rootDesc.ppStaticSamplers = pStaticSamplers;
-	rootDesc.mShaderCount = 2;
-	rootDesc.ppShaders = shaders;
-
-	addRootSignature(pRenderer, &rootDesc, &pRootSignatureShadow);
-
-	Shader* demoShaders[] = { pMeshOptDemoShader, pFloorShader };
-
-	rootDesc.mShaderCount = 2;
-	rootDesc.ppShaders = demoShaders;
-
-	addRootSignature(pRenderer, &rootDesc, &pRootSignatureShaded);
-
-	Shader* postShaders[] = { pVignetteShader, pFXAAShader };
-	rootDesc.mShaderCount = 2;
-	rootDesc.ppShaders = postShaders;
-
-	addRootSignature(pRenderer, &rootDesc, &pRootSignaturePostEffects);
-
-	if (!AddDescriptorSets())
-		return false;
-
-	return true;
-}
+// ============================================================================
+// ==============================================[ SCENE INITIALIZATION ]======
+// ============================================================================
 
 bool Application::InitSceneResources()
 {
@@ -291,16 +219,23 @@ bool Application::InitSceneResources()
 	ground = conf_new(GLTFGeode, pRenderer, pDefaultSampler, gGroundModelFile);
 	other = conf_new(GLTFGeode, pRenderer, pDefaultSampler, gOtherModelFile);
 
+	gltfGeodes.push_back(player);
+	gltfGeodes.push_back(ground);
+	gltfGeodes.push_back(other);
+
 	rootTransform = conf_new(Transform, mat4::identity());
+	transformNodes.push_back(rootTransform);
 
 	playerTransform = conf_new(Transform, mat4::identity());
 	playerTransform->addChild(player);
 	rootTransform->addChild(playerTransform);
+	transformNodes.push_back(playerTransform);
 
 	groundTransform = conf_new(Transform, mat4::identity());
 	groundTransform->addChild(ground);
 	rootTransform->addChild(groundTransform);
-	
+	transformNodes.push_back(groundTransform);
+
 	for (int i = 0; i < numOthers; i++) {
 		float x = -rangeOthers + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * rangeOthers)));
 		float z = -rangeOthers + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * rangeOthers)));
@@ -311,6 +246,7 @@ bool Application::InitSceneResources()
 		otherTransforms.push_back(conf_new(Transform, transform));
 		otherTransforms.back()->addChild(other);
 		rootTransform->addChild(otherTransforms.back());
+		transformNodes.push_back(otherTransforms.back());
 	}
 
 	if (!InitShaderResources())
@@ -321,63 +257,121 @@ bool Application::InitSceneResources()
 	return true;
 }
 
-void Application::setRenderTarget(Cmd* cmd, uint32_t count, RenderTarget** pDestinationRenderTargets, RenderTarget* pDepthStencilTarget, LoadActionsDesc* loadActions)
+void Application::RemoveSceneResources()
 {
-	if (count == 0 && pDestinationRenderTargets == NULL && pDepthStencilTarget == NULL)
-		cmdBindRenderTargets(cmd, 0, NULL, NULL, NULL, NULL, NULL, -1, -1);
-	else
-	{
-		cmdBindRenderTargets(cmd, count, pDestinationRenderTargets, pDepthStencilTarget, loadActions, NULL, NULL, -1, -1);
-		// sets the rectangles to match with first attachment, I know that it's not very portable.
-		RenderTarget* pSizeTarget = pDepthStencilTarget ? pDepthStencilTarget : pDestinationRenderTargets[0];
-		cmdSetViewport(cmd, 0.0f, 0.0f, (float)pSizeTarget->mWidth, (float)pSizeTarget->mHeight, 0.0f, 1.0f);
-		cmdSetScissor(cmd, 0, 0, pSizeTarget->mWidth, pSizeTarget->mHeight);
+	RemoveShaderResources();
+
+	// TODO fix unloading
+	for (auto geode : gltfGeodes) {
+		geode->unload();
+		conf_delete(geode);
+	}
+	for (auto t : transformNodes) {
+		conf_delete(t);
 	}
 }
 
-void Application::drawShadowMap(Cmd* cmd)
+// ============================================================================
+// ==============================================[ SHADER MANAGEMENT ]=========
+// ============================================================================
+
+bool Application::InitShaderResources()
 {
+	// shader
 
-	RenderTargetBarrier barriers[] =
-	{
-		{ pShadowRT, RESOURCE_STATE_DEPTH_WRITE },
-	};
-	cmdResourceBarrier(cmd, 0, NULL, 0, NULL, 1, barriers);
+	ShaderLoadDesc MeshOptDemoShader = {};
+	MeshOptDemoShader.mStages[0] = { "basic.vert", NULL, 0, RD_SHADER_SOURCES };
+	addShader(pRenderer, &MeshOptDemoShader, &pShaderZPass);
 
-	LoadActionsDesc loadActions = {};
-	loadActions.mLoadActionDepth = LOAD_ACTION_CLEAR;
-	loadActions.mClearDepth = pShadowRT->mClearValue;
-	cmdBeginGpuTimestampQuery(cmd, gGpuProfileToken, "Draw Shadow Map");
-	// Start render pass and apply load actions
-	setRenderTarget(cmd, 0, NULL, pShadowRT, &loadActions);
+#if defined(__ANDROID__)
+	MeshOptDemoShader.mStages[1] = { "basicMOBILE.frag", NULL, 0, RD_SHADER_SOURCES };
+#else
+	MeshOptDemoShader.mStages[1] = { "basic.frag", NULL, 0, RD_SHADER_SOURCES };
+#endif
+	addShader(pRenderer, &MeshOptDemoShader, &pMeshOptDemoShader);
 
-	cmdBindPipeline(cmd, pPipelineShadowPass_NonOPtimized);
-	cmdBindDescriptorSet(cmd, 0, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_NONE]);
-	cmdBindDescriptorSet(cmd, Application::gFrameIndex, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
-	cmdBindDescriptorSet(cmd, Application::gFrameIndex, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
+	ShaderLoadDesc VignetteShader = {};
+	VignetteShader.mStages[0] = { "Triangular.vert", NULL, 0, RD_SHADER_SOURCES };
+	VignetteShader.mStages[1] = { "vignette.frag", NULL, 0, RD_SHADER_SOURCES };
+	addShader(pRenderer, &VignetteShader, &pVignetteShader);
 
-	const uint32_t stride = sizeof(float) * 5;
-	cmdBindVertexBuffer(cmd, 1, &pFloorVB, &stride, NULL);
-	cmdBindIndexBuffer(cmd, pFloorIB, INDEX_TYPE_UINT16, 0);
+	ShaderLoadDesc FXAAShader = {};
+	FXAAShader.mStages[0] = { "Triangular.vert", NULL, 0, RD_SHADER_SOURCES };
+	FXAAShader.mStages[1] = { "FXAA.frag", NULL, 0, RD_SHADER_SOURCES };
+	addShader(pRenderer, &FXAAShader, &pFXAAShader);
 
-	cmdDrawIndexed(cmd, 6, 0, 0);
 
-	cmdBindPipeline(cmd, pPipelineShadowPass);
+	const char* pStaticSamplerNames[] = { "clampMiplessLinearSampler" };
+	Sampler* pStaticSamplers[] = { pBilinearClampSampler };
+	Shader* shaders[] = { pShaderZPass };
+	RootSignatureDesc rootDesc = {};
+	rootDesc.mStaticSamplerCount = 1;
+	rootDesc.ppStaticSamplerNames = pStaticSamplerNames;
+	rootDesc.ppStaticSamplers = pStaticSamplers;
+	rootDesc.mShaderCount = 1;
+	rootDesc.ppShaders = shaders;
+	addRootSignature(pRenderer, &rootDesc, &pRootSignatureShadow);
 
-	// Update uniform buffers
-	/*
-	gShadowUniformData.mModel = player->model;
-	BufferUpdateDesc shaderCbv = { pShadowUniformBuffer[Application::gFrameIndex] };
-	beginUpdateResource(&shaderCbv);
-	*(UniformBlock_Shadow*)shaderCbv.pMappedData = gShadowUniformData;
-	endUpdateResource(&shaderCbv, NULL);
+	Shader* demoShaders[] = { pMeshOptDemoShader };
+	rootDesc.mShaderCount = 1;
+	rootDesc.ppShaders = demoShaders;
+	addRootSignature(pRenderer, &rootDesc, &pRootSignatureShaded);
 
-	player->draw(cmd, pRootSignatureShadow, false);
-	*/
-	setRenderTarget(cmd, 0, NULL, NULL, NULL);
+	Shader* postShaders[] = { pVignetteShader, pFXAAShader };
+	rootDesc.mShaderCount = 2;
+	rootDesc.ppShaders = postShaders;
+	addRootSignature(pRenderer, &rootDesc, &pRootSignaturePostEffects);
 
-	cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);
+
+	DescriptorSetDesc setDesc = { pRootSignaturePostEffects, DESCRIPTOR_UPDATE_FREQ_NONE, 1 };
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetVignette);
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetFXAA);
+
+	setDesc = { pRootSignatureShadow, DESCRIPTOR_UPDATE_FREQ_NONE, 1 };
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_NONE]);
+	setDesc = { pRootSignatureShadow, DESCRIPTOR_UPDATE_FREQ_PER_FRAME, Application::gImageCount };
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+	setDesc = { pRootSignatureShadow, DESCRIPTOR_UPDATE_FREQ_PER_BATCH, Application::gImageCount };
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
+
+	setDesc = { pRootSignatureShaded, DESCRIPTOR_UPDATE_FREQ_NONE, 1 };
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_NONE]);
+	setDesc = { pRootSignatureShaded, DESCRIPTOR_UPDATE_FREQ_PER_FRAME, Application::gImageCount };
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+	setDesc = { pRootSignatureShaded, DESCRIPTOR_UPDATE_FREQ_PER_BATCH, Application::gImageCount };
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
+
+	return true;
 }
+
+
+
+void Application::RemoveShaderResources()
+{
+	removeDescriptorSet(pRenderer, pDescriptorSetVignette);
+	removeDescriptorSet(pRenderer, pDescriptorSetFXAA);
+
+	removeDescriptorSet(pRenderer, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_NONE]);
+	removeDescriptorSet(pRenderer, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+	removeDescriptorSet(pRenderer, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
+
+	removeDescriptorSet(pRenderer, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_NONE]);
+	removeDescriptorSet(pRenderer, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+	removeDescriptorSet(pRenderer, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
+
+	removeShader(pRenderer, pShaderZPass);
+	removeShader(pRenderer, pVignetteShader);
+	removeShader(pRenderer, pMeshOptDemoShader);
+	removeShader(pRenderer, pFXAAShader);
+
+	removeRootSignature(pRenderer, pRootSignatureShadow);
+	removeRootSignature(pRenderer, pRootSignatureShaded);
+	removeRootSignature(pRenderer, pRootSignaturePostEffects);
+}
+
+// ============================================================================
+// ==============================================[ APPLICATION MANAGEMENT ]====
+// ============================================================================
 
 bool Application::Init()
 {
@@ -502,36 +496,6 @@ bool Application::Init()
 	screenQuadVbDesc.ppBuffer = &TriangularVB;
 	addResource(&screenQuadVbDesc, NULL, LOAD_PRIORITY_NORMAL);
 
-	TextureDesc defaultTextureDesc = {};
-	defaultTextureDesc.mArraySize = 1;
-	defaultTextureDesc.mDepth = 1;
-	defaultTextureDesc.mFormat = TinyImageFormat_R8G8B8A8_UNORM;
-	defaultTextureDesc.mWidth = 4;
-	defaultTextureDesc.mHeight = 4;
-	defaultTextureDesc.mMipLevels = 1;
-	defaultTextureDesc.mSampleCount = SAMPLE_COUNT_1;
-	defaultTextureDesc.mStartState = RESOURCE_STATE_COMMON;
-	defaultTextureDesc.mDescriptors = DESCRIPTOR_TYPE_TEXTURE;
-	defaultTextureDesc.mFlags = TEXTURE_CREATION_FLAG_OWN_MEMORY_BIT;
-	defaultTextureDesc.pDebugName = gMissingTextureString;
-	TextureLoadDesc defaultLoadDesc = {};
-	defaultLoadDesc.pDesc = &defaultTextureDesc;
-	RawImageData idata = {};
-	unsigned char blackData[64];
-	memset(blackData, 0, sizeof(unsigned char) * 64);
-
-	idata.mArraySize = 1;
-	idata.mDepth = defaultTextureDesc.mDepth;
-	idata.mWidth = defaultTextureDesc.mWidth;
-	idata.mHeight = defaultTextureDesc.mHeight;
-	idata.mFormat = defaultTextureDesc.mFormat;
-	idata.mMipLevels = defaultTextureDesc.mMipLevels;
-	idata.pRawData = (uint8_t*)blackData;
-	defaultLoadDesc.pRawImageData = &idata;
-
-	defaultLoadDesc.ppTexture = &pTextureBlack;
-	addResource(&defaultLoadDesc, NULL, LOAD_PRIORITY_NORMAL);
-
 
 	BufferLoadDesc ubDesc = {};
 	ubDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -549,10 +513,10 @@ bool Application::Init()
 	ibDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_BUFFER;
 	ibDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_GPU_ONLY;
 	ibDesc.mDesc.mFlags = BUFFER_CREATION_FLAG_NONE;
-	ibDesc.mDesc.mSize = sizeof(UniformBlock_Instance) * MAX_INSTANCES;
+	ibDesc.mDesc.mSize = sizeof(mat4) * MAX_INSTANCES;
 	ibDesc.mDesc.mFirstElement = 0;
 	ibDesc.mDesc.mElementCount = MAX_INSTANCES;
-	ibDesc.mDesc.mStructStride = sizeof(UniformBlock_Instance) - 1;
+	ibDesc.mDesc.mStructStride = sizeof(mat4) - 1;
 	ibDesc.mDesc.pCounterBuffer = NULL;
 	ibDesc.pData = instanceData.data();
 	for (uint32_t i = 0; i < Application::gImageCount; ++i)
@@ -605,42 +569,62 @@ bool Application::Init()
 	return true;
 }
 
-bool Application::AddDescriptorSets()
+void Application::Exit()
 {
-	DescriptorSetDesc setDesc = { pRootSignaturePostEffects, DESCRIPTOR_UPDATE_FREQ_NONE, 1 };
-	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetVignette);
-	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetFXAA);
+	waitQueueIdle(pGraphicsQueue);
 
-	setDesc = { pRootSignatureShadow, DESCRIPTOR_UPDATE_FREQ_NONE, 1 };
-	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_NONE]);
-	setDesc = { pRootSignatureShadow, DESCRIPTOR_UPDATE_FREQ_PER_FRAME, Application::gImageCount };
-	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
-	setDesc = { pRootSignatureShadow, DESCRIPTOR_UPDATE_FREQ_PER_BATCH, Application::gImageCount };
-	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
+	Input::Exit();
 
-	setDesc = { pRootSignatureShaded, DESCRIPTOR_UPDATE_FREQ_NONE, 1 };
-	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_NONE]);
-	setDesc = { pRootSignatureShaded, DESCRIPTOR_UPDATE_FREQ_PER_FRAME, Application::gImageCount };
-	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
-	setDesc = { pRootSignatureShaded, DESCRIPTOR_UPDATE_FREQ_PER_BATCH, Application::gImageCount };
-	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
+	exitProfiler();
 
-	return true;
+	RemoveSceneResources();
+
+	destroyCameraController(pCameraController);
+	destroyCameraController(pLightView);
+
+#if defined(TARGET_IOS) || defined(__ANDROID__)
+	gVirtualJoystick.Exit();
+#endif
+
+	gAppUI.Exit();
+
+	for (uint32_t i = 0; i < Application::gImageCount; ++i)
+	{
+		removeResource(pShadowUniformBuffer[i]);
+		removeResource(pUniformBuffer[i]);
+		removeResource(pInstanceBuffer[i]);
+		removeResource(pFloorUniformBuffer[i]);
+	}
+
+	for (uint32_t i = 0; i < Application::gImageCount; ++i)
+	{
+		removeFence(pRenderer, pRenderCompleteFences[i]);
+		removeSemaphore(pRenderer, pRenderCompleteSemaphores[i]);
+	}
+	removeSemaphore(pRenderer, pImageAcquiredSemaphore);
+
+	removeCmd_n(pRenderer, Application::gImageCount, ppCmds);
+	removeCmdPool(pRenderer, pCmdPool);
+
+	removeSampler(pRenderer, pDefaultSampler);
+	removeSampler(pRenderer, pBilinearClampSampler);
+
+	removeResource(TriangularVB);
+
+	removeResource(pFloorVB);
+	removeResource(pFloorIB);
+
+	exitResourceLoaderInterface(pRenderer);
+	removeQueue(pRenderer, pGraphicsQueue);
+	removeRenderer(pRenderer);
+
+#if defined(__linux__) || defined(__ANDROID__)
+	gModelFiles.set_capacity(0);
+	gDropDownWidgetData.set_capacity(0);
+#endif
 }
 
-void Application::RemoveDescriptorSets()
-{
-	removeDescriptorSet(pRenderer, pDescriptorSetVignette);
-	removeDescriptorSet(pRenderer, pDescriptorSetFXAA);
 
-	removeDescriptorSet(pRenderer, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_NONE]);
-	removeDescriptorSet(pRenderer, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
-	removeDescriptorSet(pRenderer, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
-
-	removeDescriptorSet(pRenderer, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_NONE]);
-	removeDescriptorSet(pRenderer, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
-	removeDescriptorSet(pRenderer, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
-}
 
 void Application::PrepareDescriptorSets()
 {
@@ -697,91 +681,15 @@ void Application::PrepareDescriptorSets()
 		}
 	}
 
-	player->createMaterialResources(pRootSignatureShaded, NULL);
-	ground->createMaterialResources(pRootSignatureShaded, NULL);
-	other->createMaterialResources(pRootSignatureShaded, NULL);
-}
-
-void Application::RemoveShaderResources()
-{
-	RemoveDescriptorSets();
-
-	removeShader(pRenderer, pShaderZPass);
-	removeShader(pRenderer, pShaderZPass_NonOptimized);
-	removeShader(pRenderer, pVignetteShader);
-	removeShader(pRenderer, pFloorShader);
-	removeShader(pRenderer, pMeshOptDemoShader);
-	removeShader(pRenderer, pFXAAShader);
-
-	removeRootSignature(pRenderer, pRootSignatureShadow);
-	removeRootSignature(pRenderer, pRootSignatureShaded);
-	removeRootSignature(pRenderer, pRootSignaturePostEffects);
-}
-
-void Application::RemoveSceneResources()
-{
-	RemoveShaderResources();
-
-	rootTransform->unload();
-	conf_delete(rootTransform);
-}
-
-void Application::Exit()
-{
-	waitQueueIdle(pGraphicsQueue);
-
-	Input::Exit();
-
-	exitProfiler();
-
-	RemoveSceneResources();
-
-	destroyCameraController(pCameraController);
-	destroyCameraController(pLightView);
-
-#if defined(TARGET_IOS) || defined(__ANDROID__)
-	gVirtualJoystick.Exit();
-#endif
-
-	gAppUI.Exit();
-
-	for (uint32_t i = 0; i < Application::gImageCount; ++i)
-	{
-		removeResource(pShadowUniformBuffer[i]);
-		removeResource(pUniformBuffer[i]);
-		removeResource(pInstanceBuffer[i]);
-		removeResource(pFloorUniformBuffer[i]);
+	// Prepare material resources for gltf geodes
+	for (auto g : gltfGeodes) {
+		g->createMaterialResources(pRootSignatureShaded, NULL);
 	}
-
-	for (uint32_t i = 0; i < Application::gImageCount; ++i)
-	{
-		removeFence(pRenderer, pRenderCompleteFences[i]);
-		removeSemaphore(pRenderer, pRenderCompleteSemaphores[i]);
-	}
-	removeSemaphore(pRenderer, pImageAcquiredSemaphore);
-
-	removeCmd_n(pRenderer, Application::gImageCount, ppCmds);
-	removeCmdPool(pRenderer, pCmdPool);
-
-	removeSampler(pRenderer, pDefaultSampler);
-	removeSampler(pRenderer, pBilinearClampSampler);
-
-	removeResource(TriangularVB);
-
-	removeResource(pFloorVB);
-	removeResource(pFloorIB);
-
-	removeResource(pTextureBlack);
-
-	exitResourceLoaderInterface(pRenderer);
-	removeQueue(pRenderer, pGraphicsQueue);
-	removeRenderer(pRenderer);
-
-#if defined(__linux__) || defined(__ANDROID__)
-	gModelFiles.set_capacity(0);
-	gDropDownWidgetData.set_capacity(0);
-#endif
 }
+
+// ============================================================================
+// ==============================================[ PIPELINE DEFINITION ]=======
+// ============================================================================
 
 void Application::LoadPipelines()
 {
@@ -862,42 +770,6 @@ void Application::LoadPipelines()
 	{
 		desc = {};
 		desc.mType = PIPELINE_TYPE_GRAPHICS;
-		GraphicsPipelineDesc& shadowMapPipelineSettings = desc.mGraphicsDesc;
-		shadowMapPipelineSettings.mPrimitiveTopo = PRIMITIVE_TOPO_TRI_LIST;
-		shadowMapPipelineSettings.mRenderTargetCount = 0;
-		shadowMapPipelineSettings.pDepthState = &depthStateDesc;
-		shadowMapPipelineSettings.mDepthStencilFormat = pShadowRT->mFormat;
-		shadowMapPipelineSettings.mSampleCount = pShadowRT->mSampleCount;
-		shadowMapPipelineSettings.mSampleQuality = pShadowRT->mSampleQuality;
-		shadowMapPipelineSettings.pRootSignature = pRootSignatureShadow;
-		shadowMapPipelineSettings.pRasterizerState = &rasterizerStateDesc;
-		shadowMapPipelineSettings.pShaderProgram = pShaderZPass_NonOptimized;
-		shadowMapPipelineSettings.pVertexLayout = &screenTriangle_VertexLayout;
-		addPipeline(pRenderer, &desc, &pPipelineShadowPass_NonOPtimized);
-	}
-
-	{
-		desc = {};
-		desc.mType = PIPELINE_TYPE_GRAPHICS;
-		GraphicsPipelineDesc& pipelineSettings = desc.mGraphicsDesc;
-		pipelineSettings.mPrimitiveTopo = PRIMITIVE_TOPO_TRI_LIST;
-		pipelineSettings.mRenderTargetCount = 1;
-		pipelineSettings.pDepthState = &depthStateDesc;
-		pipelineSettings.mDepthStencilFormat = pDepthBuffer->mFormat;
-		pipelineSettings.pBlendState = &blendStateAlphaDesc;
-		pipelineSettings.pColorFormats = &pForwardRT->mFormat;
-		pipelineSettings.mSampleCount = pForwardRT->mSampleCount;
-		pipelineSettings.mSampleQuality = pForwardRT->mSampleQuality;
-		pipelineSettings.pRootSignature = pRootSignatureShaded;
-		pipelineSettings.pVertexLayout = &screenTriangle_VertexLayout;
-		pipelineSettings.pRasterizerState = &rasterizerStateDesc;
-		pipelineSettings.pShaderProgram = pFloorShader;
-		addPipeline(pRenderer, &desc, &pFloorPipeline);
-	}
-
-	{
-		desc = {};
-		desc.mType = PIPELINE_TYPE_GRAPHICS;
 		GraphicsPipelineDesc& pipelineSettings = desc.mGraphicsDesc;
 		pipelineSettings.mPrimitiveTopo = PRIMITIVE_TOPO_TRI_LIST;
 		pipelineSettings.mRenderTargetCount = 1;
@@ -932,6 +804,18 @@ void Application::LoadPipelines()
 	}
 }
 
+void Application::RemovePipelines()
+{
+	removePipeline(pRenderer, pPipelineShadowPass);
+	removePipeline(pRenderer, pVignettePipeline);
+	removePipeline(pRenderer, pMeshOptDemoPipeline);
+	removePipeline(pRenderer, pFXAAPipeline);
+}
+
+// ============================================================================
+// ==============================================[ LOAD/UNLAODING ]============
+// ============================================================================
+
 bool Application::Load()
 {
 	if (!addSwapChain())
@@ -960,16 +844,6 @@ bool Application::Load()
 	return true;
 }
 
-void Application::RemovePipelines()
-{
-	removePipeline(pRenderer, pPipelineShadowPass_NonOPtimized);
-	removePipeline(pRenderer, pPipelineShadowPass);
-	removePipeline(pRenderer, pVignettePipeline);
-	removePipeline(pRenderer, pFloorPipeline);
-	removePipeline(pRenderer, pMeshOptDemoPipeline);
-	removePipeline(pRenderer, pFXAAPipeline);
-}
-
 void Application::Unload()
 {
 	waitQueueIdle(pGraphicsQueue);
@@ -992,8 +866,14 @@ void Application::Unload()
 	removeRenderTarget(pRenderer, pShadowRT);
 }
 
+// ============================================================================
+// ==============================================[ CORE UPDATE/DRAW LOOP ]=====
+// ============================================================================
+
 void Application::Update(float deltaTime)
 {
+	// TODO clean up update call
+
 	Input::Update(mSettings.mWidth, mSettings.mHeight);
 
 #if !defined(__ANDROID__) && !defined(TARGET_IOS) && !defined(_DURANGO)
@@ -1035,13 +915,6 @@ void Application::Update(float deltaTime)
 	// generate 2nd, 3rd light from the main light
 	gUniformData.mLightDirection[1] = vec4(-sunDirection.getX(), sunDirection.getY(), -sunDirection.getZ(), 0.0f);
 	gUniformData.mLightDirection[2] = vec4(-sunDirection.getX(), -sunDirection.getY(), -sunDirection.getZ(), 0.0f);
-
-	gFloorUniformBlock.projViewMat = gUniformData.mProjectView;
-	gFloorUniformBlock.worldMat = mat4::scale(vec3(50.0f));
-	gFloorUniformBlock.screenSize = vec4((float)mSettings.mWidth, (float)mSettings.mHeight, 1.0f / mSettings.mWidth, bVignetting ? 1.0f : 0.0f);
-
-	//rot += 0.001f;
-	//player->setScaleRot(vec3(0.2f), rot, vec3(0.0f, 1.0f, 0.0f));
 
 	currVelX -= drag * currVelX;
 	currVelY -= drag * currVelY;
@@ -1095,27 +968,6 @@ void Application::Update(float deltaTime)
 	//gAppUI.Update(deltaTime);
 }
 
-void Application::PostDrawUpdate()
-{
-
-#if defined(__ANDROID__) || defined(__LINUX__)
-	if (guiModelToLoadIndex != modelToLoadIndex)
-	{
-		modelToLoadIndex = guiModelToLoadIndex;
-		gGuiModelToLoad = gModelFiles[modelToLoadIndex];
-	}
-#endif
-	gCurrentLod = min(gCurrentLod, gMaxLod);
-}
-
-void Application::SelectModelFunc(const Path* path, void* pathPtr) {
-	PathHandle* outputPath = (PathHandle*)pathPtr;
-
-	if (path) {
-		*outputPath = fsCopyPath(path);
-	}
-}
-
 void Application::Draw()
 {
 	acquireNextImage(pRenderer, pSwapChain, pImageAcquiredSemaphore, NULL, &Application::gFrameIndex);
@@ -1149,8 +1001,12 @@ void Application::Draw()
 
 	cmdBeginGpuFrameProfile(cmd, gGpuProfileToken);
 
+	// Draw depth map for shadows
 	//drawShadowMap(cmd);
+
+	// draw scene
 	{
+		// Prepare render target for drawing scene
 		LoadActionsDesc loadActions = {};
 		loadActions.mLoadActionsColor[0] = LOAD_ACTION_CLEAR;
 		loadActions.mClearColorValues[0].r = bgColor.getX();
@@ -1160,8 +1016,6 @@ void Application::Draw()
 		loadActions.mLoadActionDepth = LOAD_ACTION_CLEAR;
 		loadActions.mClearDepth.depth = 0.0f;
 		loadActions.mClearDepth.stencil = 0;
-
-		cmdBeginGpuTimestampQuery(cmd, gGpuProfileToken, "Draw Floor");
 
 		pRenderTarget = pForwardRT;
 
@@ -1174,33 +1028,8 @@ void Application::Draw()
 		cmdResourceBarrier(cmd, 0, NULL, 0, NULL, 3, barriers);
 
 		cmdBindRenderTargets(cmd, 1, &pRenderTarget, pDepthBuffer, &loadActions, NULL, NULL, -1, -1);
-		cmdSetViewport(cmd, 0.0f, 0.0f, (float)pRenderTarget->mWidth, (float)pRenderTarget->mHeight, 0.0f, 1.0f);
-		cmdSetScissor(cmd, 0, 0, pRenderTarget->mWidth, pRenderTarget->mHeight);
 
-		cmdBindPipeline(cmd, pFloorPipeline);
-
-		// Update uniform buffers
-		BufferUpdateDesc Cb = { pFloorUniformBuffer[Application::gFrameIndex] };
-		beginUpdateResource(&Cb);
-		*(UniformBlock_Floor*)Cb.pMappedData = gFloorUniformBlock;
-		endUpdateResource(&Cb, NULL);
-
-		cmdBindDescriptorSet(cmd, 0, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_NONE]);
-		cmdBindDescriptorSet(cmd, Application::gFrameIndex, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
-		cmdBindDescriptorSet(cmd, Application::gFrameIndex, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
-
-		const uint32_t stride = sizeof(float) * 5;
-		cmdBindVertexBuffer(cmd, 1, &pFloorVB, &stride, NULL);
-		cmdBindIndexBuffer(cmd, pFloorIB, INDEX_TYPE_UINT16, 0);
-
-		//cmdDrawIndexed(cmd, 6, 0, 0);
-
-		cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);
-	}
-
-	//// draw scene
-
-	{
+		// Start Drawing scene
 		cmdBeginGpuTimestampQuery(cmd, gGpuProfileToken, "Draw Scene");
 
 		Geode::GeodeShaderDesc meshShaderDesc;
@@ -1227,18 +1056,12 @@ void Application::Draw()
 		cmdSetViewport(cmd, 0.0f, 0.0f, (float)pRenderTarget->mWidth, (float)pRenderTarget->mHeight, 0.0f, 1.0f);
 		cmdSetScissor(cmd, 0, 0, pRenderTarget->mWidth, pRenderTarget->mHeight);
 
-		cmdBindPipeline(cmd, pMeshOptDemoPipeline);
-		cmdBindDescriptorSet(cmd, 0, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_NONE]);
-		cmdBindDescriptorSet(cmd, Application::gFrameIndex, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
-		cmdBindDescriptorSet(cmd, Application::gFrameIndex, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
-		
-		other->setProgram(meshShaderDesc);
-		player->setProgram(meshShaderDesc);
-		ground->setProgram(meshShaderDesc);
+		for (auto g : gltfGeodes) {
+			g->setProgram(meshShaderDesc);
+		}
 		rootTransform->draw(cmd);
 
-		
-
+		// Unbind render targets
 		cmdBindRenderTargets(cmd, 0, NULL, 0, NULL, NULL, NULL, -1, -1);
 
 		cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);
@@ -1372,11 +1195,62 @@ void Application::Draw()
 	queuePresent(pGraphicsQueue, &presentDesc);
 
 	flipProfiler();
-
-	PostDrawUpdate();
 }
 
-const char* Application::GetName() { return "08_GltfViewer"; }
+// ============================================================================
+// ==============================================[ MULTIPASS RENDERING ]=======
+// ============================================================================
+
+void Application::setRenderTarget(Cmd* cmd, uint32_t count, RenderTarget** pDestinationRenderTargets, RenderTarget* pDepthStencilTarget, LoadActionsDesc* loadActions)
+{
+	if (count == 0 && pDestinationRenderTargets == NULL && pDepthStencilTarget == NULL)
+		cmdBindRenderTargets(cmd, 0, NULL, NULL, NULL, NULL, NULL, -1, -1);
+	else
+	{
+		cmdBindRenderTargets(cmd, count, pDestinationRenderTargets, pDepthStencilTarget, loadActions, NULL, NULL, -1, -1);
+		// sets the rectangles to match with first attachment, I know that it's not very portable.
+		RenderTarget* pSizeTarget = pDepthStencilTarget ? pDepthStencilTarget : pDestinationRenderTargets[0];
+		cmdSetViewport(cmd, 0.0f, 0.0f, (float)pSizeTarget->mWidth, (float)pSizeTarget->mHeight, 0.0f, 1.0f);
+		cmdSetScissor(cmd, 0, 0, pSizeTarget->mWidth, pSizeTarget->mHeight);
+	}
+}
+
+void Application::drawShadowMap(Cmd* cmd)
+{
+
+	RenderTargetBarrier barriers[] =
+	{
+		{ pShadowRT, RESOURCE_STATE_DEPTH_WRITE },
+	};
+	cmdResourceBarrier(cmd, 0, NULL, 0, NULL, 1, barriers);
+
+	LoadActionsDesc loadActions = {};
+	loadActions.mLoadActionDepth = LOAD_ACTION_CLEAR;
+	loadActions.mClearDepth = pShadowRT->mClearValue;
+	cmdBeginGpuTimestampQuery(cmd, gGpuProfileToken, "Draw Shadow Map");
+	// Start render pass and apply load actions
+	setRenderTarget(cmd, 0, NULL, pShadowRT, &loadActions);
+
+	cmdBindPipeline(cmd, pPipelineShadowPass);
+
+	// Update uniform buffers
+	/*
+	gShadowUniformData.mModel = player->model;
+	BufferUpdateDesc shaderCbv = { pShadowUniformBuffer[Application::gFrameIndex] };
+	beginUpdateResource(&shaderCbv);
+	*(UniformBlock_Shadow*)shaderCbv.pMappedData = gShadowUniformData;
+	endUpdateResource(&shaderCbv, NULL);
+
+	player->draw(cmd, pRootSignatureShadow, false);
+	*/
+	setRenderTarget(cmd, 0, NULL, NULL, NULL);
+
+	cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);
+}
+
+// ============================================================================
+// ==============================================[ RENDER SETUP ]==============
+// ============================================================================
 
 bool Application::addSwapChain()
 {

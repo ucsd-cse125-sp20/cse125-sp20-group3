@@ -29,6 +29,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\Application.cpp" />
     <ClCompile Include="..\..\..\..\src\Geode.cpp" />
+    <ClCompile Include="..\..\..\..\src\GLTFGeode.cpp" />
     <ClCompile Include="..\..\..\..\src\GLTFObject.cpp" />
     <ClCompile Include="..\..\..\..\src\Input.cpp" />
     <ClCompile Include="..\..\..\..\src\Transform.cpp" />
@@ -69,6 +70,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\Application.h" />
     <ClInclude Include="..\..\..\..\src\Geode.h" />
+    <ClInclude Include="..\..\..\..\src\GLTFGeode.h" />
     <ClInclude Include="..\..\..\..\src\GLTFObject.h" />
     <ClInclude Include="..\..\..\..\src\Input.h" />
     <ClInclude Include="..\..\..\..\src\Node.h" />

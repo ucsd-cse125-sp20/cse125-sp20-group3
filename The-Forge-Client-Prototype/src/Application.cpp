@@ -167,6 +167,8 @@ eastl::vector<PathHandle> gModelFiles;
 
 Input inputHandler;
 
+TextDrawDesc gFrameTimeDraw = TextDrawDesc(0, 0xff00ffff, 18);
+
 #if defined(__ANDROID__) || defined(__LINUX__)
 uint32_t			modelToLoadIndex = 0;
 uint32_t			guiModelToLoadIndex = 0;
@@ -181,20 +183,6 @@ static float2		gLightDirection = { -122.0f, 222.0f };
 
 vec3 cameraOffset(0, 20, -10);
 
-const char* gDefaultModelFile = "WeirdBox.gltf";
-PathHandle gModelFile;
-
-const char* gOtherModelFile = "Kyubey.gltf";
-PathHandle gOtherFile;
-
-const char* gGroundModelFile = "Ground.gltf";
-PathHandle gGroundFile;
-
-GLTFObject* ground;
-
-GLTFObject* player;
-float rot = 0;
-
 float currPosX = 0;
 float currPosY = 0;
 float currVelX = 0;
@@ -202,11 +190,21 @@ float currVelY = 0;
 float acceleration = 1;
 float drag = 0.1f;
 
-TextDrawDesc gFrameTimeDraw = TextDrawDesc(0, 0xff00ffff, 18);
-
-std::vector<GLTFObject*> others;
 int numOthers = 10;
+int rangeOthers = 10;
 
+Transform* rootTransform;
+Transform* groundTransform;
+Transform* playerTransform;
+std::vector<Transform*> otherTransforms;
+
+const char* gPlayerModelFile = "WeirdBox.gltf";
+const char* gGroundModelFile = "Ground.gltf";
+const char* gOtherModelFile = "Kyubey.gltf";
+
+GLTFGeode* player;
+GLTFGeode* ground;
+GLTFGeode* other;
 
 Application::Application()
 {
@@ -299,18 +297,33 @@ bool Application::InitShaderResources()
 	return true;
 }
 
-bool Application::InitModelDependentResources()
+bool Application::InitSceneResources()
 {
-	for (auto other : others) {
-		if (!GLTFObject::LoadModel(other, pRenderer, pDefaultSampler, gOtherFile))
-			return false;
+	player = conf_new(GLTFGeode, pRenderer, pDefaultSampler, gPlayerModelFile);
+	ground = conf_new(GLTFGeode, pRenderer, pDefaultSampler, gGroundModelFile);
+	other = conf_new(GLTFGeode, pRenderer, pDefaultSampler, gOtherModelFile);
+
+	rootTransform = conf_new(Transform, mat4::identity());
+
+	playerTransform = conf_new(Transform, mat4::identity());
+	playerTransform->addChild(player);
+	rootTransform->addChild(playerTransform);
+
+	groundTransform = conf_new(Transform, mat4::identity());
+	groundTransform->addChild(ground);
+	rootTransform->addChild(groundTransform);
+	
+	for (int i = 0; i < numOthers; i++) {
+		float x = -rangeOthers + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * rangeOthers)));
+		float z = -rangeOthers + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * rangeOthers)));
+		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
+		float s = 0.5f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 0.5f));
+
+		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
+		otherTransforms.push_back(conf_new(Transform, transform));
+		otherTransforms.back()->addChild(other);
+		rootTransform->addChild(otherTransforms.back());
 	}
-
-	if (!GLTFObject::LoadModel(player, pRenderer, pDefaultSampler, gModelFile))
-		return false;
-
-	if (!GLTFObject::LoadModel(ground, pRenderer, pDefaultSampler, gGroundFile))
-		return false;
 
 	if (!InitShaderResources())
 		return false;
@@ -364,6 +377,7 @@ void Application::drawShadowMap(Cmd* cmd)
 	cmdBindPipeline(cmd, pPipelineShadowPass);
 
 	// Update uniform buffers
+	/*
 	gShadowUniformData.mModel = player->model;
 	BufferUpdateDesc shaderCbv = { pShadowUniformBuffer[Application::gFrameIndex] };
 	beginUpdateResource(&shaderCbv);
@@ -371,7 +385,7 @@ void Application::drawShadowMap(Cmd* cmd)
 	endUpdateResource(&shaderCbv, NULL);
 
 	player->draw(cmd, pRootSignatureShadow, false);
-
+	*/
 	setRenderTarget(cmd, 0, NULL, NULL, NULL);
 
 	cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);
@@ -531,11 +545,6 @@ bool Application::Init()
 	addResource(&defaultLoadDesc, NULL, LOAD_PRIORITY_NORMAL);
 
 
-
-	gModelFile = fsCopyPathInResourceDirectory(RD_MESHES, gDefaultModelFile);
-	gOtherFile = fsCopyPathInResourceDirectory(RD_MESHES, gOtherModelFile);
-	gGroundFile = fsCopyPathInResourceDirectory(RD_MESHES, gGroundModelFile);
-
 	BufferLoadDesc ubDesc = {};
 	ubDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	ubDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_CPU_TO_GPU;
@@ -602,33 +611,8 @@ bool Application::Init()
 	if (!Input::Init(pWindow, &gAppUI, this)) return false;
 
 
-
-
-	player = conf_new(GLTFObject);
-
-	float randoRange = 20;
-	for (int i = 0; i < numOthers; i++) {
-		float x = -randoRange + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * randoRange)));
-		float y = -randoRange + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * randoRange)));
-		float r = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX));
-		float g = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX));
-		float b = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX));
-		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
-		float s = 0.5f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 0.5f));
-
-		vec3 position = vec3(x, 0, y);
-		auto other = conf_new(GLTFObject);
-		other->setTranslate(position);
-		other->setScaleRot(vec3(s), rot, vec3(0, 1, 0));
-		other->baseColor = vec3(r, g, b);
-		others.push_back(other);
-	}
-
-	ground = conf_new(GLTFObject);
-
-
 	// Initialize models
-	InitModelDependentResources();
+	InitSceneResources();
 
 	return true;
 }
@@ -729,12 +713,9 @@ void Application::PrepareDescriptorSets()
 		}
 	}
 
-	player->createMaterialResources(pRootSignatureShaded, /* bindlessTexturesSamplersSet = */ NULL);
-	ground->createMaterialResources(pRootSignatureShaded, /* bindlessTexturesSamplersSet = */ NULL);
-
-	for (auto other : others) {
-		other->createMaterialResources(pRootSignatureShaded, /* bindlessTexturesSamplersSet = */ NULL);
-	}
+	player->createMaterialResources(pRootSignatureShaded, NULL);
+	ground->createMaterialResources(pRootSignatureShaded, NULL);
+	other->createMaterialResources(pRootSignatureShaded, NULL);
 }
 
 void Application::RemoveShaderResources()
@@ -754,20 +735,12 @@ void Application::RemoveShaderResources()
 	removeRootSignature(pRenderer, pRootSignaturePostEffects);
 }
 
-void Application::RemoveModelDependentResources()
+void Application::RemoveSceneResources()
 {
 	RemoveShaderResources();
 
-	player->removeResources();
-	conf_delete(player);
-
-	ground->removeResources();
-	conf_delete(ground);
-
-	for (auto other : others) {
-		other->removeResources();
-		conf_delete(other);
-	}
+	rootTransform->unload();
+	conf_delete(rootTransform);
 }
 
 void Application::Exit()
@@ -778,7 +751,7 @@ void Application::Exit()
 
 	exitProfiler();
 
-	RemoveModelDependentResources();
+	RemoveSceneResources();
 
 	destroyCameraController(pCameraController);
 	destroyCameraController(pLightView);
@@ -825,10 +798,6 @@ void Application::Exit()
 	gModelFiles.set_capacity(0);
 	gDropDownWidgetData.set_capacity(0);
 #endif
-
-	gModelFile = NULL;
-	gOtherFile = NULL;
-	gGroundFile = NULL;
 }
 
 void Application::LoadPipelines()
@@ -1159,19 +1128,14 @@ void Application::Update(float deltaTime)
 		currPosX += currVelX;
 		currPosY += currVelY;
 
-		player->setPositionDirection(vec3(currPosX, 0, currPosY), vec3(currVelX, 0, currVelY));
+		playerTransform->setPositionDirection(vec3(currPosX, 0, currPosY), vec3(currVelX, 0, currVelY));
 	}
 
-	pCameraController->moveTo(player->getPosition() + cameraOffset);
-	pCameraController->lookAt(player->getPosition() + vec3(0, 0.4f, 0));
+	pCameraController->moveTo(vec3(currPosX, 0, currPosY) + cameraOffset);
+	pCameraController->lookAt(vec3(currPosX, 0, currPosY) + vec3(0, 0.4f, 0));
 
 
-	for (auto other : others) {
-		other->applyTransform(mat4::translation(other->getPosition()) * mat4::rotationY(0.003f) * mat4::translation(-other->getPosition()));
-		other->update(deltaTime);
-	}
-	player->update(deltaTime);
-	ground->update(deltaTime);
+	rootTransform->update(deltaTime);
 
 
 	/************************************************************************/
@@ -1305,26 +1269,26 @@ void Application::Draw()
 	{
 		cmdBeginGpuTimestampQuery(cmd, gGpuProfileToken, "Draw Scene");
 
+		Geode::GeodeShaderDesc meshShaderDesc;
+		meshShaderDesc.rootSignature = pRootSignatureShaded;
+		meshShaderDesc.pipeline = pMeshOptDemoPipeline;
+		for (int i = 0; i < DESCRIPTOR_UPDATE_FREQ_COUNT; i++) {
+			meshShaderDesc.descriptorSets[i] = pDescriptorSetsShaded[i];
+		}
 
+		// Update general uniforms
 		shaderCbv = { pUniformBuffer[Application::gFrameIndex] };
 		beginUpdateResource(&shaderCbv);
 		*(UniformBlock*)shaderCbv.pMappedData = gUniformData;
 		endUpdateResource(&shaderCbv, NULL);
 
-
-
+		// Update per-instance uniforms
 		shaderCbv = { pInstanceBuffer[Application::gFrameIndex] };
 		beginUpdateResource(&shaderCbv);
-		UniformBlock_Instance* instanceArr = (UniformBlock_Instance*)shaderCbv.pMappedData;
-		instanceArr[player->instanceID].mModel = player->model;
-		instanceArr[ground->instanceID].mModel = ground->model;
-		//instanceArr[player->instanceID].baseColor = player->baseColor;
-		for (auto other : others) {
-			instanceArr[other->instanceID].mModel = other->model;
-			//instanceArr[other->instanceID].baseColor = other->baseColor;
-		}
+		rootTransform->updateTransformBuffer(shaderCbv, mat4::identity());
 		endUpdateResource(&shaderCbv, NULL);
 
+		// Set render target
 		cmdBindRenderTargets(cmd, 1, &pRenderTarget, pDepthBuffer, NULL, NULL, NULL, -1, -1);
 		cmdSetViewport(cmd, 0.0f, 0.0f, (float)pRenderTarget->mWidth, (float)pRenderTarget->mHeight, 0.0f, 1.0f);
 		cmdSetScissor(cmd, 0, 0, pRenderTarget->mWidth, pRenderTarget->mHeight);
@@ -1334,11 +1298,11 @@ void Application::Draw()
 		cmdBindDescriptorSet(cmd, Application::gFrameIndex, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
 		cmdBindDescriptorSet(cmd, Application::gFrameIndex, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
 		
-		for (auto other : others) {
-			other->draw(cmd, pRootSignatureShaded, true);
-		}
-		player->draw(cmd, pRootSignatureShaded, true);
-		ground->draw(cmd, pRootSignatureShaded, true);
+		other->setProgram(meshShaderDesc);
+		player->setProgram(meshShaderDesc);
+		ground->setProgram(meshShaderDesc);
+		rootTransform->draw(cmd);
+
 		
 
 		cmdBindRenderTargets(cmd, 0, NULL, 0, NULL, NULL, NULL, -1, -1);

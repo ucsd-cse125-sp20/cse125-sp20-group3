@@ -7,6 +7,9 @@ Transform::Transform(mat4 transformation)
 
 Transform::~Transform()
 {
+	for (auto child : children) {
+		conf_delete(child);
+	}
 }
 
 void Transform::unload()
@@ -45,4 +48,31 @@ void Transform::draw(Cmd* cmd)
 	for (auto child : children) {
 		child->draw(cmd);
 	}
+}
+
+void Transform::setMatrix(mat4 m)
+{
+	this->M = m;
+}
+
+void Transform::setPositionDirection(vec3 position, vec3 direction, vec3 up)
+{
+	vec3 forward = normalize(direction);
+	vec3 right = cross(forward, up);
+
+	this->M[0] = vec4(right, 0);
+	this->M[1] = vec4(up, 0);
+	this->M[2] = vec4(-forward, 0);
+	this->M[3] = vec4(position, 1);
+}
+
+void Transform::setPositionDirection(vec3 position, vec3 direction)
+{
+	setPositionDirection(position, direction, vec3(0, 1, 0));
+}
+
+void Transform::setPositionDirection(vec3 position, float angle)
+{
+	vec3 direction = vec3(cos(angle), 0, sin(angle));
+	setPositionDirection(position, direction);
 }

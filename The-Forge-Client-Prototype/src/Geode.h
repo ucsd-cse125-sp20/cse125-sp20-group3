@@ -2,6 +2,7 @@
 
 #include "../The-Forge/Common_3/Renderer/IRenderer.h"
 #include "Node.h"
+#include <queue>
 
 #define MAX_GEOMETRY_INSTANCES 50000
 
@@ -19,12 +20,14 @@ public:
 
 	static bool countingInstances;
 	static uint32_t instanceCount;
-	int instanceID = -1;
+	int selfInstanceCount = 0;
+	std::queue<int> instanceIDs;
 
+	Geode();
 	Geode(Object* obj);
 	~Geode();
 
-	void setRootSignature(GeodeShaderDesc desc);
+	void setProgram(GeodeShaderDesc desc);
 
 	void unload() override;
 

@@ -5,7 +5,8 @@
 
 #include "Input.h"
 
-#include "GLTFObject.h"
+#include "GLTFGeode.h"
+#include "Transform.h"
 
 #define IMAGE_COUNT 3
 #define LIGHT_COUNT 3
@@ -58,7 +59,7 @@ public:
 
 	Application();
     static bool InitShaderResources();
-    static bool InitModelDependentResources();
+    static bool InitSceneResources();
     static void setRenderTarget(Cmd* cmd, uint32_t count, RenderTarget** pDestinationRenderTargets, RenderTarget* pDepthStencilTarget, LoadActionsDesc* loadActions);
     static void drawShadowMap(Cmd* cmd);
     bool Init();
@@ -66,7 +67,7 @@ public:
 	static void RemoveDescriptorSets();
 	static void PrepareDescriptorSets();
 	static void RemoveShaderResources();
-	static void RemoveModelDependentResources();
+	static void RemoveSceneResources();
 	void Exit();
 	static void LoadPipelines();
 	bool Load();

@@ -1,13 +1,13 @@
 #include "player.h"
 
-Player::Player(mat4 model_mat, std::string objFilename) : Transform(model_mat) {
+Player::Player(mat4 model_mat, std::string objFilename) : model(model_mat) {
     //TODO create a geometry
 	velocity_x = 0.f;
 	velocity_z = 0.f;
 	lastTime = std::chrono::steady_clock::now();
 }
 
-Player::Player(mat4 model_mat) : Transform(model_mat) {
+Player::Player(mat4 model_mat) : model(model_mat) {
 	velocity_x = 0.f;
 	velocity_z = 0.f;
 	lastTime = std::chrono::steady_clock::now();

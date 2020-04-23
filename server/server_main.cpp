@@ -1,7 +1,7 @@
 #undef UNICODE
 
-//#include "network_connection.cpp"
 #include "../common/macros.h"
+#include "../common/player.h"
 #include <string>
 #include <iostream>
 #include "Server.h"
@@ -16,14 +16,9 @@ int __cdecl main(void)
     char recvbuf[RECV_BUFLEN];
 
 	Server* server = new Server();
+	Player* player = new Player(mat4(1));
 
     // Game State data
-    float currPosX = 0;
-    float currPosY = 0;
-    float currVelX = 0;
-    float currVelY = 0;
-    float acceleration = 1;
-    float drag = 0.1;
     float deltaTime = 0.001f;
 
     std::cout << "server started" << std::endl;
@@ -43,39 +38,32 @@ int __cdecl main(void)
             std::cout<<"Bytes received: "<<iResult<<std::endl;
             std::cout<<"Message received: "<<recvbuf<<std::endl;
 
-            // Process data and update game states
-            currVelX -= drag * currVelX;
-            currVelY -= drag * currVelY;
+            // Process data
+			int move_x, move_z = 0;
             if (recvbuf[0] == '1') {
-                currVelY += acceleration * deltaTime;
+				move_z = 1;
             }
             if (recvbuf[1] == '1') {
-                currVelX -= acceleration * deltaTime;
+				move_x = -1;
             }
             if (recvbuf[2] == '1') {
-                currVelY -= acceleration * deltaTime;
+				move_z = -1;
             }
             if (recvbuf[3] == '1') {
-                currVelX += acceleration * deltaTime;
+				move_x = 1;
             }
 
-            if (currVelX * currVelX + currVelY * currVelY > 0.01) {
-                currPosX += currVelX;
-                currPosY += currVelY;
-            }
+			player->setMove(move_x, move_z);
 
-            float* f_buf = (float*)sendbuf;
-            //f_buf[0] = currPosX;
-            //f_buf[1] = currPosY;
+			//Update Game State
+			player->update();
 
-			sendbuf[0] = recvbuf[0];
-			sendbuf[1] = recvbuf[1];
-			sendbuf[2] = recvbuf[2];
-			sendbuf[3] = recvbuf[3];
-			sendbuf[4] = '\0';
-			std::string s(sendbuf);
-			std::cout << "sending " << s << std::endl;
-            iSendResult = server->sendData(sendbuf, (int)strlen(sendbuf), 0);
+			//Send updated data back to clients
+			float sendbufSize = 0;
+			//sendbuf[0] = player->getPositionAndRotation
+			//sendbufSize += number of bytes filled in
+			std::cout << "sending " << sendbuf << std::endl;
+            iSendResult = server->sendData(sendbuf, sendbufSize, 0);
             if (iSendResult == -1) {
                 return 1;
             }

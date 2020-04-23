@@ -45,6 +45,7 @@
     <ClCompile Include="..\..\..\..\src\Transform.cpp">
       <Filter>Source Files\Scene Graph</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\SceneManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\src\Shaders\D3D12\basic.frag">
@@ -167,6 +168,9 @@
       <Filter>Header Files\Scene Graph</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\common\macros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\SceneManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

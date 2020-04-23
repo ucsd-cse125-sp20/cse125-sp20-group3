@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../../common/macros.h"
+
 #include "../The-Forge/Common_3/OS/Interfaces/IOperatingSystem.h"
 #include "../The-Forge/Middleware_3/UI/AppUI.h"
 #include "../The-Forge/Common_3/OS/Interfaces/IInput.h"
@@ -24,6 +26,8 @@ public:
 	static bool Init(WindowsDesc* window, UIApp* appUI, IApp* app);
 
 	static void Update(int32_t width, int32_t height);
+
+	static void EncodeToBuf(char buf[]);
 
 	static void Exit();
 };

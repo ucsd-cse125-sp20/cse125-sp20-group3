@@ -64,6 +64,16 @@ void Input::Update(int32_t width, int32_t height)
 	updateInputSystem(width, height);
 }
 
+void Input::EncodeToBuf(char buf[])
+{
+	// TODO redefine when action encoding is in place
+	// Possibly might be able to store encoding buffer in state, and only update
+	buf[0] = inputs[INPUT_UP] ? '1' : '0';
+	buf[1] = inputs[INPUT_LEFT] ? '1' : '0';
+	buf[2] = inputs[INPUT_DOWN] ? '1' : '0';
+	buf[3] = inputs[INPUT_RIGHT] ? '1' : '0';
+}
+
 void Input::Exit()
 {
 	exitInputSystem();

@@ -125,11 +125,8 @@ VirtualJoystickUI   gVirtualJoystick = {};
 Buffer* pUniformBuffer[IMAGE_COUNT] = { NULL };
 Buffer* pInstanceBuffer[IMAGE_COUNT] = { NULL };
 Buffer* pShadowUniformBuffer[IMAGE_COUNT] = { NULL };
-Buffer* pFloorUniformBuffer[IMAGE_COUNT] = { NULL };
 
 Buffer* TriangularVB = NULL;
-Buffer* pFloorVB = NULL;
-Buffer* pFloorIB = NULL;
 
 Sampler* pDefaultSampler = NULL;
 Sampler* pBilinearClampSampler = NULL;
@@ -148,11 +145,7 @@ ICameraController* pLightView = NULL;
 GuiComponent* pGuiWindow;
 GuiComponent* pGuiGraphics;
 
-IWidget* pSelectLodWidget = NULL;
-
 UIApp				gAppUI;
-eastl::vector<uint32_t>	gDropDownWidgetData;
-eastl::vector<PathHandle> gModelFiles;
 
 Input inputHandler;
 
@@ -249,9 +242,6 @@ bool Application::InitSceneResources()
 		transformNodes.push_back(otherTransforms.back());
 	}
 
-	if (!InitShaderResources())
-		return false;
-
 	waitForAllResourceLoads();
 
 	return true;
@@ -277,17 +267,12 @@ void Application::RemoveSceneResources()
 
 bool Application::InitShaderResources()
 {
-	// shader
-
+	// Create shaders
 	ShaderLoadDesc MeshOptDemoShader = {};
 	MeshOptDemoShader.mStages[0] = { "basic.vert", NULL, 0, RD_SHADER_SOURCES };
 	addShader(pRenderer, &MeshOptDemoShader, &pShaderZPass);
 
-#if defined(__ANDROID__)
-	MeshOptDemoShader.mStages[1] = { "basicMOBILE.frag", NULL, 0, RD_SHADER_SOURCES };
-#else
 	MeshOptDemoShader.mStages[1] = { "basic.frag", NULL, 0, RD_SHADER_SOURCES };
-#endif
 	addShader(pRenderer, &MeshOptDemoShader, &pMeshOptDemoShader);
 
 	ShaderLoadDesc VignetteShader = {};
@@ -300,7 +285,7 @@ bool Application::InitShaderResources()
 	FXAAShader.mStages[1] = { "FXAA.frag", NULL, 0, RD_SHADER_SOURCES };
 	addShader(pRenderer, &FXAAShader, &pFXAAShader);
 
-
+	// Create root signatures
 	const char* pStaticSamplerNames[] = { "clampMiplessLinearSampler" };
 	Sampler* pStaticSamplers[] = { pBilinearClampSampler };
 	Shader* shaders[] = { pShaderZPass };
@@ -322,7 +307,7 @@ bool Application::InitShaderResources()
 	rootDesc.ppShaders = postShaders;
 	addRootSignature(pRenderer, &rootDesc, &pRootSignaturePostEffects);
 
-
+	// Create descriptor sets
 	DescriptorSetDesc setDesc = { pRootSignaturePostEffects, DESCRIPTOR_UPDATE_FREQ_NONE, 1 };
 	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetVignette);
 	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetFXAA);
@@ -340,6 +325,11 @@ bool Application::InitShaderResources()
 	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
 	setDesc = { pRootSignatureShaded, DESCRIPTOR_UPDATE_FREQ_PER_BATCH, Application::gImageCount };
 	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
+
+	// Prepare material resources for gltf geodes
+	for (auto g : gltfGeodes) {
+		g->createMaterialResources(pRootSignatureShaded, NULL);
+	}
 
 	return true;
 }
@@ -451,35 +441,6 @@ bool Application::Init()
 	};
 	addSampler(pRenderer, &samplerClampDesc, &pBilinearClampSampler);
 
-	float floorPoints[] = {
-		-1.0f, 0.0f, 1.0f, -1.0f, -1.0f,
-		-1.0f, 0.0f, -1.0f, -1.0f, 1.0f,
-		1.0f, 0.0f, -1.0f, 1.0f, 1.0f,
-		1.0f, 0.0f, 1.0f, 1.0f, -1.0f,
-	};
-
-	BufferLoadDesc floorVbDesc = {};
-	floorVbDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_VERTEX_BUFFER;
-	floorVbDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_GPU_ONLY;
-	floorVbDesc.mDesc.mSize = sizeof(float) * 5 * 4;
-	floorVbDesc.pData = floorPoints;
-	floorVbDesc.ppBuffer = &pFloorVB;
-	addResource(&floorVbDesc, NULL, LOAD_PRIORITY_NORMAL);
-
-	uint16_t floorIndices[] =
-	{
-		0, 1, 3,
-		3, 1, 2
-	};
-
-	BufferLoadDesc indexBufferDesc = {};
-	indexBufferDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_INDEX_BUFFER;
-	indexBufferDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_GPU_ONLY;
-	indexBufferDesc.mDesc.mFlags = BUFFER_CREATION_FLAG_OWN_MEMORY_BIT;
-	indexBufferDesc.mDesc.mSize = sizeof(uint16_t) * 6;
-	indexBufferDesc.pData = floorIndices;
-	indexBufferDesc.ppBuffer = &pFloorIB;
-	addResource(&indexBufferDesc, NULL, LOAD_PRIORITY_NORMAL);
 
 	float screenTriangularPoints[] =
 	{
@@ -537,21 +498,10 @@ bool Application::Init()
 		addResource(&subDesc, NULL, LOAD_PRIORITY_NORMAL);
 	}
 
-	ubDesc = {};
-	ubDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	ubDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_CPU_TO_GPU;
-	ubDesc.mDesc.mSize = sizeof(UniformBlock);
-	ubDesc.mDesc.mFlags = BUFFER_CREATION_FLAG_PERSISTENT_MAP_BIT;
-	ubDesc.pData = NULL;
-	for (uint32_t i = 0; i < Application::gImageCount; ++i)
-	{
-		ubDesc.ppBuffer = &pFloorUniformBuffer[i];
-		addResource(&ubDesc, NULL, LOAD_PRIORITY_NORMAL);
-	}
+	// Initialize input system
+	if (!Input::Init(pWindow, &gAppUI, this)) return false;
 
-	// Scene Initialization Initialization
-
-
+	// Initialize camera
 	CameraMotionParameters cmp{ 1.0f, 120.0f, 40.0f };
 	vec3                   camPos{ 3.0f, 2.5f, -4.0f };
 	vec3                   lookAt{ 0.0f, 0.4f, 0.0f };
@@ -560,11 +510,13 @@ bool Application::Init()
 	pCameraController = createFpsCameraController(normalize(camPos) * 3.0f, lookAt);
 	pCameraController->setMotionParameters(cmp);
 
-	if (!Input::Init(pWindow, &gAppUI, this)) return false;
+	// Initialize shaders
+	if (!InitShaderResources())
+		return false;
 
-
-	// Initialize models
-	InitSceneResources();
+	// Initialize scene
+	if (!InitSceneResources())
+		return false;
 
 	return true;
 }
@@ -593,7 +545,6 @@ void Application::Exit()
 		removeResource(pShadowUniformBuffer[i]);
 		removeResource(pUniformBuffer[i]);
 		removeResource(pInstanceBuffer[i]);
-		removeResource(pFloorUniformBuffer[i]);
 	}
 
 	for (uint32_t i = 0; i < Application::gImageCount; ++i)
@@ -610,9 +561,6 @@ void Application::Exit()
 	removeSampler(pRenderer, pBilinearClampSampler);
 
 	removeResource(TriangularVB);
-
-	removeResource(pFloorVB);
-	removeResource(pFloorIB);
 
 	exitResourceLoaderInterface(pRenderer);
 	removeQueue(pRenderer, pGraphicsQueue);
@@ -679,11 +627,6 @@ void Application::PrepareDescriptorSets()
 			params[0].ppBuffers = &pInstanceBuffer[i];
 			updateDescriptorSet(pRenderer, i, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_BATCH], 1, params);
 		}
-	}
-
-	// Prepare material resources for gltf geodes
-	for (auto g : gltfGeodes) {
-		g->createMaterialResources(pRootSignatureShaded, NULL);
 	}
 }
 

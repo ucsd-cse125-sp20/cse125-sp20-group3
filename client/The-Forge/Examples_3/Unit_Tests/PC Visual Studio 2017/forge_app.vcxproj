@@ -33,6 +33,7 @@
     <ClCompile Include="..\..\..\..\src\GLTFGeode.cpp" />
     <ClCompile Include="..\..\..\..\src\GLTFObject.cpp" />
     <ClCompile Include="..\..\..\..\src\Input.cpp" />
+    <ClCompile Include="..\..\..\..\src\SceneManager.cpp" />
     <ClCompile Include="..\..\..\..\src\Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -76,6 +77,7 @@
     <ClInclude Include="..\..\..\..\src\Input.h" />
     <ClInclude Include="..\..\..\..\src\Node.h" />
     <ClInclude Include="..\..\..\..\src\Object.h" />
+    <ClInclude Include="..\..\..\..\src\SceneManager.h" />
     <ClInclude Include="..\..\..\..\src\Transform.h" />
     <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\cgltf\cgltf.h" />
   </ItemGroup>

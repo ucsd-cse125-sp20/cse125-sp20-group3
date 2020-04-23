@@ -1,5 +1,10 @@
 #include "Transform.h"
 
+Transform::Transform()
+{
+	this->M = mat4::identity();
+}
+
 Transform::Transform(mat4 transformation)
 {
 	this->M = transformation;

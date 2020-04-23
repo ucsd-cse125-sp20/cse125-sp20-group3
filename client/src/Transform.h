@@ -9,6 +9,7 @@ public:
 	mat4 M;
 	std::vector<Node*> children;
 
+	Transform();
 	Transform(mat4 transformation);
 	~Transform();
 

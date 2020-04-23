@@ -27,6 +27,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\common\player.cpp" />
     <ClCompile Include="..\..\..\..\src\Application.cpp" />
     <ClCompile Include="..\..\..\..\src\Client.cpp" />
     <ClCompile Include="..\..\..\..\src\Geode.cpp" />
@@ -67,7 +68,13 @@
     <None Include="..\..\..\..\src\Shaders\Vulkan\zPassFloor.vert" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\common\base.h" />
+    <ClInclude Include="..\..\..\..\..\common\entity.h" />
     <ClInclude Include="..\..\..\..\..\common\macros.h" />
+    <ClInclude Include="..\..\..\..\..\common\player.h" />
+    <ClInclude Include="..\..\..\..\..\common\team.h" />
+    <ClInclude Include="..\..\..\..\..\common\tower.h" />
+    <ClInclude Include="..\..\..\..\..\common\unit.h" />
     <ClInclude Include="..\..\..\..\src\Application.h" />
     <ClInclude Include="..\..\..\..\src\Client.h" />
     <ClInclude Include="..\..\..\..\src\Geode.h" />

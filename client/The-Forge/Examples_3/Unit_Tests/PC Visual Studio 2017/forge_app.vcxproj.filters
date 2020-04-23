@@ -22,6 +22,12 @@
     <Filter Include="Source Files\Scene Graph">
       <UniqueIdentifier>{84402ea3-422b-492a-b563-15941573e561}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Game Objects">
+      <UniqueIdentifier>{bd92a582-7078-4fb6-ae9a-de5ebb7051f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game Objects">
+      <UniqueIdentifier>{eb113d92-a420-43cf-b4cd-d73bc16c7a9a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\Application.cpp">
@@ -44,6 +50,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\Transform.cpp">
       <Filter>Source Files\Scene Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\player.cpp">
+      <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -168,6 +177,24 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\common\macros.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\base.h">
+      <Filter>Header Files\Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\entity.h">
+      <Filter>Header Files\Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\player.h">
+      <Filter>Header Files\Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\team.h">
+      <Filter>Header Files\Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\tower.h">
+      <Filter>Header Files\Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\unit.h">
+      <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

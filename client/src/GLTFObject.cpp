@@ -17,10 +17,9 @@ int GLTFObject::modelCount = 0;
 Buffer* GLTFObject::pNodeTransformsBuffer = NULL;
 
 
-void GLTFObject::Init(const Path* path, Renderer* renderer, Sampler* defaultSampler)
+void GLTFObject::Init(const Path* path, Renderer* renderer)
 {
 	pRenderer = renderer;
-	pDefaultSampler = defaultSampler;
 
 	mSamplers.resize(pData->mSamplerCount);
 	for (uint32_t i = 0; i < pData->mSamplerCount; ++i)
@@ -66,7 +65,7 @@ void GLTFObject::Init(const Path* path, Renderer* renderer, Sampler* defaultSamp
 	addResource(&defaultLoadDesc, NULL, LOAD_PRIORITY_NORMAL);
 }
 
-bool GLTFObject::LoadModel(GLTFObject* asset, Renderer* renderer, Sampler* sampler, const Path* modelFilePath)
+bool GLTFObject::LoadModel(GLTFObject* asset, Renderer* renderer, const Path* modelFilePath)
 {
 	eastl::string modelFileName = fsPathComponentToString(fsGetPathFileName(modelFilePath));
 
@@ -119,7 +118,7 @@ bool GLTFObject::LoadModel(GLTFObject* asset, Renderer* renderer, Sampler* sampl
 		return false;
 	}
 
-	asset->Init(modelFilePath, renderer, sampler);
+	asset->Init(modelFilePath, renderer);
 	waitForAllResourceLoads();
 	return true;
 }
@@ -244,7 +243,7 @@ void GLTFObject::updateTextureProperties(const GLTFTextureView& textureView, GLT
 	textureProperties.mRotation = textureView.mTransform.mRotation;
 }
 
-void GLTFObject::updateParam(DescriptorData* params, const GLTFTextureView& textureView, const char* textureName, const char* samplerName, uint32_t& nextParamIdx)
+void GLTFObject::updateParam(DescriptorData* params, const GLTFTextureView& textureView, const char* textureName, const char* samplerName, uint32_t& nextParamIdx, Sampler* defaultSampler)
 {
 	if (textureView.mTextureIndex >= 0)
 	{
@@ -269,11 +268,11 @@ void GLTFObject::updateParam(DescriptorData* params, const GLTFTextureView& text
 	}
 	else
 	{
-		params[samplerIndex].ppSamplers = &pDefaultSampler;
+		params[samplerIndex].ppSamplers = &defaultSampler;
 	}
 }
 
-void GLTFObject::createMaterialResources(RootSignature* pRootSignature, DescriptorSet* pBindlessTexturesSamplersSet)
+void GLTFObject::createMaterialResources(RootSignature* pRootSignature, DescriptorSet* pBindlessTexturesSamplersSet, Sampler* defaultSampler)
 {
 	uint64_t materialDataStride = pBindlessTexturesSamplersSet ? sizeof(GLTFMaterialData) : round_up_64(sizeof(GLTFMaterialData), 256);
 
@@ -389,22 +388,22 @@ void GLTFObject::createMaterialResources(RootSignature* pRootSignature, Descript
 		case GLTF_MATERIAL_TYPE_METALLIC_ROUGHNESS:
 		{
 			const GLTFMetallicRoughnessMaterial& metallicRoughness = material.mMetallicRoughness;
-			updateParam(params, metallicRoughness.mBaseColorTexture, "baseColorMap", "baseColorSampler", paramIdx);
-			updateParam(params, metallicRoughness.mMetallicRoughnessTexture, "metallicRoughnessMap", "metallicRoughnessSampler", paramIdx);
+			updateParam(params, metallicRoughness.mBaseColorTexture, "baseColorMap", "baseColorSampler", paramIdx, defaultSampler);
+			updateParam(params, metallicRoughness.mMetallicRoughnessTexture, "metallicRoughnessMap", "metallicRoughnessSampler", paramIdx, defaultSampler);
 			break;
 		}
 		case GLTF_MATERIAL_TYPE_SPECULAR_GLOSSINESS:
 		{
 			const GLTFSpecularGlossinessMaterial& specularGlossiness = material.mSpecularGlossiness;
-			updateParam(params, specularGlossiness.mDiffuseTexture, "baseColorMap", "baseColorSampler", paramIdx);
-			updateParam(params, specularGlossiness.mSpecularGlossinessTexture, "metallicRoughnessMap", "metallicRoughnessSampler", paramIdx);
+			updateParam(params, specularGlossiness.mDiffuseTexture, "baseColorMap", "baseColorSampler", paramIdx, defaultSampler);
+			updateParam(params, specularGlossiness.mSpecularGlossinessTexture, "metallicRoughnessMap", "metallicRoughnessSampler", paramIdx, defaultSampler);
 			break;
 		}
 		}
 
-		updateParam(params, material.mNormalTexture, "normalMap", "normalMapSampler", paramIdx);
-		updateParam(params, material.mOcclusionTexture, "occlusionMap", "occlusionMapSampler", paramIdx);
-		updateParam(params, material.mEmissiveTexture, "emissiveMap", "emissiveMapSampler", paramIdx);
+		updateParam(params, material.mNormalTexture, "normalMap", "normalMapSampler", paramIdx, defaultSampler);
+		updateParam(params, material.mOcclusionTexture, "occlusionMap", "occlusionMapSampler", paramIdx, defaultSampler);
+		updateParam(params, material.mEmissiveTexture, "emissiveMap", "emissiveMapSampler", paramIdx, defaultSampler);
 
 		if (!pBindlessTexturesSamplersSet)
 		{

@@ -1,12 +1,15 @@
 #ifndef _Application_H_
 #define _Application_H_
 
+#include <ctime>
+
 #include "../The-Forge/Common_3/OS/Interfaces/IApp.h"
 
 #include "Client.h"
 
-
 #include "Input.h"
+
+#include "SceneManager.h"
 
 #include "GLTFGeode.h"
 #include "Transform.h"
@@ -53,17 +56,20 @@ public:
     static bool InitShaderResources();
 	static void RemoveShaderResources();
 
-    bool Init();
-	void Exit();
+	void InitDebugGui();
+	static void ToggleClient();
+
+    bool Init() override;
+	void Exit() override;
 
 	static void PrepareDescriptorSets();
 	static void LoadPipelines();
 	static void RemovePipelines();
-	bool Load();
-	void Unload();
+	bool Load() override;
+	void Unload() override;
 
-	void Update(float deltaTime);
-	void Draw();
+	void Update(float deltaTime) override;
+	void Draw() override;
 
 	static void setRenderTarget(Cmd* cmd, uint32_t count, RenderTarget** pDestinationRenderTargets, RenderTarget* pDepthStencilTarget, LoadActionsDesc* loadActions);
 	static void drawShadowMap(Cmd* cmd);

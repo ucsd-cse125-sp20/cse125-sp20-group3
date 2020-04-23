@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "../The-Forge/Common_3/Renderer/IRenderer.h"
 #include "../The-Forge/Common_3/OS/Math/MathTypes.h"
 
 class Object

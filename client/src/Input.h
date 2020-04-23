@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ctime>
+
 #include "../../common/macros.h"
 
 #include "../The-Forge/Common_3/OS/Interfaces/IOperatingSystem.h"
@@ -27,7 +29,7 @@ public:
 
 	static void Update(int32_t width, int32_t height);
 
-	static void EncodeToBuf(char buf[]);
+	static int EncodeToBuf(char buf[]);
 
 	static void Exit();
 };

@@ -43,6 +43,9 @@
 #include "../The-Forge/Common_3/OS/Interfaces/IMemory.h"    // Must be last include in cpp file
 
 
+#include "../../common/player.h"
+
+
 //--------------------------------------------------------------------------------------------
 // GLOBAL DEFINTIONS
 //--------------------------------------------------------------------------------------------
@@ -143,9 +146,8 @@ ICameraController* pCameraController = NULL;
 ICameraController* pLightView = NULL;
 
 GuiComponent* pGuiWindow;
-GuiComponent* pGuiGraphics;
 
-UIApp				gAppUI;
+UIApp gAppUI;
 
 Input inputHandler;
 
@@ -165,31 +167,14 @@ static float2		gLightDirection = { -122.0f, 222.0f };
 
 vec3 cameraOffset(0, 20, -10);
 
-float currPosX = 0;
-float currPosY = 0;
-float currVelX = 0;
-float currVelY = 0;
-float acceleration = 1;
-float drag = 0.1f;
+SceneManager* scene;
 
-int numOthers = 10;
-int rangeOthers = 10;
-
-Transform* rootTransform;
-Transform* groundTransform;
-Transform* playerTransform;
-std::vector<Transform*> otherTransforms;
-
-const char* gPlayerModelFile = "WeirdBox.gltf";
-const char* gGroundModelFile = "Ground.gltf";
-const char* gOtherModelFile = "Kyubey.gltf";
-
-GLTFGeode* player;
-GLTFGeode* ground;
-GLTFGeode* other;
-
-std::vector<Transform*> transformNodes;
-std::vector<GLTFGeode*> gltfGeodes;
+bool connected = false;
+const int serverNameSize = 32;
+char serverName[serverNameSize] = "localhost";
+Client* client;
+char sendbuf[DEFAULT_BUFLEN];
+char recvbuf[DEFAULT_BUFLEN];
 
 // ============================================================================
 // ==============================================[ CODE STARTS HERE ]==========
@@ -208,57 +193,18 @@ Application::Application()
 
 bool Application::InitSceneResources()
 {
-	player = conf_new(GLTFGeode, pRenderer, pDefaultSampler, gPlayerModelFile);
-	ground = conf_new(GLTFGeode, pRenderer, pDefaultSampler, gGroundModelFile);
-	other = conf_new(GLTFGeode, pRenderer, pDefaultSampler, gOtherModelFile);
-
-	gltfGeodes.push_back(player);
-	gltfGeodes.push_back(ground);
-	gltfGeodes.push_back(other);
-
-	rootTransform = conf_new(Transform, mat4::identity());
-	transformNodes.push_back(rootTransform);
-
-	playerTransform = conf_new(Transform, mat4::identity());
-	playerTransform->addChild(player);
-	rootTransform->addChild(playerTransform);
-	transformNodes.push_back(playerTransform);
-
-	groundTransform = conf_new(Transform, mat4::identity());
-	groundTransform->addChild(ground);
-	rootTransform->addChild(groundTransform);
-	transformNodes.push_back(groundTransform);
-
-	for (int i = 0; i < numOthers; i++) {
-		float x = -rangeOthers + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * rangeOthers)));
-		float z = -rangeOthers + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * rangeOthers)));
-		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
-		float s = 0.5f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 0.5f));
-
-		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		otherTransforms.push_back(conf_new(Transform, transform));
-		otherTransforms.back()->addChild(other);
-		rootTransform->addChild(otherTransforms.back());
-		transformNodes.push_back(otherTransforms.back());
-	}
+	scene = conf_new(SceneManager, pRenderer);
 
 	waitForAllResourceLoads();
+
+	scene->createMaterialResources(pRootSignatureShaded, NULL, pDefaultSampler);
 
 	return true;
 }
 
 void Application::RemoveSceneResources()
 {
-	RemoveShaderResources();
-
-	// TODO fix unloading
-	for (auto geode : gltfGeodes) {
-		geode->unload();
-		conf_delete(geode);
-	}
-	for (auto t : transformNodes) {
-		conf_delete(t);
-	}
+	conf_delete(scene);
 }
 
 // ============================================================================
@@ -326,11 +272,6 @@ bool Application::InitShaderResources()
 	setDesc = { pRootSignatureShaded, DESCRIPTOR_UPDATE_FREQ_PER_BATCH, Application::gImageCount };
 	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
 
-	// Prepare material resources for gltf geodes
-	for (auto g : gltfGeodes) {
-		g->createMaterialResources(pRootSignatureShaded, NULL);
-	}
-
 	return true;
 }
 
@@ -357,6 +298,94 @@ void Application::RemoveShaderResources()
 	removeRootSignature(pRenderer, pRootSignatureShadow);
 	removeRootSignature(pRenderer, pRootSignatureShaded);
 	removeRootSignature(pRenderer, pRootSignaturePostEffects);
+}
+
+// ============================================================================
+// ==============================================[ APPLICATION MANAGEMENT ]====
+// ============================================================================
+
+void Application::InitDebugGui()
+{
+	GuiDesc guiDesc = {};
+	guiDesc.mStartSize = vec2(300.0f, 250.0f);
+	guiDesc.mStartPosition = vec2(100.0f, guiDesc.mStartSize.getY());
+	pGuiWindow = gAppUI.AddGuiComponent(GetName(), &guiDesc);
+
+	pGuiWindow->AddWidget(TextboxWidget("Server Name", serverName, serverNameSize));
+	CheckboxWidget toggleServerButtonWidget("Toggle Server Connection", &connected);
+	toggleServerButtonWidget.pOnEdited = Application::ToggleClient;
+	pGuiWindow->AddWidget(toggleServerButtonWidget);
+	pGuiWindow->AddWidget(SeparatorWidget());
+
+	pGuiWindow->AddWidget(CheckboxWidget("Toggle VSync", &bToggleVSync));
+	pGuiWindow->AddWidget(CheckboxWidget("Enable FXAA", &bToggleFXAA));
+	pGuiWindow->AddWidget(CheckboxWidget("Enable Vignetting", &bVignetting));
+	pGuiWindow->AddWidget(SeparatorWidget());
+
+	CollapsingHeaderWidget LightWidgets("Light Options", false, false);
+	LightWidgets.AddSubWidget(SliderFloatWidget("Light Azimuth", &gLightDirection.x, float(-180.0f), float(180.0f), float(0.001f)));
+	LightWidgets.AddSubWidget(SliderFloatWidget("Light Elevation", &gLightDirection.y, float(210.0f), float(330.0f), float(0.001f)));
+
+	LightWidgets.AddSubWidget(SeparatorWidget());
+
+	CollapsingHeaderWidget LightColor1Picker("Main Light Color");
+	LightColor1Picker.AddSubWidget(ColorPickerWidget("Main Light Color", &gLightColor[0]));
+	LightWidgets.AddSubWidget(LightColor1Picker);
+
+	CollapsingHeaderWidget LightColor1Intensity("Main Light Intensity");
+	LightColor1Intensity.AddSubWidget(SliderFloatWidget("Main Light Intensity", &gLightColorIntensity[0], 0.0f, 5.0f, 0.001f));
+	LightWidgets.AddSubWidget(LightColor1Intensity);
+
+	LightWidgets.AddSubWidget(SeparatorWidget());
+
+	CollapsingHeaderWidget LightColor2Picker("Light2 Color");
+	LightColor2Picker.AddSubWidget(ColorPickerWidget("Light2 Color", &gLightColor[1]));
+	LightWidgets.AddSubWidget(LightColor2Picker);
+
+	CollapsingHeaderWidget LightColor2Intensity("Light2 Intensity");
+	LightColor2Intensity.AddSubWidget(SliderFloatWidget("Light2 Intensity", &gLightColorIntensity[1], 0.0f, 5.0f, 0.001f));
+	LightWidgets.AddSubWidget(LightColor2Intensity);
+
+	LightWidgets.AddSubWidget(SeparatorWidget());
+
+	CollapsingHeaderWidget LightColor3Picker("Light3 Color");
+	LightColor3Picker.AddSubWidget(ColorPickerWidget("Light3 Color", &gLightColor[2]));
+	LightWidgets.AddSubWidget(LightColor3Picker);
+
+	CollapsingHeaderWidget LightColor3Intensity("Light3 Intensity");
+	LightColor3Intensity.AddSubWidget(SliderFloatWidget("Light3 Intensity", &gLightColorIntensity[2], 0.0f, 5.0f, 0.001f));
+	LightWidgets.AddSubWidget(LightColor3Intensity);
+
+	LightWidgets.AddSubWidget(SeparatorWidget());
+
+	CollapsingHeaderWidget AmbientLightColorPicker("Ambient Light Color");
+	AmbientLightColorPicker.AddSubWidget(ColorPickerWidget("Ambient Light Color", &gLightColor[3]));
+	LightWidgets.AddSubWidget(AmbientLightColorPicker);
+
+	CollapsingHeaderWidget LightColor4Intensity("Ambient Light Intensity");
+	LightColor4Intensity.AddSubWidget(SliderFloatWidget("Light Intensity", &gLightColorIntensity[3], 0.0f, 5.0f, 0.001f));
+	LightWidgets.AddSubWidget(LightColor4Intensity);
+
+	LightWidgets.AddSubWidget(SeparatorWidget());
+
+	pGuiWindow->AddWidget(LightWidgets);
+}
+
+void Application::ToggleClient()
+{
+	if (client) {
+		client->closeConnection(SD_SEND);
+		conf_delete(client);
+	}
+	else {
+		client = conf_new(Client, serverName);
+		client->sendData("1234", 4, 0);
+		char recvBuf[DEFAULT_BUFLEN];
+		int bytesReceived = client->recvData(recvBuf, DEFAULT_BUFLEN, 0);
+		Player::PlayerData data = ((Player::PlayerData*)recvBuf)[0];
+		printf("%f %f %f\n", data.x, data.z, data.rot);
+		client->sendData("lol", 3, 0);
+	}
 }
 
 // ============================================================================
@@ -498,6 +527,8 @@ bool Application::Init()
 		addResource(&subDesc, NULL, LOAD_PRIORITY_NORMAL);
 	}
 
+	InitDebugGui();
+
 	// Initialize input system
 	if (!Input::Init(pWindow, &gAppUI, this)) return false;
 
@@ -528,6 +559,8 @@ void Application::Exit()
 	Input::Exit();
 
 	exitProfiler();
+
+	RemoveShaderResources();
 
 	RemoveSceneResources();
 
@@ -826,11 +859,20 @@ void Application::Update(float deltaTime)
 		::toggleVSync(pRenderer, &pSwapChain);
 	}
 #endif
+	/************************************************************************/
+	// Server Contact
+	/************************************************************************/
+	
+	if (connected) {
+		int size = Input::EncodeToBuf(sendbuf);
+		client->sendData(sendbuf, size, 0);
+		client->recvData(recvbuf, DEFAULT_BUFLEN, 0);
+	}
 
-	pCameraController->update(deltaTime);
 	/************************************************************************/
 	// Scene Update
 	/************************************************************************/
+	pCameraController->update(deltaTime);
 	mat4 viewMat = pCameraController->getViewMatrix();
 	const float aspectInverse = (float)mSettings.mHeight / (float)mSettings.mWidth;
 	const float horizontal_fov = PI / 3.0f;
@@ -859,33 +901,15 @@ void Application::Update(float deltaTime)
 	gUniformData.mLightDirection[1] = vec4(-sunDirection.getX(), sunDirection.getY(), -sunDirection.getZ(), 0.0f);
 	gUniformData.mLightDirection[2] = vec4(-sunDirection.getX(), -sunDirection.getY(), -sunDirection.getZ(), 0.0f);
 
-	currVelX -= drag * currVelX;
-	currVelY -= drag * currVelY;
-	if (Input::inputs[InputEnum::INPUT_UP] > 0.0f) {
-		currVelY += acceleration * deltaTime;
+	if (connected) {
+		scene->updateFromClientBuf(recvbuf);
 	}
-	if (Input::inputs[InputEnum::INPUT_LEFT] > 0.0f) {
-		currVelX -= acceleration * deltaTime;
-	}
-	if (Input::inputs[InputEnum::INPUT_DOWN] > 0.0f) {
-		currVelY -= acceleration * deltaTime;
-	}
-	if (Input::inputs[InputEnum::INPUT_RIGHT] > 0.0f) {
-		currVelX += acceleration * deltaTime;
+	else {
+		scene->updateFromInputBuf(deltaTime);
 	}
 
-	if (sqrt(currVelX * currVelX + currVelY * currVelY) > 0.01) {
-		currPosX += currVelX;
-		currPosY += currVelY;
-
-		playerTransform->setPositionDirection(vec3(currPosX, 0, currPosY), vec3(currVelX, 0, currVelY));
-	}
-
-	pCameraController->moveTo(vec3(currPosX, 0, currPosY) + cameraOffset);
-	pCameraController->lookAt(vec3(currPosX, 0, currPosY) + vec3(0, 0.4f, 0));
-
-
-	rootTransform->update(deltaTime);
+	pCameraController->moveTo(scene->transforms[0]->M[3].getXYZ() + cameraOffset);
+	pCameraController->lookAt(scene->transforms[0]->M[3].getXYZ() + vec3(0, 0.4f, 0));
 
 
 	/************************************************************************/
@@ -908,7 +932,7 @@ void Application::Update(float deltaTime)
 	/************************************************************************/
 	/************************************************************************/
 
-	//gAppUI.Update(deltaTime);
+	gAppUI.Update(deltaTime);
 }
 
 void Application::Draw()
@@ -991,7 +1015,7 @@ void Application::Draw()
 		// Update per-instance uniforms
 		shaderCbv = { pInstanceBuffer[Application::gFrameIndex] };
 		beginUpdateResource(&shaderCbv);
-		rootTransform->updateTransformBuffer(shaderCbv, mat4::identity());
+		scene->updateTransformBuffer(shaderCbv, mat4::identity());
 		endUpdateResource(&shaderCbv, NULL);
 
 		// Set render target
@@ -999,10 +1023,8 @@ void Application::Draw()
 		cmdSetViewport(cmd, 0.0f, 0.0f, (float)pRenderTarget->mWidth, (float)pRenderTarget->mHeight, 0.0f, 1.0f);
 		cmdSetScissor(cmd, 0, 0, pRenderTarget->mWidth, pRenderTarget->mHeight);
 
-		for (auto g : gltfGeodes) {
-			g->setProgram(meshShaderDesc);
-		}
-		rootTransform->draw(cmd);
+		scene->setProgram(meshShaderDesc);
+		scene->draw(cmd);
 
 		// Unbind render targets
 		cmdBindRenderTargets(cmd, 0, NULL, 0, NULL, NULL, NULL, -1, -1);
@@ -1106,7 +1128,6 @@ void Application::Draw()
 		cmdDrawProfilerUI();
 
 		gAppUI.Gui(pGuiWindow);
-		gAppUI.Gui(pGuiGraphics);
 
 		gAppUI.Draw(cmd);
 

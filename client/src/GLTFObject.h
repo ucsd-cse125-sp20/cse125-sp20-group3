@@ -5,7 +5,6 @@
 
 #include "../The-Forge/Common_3/Renderer/IRenderer.h"
 #include "../The-Forge/Common_3/Renderer/IResourceLoader.h"
-//#include "../The-Forge/Common_3/OS/Interfaces/IProfiler.h"
 
 #include "../The-Forge/Common_3/ThirdParty/OpenSource/cgltf/GLTFLoader.h"
 
@@ -82,9 +81,9 @@ public:
 
 
 
-	static bool LoadModel(GLTFObject* asset, Renderer* renderer, Sampler* sampler, const Path* modelFilePath);
+	static bool LoadModel(GLTFObject* asset, Renderer* renderer, const Path* modelFilePath);
 
-	void Init(const Path* path, Renderer* renderer, Sampler* defaultSampler);
+	void Init(const Path* path, Renderer* renderer);
 
 	static VertexLayout getVertexLayout() { return pVertexLayoutModel; }
 
@@ -92,9 +91,9 @@ public:
 	void createNodeTransformsBuffer();
 
 	void updateTextureProperties(const GLTFTextureView& textureView, GLTFTextureProperties& textureProperties);
-	void updateParam(DescriptorData* params, const GLTFTextureView& textureView, const char* textureName, const char* samplerName, uint32_t& nextParamIdx);
+	void updateParam(DescriptorData* params, const GLTFTextureView& textureView, const char* textureName, const char* samplerName, uint32_t& nextParamIdx, Sampler* defaultSampler);
 
-	void createMaterialResources(RootSignature* pRootSignature, DescriptorSet* pBindlessTexturesSamplersSet = NULL);
+	void createMaterialResources(RootSignature* pRootSignature, DescriptorSet* pBindlessTexturesSamplersSet, Sampler* defaultSampler);
 	void bindBuffers(Cmd* cmd);
 	void removeResources();
 

@@ -1,18 +1,35 @@
 #pragma once
 
+#include "../The-Forge/Common_3/Renderer/IRenderer.h"
+
+#include <ctime>
+
 #include "Transform.h"
 #include "GLTFGeode.h"
 
-class SceneManager
+#include "Input.h"
+
+#include "../../common/player.h"
+
+class SceneManager : public Transform
 {
 public:
-	Transform* root;
-
 	// This vector should eventually be split between tracked objects and client only objects
 	std::vector<Transform*> transforms;
 
-	std::vector<Geode*> geodes;
+	// Will likely try to convert to a dictionary
+	std::vector<GLTFGeode*> gltfGeodes;
 
-	SceneManager();
+	// Would likely like to create a single Game object that contains all game components
+	Player player = Player(mat4::identity());
+
+	SceneManager(Renderer* renderer);
 	~SceneManager();
+
+	void createMaterialResources(RootSignature* pRootSignature, DescriptorSet* pBindlessTexturesSamplersSet, Sampler* defaultSampler);
+
+	void updateFromClientBuf(char buf[]);
+	void updateFromInputBuf(float deltaTime);
+
+	void setProgram(Geode::GeodeShaderDesc program);
 };

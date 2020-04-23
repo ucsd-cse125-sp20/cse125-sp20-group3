@@ -4,23 +4,24 @@
 
 bool GLTFGeode::useMaterials = true;
 
-GLTFGeode::GLTFGeode(Renderer* renderer, Sampler* defaultSampler, std::string filename)
+GLTFGeode::GLTFGeode(Renderer* renderer, std::string filename)
 {
 	this->obj = conf_new(GLTFObject);
 	PathHandle modelFile = fsCopyPathInResourceDirectory(RD_MESHES, filename.c_str());
-	GLTFObject::LoadModel((GLTFObject*)this->obj, renderer, defaultSampler, modelFile);
+	GLTFObject::LoadModel((GLTFObject*)this->obj, renderer, modelFile);
 
 	waitForAllResourceLoads();
 }
 
 GLTFGeode::~GLTFGeode()
 {
+	unload();
 	conf_delete(obj);
 }
 
-void GLTFGeode::createMaterialResources(RootSignature* pRootSignature, DescriptorSet* pBindlessTexturesSamplersSet)
+void GLTFGeode::createMaterialResources(RootSignature* pRootSignature, DescriptorSet* pBindlessTexturesSamplersSet, Sampler* defaultSampler)
 {
-	((GLTFObject*)obj)->createMaterialResources(pRootSignature, pBindlessTexturesSamplersSet);
+	((GLTFObject*)obj)->createMaterialResources(pRootSignature, pBindlessTexturesSamplersSet, defaultSampler);
 }
 
 void GLTFGeode::unload()

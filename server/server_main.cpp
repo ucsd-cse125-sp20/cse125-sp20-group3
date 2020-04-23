@@ -35,11 +35,12 @@ int __cdecl main(void)
         if (iResult > 0) {
             // printf("Bytes received: %d\n", iResult);
             // printf("Message recieved: %s\n", recvbuf);
-            std::cout<<"Bytes received: "<<iResult<<std::endl;
+            //std::cout<<"Bytes received: "<<iResult<<std::endl;
             std::cout<<"Message received: "<<recvbuf<<std::endl;
 
             // Process data
-			int move_x, move_z = 0;
+            int move_x = 0;
+            int move_z = 0;
             if (recvbuf[0] == '1') {
 				move_z = 1;
             }
@@ -60,9 +61,9 @@ int __cdecl main(void)
 
 			//Send updated data back to clients
 			float sendbufSize = 0;
-			//sendbuf[0] = player->getPositionAndRotation
-			//sendbufSize += number of bytes filled in
-			std::cout << "sending " << sendbuf << std::endl;
+            player->setData(sendbuf, 0);
+            sendbufSize += sizeof(Player::PlayerData);
+			//std::cout << "sending " << sendbuf << std::endl;
             iSendResult = server->sendData(sendbuf, sendbufSize, 0);
             if (iSendResult == -1) {
                 return 1;

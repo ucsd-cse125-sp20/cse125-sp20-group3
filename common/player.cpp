@@ -20,16 +20,25 @@ void Player::update() {
 	float deltaTime = deltaDuration.count();
 	lastTime = std::chrono::steady_clock::now();
 
+	float x_translate = 0;
+	float z_translate = 0;
 	if (velocity_x > 0.01f || velocity_x < -0.01f) {
-		float x_translate = velocity_x * deltaTime;
+		x_translate = velocity_x * deltaTime;
 	}
 	if (velocity_z > 0.01f || velocity_z < -0.01f) {
-		float z_translate = velocity_z * deltaTime;
+		z_translate = velocity_z * deltaTime;
 	}
 
 	//TODO translate model by (x_translate, 0, z_translate)
+	model[3] += vec4(x_translate, 0, z_translate, 0);
 
 	//TODO handle rotation stuff
+	if (sqrt(velocity_x * velocity_x + velocity_z * velocity_z) > 0.001) {
+		vec3 forward = normalize(vec3(velocity_x, 0, velocity_z));
+		vec3 right = cross(forward, vec3(0, 1, 0));
+		model[0] = vec4(right, 0);
+		model[2] = vec4(-forward, 0);
+	}
 }
 
 void Player::setVelocity(float vel_x, float vel_z) {
@@ -50,4 +59,19 @@ void Player::setMove(int move_x, int move_z) {
 void Player::setPosRot(float pos_x, float pos_z, float rot_y) {
 	//should only execute on the client
 	//TODO update matrix accordingly
+	vec3 forward = normalize(vec3(cos(rot_y), 0, sin(rot_y)));
+	vec3 right = cross(forward, vec3(0, 1, 0));
+
+	model[0] = vec4(right, 0);
+	model[2] = vec4(-forward, 0);
+	model[3] = vec4(pos_x, 0, pos_z, 1);
+}
+
+void Player::setData(char buf[], int index)
+{
+	((PlayerData*)buf)[index] = { model[3][0], model[3][2], acos(model[0][0]) };
+}
+
+mat4 Player::getMatrix() {
+	return model;
 }

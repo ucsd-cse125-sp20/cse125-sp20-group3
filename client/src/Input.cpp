@@ -19,6 +19,26 @@ bool Input::Init(WindowsDesc* window, UIApp* appUI, IApp* app)
 	actionDesc = { InputBindings::BUTTON_EXIT, [](InputActionContext* ctx) { requestShutdown(); return true; } };
 	addInputAction(&actionDesc);
 	
+	actionDesc =
+	{
+		InputBindings::BUTTON_ANY, [](InputActionContext* ctx)
+		{
+			static uint8_t virtualKeyboard = 0;
+			bool capture = Input::appUI->OnButton(ctx->mBinding, ctx->mBool, ctx->pPosition);
+			setEnableCaptureInput(capture && INPUT_ACTION_PHASE_CANCELED != ctx->mPhase);
+			if (Input::appUI->WantTextInput() != virtualKeyboard)
+			{
+				virtualKeyboard = Input::appUI->WantTextInput();
+				setVirtualKeyboard(virtualKeyboard);
+			}
+			return true;
+		}, Input::app
+	};
+	addInputAction(&actionDesc);
+
+	actionDesc = { InputBindings::TEXT, [](InputActionContext* ctx) { return Input::appUI->OnText(ctx->pText); } };
+	addInputAction(&actionDesc);
+
 	typedef bool(*StickInputHandler)(InputActionContext* ctx);
 	static StickInputHandler onStickInput = [](InputActionContext* ctx)
 	{
@@ -64,7 +84,7 @@ void Input::Update(int32_t width, int32_t height)
 	updateInputSystem(width, height);
 }
 
-void Input::EncodeToBuf(char buf[])
+int Input::EncodeToBuf(char buf[])
 {
 	// TODO redefine when action encoding is in place
 	// Possibly might be able to store encoding buffer in state, and only update
@@ -72,6 +92,8 @@ void Input::EncodeToBuf(char buf[])
 	buf[1] = inputs[INPUT_LEFT] ? '1' : '0';
 	buf[2] = inputs[INPUT_DOWN] ? '1' : '0';
 	buf[3] = inputs[INPUT_RIGHT] ? '1' : '0';
+
+	return 4;
 }
 
 void Input::Exit()

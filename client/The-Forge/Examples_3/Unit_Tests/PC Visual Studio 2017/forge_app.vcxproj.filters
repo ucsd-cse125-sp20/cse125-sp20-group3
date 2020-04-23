@@ -55,7 +55,7 @@
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\SceneManager.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Scene Graph</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -181,9 +181,6 @@
     <ClInclude Include="..\..\..\..\..\common\macros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\SceneManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\..\common\base.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
@@ -201,6 +198,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\common\unit.h">
       <Filter>Header Files\Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\SceneManager.h">
+      <Filter>Header Files\Scene Graph</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

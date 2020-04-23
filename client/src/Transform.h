@@ -2,6 +2,9 @@
 
 #include <algorithm>
 
+#include "../The-Forge/Common_3/Renderer/IResourceLoader.h"
+#include "../The-Forge/Common_3/OS/Math/MathTypes.h"
+
 #include "Node.h"
 
 class Transform : public Node {

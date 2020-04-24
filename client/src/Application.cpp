@@ -373,7 +373,7 @@ void Application::InitDebugGui()
 
 void Application::ToggleClient()
 {
-	if (client) {
+	if (!connected) {
 		client->closeConnection(SD_SEND);
 		conf_delete(client);
 	}
@@ -555,6 +555,11 @@ bool Application::Init()
 void Application::Exit()
 {
 	waitQueueIdle(pGraphicsQueue);
+
+	if (connected) {
+		connected = false;
+		ToggleClient();
+	}
 
 	Input::Exit();
 

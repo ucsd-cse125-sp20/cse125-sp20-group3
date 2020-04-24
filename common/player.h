@@ -7,13 +7,13 @@
 #include <chrono>
 #include <ctime>
 
-#define MOVE_SPEED 5
+#define MOVE_SPEED 1
 
 class Player {
 private:
     std::chrono::steady_clock::time_point lastTime;
     mat4 model;
-    float velocity_x, velocity_z, acc_x, acc_z;
+    float velocity_x, velocity_z, acceleration_x, acceleration_z;
 public:
     struct PlayerData {
         float x, z, rot;

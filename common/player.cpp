@@ -10,6 +10,8 @@ Player::Player(mat4 model_mat, std::string objFilename) : model(model_mat) {
 Player::Player(mat4 model_mat) : model(model_mat) {
 	velocity_x = 0.f;
 	velocity_z = 0.f;
+	acceleration_x = 0.f;
+	acceleration_z = 0.f;
 	lastTime = std::chrono::steady_clock::now();
 }
 
@@ -20,20 +22,17 @@ void Player::update() {
 	float deltaTime = deltaDuration.count();
 	lastTime = std::chrono::steady_clock::now();
 
-	float x_translate = 0;
-	float z_translate = 0;
-	if (velocity_x > 0.01f || velocity_x < -0.01f) {
-		x_translate = velocity_x * deltaTime;
-	}
-	if (velocity_z > 0.01f || velocity_z < -0.01f) {
-		z_translate = velocity_z * deltaTime;
-	}
-
-	//TODO translate model by (x_translate, 0, z_translate)
-	model[3] += vec4(x_translate, 0, z_translate, 0);
+	
+	velocity_x *= 0.9f;
+	velocity_z *= 0.9f;
+	velocity_x += acceleration_x * deltaTime;
+	velocity_z += acceleration_z * deltaTime;
+	//printf("%f %f\n", velocity_x, velocity_z);
 
 	//TODO handle rotation stuff
 	if (sqrt(velocity_x * velocity_x + velocity_z * velocity_z) > 0.001) {
+		model[3] += vec4(velocity_x, 0, velocity_z, 0);
+
 		vec3 forward = normalize(vec3(velocity_x, 0, velocity_z));
 		vec3 right = cross(forward, vec3(0, 1, 0));
 		model[0] = vec4(right, 0);
@@ -47,13 +46,13 @@ void Player::setVelocity(float vel_x, float vel_z) {
 }
 
 void Player::setMove(int move_x, int move_z) {
-	if (move_x < 0) velocity_x = -1 * MOVE_SPEED;
-	else if (move_x > 0) velocity_x = MOVE_SPEED;
-	else velocity_x = 0;
+	if (move_x < 0) acceleration_x = -1 * MOVE_SPEED;
+	else if (move_x > 0) acceleration_x = MOVE_SPEED;
+	else acceleration_x = 0;
 
-	if (move_z < 0) velocity_z = -1 * MOVE_SPEED;
-	else if (move_z > 0) velocity_z = MOVE_SPEED;
-	else velocity_z = 0;
+	if (move_z < 0) acceleration_z = -1 * MOVE_SPEED;
+	else if (move_z > 0) acceleration_z = MOVE_SPEED;
+	else acceleration_z = 0;
 }
 
 void Player::setPosRot(float pos_x, float pos_z, float rot_y) {
@@ -69,7 +68,7 @@ void Player::setPosRot(float pos_x, float pos_z, float rot_y) {
 
 void Player::setData(char buf[], int index)
 {
-	((PlayerData*)buf)[index] = { model[3][0], model[3][2], acos(model[0][0]) };
+	((PlayerData*)buf)[index] = { model[3][0], model[3][2], atan2(-model[2][2], -model[2][0]) };
 }
 
 mat4 Player::getMatrix() {

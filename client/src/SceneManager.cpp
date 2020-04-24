@@ -67,27 +67,25 @@ void SceneManager::updateFromClientBuf(char buf[])
 
 void SceneManager::updateFromInputBuf(float deltaTime)
 {
-	currVelX -= drag * currVelX;
-	currVelY -= drag * currVelY;
-	if (Input::inputs[InputEnum::INPUT_UP] > 0.0f) {
-		currVelY += acceleration * deltaTime;
+	char recvbuf[DEFAULT_BUFLEN];
+	Input::EncodeToBuf(recvbuf);
+	int move_x = 0;
+	int move_z = 0;
+	if (recvbuf[0] == '1') {
+		move_z = 1;
 	}
-	if (Input::inputs[InputEnum::INPUT_LEFT] > 0.0f) {
-		currVelX -= acceleration * deltaTime;
+	if (recvbuf[1] == '1') {
+		move_x = -1;
 	}
-	if (Input::inputs[InputEnum::INPUT_DOWN] > 0.0f) {
-		currVelY -= acceleration * deltaTime;
+	if (recvbuf[2] == '1') {
+		move_z = -1;
 	}
-	if (Input::inputs[InputEnum::INPUT_RIGHT] > 0.0f) {
-		currVelX += acceleration * deltaTime;
+	if (recvbuf[3] == '1') {
+		move_x = 1;
 	}
-
-	if (sqrt(currVelX * currVelX + currVelY * currVelY) > 0.01) {
-		currPosX += currVelX;
-		currPosY += currVelY;
-
-		transforms[0]->setPositionDirection(vec3(currPosX, 0, currPosY), vec3(currVelX, 0, currVelY));
-	}
+	player.setMove(move_x, move_z);
+	player.update();
+	transforms[0]->setMatrix(player.getMatrix());
 }
 
 void SceneManager::setProgram(Geode::GeodeShaderDesc program)

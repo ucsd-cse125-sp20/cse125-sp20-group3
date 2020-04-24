@@ -36,7 +36,7 @@ int __cdecl main(void)
             // printf("Bytes received: %d\n", iResult);
             // printf("Message recieved: %s\n", recvbuf);
             //std::cout<<"Bytes received: "<<iResult<<std::endl;
-            std::cout<<"Message received: "<<recvbuf<<std::endl;
+            //std::cout<<"Message received: "<<recvbuf<<std::endl;
 
             // Process data
             int move_x = 0;
@@ -69,17 +69,17 @@ int __cdecl main(void)
                 return 1;
             }
             // printf("Bytes sent: %d\n", iSendResult);
-            std::cout << "Bytes sent: "<< iSendResult << std::endl;
+            //std::cout << "Bytes sent: "<< iSendResult << std::endl;
         }
         else if (iResult == 0) {
                 // printf("Connection closing...\n");
-                std::cout << "Nothing received" << std::endl;
+                //std::cout << "Nothing received" << std::endl;
         }
         else  {
             return 1;
         }
 
-    } while (iResult > 0);
+    } while (1);// (iResult > 0);
 
     // shutdown the connection since we're done
     iResult = server->cleanup(SD_SEND);

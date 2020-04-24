@@ -28,6 +28,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\..\common\player.cpp" />
+    <ClCompile Include="..\..\..\..\..\server\GAMEOBJECT.CPP" />
     <ClCompile Include="..\..\..\..\src\Application.cpp" />
     <ClCompile Include="..\..\..\..\src\Client.cpp" />
     <ClCompile Include="..\..\..\..\src\Geode.cpp" />
@@ -70,12 +71,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\common\base.h" />
+    <ClInclude Include="..\..\..\..\..\common\client2server.h" />
     <ClInclude Include="..\..\..\..\..\common\entity.h" />
     <ClInclude Include="..\..\..\..\..\common\macros.h" />
     <ClInclude Include="..\..\..\..\..\common\player.h" />
     <ClInclude Include="..\..\..\..\..\common\team.h" />
     <ClInclude Include="..\..\..\..\..\common\tower.h" />
     <ClInclude Include="..\..\..\..\..\common\unit.h" />
+    <ClInclude Include="..\..\..\..\..\server\GameObject.h" />
     <ClInclude Include="..\..\..\..\src\Application.h" />
     <ClInclude Include="..\..\..\..\src\Client.h" />
     <ClInclude Include="..\..\..\..\src\Geode.h" />
@@ -226,7 +229,8 @@
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
     </Manifest>
     <PostBuildEvent>
-      <Command>"$(OutDir)AssetPipelineCmd.exe" -pa "$(SolutionDir)..\..\..\..\Assets\Animation" "$(SolutionDir)..\..\..\..\Assets\Animation"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <CustomBuildStep>
       <Command>
@@ -264,7 +268,8 @@
       <AdditionalOptions>/ignore:4099</AdditionalOptions>
     </Link>
     <PostBuildEvent>
-      <Command>"$(OutDir)AssetPipelineCmd.exe" -pa "$(SolutionDir)..\..\..\..\Assets\Animation" "$(SolutionDir)..\..\..\..\Assets\Animation"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
@@ -306,7 +311,8 @@
       <AdditionalOptions>/ignore:4099</AdditionalOptions>
     </Link>
     <PostBuildEvent>
-      <Command>"$(OutDir)AssetPipelineCmd.exe" -pa "$(SolutionDir)..\..\..\..\Assets\Animation" "$(SolutionDir)..\..\..\..\Assets\Animation"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
@@ -354,7 +360,8 @@
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
     </Manifest>
     <PostBuildEvent>
-      <Command>"$(OutDir)AssetPipelineCmd.exe" -pa "$(SolutionDir)..\..\..\..\Assets\Animation" "$(SolutionDir)..\..\..\..\Assets\Animation"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <CustomBuildStep>
       <Command>
@@ -396,7 +403,8 @@
       <AdditionalOptions>/ignore:4099</AdditionalOptions>
     </Link>
     <PostBuildEvent>
-      <Command>"$(OutDir)AssetPipelineCmd.exe" -pa "$(SolutionDir)..\..\..\..\Assets\Animation" "$(SolutionDir)..\..\..\..\Assets\Animation"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
@@ -442,7 +450,8 @@
       <AdditionalOptions>/ignore:4099</AdditionalOptions>
     </Link>
     <PostBuildEvent>
-      <Command>"$(OutDir)AssetPipelineCmd.exe" -pa "$(SolutionDir)..\..\..\..\Assets\Animation" "$(SolutionDir)..\..\..\..\Assets\Animation"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>

@@ -3,8 +3,11 @@
 #include "../common/macros.h"
 #include "../common/player.h"
 #include <string>
+#include <map>
 #include <iostream>
 #include "Server.h"
+#include "GameObject.h"
+#include "../common/client2server.h"
 
 int __cdecl main(void)
 {
@@ -16,7 +19,11 @@ int __cdecl main(void)
     char recvbuf[RECV_BUFLEN];
 
 	Server* server = new Server();
+	std::map<std::string, GameObject*> idMap;
+    int next_id = 0;
 	Player* player = new Player(mat4(1));
+    idMap[std::to_string(next_id)] = player;
+    next_id++;
 
     // Game State data
     float deltaTime = 0.001f;
@@ -33,28 +40,13 @@ int __cdecl main(void)
         ZeroMemory( recvbuf, RECV_BUFLEN );
         iResult = server->recvData(recvbuf, RECV_BUFLEN, 0);
         if (iResult > 0) {
-            // printf("Bytes received: %d\n", iResult);
-            // printf("Message recieved: %s\n", recvbuf);
-            //std::cout<<"Bytes received: "<<iResult<<std::endl;
-            //std::cout<<"Message received: "<<recvbuf<<std::endl;
 
             // Process data
-            int move_x = 0;
-            int move_z = 0;
-            if (recvbuf[0] == '1') {
-				move_z = 1;
-            }
-            if (recvbuf[1] == '1') {
-				move_x = -1;
-            }
-            if (recvbuf[2] == '1') {
-				move_z = -1;
-            }
-            if (recvbuf[3] == '1') {
-				move_x = 1;
-            }
+			// read id, handle player input
+            PlayerInput in = ((PlayerInput*)recvbuf)[0];
+			//populate in with received data
 
-			player->setMove(move_x, move_z);
+			player->setMoveAndDir(in);
 
 			//Update Game State
 			player->update();
@@ -62,18 +54,16 @@ int __cdecl main(void)
 			//Send updated data back to clients
 			float sendbufSize = 0;
             player->setData(sendbuf, 0);
-            sendbufSize += sizeof(Player::PlayerData);
+            sendbufSize += sizeof(GameObject::GameObjectData);
 			//std::cout << "sending " << sendbuf << std::endl;
             iSendResult = server->sendData(sendbuf, sendbufSize, 0);
             if (iSendResult == -1) {
                 return 1;
             }
-            // printf("Bytes sent: %d\n", iSendResult);
-            //std::cout << "Bytes sent: "<< iSendResult << std::endl;
+            
         }
         else if (iResult == 0) {
-                // printf("Connection closing...\n");
-                //std::cout << "Nothing received" << std::endl;
+                
         }
         else  {
             return 1;

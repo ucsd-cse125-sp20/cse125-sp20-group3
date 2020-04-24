@@ -14,6 +14,8 @@
 #include "GLTFGeode.h"
 #include "Transform.h"
 
+#include "../../common/client2server.h"
+
 
 #define IMAGE_COUNT 3
 #define LIGHT_COUNT 3

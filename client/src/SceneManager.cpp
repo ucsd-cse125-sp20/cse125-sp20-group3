@@ -5,12 +5,7 @@ namespace {
 	const char* groundFile = "Ground.gltf";
 	const char* otherFile = "Kyubey.gltf";
 
-	float currPosX = 0;
-	float currPosY = 0;
-	float currVelX = 0;
-	float currVelY = 0;
-	float acceleration = 1;
-	float drag = 0.1f;
+	float rot = 0.f;
 }
 
 SceneManager::SceneManager(Renderer* renderer)
@@ -60,30 +55,19 @@ void SceneManager::createMaterialResources(RootSignature* pRootSignature, Descri
 
 void SceneManager::updateFromClientBuf(char buf[])
 {
-	Player::PlayerData data = ((Player::PlayerData*)buf)[0];
+	GameObject::GameObjectData data = ((GameObject::GameObjectData*)buf)[0];
 	player.setPosRot(data.x, data.z, data.rot);
 	transforms[0]->setMatrix(player.getMatrix());
 }
 
 void SceneManager::updateFromInputBuf(float deltaTime)
 {
+	rot += 0.1f;
 	char recvbuf[DEFAULT_BUFLEN];
 	Input::EncodeToBuf(recvbuf);
-	int move_x = 0;
-	int move_z = 0;
-	if (recvbuf[0] == '1') {
-		move_z = 1;
-	}
-	if (recvbuf[1] == '1') {
-		move_x = -1;
-	}
-	if (recvbuf[2] == '1') {
-		move_z = -1;
-	}
-	if (recvbuf[3] == '1') {
-		move_x = 1;
-	}
-	player.setMove(move_x, move_z);
+	PlayerInput input = ((PlayerInput*)recvbuf)[0];
+	input.view_y_rot = rot;
+	player.setMoveAndDir(input);
 	player.update();
 	transforms[0]->setMatrix(player.getMatrix());
 }

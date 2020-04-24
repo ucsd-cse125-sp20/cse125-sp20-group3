@@ -2,6 +2,7 @@
 
 #include <ctime>
 
+#include "../../common/client2server.h"
 #include "../../common/macros.h"
 
 #include "../The-Forge/Common_3/OS/Interfaces/IOperatingSystem.h"

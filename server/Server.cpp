@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
+#include <thread>
 #include "Server.h"
 
 // Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib
@@ -22,7 +23,7 @@ Server::Server() {
 	struct addrinfo* ptr = NULL;
 	struct addrinfo hints;
 
-	std::cout << "1" << std::endl;
+	
 	int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (iResult != 0) {
 		printf("WSAStartup failed with error: %d\n", iResult);
@@ -36,7 +37,7 @@ Server::Server() {
 	hints.ai_flags = AI_PASSIVE;
 
 
-	std::cout << "2" << std::endl;
+	
 	// Resolve the server address and port
 	iResult = getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
 	if (iResult != 0) {
@@ -45,7 +46,7 @@ Server::Server() {
 		//TODO handle failure
 	}
 
-	std::cout << "3" << std::endl;
+	
 	for (ptr = result; ptr != NULL; ptr = ptr->ai_next) {
 		// Create a SOCKET for connecting to server
 		ListenSocket = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
@@ -56,7 +57,7 @@ Server::Server() {
 			//TODO handle failure
 		}
 
-		std::cout << "4" << std::endl;
+		
 		//TODO should either of these loop like how client loops on a failed connect() ?
 
 		// Setup the TCP listening socket
@@ -72,7 +73,7 @@ Server::Server() {
 
 	freeaddrinfo(result);
 
-	std::cout << "5" << std::endl;
+	
 	iResult = listen(ListenSocket, SOMAXCONN);
 	if (iResult == SOCKET_ERROR) {
 		printf("listen failed with error: %d\n", WSAGetLastError());
@@ -81,13 +82,31 @@ Server::Server() {
 		//TODO handle failure
 	}
 
-	std::cout << "6" << std::endl;
+	
 
-	// Accept a client socket
-	ClientSockets[0] = accept(ListenSocket, NULL, NULL);
-	//TODO iterate through all the ClientSockets eventually
+	// // Accept a client socket
+	// ClientSockets[0] = accept(ListenSocket, NULL, NULL);
+	// //TODO iterate through all the ClientSockets eventually
+	int number_of_clients = 0;
+	sockaddr client_sock[NUM_PLAYERS]; // info on client sockets
+	while (number_of_clients < NUM_PLAYERS) // let MAX_CLIENTS connect
+	{
+		ClientSockets[number_of_clients] = accept (ListenSocket, NULL, NULL); 
+		if (ClientSockets[number_of_clients] == INVALID_SOCKET)
+		{ // error accepting connection
+			WSACleanup ();
+			return;
+		}
+		else
+		{ // client connected successfully
+			// start a thread that will communicate with client
+			//startThread (client[number_of_clients]);
+			number_of_clients++;
+			std::cout << "Accepted " << number_of_clients << " of " << NUM_PLAYERS << " players" << std::endl;
+		}
+	}
 
-	std::cout << "6.5" << std::endl;
+	
 	if (ClientSockets[0] == INVALID_SOCKET) {
 		printf("accept failed with error: %d\n", WSAGetLastError());
 		closesocket(ListenSocket);
@@ -98,7 +117,7 @@ Server::Server() {
 	// No longer need server socket
 	closesocket(ListenSocket);
 
-	std::cout << "7" << std::endl;
+	
 }
 
 int Server::sendData(char sendbuf[], int buflen, int flags) {
@@ -131,7 +150,6 @@ int Server::recvData(char recvbuf[], int buflen, int flags) {
 		//ZeroMemory(tempbufs, sizeof(tempbufs));
 		iResult = recv(ClientSockets[i], tempbufs[i], DEFAULT_BUFLEN, flags);
 		if (iResult == SOCKET_ERROR) {
-			// printf("send failed with error: %d\n", WSAGetLastError());
 			std::cout << "send failed with error: " << WSAGetLastError() << std::endl;
 			closesocket(ClientSockets[i]);
 			WSACleanup();

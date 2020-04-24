@@ -167,6 +167,8 @@ static float2		gLightDirection = { -122.0f, 222.0f };
 
 vec3 cameraOffset(0, 20, -10);
 
+float rot = 0.f;
+
 SceneManager* scene;
 
 bool connected = false;
@@ -382,7 +384,7 @@ void Application::ToggleClient()
 		client->sendData("1234", 4, 0);
 		char recvBuf[DEFAULT_BUFLEN];
 		int bytesReceived = client->recvData(recvBuf, DEFAULT_BUFLEN, 0);
-		Player::PlayerData data = ((Player::PlayerData*)recvBuf)[0];
+		GameObject::GameObjectData data = ((GameObject::GameObjectData*)recvBuf)[0];
 		printf("%f %f %f\n", data.x, data.z, data.rot);
 		client->sendData("lol", 3, 0);
 	}
@@ -868,8 +870,12 @@ void Application::Update(float deltaTime)
 	// Server Contact
 	/************************************************************************/
 	
+	rot += 0.1f;
+
 	if (connected) {
 		int size = Input::EncodeToBuf(sendbuf);
+		//((PlayerInput*)sendbuf)[0].view_y_rot = pCameraController->getRotationXY().getY();
+		((PlayerInput*)sendbuf)[0].view_y_rot = rot;
 		client->sendData(sendbuf, size, 0);
 		client->recvData(recvbuf, DEFAULT_BUFLEN, 0);
 	}

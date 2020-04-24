@@ -3,8 +3,7 @@ import os
 from pathlib import Path
 from mathutils import Matrix
 
-export_mesh = False
-
+export_mesh = True
 export_animations = True
 
 def select_type(types):
@@ -15,13 +14,25 @@ def select_type(types):
             o.select_set(False)
     
 output_dir = os.path.splitext(os.path.basename(bpy.context.blend_data.filepath))[0]
+try:
+    original_umask = os.umask(0)
+    os.mkdir(output_dir)
+    os.mkdir(output_dir + '/animations')
+finally:
+    os.umask(original_umask)
 
-Path(output_dir + '/animations').mkdir(parents=True, exist_ok=True)
+select_type([])
 
 if export_mesh:
     # Reset pose
-    for pb in bpy.context.selected_pose_bones_from_active_object:
-        pb.matrix_basis = Matrix.Identity(4)
+    for obj in bpy.data.objects:
+        if obj.type == 'ARMATURE':
+            obj.select_set(True)
+            break
+    bpy.ops.object.mode_set(mode='EDIT', toggle=False)
+    for obj in bpy.data.objects:
+        if obj.type == 'ARMATURE':
+            obj.pose
 
     # Select mesh and armature
     select_type(['ARMATURE', 'MESH'])
@@ -37,3 +48,35 @@ if export_mesh:
         check_existing=False
     )
     
+if export_animations:
+        
+    armature = None
+    animated_meshes = []
+    for obj in bpy.data.objects:
+        if obj.type == 'ARMATURE' and armature is None:
+            armature = obj
+            obj.select_set(True)
+        else:
+            obj.select_set(False)
+            
+    original_action = armature.animation_data.action
+    
+    for action in bpy.data.actions:
+        armature.animation_data_clear()
+        anim = armature.animation_data_create()
+        anim.action = action
+        
+        bpy.ops.export_scene.gltf(
+            export_format='GLTF_SEPARATE',
+            export_apply=True,
+            export_selected=True,
+            export_animations=True,
+            export_force_sampling=True,
+            export_def_bones=True,
+            filepath=output_dir + '/animations/' + action.name + '.gltf',
+            check_existing=False
+        )
+        
+    armature.animation_data_clear()
+    anim = armature.animation_data_create()
+    anim.action = original_action

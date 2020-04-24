@@ -86,14 +86,13 @@ void Input::Update(int32_t width, int32_t height)
 
 int Input::EncodeToBuf(char buf[])
 {
-	// TODO redefine when action encoding is in place
-	// Possibly might be able to store encoding buffer in state, and only update
-	buf[0] = inputs[INPUT_UP] ? '1' : '0';
-	buf[1] = inputs[INPUT_LEFT] ? '1' : '0';
-	buf[2] = inputs[INPUT_DOWN] ? '1' : '0';
-	buf[3] = inputs[INPUT_RIGHT] ? '1' : '0';
+	int move_x = (inputs[INPUT_RIGHT] ? 1 : 0) + (inputs[INPUT_LEFT] ? -1 : 0);
+	int move_z = (inputs[INPUT_UP] ? 1 : 0) + (inputs[INPUT_DOWN] ? -1 : 0);
+	float view_y_rot = 0.0f;
 
-	return 4;
+	((PlayerInput*)buf)[0] = { move_x, move_z, view_y_rot };
+
+	return sizeof(PlayerInput);
 }
 
 void Input::Exit()

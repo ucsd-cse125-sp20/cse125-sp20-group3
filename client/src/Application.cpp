@@ -907,6 +907,7 @@ void Application::Update(float deltaTime)
 	else {
 		scene->updateFromInputBuf(deltaTime);
 	}
+	scene->update(deltaTime);
 
 	pCameraController->moveTo(scene->transforms[0]->M[3].getXYZ() + cameraOffset);
 	pCameraController->lookAt(scene->transforms[0]->M[3].getXYZ() + vec3(0, 0.4f, 0));

@@ -226,8 +226,7 @@
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
     </Manifest>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>"$(OutDir)AssetPipelineCmd.exe" -pa "$(SolutionDir)..\..\..\..\Assets\Animation" "$(SolutionDir)..\..\..\..\Assets\Animation"</Command>
     </PostBuildEvent>
     <CustomBuildStep>
       <Command>
@@ -265,8 +264,7 @@
       <AdditionalOptions>/ignore:4099</AdditionalOptions>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>"$(OutDir)AssetPipelineCmd.exe" -pa "$(SolutionDir)..\..\..\..\Assets\Animation" "$(SolutionDir)..\..\..\..\Assets\Animation"</Command>
     </PostBuildEvent>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
@@ -308,8 +306,7 @@
       <AdditionalOptions>/ignore:4099</AdditionalOptions>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>"$(OutDir)AssetPipelineCmd.exe" -pa "$(SolutionDir)..\..\..\..\Assets\Animation" "$(SolutionDir)..\..\..\..\Assets\Animation"</Command>
     </PostBuildEvent>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
@@ -357,8 +354,7 @@
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
     </Manifest>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>"$(OutDir)AssetPipelineCmd.exe" -pa "$(SolutionDir)..\..\..\..\Assets\Animation" "$(SolutionDir)..\..\..\..\Assets\Animation"</Command>
     </PostBuildEvent>
     <CustomBuildStep>
       <Command>
@@ -400,8 +396,7 @@
       <AdditionalOptions>/ignore:4099</AdditionalOptions>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>"$(OutDir)AssetPipelineCmd.exe" -pa "$(SolutionDir)..\..\..\..\Assets\Animation" "$(SolutionDir)..\..\..\..\Assets\Animation"</Command>
     </PostBuildEvent>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>
@@ -447,8 +442,7 @@
       <AdditionalOptions>/ignore:4099</AdditionalOptions>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>"$(OutDir)AssetPipelineCmd.exe" -pa "$(SolutionDir)..\..\..\..\Assets\Animation" "$(SolutionDir)..\..\..\..\Assets\Animation"</Command>
     </PostBuildEvent>
     <Manifest>
       <EnableDpiAwareness>PerMonitorHighDPIAware</EnableDpiAwareness>

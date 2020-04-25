@@ -21,9 +21,10 @@ int __cdecl main(void)
 	Server* server = new Server();
 	std::map<std::string, GameObject*> idMap;
     int next_id = 0;
-	Player* player = new Player(mat4(1));
+	Player* player = new Player(mat4::identity());
     idMap[std::to_string(next_id)] = player;
     next_id++;
+    bool firstMessage = true;
 
     // Game State data
     float deltaTime = 0.001f;
@@ -40,6 +41,11 @@ int __cdecl main(void)
         ZeroMemory( recvbuf, RECV_BUFLEN );
         iResult = server->recvData(recvbuf, RECV_BUFLEN, 0);
         if (iResult > 0) {
+
+            if (firstMessage) {
+                player->resetClock();
+                firstMessage = false;
+            }
 
             // Process data
 			// read id, handle player input

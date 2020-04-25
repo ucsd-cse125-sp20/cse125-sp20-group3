@@ -4,7 +4,7 @@
 #include "Node.h"
 #include <queue>
 
-#define MAX_GEOMETRY_INSTANCES 50000
+#define MAX_GEOMETRY_INSTANCES 5000
 
 class Geode : public Node 
 {
@@ -23,6 +23,10 @@ public:
 	int selfInstanceCount = 0;
 	std::queue<int> instanceIDs;
 
+	std::queue<vec3> positions;
+	std::queue<bool> shouldCull;
+	float radius = 0.0f;
+
 	Geode();
 	Geode(Object* obj);
 	~Geode();
@@ -31,5 +35,6 @@ public:
 
 	void update(float deltaTime) override;
 	void updateTransformBuffer(BufferUpdateDesc& desc, mat4 parentTransform);
+	void cull(const vec4 planes[6], bool doCull) override;
 	void draw(Cmd* cmd) override;
 };

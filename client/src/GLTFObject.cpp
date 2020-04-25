@@ -193,7 +193,7 @@ void GLTFObject::createNodeTransformsBuffer()
 	const float targetSize = 1.0;
 
 	vec3 modelSize = modelBounds[1] - modelBounds[0];
-	float largestDim = max(modelSize.getX(), max(modelSize.getY(), modelSize.getZ()));
+	radius = 0.5f * sqrt(modelSize[0] * modelSize[0] + modelSize[1] * modelSize[1] + modelSize[2] * modelSize[2]);
 	Point3 modelCentreBase = Point3(
 		0.5f * (modelBounds[0].getX() + modelBounds[1].getX()),
 		modelBounds[0].getY(),

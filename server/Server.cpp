@@ -88,7 +88,6 @@ Server::Server() {
 	// ClientSockets[0] = accept(ListenSocket, NULL, NULL);
 	// //TODO iterate through all the ClientSockets eventually
 	int number_of_clients = 0;
-	sockaddr client_sock[NUM_PLAYERS]; // info on client sockets
 	while (number_of_clients < NUM_PLAYERS) // let MAX_CLIENTS connect
 	{
 		ClientSockets[number_of_clients] = accept (ListenSocket, NULL, NULL); 

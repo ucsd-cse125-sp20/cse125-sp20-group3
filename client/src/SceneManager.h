@@ -9,7 +9,7 @@
 
 #include "Input.h"
 
-#include "../../server/GameObject.h"
+#include "../../common/GameObject.h"
 #include "../../common/player.h"
 #include "../../common/client2server.h"
 

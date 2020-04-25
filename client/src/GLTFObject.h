@@ -68,6 +68,8 @@ public:
 	mat4 model = mat4::identity();
 	vec3 baseColor = vec3(1);
 
+	float radius = 0;
+
 	mat4* initialNodeTransforms, * nodeTransforms;
 
 	static VertexLayout pVertexLayoutModel;

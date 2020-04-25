@@ -2,6 +2,7 @@
 #define _Application_H_
 
 #include <ctime>
+#include <vector>
 
 #include "../The-Forge/Common_3/OS/Interfaces/IApp.h"
 
@@ -19,7 +20,6 @@
 
 #define IMAGE_COUNT 3
 #define LIGHT_COUNT 3
-#define MAX_INSTANCES 50
 
 class Application : public IApp
 {

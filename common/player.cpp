@@ -21,8 +21,8 @@ void Player::update() {
 	
 	velocity_x *= 0.9f;
 	velocity_z *= 0.9f;
-	velocity_x += acceleration_x * deltaTime;
-	velocity_z += acceleration_z * deltaTime;
+	velocity_x += (cos(rotation_y) * acceleration_x - sin(rotation_y) * acceleration_z) * deltaTime;
+	velocity_z += (cos(rotation_y) * acceleration_z + sin(rotation_y) * acceleration_x) * deltaTime;
 	//printf("%f %f %f %f %f\n", velocity_x, velocity_z, acceleration_x, acceleration_z, deltaTime);
 
 	//TODO handle rotation stuff

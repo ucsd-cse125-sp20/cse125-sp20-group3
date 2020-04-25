@@ -6,7 +6,7 @@
 #include <iostream>
 #include <chrono>
 #include <ctime>
-#include "../server/GameObject.h"
+#include "GameObject.h"
 #include "client2server.h"
 
 #define MOVE_SPEED 1

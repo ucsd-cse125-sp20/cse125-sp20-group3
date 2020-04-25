@@ -41,8 +41,30 @@ void Geode::updateTransformBuffer(BufferUpdateDesc& desc, mat4 parentTransform)
 	}
 	int instanceID = instanceCount++;
 	instanceIDs.push(instanceID);
+	positions.push(parentTransform[3].getXYZ());
 	mat4* instanceData = (mat4*)desc.pMappedData;
 	instanceData[instanceID] = parentTransform;
+}
+
+void Geode::cull(const vec4 planes[6], bool doCull)
+{
+	if (!doCull) {
+		shouldCull.push(false);
+		return;
+	}
+	vec3 position = positions.front();
+	positions.pop();
+
+	for (int i = 0; i < 6; ++i)
+	{
+		float distance = dot(position, planes[i].getXYZ()) + planes[i].getW();
+
+		if (distance < -radius) {
+			shouldCull.push(true);
+			return;
+		}
+	}
+	shouldCull.push(false);
 }
 
 void Geode::draw(Cmd* cmd)
@@ -50,12 +72,16 @@ void Geode::draw(Cmd* cmd)
 	countingInstances = false;
 	int instanceID = instanceIDs.front();
 	instanceIDs.pop();
+	bool culling = shouldCull.front();
+	shouldCull.pop();
 
-	cmdBindPipeline(cmd, shader.pipeline);
-	for (int i = 0; i < DESCRIPTOR_UPDATE_FREQ_COUNT; i++) {
-		if (shader.descriptorSets[i])
-			cmdBindDescriptorSet(cmd, i == 0 ? 0 : Application::gFrameIndex, shader.descriptorSets[i]);
+	if (!culling) {
+		cmdBindPipeline(cmd, shader.pipeline);
+		for (int i = 0; i < DESCRIPTOR_UPDATE_FREQ_COUNT; i++) {
+			if (shader.descriptorSets[i])
+				cmdBindDescriptorSet(cmd, i == 0 ? 0 : Application::gFrameIndex, shader.descriptorSets[i]);
+		}
+		cmdBindPushConstants(cmd, shader.rootSignature, "cbRootConstants", &instanceID);
+		obj->draw(cmd);
 	}
-	cmdBindPushConstants(cmd, shader.rootSignature, "cbRootConstants", &instanceID);
-	obj->draw(cmd);
 }

@@ -60,6 +60,7 @@ const uint32_t		gTotalLightCount = gLightCount + 1;
 int					gCurrentLod = 0;
 int					gMaxLod = 5;
 
+bool				bToggleCull = true;
 bool				bToggleFXAA = true;
 bool				bVignetting = true;
 bool				bToggleVSync = false;
@@ -162,10 +163,13 @@ const wchar_t* gMissingTextureString = L"MissingTexture";
 
 const uint			gBackroundColor = { 0xb2b2b2ff };
 static uint			gLightColor[gTotalLightCount] = { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffff66 };
-static float		gLightColorIntensity[gTotalLightCount] = { 2.0f, 0.2f, 0.2f, 0.25f };
+static float		gLightColorIntensity[gTotalLightCount] = { 1.0f, 0.2f, 0.2f, 0.25f };
 static float2		gLightDirection = { -122.0f, 222.0f };
 
-vec3 cameraOffset(0, 20, -10);
+mat4 Application::viewMat = mat4::identity();
+mat4 Application::projMat = mat4::identity();
+
+vec3 cameraOffset(0, 5, -5);
 
 float rot = 0.f;
 
@@ -319,12 +323,13 @@ void Application::InitDebugGui()
 	pGuiWindow->AddWidget(toggleServerButtonWidget);
 	pGuiWindow->AddWidget(SeparatorWidget());
 
+	pGuiWindow->AddWidget(CheckboxWidget("Toggle Culling", &bToggleCull));
 	pGuiWindow->AddWidget(CheckboxWidget("Toggle VSync", &bToggleVSync));
 	pGuiWindow->AddWidget(CheckboxWidget("Enable FXAA", &bToggleFXAA));
 	pGuiWindow->AddWidget(CheckboxWidget("Enable Vignetting", &bVignetting));
 	pGuiWindow->AddWidget(SeparatorWidget());
 
-	CollapsingHeaderWidget LightWidgets("Light Options", false, false);
+	CollapsingHeaderWidget LightWidgets("Light Options");
 	LightWidgets.AddSubWidget(SliderFloatWidget("Light Azimuth", &gLightDirection.x, float(-180.0f), float(180.0f), float(0.001f)));
 	LightWidgets.AddSubWidget(SliderFloatWidget("Light Elevation", &gLightDirection.y, float(210.0f), float(330.0f), float(0.001f)));
 
@@ -385,7 +390,7 @@ void Application::ToggleClient()
 		char recvBuf[DEFAULT_BUFLEN];
 		int bytesReceived = client->recvData(recvBuf, DEFAULT_BUFLEN, 0);
 		GameObject::GameObjectData data = ((GameObject::GameObjectData*)recvBuf)[0];
-		printf("%f %f %f\n", data.x, data.z, data.rot);
+		//printf("%f %f %f\n", data.x, data.z, data.rot);
 		client->sendData("lol", 3, 0);
 	}
 }
@@ -505,9 +510,9 @@ bool Application::Init()
 	ibDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_BUFFER;
 	ibDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_GPU_ONLY;
 	ibDesc.mDesc.mFlags = BUFFER_CREATION_FLAG_NONE;
-	ibDesc.mDesc.mSize = sizeof(mat4) * MAX_INSTANCES;
+	ibDesc.mDesc.mSize = sizeof(mat4) * MAX_GEOMETRY_INSTANCES;
 	ibDesc.mDesc.mFirstElement = 0;
-	ibDesc.mDesc.mElementCount = MAX_INSTANCES;
+	ibDesc.mDesc.mElementCount = MAX_GEOMETRY_INSTANCES;
 	ibDesc.mDesc.mStructStride = sizeof(mat4) - 1;
 	ibDesc.mDesc.pCounterBuffer = NULL;
 	ibDesc.pData = instanceData.data();
@@ -531,17 +536,18 @@ bool Application::Init()
 
 	InitDebugGui();
 
-	// Initialize input system
-	if (!Input::Init(pWindow, &gAppUI, this)) return false;
-
 	// Initialize camera
 	CameraMotionParameters cmp{ 1.0f, 120.0f, 40.0f };
-	vec3                   camPos{ 3.0f, 2.5f, -4.0f };
-	vec3                   lookAt{ 0.0f, 0.4f, 0.0f };
+	vec3                   camPos{ 0.0f, 0.0f, 0.0f };
+	vec3                   lookAt{ 0.0f, 0.0f, 1.0f };
 
 	pLightView = createGuiCameraController(camPos, lookAt);
-	pCameraController = createFpsCameraController(normalize(camPos) * 3.0f, lookAt);
+	pCameraController = createFpsCameraController(camPos, lookAt);
 	pCameraController->setMotionParameters(cmp);
+
+	// Initialize input system
+	if (!Input::Init(pWindow, &gAppUI, this, pCameraController)) 
+		return false;
 
 	// Initialize shaders
 	if (!InitShaderResources())
@@ -870,27 +876,25 @@ void Application::Update(float deltaTime)
 	// Server Contact
 	/************************************************************************/
 	
-	rot += 0.1f;
-
 	if (connected) {
 		int size = Input::EncodeToBuf(sendbuf);
-		//((PlayerInput*)sendbuf)[0].view_y_rot = pCameraController->getRotationXY().getY();
-		((PlayerInput*)sendbuf)[0].view_y_rot = rot;
 		client->sendData(sendbuf, size, 0);
 		client->recvData(recvbuf, DEFAULT_BUFLEN, 0);
+		GameObject::GameObjectData data = ((GameObject::GameObjectData*)recvbuf)[0];
+		printf("%f %f %f\n", data.x, data.z, data.rot);
 	}
 
 	/************************************************************************/
 	// Scene Update
 	/************************************************************************/
 	pCameraController->update(deltaTime);
-	mat4 viewMat = pCameraController->getViewMatrix();
+	Application::viewMat = mat4::translation(vec3(0,-2,10)) * pCameraController->getViewMatrix();
 	const float aspectInverse = (float)mSettings.mHeight / (float)mSettings.mWidth;
 	const float horizontal_fov = PI / 3.0f;
-	mat4 projMat = mat4::perspectiveReverseZ(horizontal_fov, aspectInverse, 0.001f, 1000.0f);
+	Application::projMat = mat4::perspectiveReverseZ(horizontal_fov, aspectInverse, 0.001f, 1000.0f);
 	gUniformData.mProjectView = projMat * viewMat;
 	gUniformData.mModel = mat4::identity();
-	gUniformData.mCameraPosition = vec4(pCameraController->getViewPosition(), 1.0f);
+	gUniformData.mCameraPosition = vec4(pCameraController->getViewPosition() + cameraOffset, 1.0f);
 
 	for (uint i = 0; i < gTotalLightCount; ++i)
 	{
@@ -920,8 +924,8 @@ void Application::Update(float deltaTime)
 	}
 	scene->update(deltaTime);
 
-	pCameraController->moveTo(scene->transforms[0]->M[3].getXYZ() + cameraOffset);
-	pCameraController->lookAt(scene->transforms[0]->M[3].getXYZ() + vec3(0, 0.4f, 0));
+	pCameraController->moveTo(scene->transforms[0]->M[3].getXYZ());
+	//pCameraController->lookAt(scene->transforms[0]->M[3].getXYZ() + vec3(0, 0, 1));
 
 
 	/************************************************************************/
@@ -1034,6 +1038,10 @@ void Application::Draw()
 		cmdBindRenderTargets(cmd, 1, &pRenderTarget, pDepthBuffer, NULL, NULL, NULL, -1, -1);
 		cmdSetViewport(cmd, 0.0f, 0.0f, (float)pRenderTarget->mWidth, (float)pRenderTarget->mHeight, 0.0f, 1.0f);
 		cmdSetScissor(cmd, 0, 0, pRenderTarget->mWidth, pRenderTarget->mHeight);
+
+		vec4 frustumPlanes[6];
+		mat4::extractFrustumClipPlanes(Application::projMat * Application::viewMat, frustumPlanes[0], frustumPlanes[1], frustumPlanes[2], frustumPlanes[3], frustumPlanes[4], frustumPlanes[5], true);
+		scene->cull(frustumPlanes, bToggleCull);
 
 		scene->setProgram(meshShaderDesc);
 		scene->draw(cmd);

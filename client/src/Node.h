@@ -9,4 +9,5 @@ class Node : public Object
 {
 public:
 	virtual void updateTransformBuffer(BufferUpdateDesc& desc, mat4 parentTransform) = 0;
+	virtual void cull(const vec4 planes[6], bool doCull) = 0;
 };

@@ -20,6 +20,7 @@ public:
 //	~GameObject();
 
 	void update();
+	void resetClock();
 
 	void setPosRot(float pos_x, float pos_z, float rot_y);
 	void setMatrix(mat4 m);

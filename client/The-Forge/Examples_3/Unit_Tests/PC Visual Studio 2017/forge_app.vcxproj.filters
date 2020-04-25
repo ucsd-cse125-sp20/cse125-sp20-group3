@@ -57,7 +57,7 @@
     <ClCompile Include="..\..\..\..\src\SceneManager.cpp">
       <Filter>Source Files\Scene Graph</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\server\GAMEOBJECT.CPP">
+    <ClCompile Include="..\..\..\..\..\common\GameObject.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
   </ItemGroup>
@@ -205,7 +205,8 @@
     <ClInclude Include="..\..\..\..\src\SceneManager.h">
       <Filter>Header Files\Scene Graph</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\server\GameObject.h">
+    <ClInclude Include="..\..\..\..\..\common\client2server.h" />
+    <ClInclude Include="..\..\..\..\..\common\GameObject.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
   </ItemGroup>

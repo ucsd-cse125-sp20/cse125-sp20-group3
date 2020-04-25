@@ -98,9 +98,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\common\GameObject.cpp" />
     <ClCompile Include="..\common\ObjectManager.cpp" />
     <ClCompile Include="..\common\player.cpp" />
-    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="server_main.cpp" />
   </ItemGroup>
@@ -108,13 +108,13 @@
     <ClInclude Include="..\common\base.h" />
     <ClInclude Include="..\common\client2server.h" />
     <ClInclude Include="..\common\entity.h" />
+    <ClInclude Include="..\common\GameObject.h" />
     <ClInclude Include="..\common\macros.h" />
     <ClInclude Include="..\common\ObjectManager.h" />
     <ClInclude Include="..\common\player.h" />
     <ClInclude Include="..\common\team.h" />
     <ClInclude Include="..\common\tower.h" />
     <ClInclude Include="..\common\unit.h" />
-    <ClInclude Include="GameObject.h" />
     <ClInclude Include="Server.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

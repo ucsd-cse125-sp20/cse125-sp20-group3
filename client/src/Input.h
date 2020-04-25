@@ -5,6 +5,7 @@
 #include "../../common/client2server.h"
 #include "../../common/macros.h"
 
+#include "../The-Forge/Common_3/OS/Interfaces/ICameraController.h"
 #include "../The-Forge/Common_3/OS/Interfaces/IOperatingSystem.h"
 #include "../The-Forge/Middleware_3/UI/AppUI.h"
 #include "../The-Forge/Common_3/OS/Interfaces/IInput.h"
@@ -23,10 +24,11 @@ public:
 
 	static UIApp* appUI;
 	static IApp* app;
+	static ICameraController* camera;
 
 	static float inputs[InputEnum::INPUT_LAST];
 
-	static bool Init(WindowsDesc* window, UIApp* appUI, IApp* app);
+	static bool Init(WindowsDesc* window, UIApp* appUI, IApp* app, ICameraController* camera);
 
 	static void Update(int32_t width, int32_t height);
 

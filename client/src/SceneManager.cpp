@@ -1,11 +1,10 @@
 #include "SceneManager.h"
 
 namespace {
-	const char* playerFile = "WeirdBox.gltf";
+	const char* playerFile = "female-char.gltf";
 	const char* groundFile = "Ground.gltf";
-	const char* otherFile = "Kyubey.gltf";
-
-	float rot = 0.f;
+	const char* otherFile = "tower-1-laser.gltf";
+	const char* thingFile = "minion-retry.gltf";
 }
 
 SceneManager::SceneManager(Renderer* renderer)
@@ -14,11 +13,15 @@ SceneManager::SceneManager(Renderer* renderer)
 	gltfGeodes.push_back(conf_new(GLTFGeode, renderer, playerFile));
 	gltfGeodes.push_back(conf_new(GLTFGeode, renderer, groundFile));
 	gltfGeodes.push_back(conf_new(GLTFGeode, renderer, otherFile));
+	gltfGeodes.push_back(conf_new(GLTFGeode, renderer, thingFile));
 
 	Transform* t = conf_new(Transform, mat4::identity());
-	t->addChild(gltfGeodes[0]);
+	Transform* t2 = conf_new(Transform, mat4::rotationY(-PI/2));
+	t->addChild(t2);
+	t2->addChild(gltfGeodes[0]);
 	this->addChild(t);
 	transforms.push_back(t);
+	transforms.push_back(t2);
 
 	t = conf_new(Transform, mat4::identity());
 	t->addChild(gltfGeodes[1]);
@@ -26,11 +29,23 @@ SceneManager::SceneManager(Renderer* renderer)
 	transforms.push_back(t);
 
 	srand((unsigned int)time(NULL));
-	for (int i = 0; i < 50; i++) {
-		float x = -50 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (100)));
-		float z = -50 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (100)));
+	for (int i = 0; i < 500; i++) {
+		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
+		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
 		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
-		float s = 0.5f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 0.5f));
+		float s = 1.0f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
+
+		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
+		t = conf_new(Transform, transform);
+		t->addChild(gltfGeodes[3]);
+		this->addChild(t);
+		transforms.push_back(t);
+	}
+	for (int i = 0; i < 100; i++) {
+		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
+		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
+		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
+		float s = 0.75f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 0.5f));
 
 		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
 		t = conf_new(Transform, transform);
@@ -62,11 +77,10 @@ void SceneManager::updateFromClientBuf(char buf[])
 
 void SceneManager::updateFromInputBuf(float deltaTime)
 {
-	rot += 0.1f;
 	char recvbuf[DEFAULT_BUFLEN];
 	Input::EncodeToBuf(recvbuf);
 	PlayerInput input = ((PlayerInput*)recvbuf)[0];
-	input.view_y_rot = rot;
+	//printf("%d %d %f\n", input.move_x, input.move_z, input.view_y_rot);
 	player.setMoveAndDir(input);
 	player.update();
 	transforms[0]->setMatrix(player.getMatrix());

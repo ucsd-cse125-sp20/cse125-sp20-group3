@@ -38,6 +38,13 @@ void Transform::updateTransformBuffer(BufferUpdateDesc& desc, mat4 parentTransfo
 	}
 }
 
+void Transform::cull(const vec4 planes[6], bool doCull)
+{
+	for (auto child : children) {
+		child->cull(planes, doCull);
+	}
+}
+
 void Transform::draw(Cmd* cmd)
 {
 	for (auto child : children) {

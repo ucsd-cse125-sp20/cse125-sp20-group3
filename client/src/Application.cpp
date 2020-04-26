@@ -129,6 +129,7 @@ VirtualJoystickUI   gVirtualJoystick = {};
 Buffer* pUniformBuffer[IMAGE_COUNT] = { NULL };
 Buffer* pInstanceBuffer[IMAGE_COUNT] = { NULL };
 Buffer* pShadowUniformBuffer[IMAGE_COUNT] = { NULL };
+Buffer* pShadowInstanceBuffer[IMAGE_COUNT] = { NULL };
 
 Buffer* TriangularVB = NULL;
 
@@ -138,6 +139,7 @@ Sampler* pBilinearClampSampler = NULL;
 Application::UniformBlock		gUniformData;
 Application::UniformBlock_Shadow gShadowUniformData;
 std::vector<mat4> instanceData;
+std::vector<mat4> shadowInstanceData;
 
 //--------------------------------------------------------------------------------------------
 // THE FORGE OBJECTS
@@ -313,23 +315,28 @@ void Application::RemoveShaderResources()
 void Application::InitDebugGui()
 {
 	GuiDesc guiDesc = {};
-	guiDesc.mStartSize = vec2(300.0f, 250.0f);
-	guiDesc.mStartPosition = vec2(100.0f, guiDesc.mStartSize.getY());
-	pGuiWindow = gAppUI.AddGuiComponent(GetName(), &guiDesc);
+	guiDesc.mStartSize = vec2(400.0f, 20.0f);
+	guiDesc.mStartPosition = vec2(100, 0);
+	pGuiWindow = gAppUI.AddGuiComponent("Client Settings", &guiDesc);
 
-	pGuiWindow->AddWidget(TextboxWidget("Server Name", serverName, serverNameSize));
+	CollapsingHeaderWidget NetworkWidgets("Network Settings", false, false);
+	NetworkWidgets.AddSubWidget(TextboxWidget("Server Name", serverName, serverNameSize));
 	CheckboxWidget toggleServerButtonWidget("Toggle Server Connection", &connected);
 	toggleServerButtonWidget.pOnEdited = Application::ToggleClient;
-	pGuiWindow->AddWidget(toggleServerButtonWidget);
-	pGuiWindow->AddWidget(SeparatorWidget());
+	NetworkWidgets.AddSubWidget(toggleServerButtonWidget);
+	pGuiWindow->AddWidget(NetworkWidgets);
 
-	pGuiWindow->AddWidget(CheckboxWidget("Toggle Culling", &bToggleCull));
-	pGuiWindow->AddWidget(CheckboxWidget("Toggle VSync", &bToggleVSync));
-	pGuiWindow->AddWidget(CheckboxWidget("Enable FXAA", &bToggleFXAA));
-	pGuiWindow->AddWidget(CheckboxWidget("Enable Vignetting", &bVignetting));
-	pGuiWindow->AddWidget(SeparatorWidget());
+	CollapsingHeaderWidget PerformanceWidgets("Performance Settings");
+	PerformanceWidgets.AddSubWidget(CheckboxWidget("Toggle Culling", &bToggleCull));
+	PerformanceWidgets.AddSubWidget(CheckboxWidget("Toggle VSync", &bToggleVSync));
+	pGuiWindow->AddWidget(PerformanceWidgets);
 
-	CollapsingHeaderWidget LightWidgets("Light Options");
+	CollapsingHeaderWidget RenderWidgets("Render Settings");
+	RenderWidgets.AddSubWidget(CheckboxWidget("Enable FXAA", &bToggleFXAA));
+	RenderWidgets.AddSubWidget(CheckboxWidget("Enable Vignetting", &bVignetting));
+	pGuiWindow->AddWidget(RenderWidgets);
+
+	CollapsingHeaderWidget LightWidgets("Lighting Settings");
 	LightWidgets.AddSubWidget(SliderFloatWidget("Light Azimuth", &gLightDirection.x, float(-180.0f), float(180.0f), float(0.001f)));
 	LightWidgets.AddSubWidget(SliderFloatWidget("Light Elevation", &gLightDirection.y, float(210.0f), float(330.0f), float(0.001f)));
 
@@ -345,26 +352,6 @@ void Application::InitDebugGui()
 
 	LightWidgets.AddSubWidget(SeparatorWidget());
 
-	CollapsingHeaderWidget LightColor2Picker("Light2 Color");
-	LightColor2Picker.AddSubWidget(ColorPickerWidget("Light2 Color", &gLightColor[1]));
-	LightWidgets.AddSubWidget(LightColor2Picker);
-
-	CollapsingHeaderWidget LightColor2Intensity("Light2 Intensity");
-	LightColor2Intensity.AddSubWidget(SliderFloatWidget("Light2 Intensity", &gLightColorIntensity[1], 0.0f, 5.0f, 0.001f));
-	LightWidgets.AddSubWidget(LightColor2Intensity);
-
-	LightWidgets.AddSubWidget(SeparatorWidget());
-
-	CollapsingHeaderWidget LightColor3Picker("Light3 Color");
-	LightColor3Picker.AddSubWidget(ColorPickerWidget("Light3 Color", &gLightColor[2]));
-	LightWidgets.AddSubWidget(LightColor3Picker);
-
-	CollapsingHeaderWidget LightColor3Intensity("Light3 Intensity");
-	LightColor3Intensity.AddSubWidget(SliderFloatWidget("Light3 Intensity", &gLightColorIntensity[2], 0.0f, 5.0f, 0.001f));
-	LightWidgets.AddSubWidget(LightColor3Intensity);
-
-	LightWidgets.AddSubWidget(SeparatorWidget());
-
 	CollapsingHeaderWidget AmbientLightColorPicker("Ambient Light Color");
 	AmbientLightColorPicker.AddSubWidget(ColorPickerWidget("Ambient Light Color", &gLightColor[3]));
 	LightWidgets.AddSubWidget(AmbientLightColorPicker);
@@ -372,8 +359,6 @@ void Application::InitDebugGui()
 	CollapsingHeaderWidget LightColor4Intensity("Ambient Light Intensity");
 	LightColor4Intensity.AddSubWidget(SliderFloatWidget("Light Intensity", &gLightColorIntensity[3], 0.0f, 5.0f, 0.001f));
 	LightWidgets.AddSubWidget(LightColor4Intensity);
-
-	LightWidgets.AddSubWidget(SeparatorWidget());
 
 	pGuiWindow->AddWidget(LightWidgets);
 }
@@ -515,10 +500,14 @@ bool Application::Init()
 	ibDesc.mDesc.mElementCount = MAX_GEOMETRY_INSTANCES;
 	ibDesc.mDesc.mStructStride = sizeof(mat4) - 1;
 	ibDesc.mDesc.pCounterBuffer = NULL;
-	ibDesc.pData = instanceData.data();
 	for (uint32_t i = 0; i < Application::gImageCount; ++i)
 	{
+		ibDesc.pData = instanceData.data();
 		ibDesc.ppBuffer = &pInstanceBuffer[i];
+		addResource(&ibDesc, NULL, LOAD_PRIORITY_NORMAL);
+
+		ibDesc.pData = shadowInstanceData.data();
+		ibDesc.ppBuffer = &pShadowInstanceBuffer[i];
 		addResource(&ibDesc, NULL, LOAD_PRIORITY_NORMAL);
 	}
 
@@ -591,6 +580,7 @@ void Application::Exit()
 		removeResource(pShadowUniformBuffer[i]);
 		removeResource(pUniformBuffer[i]);
 		removeResource(pInstanceBuffer[i]);
+		removeResource(pShadowInstanceBuffer[i]);
 	}
 
 	for (uint32_t i = 0; i < Application::gImageCount; ++i)
@@ -647,7 +637,7 @@ void Application::PrepareDescriptorSets()
 			updateDescriptorSet(pRenderer, i, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_FRAME], 1, params);
 
 			params[0].pName = "instanceBuffer";
-			params[0].ppBuffers = &pInstanceBuffer[i];
+			params[0].ppBuffers = &pShadowInstanceBuffer[i];
 			updateDescriptorSet(pRenderer, i, pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_PER_BATCH], 1, params);
 		}
 	}
@@ -896,6 +886,8 @@ void Application::Update(float deltaTime)
 	gUniformData.mModel = mat4::identity();
 	gUniformData.mCameraPosition = vec4(pCameraController->getViewPosition() + cameraOffset, 1.0f);
 
+	mat4 viewProj = Application::projMat * Application::viewMat;
+
 	for (uint i = 0; i < gTotalLightCount; ++i)
 	{
 		gUniformData.mLightColor[i] = vec4(float((gLightColor[i] >> 24) & 0xff),
@@ -916,6 +908,8 @@ void Application::Update(float deltaTime)
 	gUniformData.mLightDirection[1] = vec4(-sunDirection.getX(), sunDirection.getY(), -sunDirection.getZ(), 0.0f);
 	gUniformData.mLightDirection[2] = vec4(-sunDirection.getX(), -sunDirection.getY(), -sunDirection.getZ(), 0.0f);
 
+
+
 	if (connected) {
 		scene->updateFromClientBuf(recvbuf);
 	}
@@ -924,23 +918,33 @@ void Application::Update(float deltaTime)
 	}
 	scene->update(deltaTime);
 
-	pCameraController->moveTo(scene->transforms[0]->M[3].getXYZ());
-	//pCameraController->lookAt(scene->transforms[0]->M[3].getXYZ() + vec3(0, 0, 1));
+	vec3 playerPos = scene->transforms[0]->M[3].getXYZ();
+	pCameraController->moveTo(playerPos);
 
 
 	/************************************************************************/
 	// Light Matrix Update - for shadow map
 	/************************************************************************/
 
-	vec3 lightPos = sunDirection * 4.0f;
-	pLightView->moveTo(lightPos);
-	pLightView->lookAt(vec3(0.0f));
+	vec3 lightPos = sunDirection;
+	pLightView->moveTo(lightPos + playerPos);
+	pLightView->lookAt(vec3(0.0f) + playerPos);
 
 	mat4 lightView = pLightView->getViewMatrix();
 	//perspective as spotlight, for future use. TODO: Use a frustum fitting algorithm to maximise effective resolution!
-	const float shadowRange = 2.7f;
-	//const float shadowHalfRange = shadowRange * 0.5f;
-	mat4 lightProjMat = mat4::orthographicReverseZ(-shadowRange, shadowRange, -shadowRange, shadowRange, shadowRange * 0.5f, shadowRange * 4.0f);
+	vec3 corners[8];
+	getFrustumCorners(viewProj, corners);
+	Point3 bounds[2] = { Point3(FLT_MAX), Point3(-FLT_MAX) };
+	for (int i = 0; i < 8; i++) {
+		vec4 lightSpace = lightView * corners[i];
+		bounds[0] = minPerElem(bounds[0], Point3(lightSpace.getXYZ()));
+		bounds[1] = maxPerElem(bounds[1], Point3(lightSpace.getXYZ()));
+	}
+	//mat4 lightProjMat = mat4::orthographicReverseZ(bounds[0][0], bounds[1][0], bounds[0][1], bounds[1][1], 0, 20);
+
+
+	const float shadowRange = 10.0f;
+	mat4 lightProjMat = mat4::orthographicReverseZ(-shadowRange, shadowRange, -shadowRange, shadowRange, 0, shadowRange * 8.0f);
 
 	gShadowUniformData.ViewProj = lightProjMat * lightView;
 	gUniformData.mShadowLightViewProj = gShadowUniformData.ViewProj;
@@ -985,7 +989,7 @@ void Application::Draw()
 	cmdBeginGpuFrameProfile(cmd, gGpuProfileToken);
 
 	// Draw depth map for shadows
-	//drawShadowMap(cmd);
+	drawShadowMap(cmd);
 
 	// draw scene
 	{
@@ -1022,12 +1026,6 @@ void Application::Draw()
 			meshShaderDesc.descriptorSets[i] = pDescriptorSetsShaded[i];
 		}
 
-		// Update general uniforms
-		shaderCbv = { pUniformBuffer[Application::gFrameIndex] };
-		beginUpdateResource(&shaderCbv);
-		*(UniformBlock*)shaderCbv.pMappedData = gUniformData;
-		endUpdateResource(&shaderCbv, NULL);
-
 		// Update per-instance uniforms
 		shaderCbv = { pInstanceBuffer[Application::gFrameIndex] };
 		beginUpdateResource(&shaderCbv);
@@ -1044,6 +1042,7 @@ void Application::Draw()
 		scene->cull(frustumPlanes, bToggleCull);
 
 		scene->setProgram(meshShaderDesc);
+		GLTFGeode::useMaterials = true;
 		scene->draw(cmd);
 
 		// Unbind render targets
@@ -1140,12 +1139,12 @@ void Application::Draw()
 		//gVirtualJoystick.Draw(cmd, { 1.0f, 1.0f, 1.0f, 1.0f });
 #endif
 
-		cmdDrawCpuProfile(cmd, float2(8.0f, 15.0f), &gFrameTimeDraw);
+		cmdDrawCpuProfile(cmd, float2(8, mSettings.mHeight - 200), &gFrameTimeDraw);
 #if !defined(__ANDROID__)
-		cmdDrawGpuProfile(cmd, float2(8, 40), gGpuProfileToken);
+		cmdDrawGpuProfile(cmd, float2(8, mSettings.mHeight - 160), gGpuProfileToken);
 #endif
 
-		cmdDrawProfilerUI();
+		//cmdDrawProfilerUI();
 
 		gAppUI.Gui(pGuiWindow);
 
@@ -1201,6 +1200,11 @@ void Application::setRenderTarget(Cmd* cmd, uint32_t count, RenderTarget** pDest
 
 void Application::drawShadowMap(Cmd* cmd)
 {
+	// Update uniform buffers
+	BufferUpdateDesc shaderCbv = { pShadowUniformBuffer[gFrameIndex] };
+	beginUpdateResource(&shaderCbv);
+	*(UniformBlock_Shadow*)shaderCbv.pMappedData = gShadowUniformData;
+	endUpdateResource(&shaderCbv, NULL);
 
 	RenderTargetBarrier barriers[] =
 	{
@@ -1217,16 +1221,35 @@ void Application::drawShadowMap(Cmd* cmd)
 
 	cmdBindPipeline(cmd, pPipelineShadowPass);
 
-	// Update uniform buffers
-	/*
-	gShadowUniformData.mModel = player->model;
-	BufferUpdateDesc shaderCbv = { pShadowUniformBuffer[Application::gFrameIndex] };
+	
+
+
+
+	Geode::GeodeShaderDesc meshShaderDesc;
+	meshShaderDesc.rootSignature = pRootSignatureShadow;
+	meshShaderDesc.pipeline = pPipelineShadowPass;
+	for (int i = 0; i < DESCRIPTOR_UPDATE_FREQ_COUNT; i++) {
+		meshShaderDesc.descriptorSets[i] = pDescriptorSetsShadow[i];
+	}
+
+	// Update per-instance uniforms
+	shaderCbv = { pShadowInstanceBuffer[Application::gFrameIndex] };
 	beginUpdateResource(&shaderCbv);
-	*(UniformBlock_Shadow*)shaderCbv.pMappedData = gShadowUniformData;
+	scene->updateTransformBuffer(shaderCbv, mat4::identity());
 	endUpdateResource(&shaderCbv, NULL);
 
-	player->draw(cmd, pRootSignatureShadow, false);
-	*/
+	vec4 frustumPlanes[6];
+	mat4::extractFrustumClipPlanes(gShadowUniformData.ViewProj, frustumPlanes[0], frustumPlanes[1], frustumPlanes[2], frustumPlanes[3], frustumPlanes[4], frustumPlanes[5], true);
+	scene->cull(frustumPlanes, bToggleCull);
+
+	scene->setProgram(meshShaderDesc);
+	GLTFGeode::useMaterials = false;
+	scene->draw(cmd);
+
+
+
+
+
 	setRenderTarget(cmd, 0, NULL, NULL, NULL);
 
 	cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);
@@ -1328,6 +1351,30 @@ bool Application::addDepthBuffer()
 	addRenderTarget(pRenderer, &shadowRTDesc, &pShadowRT);
 
 	return pDepthBuffer != NULL && pShadowRT != NULL;
+}
+
+void Application::getFrustumCorners(mat4 frustum, vec3 corners[8])
+{
+	vec4 ndcCorners[8];
+	ndcCorners[0] = vec4(1, 1, 1, 1);
+	ndcCorners[1] = vec4(-1, 1, 1, 1);
+	ndcCorners[2] = vec4(-1, -1, 1, 1);
+	ndcCorners[3] = vec4(1, -1, 1, 1);
+	ndcCorners[4] = vec4(1, 1, 0, 1);
+	ndcCorners[5] = vec4(-1, 1, 0, 1);
+	ndcCorners[6] = vec4(-1, -1, 0, 1);
+	ndcCorners[7] = vec4(1, -1, 0, 1);
+
+	mat4 invFrustum = inverse(frustum);
+	//print(frustum);
+	//print(invFrustum);
+	for (int i = 0; i < 8; i++) {
+		//print(ndcCorners[i]);
+		ndcCorners[i] = invFrustum  * ndcCorners[i];
+		corners[i] = (ndcCorners[i] / ndcCorners[i][3]).getXYZ();
+		//print(ndcCorners[i]);
+		//print(corners[i]);
+	}
 }
 
 

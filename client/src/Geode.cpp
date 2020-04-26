@@ -36,6 +36,9 @@ void Geode::update(float deltaTime)
 void Geode::updateTransformBuffer(BufferUpdateDesc& desc, mat4 parentTransform)
 {
 	if (!countingInstances) {
+		instanceIDs = std::queue<int>();
+		positions = std::queue<vec3>();
+		shouldCull = std::queue<bool>();
 		countingInstances = true;
 		instanceCount = 0;
 	}
@@ -48,6 +51,7 @@ void Geode::updateTransformBuffer(BufferUpdateDesc& desc, mat4 parentTransform)
 
 void Geode::cull(const vec4 planes[6], bool doCull)
 {
+	countingInstances = false;
 	if (!doCull) {
 		shouldCull.push(false);
 		return;
@@ -69,7 +73,6 @@ void Geode::cull(const vec4 planes[6], bool doCull)
 
 void Geode::draw(Cmd* cmd)
 {
-	countingInstances = false;
 	int instanceID = instanceIDs.front();
 	instanceIDs.pop();
 	bool culling = shouldCull.front();

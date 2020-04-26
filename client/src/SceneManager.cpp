@@ -29,9 +29,10 @@ SceneManager::SceneManager(Renderer* renderer)
 	transforms.push_back(t);
 
 	srand((unsigned int)time(NULL));
-	for (int i = 0; i < 500; i++) {
-		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
-		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
+	float range = 50;
+	for (int i = 0; i < 50; i++) {
+		float x = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
+		float z = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
 		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
 		float s = 1.0f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
 
@@ -41,9 +42,9 @@ SceneManager::SceneManager(Renderer* renderer)
 		this->addChild(t);
 		transforms.push_back(t);
 	}
-	for (int i = 0; i < 100; i++) {
-		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
-		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
+	for (int i = 0; i < 10; i++) {
+		float x = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
+		float z = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
 		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
 		float s = 0.75f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 0.5f));
 

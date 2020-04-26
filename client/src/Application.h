@@ -80,6 +80,8 @@ public:
 	bool addRenderTargets();
 	bool addDepthBuffer();
 
+	static void getFrustumCorners(mat4 frustum, vec3 corners[8]);
+
 	const char* Application::GetName() { return "client"; }
 };
 

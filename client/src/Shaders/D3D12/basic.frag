@@ -433,7 +433,8 @@ PSOut main(PsIn input) : SV_TARGET
 	result *= ao;
 
 	// TODO fix shadows later
-	result += CalcPCFShadowFactor(input.pos) - CalcPCFShadowFactor(input.pos);
+	//result += CalcPCFShadowFactor(input.pos) - CalcPCFShadowFactor(input.pos);
+	result *= CalcPCFShadowFactor(input.pos);
 
 	// Ambeint Light
 	result += baseColor.rgb * lightColor[3].rgb * lightColor[3].a;

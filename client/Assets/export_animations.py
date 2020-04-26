@@ -13,11 +13,14 @@ def select_type(types):
         else:
             o.select_set(False)
     
-output_dir = os.path.splitext(os.path.basename(bpy.context.blend_data.filepath))[0]
+output_dir = os.path.splitext(bpy.context.blend_data.filepath)[0]
+print(os.path.splitext(bpy.context.blend_data.filepath))
 try:
-    original_umask = os.umask(0)
+    original_umask = os.umask(000)
     os.mkdir(output_dir)
     os.mkdir(output_dir + '/animations')
+except FileExistsError:
+    print('reusing directory')
 finally:
     os.umask(original_umask)
 
@@ -72,7 +75,6 @@ if export_animations:
             export_selected=True,
             export_animations=True,
             export_force_sampling=True,
-            export_def_bones=True,
             filepath=output_dir + '/animations/' + action.name + '.gltf',
             check_existing=False
         )

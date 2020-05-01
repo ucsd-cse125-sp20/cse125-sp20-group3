@@ -50,16 +50,21 @@ int __cdecl main(void)
 			// read id, handle player input
             //PlayerInput in = ((PlayerInput*)recvbuf)[0];
 			std::string s(recvbuf);
-			std::cout << "recvbuf: " << s << "\n";
+			//std::cout << "recvbuf: " << s << "\n";
 			if (s != "01234," && s != "0lol,") {
 				int ind = 0;
 				for (int b = 0; b < NUM_PLAYERS; b++) {
 					char player_num = recvbuf[ind];
 					ind++;
 
-					std::cout << "processing player " << player_num << "\n";
+					//std::cout << "processing player " << player_num << "\n";
 
-					PlayerInput input = ((PlayerInput*)recvbuf)[ind]; //TODO modify this to allow for build tower commands
+					int move_x = ((int*)(recvbuf + ind))[0];
+					int move_z = ((int*)(recvbuf + ind))[1];
+					float view_y_rot = ((float*)(recvbuf + ind))[2];
+					//std::cout << "read recvbuf: x: " << move_x << " z: " << move_z << " y: " << view_y_rot << "\n";
+
+					PlayerInput input = ((PlayerInput*)(recvbuf + ind))[0]; //TODO modify this to allow for build tower commands
 					ind += sizeof PlayerInput;
 
 					if (recvbuf[ind] == DELIMITER) {

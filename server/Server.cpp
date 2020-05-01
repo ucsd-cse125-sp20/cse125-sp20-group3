@@ -159,8 +159,15 @@ int Server::recvData(char recvbuf[], int buflen, int flags) {
 			continue;
 		}
 		recvlens[i] = iResult;
-		std::cout << "recvlens from player " << i << ": " << recvlens[i] << "\n";
+		//std::cout << "recvlens from player " << i << ": " << recvlens[i] << "\n";
 		totaliResult += iResult;
+
+		if (recvlens[i] == 12) {
+			int move_x = ((int*)tempbufs[i])[0];
+			int move_z = ((int*)tempbufs[i])[1];
+			float view_y_rot = ((float*)tempbufs[i])[2];
+			//std::cout << "received: x: " << move_x << " z: " << move_z << " y: " << view_y_rot << "\n";
+		}
 	}
 	if (err) return err;
 	int recvbufind = 0;
@@ -171,17 +178,18 @@ int Server::recvData(char recvbuf[], int buflen, int flags) {
 		recvbuf[recvbufind] = player_num; //write player number to recvbuf
 		recvbufind++;
 
-		if (recvlens[i] == 12) {
-			float move_x = (float)(tempbufs[i][0]);
-			float move_z = (float)(tempbufs[i][4]);
-			float view_y_rot = (float)(tempbufs[i][8]);
-
-			std::cout << "Server recv: move_x: " << move_x << " move_z: " << move_z << " rot_y: " << view_y_rot << "\n";
-		}
+		int begin_data_ind = recvbufind;
 
 		for (int j = 0; j < recvlens[i]; j++) {
 			recvbuf[recvbufind] = tempbufs[i][j];
 			recvbufind++;
+		}
+
+		if (recvlens[i] == 12) {
+			int move_x = ((int*)(recvbuf + begin_data_ind))[0];
+			int move_z = ((int*)(recvbuf + begin_data_ind))[1];
+			float view_y_rot = ((float*)(recvbuf + begin_data_ind))[2];
+			//std::cout << "wrote to recvbuf: x: " << move_x << " z: " << move_z << " y: " << view_y_rot << "\n";
 		}
 
 		recvbuf[recvbufind] = DELIMITER;

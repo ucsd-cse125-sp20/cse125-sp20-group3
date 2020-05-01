@@ -1,19 +1,24 @@
-#include "OBJObject.h"
+#ifndef _ENTITY_H_
+#define _ENTITY_H_
+
+#include "GameObject.h"
 #include "team.h"
 #include <iostream>
 #include <chrono>
 #include <ctime>
 
-class Entity : public OBJObject {
+class Entity : public GameObject {
 private:
-        int health;
-        int attack;
-        Team team;
+    int health;
+    int attack;
+    Team* team;
 public:
-        Entity(std::string objFilename);
-        Entity();
-        ~Entity();
-        void update();
-        void updateHealth(int attack);
-        bool isEnemyTeam(Team checkTeam);
+	Entity() : GameObject() {};
+	Entity(mat4 m) : GameObject(m) {};
+	void update() { GameObject::update(); }
+    bool isEnemyTeam(Team* checkTeam);
+	int getHealth() { return health; }
+	void updateHealth(int attack);
 };
+
+#endif

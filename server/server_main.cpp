@@ -6,7 +6,8 @@
 #include <map>
 #include <iostream>
 #include "Server.h"
-#include "GameObject.h"
+#include "SceneManager_Server.h"
+#include "../common/GameObject.h"
 #include "../common/client2server.h"
 
 int __cdecl main(void)
@@ -15,15 +16,13 @@ int __cdecl main(void)
     int iResult;
 	int iSendResult;
     char sendbuf[DEFAULT_BUFLEN] = "I'm server";
-	const int RECV_BUFLEN = DEFAULT_BUFLEN * NUM_PLAYERS;
+	//recvbuf structure: [(player number + received bytes + delimiter) for each player]
+	const int RECV_BUFLEN = NUM_PLAYERS + (DEFAULT_BUFLEN * NUM_PLAYERS) + NUM_PLAYERS; //worst case, player num + default buflen + delim
     char recvbuf[RECV_BUFLEN];
 
 	Server* server = new Server();
-	std::map<std::string, GameObject*> idMap;
-    int next_id = 0;
+	SceneManager_Server* manager = new SceneManager_Server();
 	Player* player = new Player(mat4::identity());
-    idMap[std::to_string(next_id)] = player;
-    next_id++;
     bool firstMessage = true;
 
     // Game State data
@@ -49,18 +48,37 @@ int __cdecl main(void)
 
             // Process data
 			// read id, handle player input
-            PlayerInput in = ((PlayerInput*)recvbuf)[0];
-			//populate in with received data
+            //PlayerInput in = ((PlayerInput*)recvbuf)[0];
+			std::string s(recvbuf);
+			std::cout << "recvbuf: " << s << "\n";
+			if (s != "01234," && s != "0lol,") {
+				int ind = 0;
+				for (int b = 0; b < NUM_PLAYERS; b++) {
+					char player_num = recvbuf[ind];
+					ind++;
 
-			player->setMoveAndDir(in);
+					std::cout << "processing player " << player_num << "\n";
+
+					PlayerInput input = ((PlayerInput*)recvbuf)[ind]; //TODO modify this to allow for build tower commands
+					ind += sizeof PlayerInput;
+
+					if (recvbuf[ind] == DELIMITER) {
+						manager->processInput(std::string(1, player_num), input);
+					}
+					else {
+						std::cout << "buf size mismatch in receive, delimiter not found when expected\n";
+					}
+					ind++;
+				}
+			}
 
 			//Update Game State
-			player->update();
+			manager->update();
 
 			//Send updated data back to clients
-			float sendbufSize = 0;
-            player->setData(sendbuf, 0);
-            sendbufSize += sizeof(GameObject::GameObjectData);
+			float sendbufSize = manager->encodeScene(sendbuf);
+            //player->setData(sendbuf, 0);
+            //sendbufSize += sizeof(GameObject::GameObjectData);
 			//std::cout << "sending " << sendbuf << std::endl;
             iSendResult = server->sendData(sendbuf, sendbufSize, 0);
             if (iSendResult == -1) {

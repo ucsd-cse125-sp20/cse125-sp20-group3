@@ -202,12 +202,14 @@
     <ClInclude Include="..\..\..\..\..\common\unit.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\SceneManager.h">
-      <Filter>Header Files\Scene Graph</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\common\client2server.h" />
     <ClInclude Include="..\..\..\..\..\common\GameObject.h">
       <Filter>Header Files\Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\client2server.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\SceneManager_Client.h">
+      <Filter>Header Files\Scene Graph</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

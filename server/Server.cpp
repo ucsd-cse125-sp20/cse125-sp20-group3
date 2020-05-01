@@ -143,26 +143,49 @@ int Server::recvData(char recvbuf[], int buflen, int flags) {
 	int iResult;
 	int totaliResult = 0;
 	char tempbufs[NUM_PLAYERS][DEFAULT_BUFLEN];
+	int recvlens[NUM_PLAYERS];
 	ZeroMemory(tempbufs, sizeof(tempbufs));
 
 	for (int i = 0; i < NUM_PLAYERS; i++) {
 		//ZeroMemory(tempbufs, sizeof(tempbufs));
+		//std::cout << "recving from player " << i << "\n";
 		iResult = recv(ClientSockets[i], tempbufs[i], DEFAULT_BUFLEN, flags);
 		if (iResult == SOCKET_ERROR) {
-			std::cout << "send failed with error: " << WSAGetLastError() << std::endl;
+			std::cout << "recv failed with error: " << WSAGetLastError() << std::endl;
 			closesocket(ClientSockets[i]);
 			WSACleanup();
 			err = -1;
+			recvlens[i] = 0;
 			continue;
 		}
+		recvlens[i] = iResult;
+		std::cout << "recvlens from player " << i << ": " << recvlens[i] << "\n";
 		totaliResult += iResult;
 	}
 	if (err) return err;
 	int recvbufind = 0;
 	for (int i = 0; i < NUM_PLAYERS; i++) {
-		for (int j = 0; j < DEFAULT_BUFLEN; j++, recvbufind++) {
-			recvbuf[recvbufind] = tempbufs[i][j];
+		char player_num = std::to_string(i).c_str()[0]; //convert player index in sockets array to char
+		
+		//std::cout << "writing recvbuf for player " << player_num << "\n";
+		recvbuf[recvbufind] = player_num; //write player number to recvbuf
+		recvbufind++;
+
+		if (recvlens[i] == 12) {
+			float move_x = (float)(tempbufs[i][0]);
+			float move_z = (float)(tempbufs[i][4]);
+			float view_y_rot = (float)(tempbufs[i][8]);
+
+			std::cout << "Server recv: move_x: " << move_x << " move_z: " << move_z << " rot_y: " << view_y_rot << "\n";
 		}
+
+		for (int j = 0; j < recvlens[i]; j++) {
+			recvbuf[recvbufind] = tempbufs[i][j];
+			recvbufind++;
+		}
+
+		recvbuf[recvbufind] = DELIMITER;
+		recvbufind++;
 	}
 	return totaliResult;
 }

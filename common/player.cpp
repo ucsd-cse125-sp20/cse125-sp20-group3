@@ -1,15 +1,13 @@
 #include "player.h"
 
-Player::Player(mat4 model_mat, std::string objFilename) : GameObject(model_mat) {
-    //TODO create a geometry
-	velocity_x = 0.f;
-	velocity_z = 0.f;
-	lastTime = std::chrono::steady_clock::now();
+Player::Player() : Entity() {
+
 }
 
-Player::Player(mat4 model_mat) : GameObject(model_mat) {
+Player::Player(mat4 model_mat) : Entity(model_mat) {
 	velocity_x = 0.f;
 	velocity_z = 0.f;
+	rotation_y = 0.f;
 	acceleration_x = 0.f;
 	acceleration_z = 0.f;
 	lastTime = std::chrono::steady_clock::now();
@@ -17,7 +15,7 @@ Player::Player(mat4 model_mat) : GameObject(model_mat) {
 
 void Player::update() {
 	//should only execute on the server
-	GameObject::update();
+	Entity::update();
 	
 	velocity_x *= 0.9f;
 	velocity_z *= 0.9f;

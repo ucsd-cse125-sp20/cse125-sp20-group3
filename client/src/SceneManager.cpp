@@ -1,4 +1,4 @@
-#include "SceneManager.h"
+#include "SceneManager_Client.h"
 
 namespace {
 	const char* playerFile = "female-char.gltf";
@@ -7,7 +7,7 @@ namespace {
 	const char* thingFile = "minion-retry.gltf";
 }
 
-SceneManager::SceneManager(Renderer* renderer)
+SceneManager_Client::SceneManager_Client(Renderer* renderer)
 {
 	// It'd be nice if I could put this in a loop later
 	gltfGeodes.push_back(conf_new(GLTFGeode, renderer, playerFile));
@@ -55,27 +55,27 @@ SceneManager::SceneManager(Renderer* renderer)
 	}
 }
 
-SceneManager::~SceneManager()
+SceneManager_Client::~SceneManager_Client()
 {
 	for (auto t : transforms) conf_delete(t);
 	for (auto g : gltfGeodes) conf_delete(g);
 }
 
-void SceneManager::createMaterialResources(RootSignature* pRootSignature, DescriptorSet* pBindlessTexturesSamplersSet, Sampler* defaultSampler)
+void SceneManager_Client::createMaterialResources(RootSignature* pRootSignature, DescriptorSet* pBindlessTexturesSamplersSet, Sampler* defaultSampler)
 {
 	for (auto g : gltfGeodes) {
 		g->createMaterialResources(pRootSignature, pBindlessTexturesSamplersSet, defaultSampler);
 	}
 }
 
-void SceneManager::updateFromClientBuf(char buf[])
+void SceneManager_Client::updateFromClientBuf(char buf[])
 {
 	GameObject::GameObjectData data = ((GameObject::GameObjectData*)buf)[0];
 	player.setPosRot(data.x, data.z, data.rot);
 	transforms[0]->setMatrix(player.getMatrix());
 }
 
-void SceneManager::updateFromInputBuf(float deltaTime)
+void SceneManager_Client::updateFromInputBuf(float deltaTime)
 {
 	char recvbuf[DEFAULT_BUFLEN];
 	Input::EncodeToBuf(recvbuf);
@@ -86,7 +86,7 @@ void SceneManager::updateFromInputBuf(float deltaTime)
 	transforms[0]->setMatrix(player.getMatrix());
 }
 
-void SceneManager::setProgram(Geode::GeodeShaderDesc program)
+void SceneManager_Client::setProgram(Geode::GeodeShaderDesc program)
 {
 	for (auto g : gltfGeodes) {
 		g->setProgram(program);

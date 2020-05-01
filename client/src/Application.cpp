@@ -173,7 +173,7 @@ vec3 cameraOffset(0, 5, -5);
 
 float rot = 0.f;
 
-SceneManager* scene;
+SceneManager_Client* scene;
 
 bool connected = false;
 const int serverNameSize = 32;
@@ -199,7 +199,7 @@ Application::Application()
 
 bool Application::InitSceneResources()
 {
-	scene = conf_new(SceneManager, pRenderer);
+	scene = conf_new(SceneManager_Client, pRenderer);
 
 	waitForAllResourceLoads();
 

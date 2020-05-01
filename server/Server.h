@@ -1,3 +1,6 @@
+#ifndef _SERVER_H_
+#define _SERVER_H_
+
 #define WIN32_LEAN_AND_MEAN
 
 #pragma once
@@ -26,3 +29,5 @@ public:
 	int recvData(char recvbuf[], int buflen, int flags); //recv data from clients
 	int cleanup(int how); //close all clients' connections with server
 };
+
+#endif

@@ -9,11 +9,13 @@
 
 #include "Input.h"
 
+#include "../../common/macros.h"
 #include "../../common/GameObject.h"
+#include "../../common/entity.h"
 #include "../../common/player.h"
 #include "../../common/client2server.h"
 
-class SceneManager : public Transform
+class SceneManager_Client : public Transform
 {
 public:
 	// This vector should eventually be split between tracked objects and client only objects
@@ -25,8 +27,8 @@ public:
 	// Would likely like to create a single Game object that contains all game components
 	Player player = Player(mat4::identity());
 
-	SceneManager(Renderer* renderer);
-	~SceneManager();
+	SceneManager_Client(Renderer* renderer);
+	~SceneManager_Client();
 
 	void createMaterialResources(RootSignature* pRootSignature, DescriptorSet* pBindlessTexturesSamplersSet, Sampler* defaultSampler);
 

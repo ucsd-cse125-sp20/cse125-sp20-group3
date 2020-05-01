@@ -682,6 +682,7 @@ bool AssetPipeline::CreateRuntimeSkeleton(
 			cgltf_node* bone = skin->joints[j];
 			for (uint k = 0; k < (uint)nodeData.size(); ++k)
 			{
+				printf("marked bone %s ?= %s\n", nodeData[k].mName, std::string(bone->name));
 				if (nodeData[k].mName == eastl::string(bone->name))
 				{
 					int nodeIndex = k;

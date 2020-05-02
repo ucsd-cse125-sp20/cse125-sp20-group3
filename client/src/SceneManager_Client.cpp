@@ -70,8 +70,58 @@ void SceneManager_Client::createMaterialResources(RootSignature* pRootSignature,
 
 void SceneManager_Client::updateFromClientBuf(char buf[])
 {
+	/*std::string id_str = "";
+	GameObject::GameObjectData data;
+	int health;
+	int state = 0; // 0 for reading id, 1 for reading gameobjectdata, 2 for reading health
+	for (int i = 0; i < DEFAULT_BUFLEN; i++) {
+		if (buf[i] == DELIMITER) {
+			if (state == 2) {
+				std::cout << "id: " << id_str << " x: " << data.x << " z: " << data.z << " y: " << data.rot << " health: " << health << "\n";
+				if (idMap.find(id_str) == idMap.end()) { //new id encountered, spawn new object
+					if (ID_PLAYER_MIN < stoi(id_str) || stoi(id_str) < ID_PLAYER_MAX) {
+						//idMap[id_str] = new Player();
+					}
+					else if (ID_BASE_MIN < stoi(id_str) || stoi(id_str) < ID_BASE_MAX) {
+						//idMap[id_str] = new Base();
+					}
+					else if (ID_MINION_MIN < stoi(id_str) || stoi(id_str) < ID_MINION_MAX) {
+						//idMap[id_str] = new Minion();
+					}
+					else if (ID_TOWER_MIN < stoi(id_str) || stoi(id_str) < ID_TOWER_MAX) {
+						//idMap[id_str] = new Tower();
+					}
+					else if (ID_RESOURCE_MIN < stoi(id_str) || stoi(id_str) < ID_RESOURCE_MAX) {
+						//idMap[id_str] = new Resource();
+					}
+				}
+				idMap[id_str]->setData(data);
+				idMap[id_str]->setHealth(health);
+				state = 0;
+				id_str = "";
+			}
+			else state++;
+		}
+		else {
+			if (state == 0) {
+				id_str += buf[i];
+			}
+			else if (state == 1) {
+				data = ((GameObject::GameObjectData*)(buf + i))[0];
+				i += (sizeof GameObject::GameObjectData) - 1; //-1 to account for i++
+			}
+			else if (state == 2) {
+				health = ((int*)(buf + i))[0];
+				i += sizeof(int) - 1; //-1 to account for i++
+			}
+			else {
+				std::cout << "SceneManager_Client updateFromClientBuf state out of sync";
+			}
+		}
+
+	}*/
 	GameObject::GameObjectData data = ((GameObject::GameObjectData*)buf)[0];
-	player.setPosRot(data.x, data.z, data.rot);
+	player.setData(data);
 	transforms[0]->setMatrix(player.getMatrix());
 }
 

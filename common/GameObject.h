@@ -22,9 +22,9 @@ public:
 	virtual void update();
 	void resetClock();
 
-	void setPosRot(float pos_x, float pos_z, float rot_y);
+	void setData(GameObjectData data);
 	void setMatrix(mat4 m);
 	mat4 getMatrix();
 
-	int setData(char buf[], int index);
+	int writeData(char buf[], int index);
 };

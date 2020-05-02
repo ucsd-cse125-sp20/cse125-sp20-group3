@@ -7,6 +7,7 @@
 #include <ctime>
 #include "entity.h"
 #include "client2server.h"
+#include "macros.h"
 
 #define MOVE_SPEED 1
 

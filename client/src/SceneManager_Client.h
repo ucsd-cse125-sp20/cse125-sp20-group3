@@ -3,6 +3,7 @@
 #include "../The-Forge/Common_3/Renderer/IRenderer.h"
 
 #include <ctime>
+#include <map>
 
 #include "Transform.h"
 #include "GLTFGeode.h"
@@ -17,6 +18,9 @@
 
 class SceneManager_Client : public Transform
 {
+private:
+	//std::map<std::string, Entity*> idMap;
+
 public:
 	// This vector should eventually be split between tracked objects and client only objects
 	std::vector<Transform*> transforms;

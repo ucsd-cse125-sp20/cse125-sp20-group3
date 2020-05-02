@@ -1,6 +1,6 @@
 #include "player.h"
 
-Player::Player() : Entity() {
+Player::Player() : Entity(PLAYER_HEALTH, PLAYER_ATTACK) {
 	velocity_x = 0.f;
 	velocity_z = 0.f;
 	rotation_y = 0.f;
@@ -8,7 +8,7 @@ Player::Player() : Entity() {
 	acceleration_z = 0.f;
 }
 
-Player::Player(mat4 model_mat) : Entity(model_mat) {
+Player::Player(mat4 model_mat) : Entity(PLAYER_HEALTH, PLAYER_ATTACK, model_mat) {
 	velocity_x = 0.f;
 	velocity_z = 0.f;
 	rotation_y = 0.f;

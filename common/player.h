@@ -20,7 +20,7 @@ public:
     Player(); //client-side, init nothing
     Player(mat4 model_mat); //server-side, only init state management logic
 	
-    void update(); //server-side state management
+    void update() override; //server-side state management
 	void setVelocity(float vel_x, float vel_z);
 	void setMoveAndDir(PlayerInput in);
 

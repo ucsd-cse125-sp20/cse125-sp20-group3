@@ -17,7 +17,6 @@
 #define ID_RESOURCE_MIN 4000
 #define ID_RESOURCE_MAX 4999
 
-#define PLAYER_TYPE 'p'
 #define BASE_TYPE 'b'
 #define MINION_TYPE 'm'
 #define TOWER_TYPE 't'

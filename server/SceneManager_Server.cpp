@@ -9,18 +9,11 @@ SceneManager_Server::SceneManager_Server() {
 
 	//team1 = new Team();
 	//team2 = new Team();
-
-	//hardcode
-	p = new Player();
 }
 
 void SceneManager_Server::processInput(std::string player, PlayerInput in) {
-	//((Player*)idMap[player])->setMoveAndDir(in);
-	std::cout << "processing input for player " << player << ": " << in.move_x << " " << in.move_z << " " << in.view_y_rot << "\n";
-
-	//hardcode
-	//((Player*)(idMap["0"]))->setMoveAndDir(in);
-	p->setMoveAndDir(in);
+	((Player*)idMap[player])->setMoveAndDir(in);
+	//std::cout << "processing input for player " << player << ": " << in.move_x << " " << in.move_z << " " << in.view_y_rot << "\n";
 }
 
 std::string SceneManager_Server::addPlayer(std::string player_id) {
@@ -29,24 +22,55 @@ std::string SceneManager_Server::addPlayer(std::string player_id) {
 	return player_id;
 }
 
-void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, float y_rot) {
+void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, float rot_y) {
+	/*Entity* ent;
+	int id_int;
 
+	switch (spawnType) { //WARN: possible id wrap issues
+	case BASE_TYPE:
+		ent = new Base();
+		id_int = next_base_id;
+		next_base_id++;
+		if (next_base_id == ID_BASE_MAX) next_base_id = ID_BASE_MIN;
+		break;
+	case MINION_TYPE:
+		ent = new Minion();
+		id_int = next_minion_id;
+		next_minion_id++;
+		if (next_minion_id == ID_MINION_MAX) next_minion_id = ID_MINION_MIN;
+		break;
+	case TOWER_TYPE:
+		ent = new Tower();
+		id_int = next_tower_id;
+		next_tower_id++;
+		if (next_tower_id == ID_TOWER_MAX) next_tower_id = ID_TOWER_MIN;
+		break;
+	case RESOURCE_TYPE:
+		ent = new Resource();
+		id_int = next_resource_id;
+		next_resource_id++;
+		if (next_resource_id == ID_RESOURCE_MAX) next_resource_id = ID_RESOURCE_MIN;
+		break;
+	default:
+		ent = new Minion();
+		id_int = -1;
+		std::cout << "spawnEntity encountered unknown entity type\n";
+	}
+
+	ent->setPosRot(pos_x, pos_z, rot_y);
+	idMap[std::to_string(id_int)] = ent;*/
 }
 
 void SceneManager_Server::resetClocks() {
-	/*for (std::pair<std::string, Entity*> idEntPair : idMap) {
+	for (std::pair<std::string, Entity*> idEntPair : idMap) {
 		idEntPair.second->resetClock();
-	}*/
-	//idMap["0"]->resetClock();
-	p->resetClock();
+	}
 }
 
 void SceneManager_Server::update() {
-	/*for (std::pair<std::string, Entity*> idEntPair: idMap) {
+	for (std::pair<std::string, Entity*> idEntPair: idMap) {
 		idEntPair.second->update();
-	}*/
-	//idMap["0"]->update();
-	p->update();
+	}
 }
 
 int SceneManager_Server::encodeScene(char buf[]) {
@@ -56,6 +80,7 @@ int SceneManager_Server::encodeScene(char buf[]) {
 	 * ...
 	 */
 
+	//TODO implement SceneManager_Client to process data in this format
 	/*int i = 0;
 	for (std::pair<std::string, Entity*> idEntPair : idMap) { //iterate through all entities in scene
 		strncpy(buf + i, idEntPair.first.c_str(), idEntPair.first.length()); //write id bytes without null term
@@ -78,7 +103,6 @@ int SceneManager_Server::encodeScene(char buf[]) {
 
 	return i;*/
 
-	//idMap["0"]->setData(buf, 0);
-	p->setData(buf, 0);
+	idMap["0"]->setData(buf, 0);
 	return sizeof(GameObject::GameObjectData);
 }

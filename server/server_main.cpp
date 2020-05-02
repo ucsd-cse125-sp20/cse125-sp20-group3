@@ -30,7 +30,7 @@ int __cdecl main(void)
 
     std::cout << "server started" << std::endl;
 
-	manager->addPlayer("0");
+	manager->addPlayer("0"); //TODO change this to happen on client connection
 
     // Receive until the peer shuts down the connection
     do {
@@ -50,7 +50,6 @@ int __cdecl main(void)
 
             // Process data
 			// read id, handle player input
-            //PlayerInput in = ((PlayerInput*)recvbuf)[0];
 			std::string s(recvbuf);
 			//std::cout << "recvbuf: " << s << "\n";
 			if (s != "01234," && s != "0lol,") {
@@ -61,10 +60,10 @@ int __cdecl main(void)
 
 					//std::cout << "processing player " << player_num << "\n";
 
-					int move_x = ((int*)(recvbuf + ind))[0];
+					/*int move_x = ((int*)(recvbuf + ind))[0];
 					int move_z = ((int*)(recvbuf + ind))[1];
 					float view_y_rot = ((float*)(recvbuf + ind))[2];
-					//std::cout << "read recvbuf: x: " << move_x << " z: " << move_z << " y: " << view_y_rot << "\n";
+					std::cout << "read recvbuf: x: " << move_x << " z: " << move_z << " y: " << view_y_rot << "\n";*/
 
 					PlayerInput input = ((PlayerInput*)(recvbuf + ind))[0]; //TODO modify this to allow for build tower commands
 					ind += sizeof PlayerInput;
@@ -84,12 +83,10 @@ int __cdecl main(void)
 
 			//Send updated data back to clients
 			float sendbufSize = manager->encodeScene(sendbuf);
-			float xpos = ((float*)sendbuf)[0];
-			float zpos = ((float*)sendbuf)[1];
-			float yrot = ((float*)sendbuf)[2];
-			std::cout << "sending x: " << xpos << " z: " << zpos << " y: " << yrot << "\n";
-            //player->setData(sendbuf, 0);
-            //sendbufSize += sizeof(GameObject::GameObjectData);
+			//float xpos = ((float*)sendbuf)[0];
+			//float zpos = ((float*)sendbuf)[1];
+			//float yrot = ((float*)sendbuf)[2];
+			//std::cout << "sending x: " << xpos << " z: " << zpos << " y: " << yrot << "\n";
 			//std::cout << "sending " << sendbuf << std::endl;
             iSendResult = server->sendData(sendbuf, sendbufSize, 0);
             if (iSendResult == -1) {

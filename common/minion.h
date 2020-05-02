@@ -4,12 +4,12 @@
 #include <chrono>
 #include <ctime>
 
-class Unit : public Entity {
+class Minion : public Entity {
 private:
         Entity attackTarget;
 public:
-        Unit(std::string objFilename);
-        Unit();
-        ~Unit();
-        void update();
+        Minion(std::string objFilename);
+        Minion();
+        ~Minion();
+        void update() override;
 };

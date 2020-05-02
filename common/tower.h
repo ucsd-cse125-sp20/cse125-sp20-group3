@@ -1,4 +1,4 @@
-#include "OBJObject.h"
+#include "entity.h"
 #include "team.h"
 #include <iostream>
 #include <chrono>
@@ -9,5 +9,5 @@ public:
         Tower(std::string objFilename);
         Tower();
         ~Tower();
-        void update();
+        void update() override;
 };

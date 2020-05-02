@@ -19,7 +19,7 @@ public:
 	
 //	~GameObject();
 
-	void update();
+	virtual void update();
 	void resetClock();
 
 	void setPosRot(float pos_x, float pos_z, float rot_y);

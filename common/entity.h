@@ -8,14 +8,14 @@
 #include <ctime>
 
 class Entity : public GameObject {
-private:
+protected:
     int health;
     int attack;
     Team* team;
 public:
 	Entity() : GameObject() {};
 	Entity(mat4 m) : GameObject(m) {};
-	void update() { GameObject::update(); }
+	void update() override { GameObject::update(); }
     bool isEnemyTeam(Team* checkTeam);
 	int getHealth() { return health; }
 	void updateHealth(int attack);

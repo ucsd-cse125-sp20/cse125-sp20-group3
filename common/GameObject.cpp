@@ -2,6 +2,7 @@
 
 GameObject::GameObject() {
 	model = mat4::identity();
+	lastTime = std::chrono::steady_clock::now();
 }
 
 void GameObject::update() {

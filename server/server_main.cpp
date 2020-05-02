@@ -22,13 +22,15 @@ int __cdecl main(void)
 
 	Server* server = new Server();
 	SceneManager_Server* manager = new SceneManager_Server();
-	Player* player = new Player(mat4::identity());
+	//Player* player = new Player(mat4::identity());
     bool firstMessage = true;
 
     // Game State data
     float deltaTime = 0.001f;
 
     std::cout << "server started" << std::endl;
+
+	manager->addPlayer("0");
 
     // Receive until the peer shuts down the connection
     do {
@@ -42,7 +44,7 @@ int __cdecl main(void)
         if (iResult > 0) {
 
             if (firstMessage) {
-                player->resetClock();
+                manager->resetClocks();
                 firstMessage = false;
             }
 
@@ -75,13 +77,17 @@ int __cdecl main(void)
 					}
 					ind++;
 				}
-			}
 
-			//Update Game State
-			manager->update();
+				//Update Game State
+				manager->update();
+			}
 
 			//Send updated data back to clients
 			float sendbufSize = manager->encodeScene(sendbuf);
+			float xpos = ((float*)sendbuf)[0];
+			float zpos = ((float*)sendbuf)[1];
+			float yrot = ((float*)sendbuf)[2];
+			std::cout << "sending x: " << xpos << " z: " << zpos << " y: " << yrot << "\n";
             //player->setData(sendbuf, 0);
             //sendbufSize += sizeof(GameObject::GameObjectData);
 			//std::cout << "sending " << sendbuf << std::endl;

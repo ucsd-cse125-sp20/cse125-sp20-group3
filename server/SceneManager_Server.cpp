@@ -19,17 +19,34 @@ void SceneManager_Server::processInput(std::string player, PlayerInput in) {
 	std::cout << "processing input for player " << player << ": " << in.move_x << " " << in.move_z << " " << in.view_y_rot << "\n";
 
 	//hardcode
+	//((Player*)(idMap["0"]))->setMoveAndDir(in);
 	p->setMoveAndDir(in);
+}
+
+std::string SceneManager_Server::addPlayer(std::string player_id) {
+	idMap[player_id] = new Player();
+	//std::cout << "created new player id: " << player_id << " at " << idMap[player_id] << "\n";
+	return player_id;
 }
 
 void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, float y_rot) {
 
 }
 
+void SceneManager_Server::resetClocks() {
+	/*for (std::pair<std::string, Entity*> idEntPair : idMap) {
+		idEntPair.second->resetClock();
+	}*/
+	//idMap["0"]->resetClock();
+	p->resetClock();
+}
+
 void SceneManager_Server::update() {
-	for (std::pair<std::string, Entity*> idEntPair: idMap) {
+	/*for (std::pair<std::string, Entity*> idEntPair: idMap) {
 		idEntPair.second->update();
-	}
+	}*/
+	//idMap["0"]->update();
+	p->update();
 }
 
 int SceneManager_Server::encodeScene(char buf[]) {
@@ -41,8 +58,8 @@ int SceneManager_Server::encodeScene(char buf[]) {
 
 	/*int i = 0;
 	for (std::pair<std::string, Entity*> idEntPair : idMap) { //iterate through all entities in scene
-		strncpy(buf + i, idEntPair.first.c_str(), idEntPair.first.length); //write id bytes without null term
-		i += idEntPair.first.length;
+		strncpy(buf + i, idEntPair.first.c_str(), idEntPair.first.length()); //write id bytes without null term
+		i += idEntPair.first.length();
 
 		buf[i] = DELIMITER; //write delimiter
 		i++;
@@ -57,8 +74,11 @@ int SceneManager_Server::encodeScene(char buf[]) {
 
 		buf[i] = DELIMITER; //write delimiter
 		i++;
-	}*/
+	}
 
+	return i;*/
+
+	//idMap["0"]->setData(buf, 0);
 	p->setData(buf, 0);
 	return sizeof(GameObject::GameObjectData);
 }

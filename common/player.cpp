@@ -1,7 +1,11 @@
 #include "player.h"
 
 Player::Player() : Entity() {
-
+	velocity_x = 0.f;
+	velocity_z = 0.f;
+	rotation_y = 0.f;
+	acceleration_x = 0.f;
+	acceleration_z = 0.f;
 }
 
 Player::Player(mat4 model_mat) : Entity(model_mat) {
@@ -32,6 +36,11 @@ void Player::update() {
 	vec3 right = cross(forward, vec3(0, 1, 0));
 	model[0] = vec4(right, 0);
 	model[2] = vec4(-forward, 0);
+
+	float xpos = model[3][0];
+	float zpos = model[3][2];
+	float yrot = atan2(-model[2][2], -model[2][0]);
+	std::cout << "player x: " << xpos << " z: " << zpos << " y: " << yrot << "\n";
 }
 
 void Player::setVelocity(float vel_x, float vel_z) {

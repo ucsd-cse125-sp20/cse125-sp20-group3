@@ -6,8 +6,8 @@
 
 class Tower : public Entity {
 public:
-        Tower(std::string objFilename);
-        Tower();
+        Tower(mat4 model_mat, std::string objFilename);
+        Tower(mat4 model_mat);
         ~Tower();
         void update();
 };

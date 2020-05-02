@@ -1,14 +1,13 @@
 #include "base.h"
 
 Base::Base(mat4 model_mat, std::string objFilename) : GameObject(model_mat) {
-        health = 100;
-	lastTime = std::chrono::steady_clock::now();
+    Base::Base(model_mat);
 }
 
 //Not entirely sure why we need this constructor but put it in
 //for consistency
 Base::Base(mat4 model_mat) : GameObject(model_mat) {
-        health = 100;
+    health = 100;
 	lastTime = std::chrono::steady_clock::now();
 }
 

@@ -6,8 +6,8 @@
 
 class Base : public Entity {
 public:
-        Base(std::string objFilename);
-        Base();
+        Base(mat4 model_mat, std::string objFilename);
+        Base(mat4 model_mat);
         ~Base();
         void update();
 };

@@ -8,8 +8,8 @@ class Unit : public Entity {
 private:
         Entity attackTarget;
 public:
-        Unit(std::string objFilename);
-        Unit();
+        Unit(mat4 model_mat, std::string objFilename);
+        Unit(mat4 model_mat);
         ~Unit();
         void update();
 };

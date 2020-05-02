@@ -1,16 +1,39 @@
 #include "team.h"
 
-Team::update() {
-        //send the base health, unitCount,
-        //and towerCount
+Team::Team(std::string objFilename) {
+    Team::Team();
+}
+
+Team::Team() {
+    baseHealth = 100;
+    unitCount = 0;
+    towerCount = 0;
+}
+
+void Team::update() {
+    //send the base health, unitCount and towerCount
 }
 
 void Team::incTower(int amount) {
-        towerCount+=amount;
+    towerCount+=amount;
 }
 
 void Team::incUnit(int amount) {
-        unitCounter+=amount;
+    unitCount+=amount;
 }
 
-void Team::checkResources(int attack);
+void Team::checkResources(std::string entityType) {
+    //find a better way to determine type of entity
+    //perhaps enums would be a good way? 
+    if (entityType == "unit") {
+        //check if there are enough resources to spawn unit
+        return true
+    }
+    else if (entityType == "tower") {
+        //check if there are enough resources to spawn tower
+        return true
+    }
+    else {
+        //error, string not recognized
+    }
+}

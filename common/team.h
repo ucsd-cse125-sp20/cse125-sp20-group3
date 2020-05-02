@@ -23,7 +23,7 @@ public:
         void update();
         void incTower(int amount);
         void incUnit(int amount);
-        void checkResources(int attack);
+        void checkResources(std::string entityType);
 };
 
 #endif

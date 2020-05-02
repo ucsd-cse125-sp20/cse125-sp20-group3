@@ -29,6 +29,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\..\common\GameObject.cpp" />
     <ClCompile Include="..\..\..\..\..\common\player.cpp" />
+    <ClCompile Include="..\..\..\..\src\OzzObject.cpp" />
     <ClCompile Include="..\..\..\..\src\Application.cpp" />
     <ClCompile Include="..\..\..\..\src\Client.cpp" />
     <ClCompile Include="..\..\..\..\src\Geode.cpp" />
@@ -44,14 +45,12 @@
     <None Include="..\..\..\..\src\Shaders\D3D12\FXAA.frag" />
     <None Include="..\..\..\..\src\Shaders\D3D12\profile.frag" />
     <None Include="..\..\..\..\src\Shaders\D3D12\profile.vert" />
-    <None Include="..\..\..\..\src\Shaders\D3D12\shader.frag" />
-    <None Include="..\..\..\..\src\Shaders\D3D12\shader.vert" />
+    <None Include="..\..\..\..\src\Shaders\D3D12\skinning.frag" />
+    <None Include="..\..\..\..\src\Shaders\D3D12\skinning.vert" />
     <None Include="..\..\..\..\src\Shaders\D3D12\Triangular.vert" />
     <None Include="..\..\..\..\src\Shaders\D3D12\vignette.frag" />
     <None Include="..\..\..\..\src\Shaders\D3D12\watermark.frag" />
     <None Include="..\..\..\..\src\Shaders\D3D12\watermark.vert" />
-    <None Include="..\..\..\..\src\Shaders\D3D12\zPass.vert" />
-    <None Include="..\..\..\..\src\Shaders\D3D12\zPassFloor.vert" />
     <None Include="..\..\..\..\src\Shaders\Vulkan\basic.frag" />
     <None Include="..\..\..\..\src\Shaders\Vulkan\basic.vert" />
     <None Include="..\..\..\..\src\Shaders\Vulkan\basicMOBILE.frag" />
@@ -79,6 +78,7 @@
     <ClInclude Include="..\..\..\..\..\common\team.h" />
     <ClInclude Include="..\..\..\..\..\common\tower.h" />
     <ClInclude Include="..\..\..\..\..\common\unit.h" />
+    <ClInclude Include="..\..\..\..\src\OzzObject.h" />
     <ClInclude Include="..\..\..\..\src\Application.h" />
     <ClInclude Include="..\..\..\..\src\Client.h" />
     <ClInclude Include="..\..\..\..\src\Geode.h" />
@@ -264,7 +264,7 @@
       <AdditionalOptions>/ENTRY:mainCRTStartup %(AdditionalOptions)</AdditionalOptions>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
       <AdditionalLibraryDirectories>$(GLFW_DIR)\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Xinput9_1_0.lib;ws2_32.lib;gainputstatic.lib;RendererDX12.lib;OS.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Xinput9_1_0.lib;ws2_32.lib;gainputstatic.lib;ozz_base.lib;ozz_animation.lib;RendererDX12.lib;OS.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/ignore:4099</AdditionalOptions>
     </Link>
     <PostBuildEvent>

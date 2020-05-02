@@ -28,6 +28,12 @@
     <Filter Include="Source Files\Game Objects">
       <UniqueIdentifier>{eb113d92-a420-43cf-b4cd-d73bc16c7a9a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Networking">
+      <UniqueIdentifier>{0105a183-08b2-4441-b134-20bf3bb5bc42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asset Loading">
+      <UniqueIdentifier>{b280c579-d225-446e-a27f-bc3cf3b71e0b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\Application.cpp">
@@ -60,6 +66,9 @@
     <ClCompile Include="..\..\..\..\..\common\GameObject.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\OzzObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\src\Shaders\D3D12\basic.frag">
@@ -77,12 +86,6 @@
     <None Include="..\..\..\..\src\Shaders\D3D12\profile.vert">
       <Filter>Shaders\D3D12</Filter>
     </None>
-    <None Include="..\..\..\..\src\Shaders\D3D12\shader.frag">
-      <Filter>Shaders\D3D12</Filter>
-    </None>
-    <None Include="..\..\..\..\src\Shaders\D3D12\shader.vert">
-      <Filter>Shaders\D3D12</Filter>
-    </None>
     <None Include="..\..\..\..\src\Shaders\D3D12\Triangular.vert">
       <Filter>Shaders\D3D12</Filter>
     </None>
@@ -93,12 +96,6 @@
       <Filter>Shaders\D3D12</Filter>
     </None>
     <None Include="..\..\..\..\src\Shaders\D3D12\watermark.vert">
-      <Filter>Shaders\D3D12</Filter>
-    </None>
-    <None Include="..\..\..\..\src\Shaders\D3D12\zPass.vert">
-      <Filter>Shaders\D3D12</Filter>
-    </None>
-    <None Include="..\..\..\..\src\Shaders\D3D12\zPassFloor.vert">
       <Filter>Shaders\D3D12</Filter>
     </None>
     <None Include="..\..\..\..\src\Shaders\Vulkan\basic.frag">
@@ -149,24 +146,21 @@
     <None Include="..\..\..\..\src\Shaders\Vulkan\zPassFloor.vert">
       <Filter>Shaders\Vulkan</Filter>
     </None>
+    <None Include="..\..\..\..\src\Shaders\D3D12\skinning.frag">
+      <Filter>Shaders\D3D12</Filter>
+    </None>
+    <None Include="..\..\..\..\src\Shaders\D3D12\skinning.vert">
+      <Filter>Shaders\D3D12</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\cgltf\cgltf.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\Object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\GLTFObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\Input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\src\Client.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\Geode.h">
@@ -180,9 +174,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\GLTFGeode.h">
       <Filter>Header Files\Scene Graph</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\common\macros.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\common\base.h">
       <Filter>Header Files\Game Objects</Filter>
@@ -205,9 +196,26 @@
     <ClInclude Include="..\..\..\..\src\SceneManager.h">
       <Filter>Header Files\Scene Graph</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\common\client2server.h" />
     <ClInclude Include="..\..\..\..\..\common\GameObject.h">
       <Filter>Header Files\Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\macros.h">
+      <Filter>Header Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\client2server.h">
+      <Filter>Header Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\Client.h">
+      <Filter>Header Files\Networking</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\GLTFObject.h">
+      <Filter>Header Files\Asset Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\cgltf\cgltf.h">
+      <Filter>Header Files\Asset Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\OzzObject.h">
+      <Filter>Header Files\Asset Loading</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -107,27 +107,40 @@ Semaphore* pRenderCompleteSemaphores[IMAGE_COUNT] = { NULL };
 
 Shader* pShaderZPass = NULL;
 Shader* pMeshOptDemoShader = NULL;
+Shader* pShaderSkinning = NULL;
 Shader* pVignetteShader = NULL;
 Shader* pFXAAShader = NULL;
 
 Pipeline* pPipelineShadowPass = NULL;
 Pipeline* pMeshOptDemoPipeline = NULL;
+Pipeline* pPipelineSkinning = NULL;
 Pipeline* pVignettePipeline = NULL;
 Pipeline* pFXAAPipeline = NULL;
 
 RootSignature* pRootSignatureShadow = NULL;
 RootSignature* pRootSignatureShaded = NULL;
+RootSignature* pRootSignatureSkinning = NULL; // TODO merge into shaded RS
 RootSignature* pRootSignaturePostEffects = NULL;
 
 DescriptorSet* pDescriptorSetVignette;
 DescriptorSet* pDescriptorSetFXAA;
 DescriptorSet* pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_COUNT];
 DescriptorSet* pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_COUNT];
+DescriptorSet* pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_COUNT];
 
 VirtualJoystickUI   gVirtualJoystick = {};
 
+struct UniformBlockPlane
+{
+	mat4 mProjectView;
+	mat4 mToWorldMat;
+};
+UniformBlockPlane gUniformDataPlane;
+
+Buffer* pPlaneUniformBuffer[IMAGE_COUNT] = { NULL };
 Buffer* pUniformBuffer[IMAGE_COUNT] = { NULL };
 Buffer* pInstanceBuffer[IMAGE_COUNT] = { NULL };
+Buffer* pUniformBufferBones[IMAGE_COUNT] = { NULL };
 Buffer* pShadowUniformBuffer[IMAGE_COUNT] = { NULL };
 Buffer* pShadowInstanceBuffer[IMAGE_COUNT] = { NULL };
 
@@ -176,6 +189,8 @@ vec3 cameraOffset(0, 5, -5);
 float rot = 0.f;
 
 SceneManager* scene;
+OzzObject* animatedObj;
+
 
 bool connected = false;
 const int serverNameSize = 32;
@@ -207,12 +222,18 @@ bool Application::InitSceneResources()
 
 	scene->createMaterialResources(pRootSignatureShaded, NULL, pDefaultSampler);
 
+	animatedObj = conf_new(OzzObject, "SpinningBox");
+	animatedObj->AddClip("action");
+
 	return true;
 }
 
 void Application::RemoveSceneResources()
 {
 	conf_delete(scene);
+
+	animatedObj->removeResources();
+	conf_delete(animatedObj);
 }
 
 // ============================================================================
@@ -228,6 +249,13 @@ bool Application::InitShaderResources()
 
 	MeshOptDemoShader.mStages[1] = { "basic.frag", NULL, 0, RD_SHADER_SOURCES };
 	addShader(pRenderer, &MeshOptDemoShader, &pMeshOptDemoShader);
+
+	char           maxNumBonesMacroBuffer[4] = "50";
+	ShaderMacro    maxNumBonesMacro = { "MAX_NUM_BONES", maxNumBonesMacroBuffer };
+	ShaderLoadDesc skinningShader = {};
+	skinningShader.mStages[0] = { "skinning.vert", &maxNumBonesMacro, 1, RD_SHADER_SOURCES };
+	skinningShader.mStages[1] = { "skinning.frag", &maxNumBonesMacro, 1, RD_SHADER_SOURCES }; // TODO adapt to use basic.frag
+	addShader(pRenderer, &skinningShader, &pShaderSkinning);
 
 	ShaderLoadDesc VignetteShader = {};
 	VignetteShader.mStages[0] = { "Triangular.vert", NULL, 0, RD_SHADER_SOURCES };
@@ -256,6 +284,10 @@ bool Application::InitShaderResources()
 	rootDesc.ppShaders = demoShaders;
 	addRootSignature(pRenderer, &rootDesc, &pRootSignatureShaded);
 
+	rootDesc.mShaderCount = 1;
+	rootDesc.ppShaders = &pShaderSkinning;
+	addRootSignature(pRenderer, &rootDesc, &pRootSignatureSkinning);
+
 	Shader* postShaders[] = { pVignetteShader, pFXAAShader };
 	rootDesc.mShaderCount = 2;
 	rootDesc.ppShaders = postShaders;
@@ -280,6 +312,11 @@ bool Application::InitShaderResources()
 	setDesc = { pRootSignatureShaded, DESCRIPTOR_UPDATE_FREQ_PER_BATCH, Application::gImageCount };
 	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
 
+	setDesc = { pRootSignatureSkinning, DESCRIPTOR_UPDATE_FREQ_NONE, 1 };
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_NONE]);
+	setDesc = { pRootSignatureSkinning, DESCRIPTOR_UPDATE_FREQ_PER_DRAW, Application::gImageCount };
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_DRAW]);
+
 	return true;
 }
 
@@ -298,13 +335,18 @@ void Application::RemoveShaderResources()
 	removeDescriptorSet(pRenderer, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
 	removeDescriptorSet(pRenderer, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
 
+	removeDescriptorSet(pRenderer, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_NONE]);
+	removeDescriptorSet(pRenderer, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_DRAW]);
+
 	removeShader(pRenderer, pShaderZPass);
 	removeShader(pRenderer, pVignetteShader);
 	removeShader(pRenderer, pMeshOptDemoShader);
+	removeShader(pRenderer, pShaderSkinning);
 	removeShader(pRenderer, pFXAAShader);
 
 	removeRootSignature(pRenderer, pRootSignatureShadow);
 	removeRootSignature(pRenderer, pRootSignatureShaded);
+	removeRootSignature(pRenderer, pRootSignatureSkinning);
 	removeRootSignature(pRenderer, pRootSignaturePostEffects);
 }
 
@@ -523,6 +565,30 @@ bool Application::Init()
 		addResource(&subDesc, NULL, LOAD_PRIORITY_NORMAL);
 	}
 
+	BufferLoadDesc boneBufferDesc = {};
+	boneBufferDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	boneBufferDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_CPU_TO_GPU;
+	boneBufferDesc.mDesc.mFlags = BUFFER_CREATION_FLAG_PERSISTENT_MAP_BIT;
+	boneBufferDesc.mDesc.mSize = sizeof(mat4) * 50;
+	boneBufferDesc.pData = NULL;
+	for (uint32_t i = 0; i < Application::gImageCount; ++i)
+	{
+		boneBufferDesc.ppBuffer = &pUniformBufferBones[i];
+		addResource(&boneBufferDesc, NULL, LOAD_PRIORITY_NORMAL);
+	}
+
+	ubDesc = {};
+	ubDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	ubDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_CPU_TO_GPU;
+	ubDesc.mDesc.mSize = sizeof(UniformBlockPlane);
+	ubDesc.mDesc.mFlags = BUFFER_CREATION_FLAG_PERSISTENT_MAP_BIT;
+	ubDesc.pData = NULL;
+	for (uint32_t i = 0; i < gImageCount; ++i)
+	{
+		ubDesc.ppBuffer = &pPlaneUniformBuffer[i];
+		addResource(&ubDesc, NULL, LOAD_PRIORITY_NORMAL);
+	}
+
 	InitDebugGui();
 
 	// Initialize camera
@@ -580,6 +646,8 @@ void Application::Exit()
 		removeResource(pShadowUniformBuffer[i]);
 		removeResource(pUniformBuffer[i]);
 		removeResource(pInstanceBuffer[i]);
+		removeResource(pUniformBufferBones[i]);
+		removeResource(pPlaneUniformBuffer[i]);
 		removeResource(pShadowInstanceBuffer[i]);
 	}
 
@@ -664,6 +732,22 @@ void Application::PrepareDescriptorSets()
 			updateDescriptorSet(pRenderer, i, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_BATCH], 1, params);
 		}
 	}
+
+	{
+		DescriptorData params[2] = {};
+		params[0].pName = "DiffuseTexture";
+		params[0].ppTextures = &animatedObj->pTextureDiffuse;
+		updateDescriptorSet(pRenderer, 0, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_NONE], 1, params);
+
+		for (uint32_t i = 0; i < gImageCount; ++i)
+		{
+			params[0].pName = "uniformBlock";
+			params[0].ppBuffers = &pPlaneUniformBuffer[i];
+			params[1].pName = "boneMatrices";
+			params[1].ppBuffers = &pUniformBufferBones[i];
+			updateDescriptorSet(pRenderer, i, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_DRAW], 2, params);
+		}
+	}
 }
 
 // ============================================================================
@@ -672,7 +756,6 @@ void Application::PrepareDescriptorSets()
 
 void Application::LoadPipelines()
 {
-	PipelineDesc desc = {};
 
 	/************************************************************************/
 	// Setup the resources needed for shadow map
@@ -697,7 +780,7 @@ void Application::LoadPipelines()
 	blendStateAlphaDesc.mIndependentBlend = false;
 
 	{
-		desc = {};
+		PipelineDesc desc = {};
 		desc.mType = PIPELINE_TYPE_GRAPHICS;
 		GraphicsPipelineDesc& shadowMapPipelineSettings = desc.mGraphicsDesc;
 		shadowMapPipelineSettings.mPrimitiveTopo = PRIMITIVE_TOPO_TRI_LIST;
@@ -714,7 +797,7 @@ void Application::LoadPipelines()
 	}
 
 	{
-		desc = {};
+		PipelineDesc desc = {};
 		desc.mType = PIPELINE_TYPE_GRAPHICS;
 		GraphicsPipelineDesc& pipelineSettings = desc.mGraphicsDesc;
 		pipelineSettings.mPrimitiveTopo = PRIMITIVE_TOPO_TRI_LIST;
@@ -747,7 +830,7 @@ void Application::LoadPipelines()
 	screenTriangle_VertexLayout.mAttribs[1].mOffset = 3 * sizeof(float);
 
 	{
-		desc = {};
+		PipelineDesc desc = {};
 		desc.mType = PIPELINE_TYPE_GRAPHICS;
 		GraphicsPipelineDesc& pipelineSettings = desc.mGraphicsDesc;
 		pipelineSettings.mPrimitiveTopo = PRIMITIVE_TOPO_TRI_LIST;
@@ -765,7 +848,7 @@ void Application::LoadPipelines()
 	}
 
 	{
-		desc = {};
+		PipelineDesc desc = {};
 		desc.mType = PIPELINE_TYPE_GRAPHICS;
 		GraphicsPipelineDesc& pipelineSettings = desc.mGraphicsDesc;
 		pipelineSettings.mPrimitiveTopo = PRIMITIVE_TOPO_TRI_LIST;
@@ -781,6 +864,27 @@ void Application::LoadPipelines()
 		pipelineSettings.pShaderProgram = pFXAAShader;
 		addPipeline(pRenderer, &desc, &pFXAAPipeline);
 	}
+
+	{
+		PipelineDesc desc = {};
+		desc.mType = PIPELINE_TYPE_GRAPHICS;
+		GraphicsPipelineDesc& pipelineSettings = desc.mGraphicsDesc;
+		pipelineSettings = {};
+		pipelineSettings.mPrimitiveTopo = PRIMITIVE_TOPO_TRI_LIST;
+		pipelineSettings.mRenderTargetCount = 1;
+		pipelineSettings.pDepthState = &depthStateDesc;
+		pipelineSettings.mDepthStencilFormat = pDepthBuffer->mFormat;
+		pipelineSettings.pBlendState = &blendStateAlphaDesc;
+		pipelineSettings.pColorFormats = &pForwardRT->mFormat;
+		pipelineSettings.mSampleCount = pForwardRT->mSampleCount;
+		pipelineSettings.mSampleQuality = pForwardRT->mSampleQuality;
+		pipelineSettings.mDepthStencilFormat = pDepthBuffer->mFormat;
+		pipelineSettings.pRootSignature = pRootSignatureSkinning;
+		pipelineSettings.pShaderProgram = pShaderSkinning;
+		pipelineSettings.pVertexLayout = &animatedObj->getVertexLayout();
+		pipelineSettings.pRasterizerState = &rasterizerStateDesc;
+		addPipeline(pRenderer, &desc, &pPipelineSkinning);
+	}
 }
 
 void Application::RemovePipelines()
@@ -788,6 +892,7 @@ void Application::RemovePipelines()
 	removePipeline(pRenderer, pPipelineShadowPass);
 	removePipeline(pRenderer, pVignettePipeline);
 	removePipeline(pRenderer, pMeshOptDemoPipeline);
+	removePipeline(pRenderer, pPipelineSkinning);
 	removePipeline(pRenderer, pFXAAPipeline);
 }
 
@@ -921,6 +1026,9 @@ void Application::Update(float deltaTime)
 	vec3 playerPos = scene->transforms[0]->M[3].getXYZ();
 	pCameraController->moveTo(playerPos);
 
+	animatedObj->update(deltaTime);
+	gUniformDataPlane.mProjectView = projMat * viewMat;
+	gUniformDataPlane.mToWorldMat = mat4::identity();
 
 	/************************************************************************/
 	// Light Matrix Update - for shadow map
@@ -1044,6 +1152,28 @@ void Application::Draw()
 		scene->setProgram(meshShaderDesc);
 		GLTFGeode::useMaterials = true;
 		scene->draw(cmd);
+
+
+
+
+
+		BufferUpdateDesc planeViewProjCbv = { pPlaneUniformBuffer[gFrameIndex] };
+		beginUpdateResource(&planeViewProjCbv);
+		*(UniformBlockPlane*)planeViewProjCbv.pMappedData = gUniformDataPlane;
+		endUpdateResource(&planeViewProjCbv, NULL);
+
+		BufferUpdateDesc boneBufferUpdateDesc = { pUniformBufferBones[gFrameIndex] };
+		beginUpdateResource(&boneBufferUpdateDesc);
+		memcpy(boneBufferUpdateDesc.pMappedData, &animatedObj->gUniformDataBones, sizeof(mat4) * animatedObj->gStickFigureRig.GetNumJoints());
+		endUpdateResource(&boneBufferUpdateDesc, NULL);
+
+		cmdBindPipeline(cmd, pPipelineSkinning);
+		cmdBindDescriptorSet(cmd, 0, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_NONE]);
+		cmdBindDescriptorSet(cmd, gFrameIndex, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_DRAW]);
+		animatedObj->draw(cmd);
+
+
+
 
 		// Unbind render targets
 		cmdBindRenderTargets(cmd, 0, NULL, 0, NULL, NULL, NULL, -1, -1);

@@ -34,6 +34,7 @@ void Rig::Initialize(const Path* skeletonFilePath)
 	mNumJoints = mSkeleton.num_joints();
 
 	// Find the root index
+	mRootIndex = 1; // FIND OUT WHAT'S WRONG HERE TODO <====================================================================
 	for (unsigned int i = 0; i < mNumJoints; i++)
 	{
 		if (mSkeleton.joint_properties()[i].parent == ozz::animation::Skeleton::kNoParentIndex)

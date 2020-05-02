@@ -14,6 +14,7 @@
 
 #include "GLTFGeode.h"
 #include "Transform.h"
+#include "OzzObject.h"
 
 #include "../../common/client2server.h"
 

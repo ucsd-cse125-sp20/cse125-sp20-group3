@@ -630,10 +630,27 @@ bool AssetPipeline::CreateRuntimeSkeleton(
 		return false;
 	}
 
+	int root = 0;
+	for (root = 0; root < data->nodes_count; root++) {
+		bool isChild = false;
+		for (int j = 0; j < data->nodes_count; j++) {
+			for (int k = 0; k < data->nodes[j].children_count; k++) {
+				if (data->nodes[j].children[k]->name == data->nodes[root].name) {
+					isChild = true;
+					break;
+				}
+			}
+			if (isChild) break;
+		}
+		if (!isChild) break;
+	}
+	printf("Using %s as the root node\n", data->nodes[root].name);
+
+
 	// Gather node info
 	// Used to mark nodes that should be included in the skeleton
 	eastl::vector<NodeInfo> nodeData(1);
-	nodeData[0] = { data->nodes[0].name, -1, {}, false, &data->nodes[0] };
+	nodeData[0] = { data->nodes[root].name, -1, {}, false, &data->nodes[root] };
 
 	const int queueSize = 128;
 	int       nodeQueue[queueSize] = {};    // Simple queue because tinystl doesn't have one
@@ -682,9 +699,9 @@ bool AssetPipeline::CreateRuntimeSkeleton(
 			cgltf_node* bone = skin->joints[j];
 			for (uint k = 0; k < (uint)nodeData.size(); ++k)
 			{
-				printf("marked bone %s ?= %s\n", nodeData[k].mName, std::string(bone->name));
 				if (nodeData[k].mName == eastl::string(bone->name))
 				{
+					//printf("marked bone %s\n", nodeData[k].mName);
 					int nodeIndex = k;
 					while (nodeIndex != -1)
 					{

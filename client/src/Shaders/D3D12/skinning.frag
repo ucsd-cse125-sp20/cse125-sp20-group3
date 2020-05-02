@@ -22,34 +22,19 @@
  * under the License.
 */
 
-// Shader for Skybox in Unit Test 01 - Transformations
-
-#define MAX_PLANETS 20
-
-cbuffer uniformBlock : register(b0, UPDATE_FREQ_PER_FRAME)
+struct VSOutput 
 {
-    float4x4 mvp;
-    float4x4 toWorld[MAX_PLANETS];
-    float4 color[MAX_PLANETS];
-
-    // Point Light Information
-    float3 lightPosition;
-    float3 lightColor;
-};
-
-struct VSOutput {
 	float4 Position : SV_POSITION;
-    float4 TexCoord : TEXCOORD;
+    float3 Normal : NORMAL;
+	float2 UV : TEXCOORD0;
 };
 
-VSOutput main(float4 Position : POSITION)
+Texture2D DiffuseTexture : register(t0);
+SamplerState DefaultSampler : register(s0);
+
+float4 main(VSOutput input) : SV_TARGET
 {
-	VSOutput result;
- 
-    float4 p = float4(Position.x*9, Position.y*9, Position.z*9, 1.0);
-    float4x4 m =  mvp;
-    p = mul(m,p);
-    result.Position = p.xyww;
-    result.TexCoord = float4(Position.x, Position.y, Position.z,Position.w);
-	return result;
+	float nDotl =  saturate((dot(normalize(input.Normal), float3(0, 1, 0)) + 1.0f) * 0.5f);
+	float3 color = DiffuseTexture.Sample(DefaultSampler, input.UV).rgb;
+    return float4(color * nDotl, 1.0f);
 }

@@ -22,16 +22,35 @@
  * under the License.
 */
 
-cbuffer uniformBlock : register(b0, UPDATE_FREQ_PER_DRAW)
+#define MAX_NUM_BONES 100
+
+cbuffer cbPerPass : register(b0, UPDATE_FREQ_PER_FRAME)
 {
-	float4x4 vpMatrix;
-	float4x4 modelMatrix;
+	float4x4	projView;
+	float4x4	sceneToWorld;
+	float4x4	shadowLightViewProj;
+	float4      camPos;
+	float4      lightColor[4];
+	float4      lightDirection[3];
 };
 
-cbuffer boneMatrices : register(b1, UPDATE_FREQ_PER_DRAW)
+cbuffer boneMatrices : register(b1, UPDATE_FREQ_PER_BATCH)
 {
 	float4x4 boneMatrix[MAX_NUM_BONES];
 };
+
+struct InstanceData
+{
+	float4x4	boneMatric;
+};
+
+cbuffer cbRootConstants : register(b2) {
+	uint nodeIndex;
+    uint instanceIndex;
+	uint modelIndex;
+};
+
+StructuredBuffer<InstanceData> instanceBuffer : register(t0, UPDATE_FREQ_PER_BATCH);
 
 struct VSInput
 {
@@ -42,26 +61,35 @@ struct VSInput
 	uint4 BoneIndices : JOINTS;
 };
 
-struct VSOutput {
-	float4 Position : SV_POSITION;
-    float3 Normal : NORMAL;
-	float2 UV : TEXCOORD0;
+struct PsIn
+{    
+    float3 pos               : POSITION;
+	float3 normal	         : NORMAL;
+	float2 texCoord          : TEXCOORD0;
+    float4 position          : SV_Position;
 };
 
-VSOutput main(VSInput input)
+PsIn main(VSInput input)
 {
-    VSOutput result;
+    PsIn result;
 	
 	float4x4 boneTransform = (boneMatrix[input.BoneIndices[0]]) * input.BoneWeights[0];
 	boneTransform += (boneMatrix[input.BoneIndices[1]]) * input.BoneWeights[1];
 	boneTransform += (boneMatrix[input.BoneIndices[2]]) * input.BoneWeights[2];
 	boneTransform += (boneMatrix[input.BoneIndices[3]]) * input.BoneWeights[3];
 	
-	result.Position = mul(boneTransform, float4(input.Position, 1.0f));
-	result.Position = mul(modelMatrix, result.Position);
-	result.Position = mul(vpMatrix, result.Position);
-	result.Normal = normalize(mul(modelMatrix, float4(input.Normal, 0.0f)).xyz);
-	result.UV = input.UV;
+    float4x4 modelMatrix = float4x4(1, 0, 0, 0,
+                                    0, 1, 0, 0,
+                                    0, 0, 1, 0,
+                                    0, 0, 0, 1);
+
+	float4 skinnedPosition = mul(boneTransform, float4(input.Position, 1.0f));
+	float4 worldPosition = mul(modelMatrix, skinnedPosition);
+
+	result.position = mul(projView, worldPosition);
+    result.pos = worldPosition.xyz;
+	result.normal = normalize(mul(modelMatrix, float4(input.Normal, 0.0f)).xyz);
+	result.texCoord = input.UV;
 
     return result;
 }

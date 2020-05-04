@@ -636,6 +636,7 @@ bool AssetPipeline::CreateRuntimeSkeleton(
 		for (int j = 0; j < data->nodes_count; j++) {
 			for (int k = 0; k < data->nodes[j].children_count; k++) {
 				if (data->nodes[j].children[k]->name == data->nodes[root].name) {
+					//printf("%s is a child of %s\n", data->nodes[root].name, data->nodes[j].name);
 					isChild = true;
 					break;
 				}
@@ -701,7 +702,7 @@ bool AssetPipeline::CreateRuntimeSkeleton(
 			{
 				if (nodeData[k].mName == eastl::string(bone->name))
 				{
-					//printf("marked bone %s\n", nodeData[k].mName);
+					printf("marked bone %s\n", nodeData[k].mName);
 					int nodeIndex = k;
 					while (nodeIndex != -1)
 					{
@@ -734,13 +735,14 @@ bool AssetPipeline::CreateRuntimeSkeleton(
 		ozz::animation::offline::RawSkeleton::Joint joint;
 		joint.transform.translation = vec3(node->translation[0], node->translation[1], node->translation[2]);
 		joint.transform.rotation = Quat(node->rotation[0], node->rotation[1], node->rotation[2], node->rotation[3]);
-		joint.transform.scale = vec3(node->scale[0], node->scale[1], node->scale[2]) * (boneInfo.mParentNodeIndex == -1 ? 0.01f : 1.f);
+		joint.transform.scale = vec3(node->scale[0], node->scale[1], node->scale[2]) * (boneInfo.mParentNodeIndex == -1 ? 1.f : 1.f);
 		joint.name = nodeInfo->mName.c_str();
 
 		// Add node to raw skeleton
 		ozz::animation::offline::RawSkeleton::Joint* newParentJoint = NULL;
 		if (boneInfo.pParentJoint == NULL)
 		{
+			printf("ROOT: %s\n", joint.name);
 			rawSkeleton.roots.push_back(joint);
 			newParentJoint = &rawSkeleton.roots.back();
 		}

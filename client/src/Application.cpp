@@ -222,8 +222,9 @@ bool Application::InitSceneResources()
 
 	scene->createMaterialResources(pRootSignatureShaded, NULL, pDefaultSampler);
 
-	animatedObj = conf_new(OzzObject, "SpinningBox");
-	animatedObj->AddClip("action");
+	animatedObj = conf_new(OzzObject, pRenderer, "kyubey");
+	animatedObj->AddClip("ArmatureAction");
+	animatedObj->createMaterialResources(pRootSignatureSkinning, NULL, pDefaultSampler);
 
 	return true;
 }
@@ -250,11 +251,9 @@ bool Application::InitShaderResources()
 	MeshOptDemoShader.mStages[1] = { "basic.frag", NULL, 0, RD_SHADER_SOURCES };
 	addShader(pRenderer, &MeshOptDemoShader, &pMeshOptDemoShader);
 
-	char           maxNumBonesMacroBuffer[4] = "50";
-	ShaderMacro    maxNumBonesMacro = { "MAX_NUM_BONES", maxNumBonesMacroBuffer };
 	ShaderLoadDesc skinningShader = {};
-	skinningShader.mStages[0] = { "skinning.vert", &maxNumBonesMacro, 1, RD_SHADER_SOURCES };
-	skinningShader.mStages[1] = { "skinning.frag", &maxNumBonesMacro, 1, RD_SHADER_SOURCES }; // TODO adapt to use basic.frag
+	skinningShader.mStages[0] = { "skinning.vert", NULL, 0, RD_SHADER_SOURCES };
+	skinningShader.mStages[1] = { "basic.frag", NULL, 0, RD_SHADER_SOURCES };
 	addShader(pRenderer, &skinningShader, &pShaderSkinning);
 
 	ShaderLoadDesc VignetteShader = {};
@@ -283,6 +282,11 @@ bool Application::InitShaderResources()
 	rootDesc.mShaderCount = 1;
 	rootDesc.ppShaders = demoShaders;
 	addRootSignature(pRenderer, &rootDesc, &pRootSignatureShaded);
+
+	//Shader* demoShaders[] = { pMeshOptDemoShader, pShaderSkinning };
+	//rootDesc.mShaderCount = 2;
+	//rootDesc.ppShaders = demoShaders;
+	//addRootSignature(pRenderer, &rootDesc, &pRootSignatureShaded);
 
 	rootDesc.mShaderCount = 1;
 	rootDesc.ppShaders = &pShaderSkinning;
@@ -314,8 +318,10 @@ bool Application::InitShaderResources()
 
 	setDesc = { pRootSignatureSkinning, DESCRIPTOR_UPDATE_FREQ_NONE, 1 };
 	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_NONE]);
-	setDesc = { pRootSignatureSkinning, DESCRIPTOR_UPDATE_FREQ_PER_DRAW, Application::gImageCount };
-	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_DRAW]);
+	setDesc = { pRootSignatureSkinning, DESCRIPTOR_UPDATE_FREQ_PER_FRAME, Application::gImageCount };
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+	setDesc = { pRootSignatureSkinning, DESCRIPTOR_UPDATE_FREQ_PER_BATCH, Application::gImageCount };
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
 
 	return true;
 }
@@ -336,7 +342,8 @@ void Application::RemoveShaderResources()
 	removeDescriptorSet(pRenderer, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
 
 	removeDescriptorSet(pRenderer, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_NONE]);
-	removeDescriptorSet(pRenderer, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_DRAW]);
+	removeDescriptorSet(pRenderer, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+	removeDescriptorSet(pRenderer, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
 
 	removeShader(pRenderer, pShaderZPass);
 	removeShader(pRenderer, pVignetteShader);
@@ -734,18 +741,17 @@ void Application::PrepareDescriptorSets()
 	}
 
 	{
-		DescriptorData params[2] = {};
-		params[0].pName = "DiffuseTexture";
-		params[0].ppTextures = &animatedObj->pTextureDiffuse;
-		updateDescriptorSet(pRenderer, 0, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_NONE], 1, params);
+		DescriptorData params[1] = {};
 
 		for (uint32_t i = 0; i < gImageCount; ++i)
 		{
-			params[0].pName = "uniformBlock";
-			params[0].ppBuffers = &pPlaneUniformBuffer[i];
-			params[1].pName = "boneMatrices";
-			params[1].ppBuffers = &pUniformBufferBones[i];
-			updateDescriptorSet(pRenderer, i, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_DRAW], 2, params);
+			params[0].pName = "cbPerPass";
+			params[0].ppBuffers = &pUniformBuffer[i];
+			updateDescriptorSet(pRenderer, i, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_FRAME], 1, params);
+
+			params[0].pName = "boneMatrices";
+			params[0].ppBuffers = &pUniformBufferBones[i];
+			updateDescriptorSet(pRenderer, i, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_BATCH], 1, params);
 		}
 	}
 }
@@ -1027,8 +1033,6 @@ void Application::Update(float deltaTime)
 	pCameraController->moveTo(playerPos);
 
 	animatedObj->update(deltaTime);
-	gUniformDataPlane.mProjectView = projMat * viewMat;
-	gUniformDataPlane.mToWorldMat = mat4::identity();
 
 	/************************************************************************/
 	// Light Matrix Update - for shadow map
@@ -1073,12 +1077,6 @@ void Application::Draw()
 	getFenceStatus(pRenderer, pNextFence, &fenceStatus);
 	if (fenceStatus == FENCE_STATUS_INCOMPLETE)
 		waitForFences(pRenderer, 1, &pNextFence);
-
-	// Update uniform buffers
-	BufferUpdateDesc shaderCbv = { pUniformBuffer[Application::gFrameIndex] };
-	beginUpdateResource(&shaderCbv);
-	*(UniformBlock*)shaderCbv.pMappedData = gUniformData;
-	endUpdateResource(&shaderCbv, NULL);
 
 	RenderTarget* pRenderTarget = NULL;
 
@@ -1134,6 +1132,12 @@ void Application::Draw()
 			meshShaderDesc.descriptorSets[i] = pDescriptorSetsShaded[i];
 		}
 
+		// Update general uniform buffers
+		BufferUpdateDesc shaderCbv = { pUniformBuffer[Application::gFrameIndex] };
+		beginUpdateResource(&shaderCbv);
+		*(UniformBlock*)shaderCbv.pMappedData = gUniformData;
+		endUpdateResource(&shaderCbv, NULL);
+
 		// Update per-instance uniforms
 		shaderCbv = { pInstanceBuffer[Application::gFrameIndex] };
 		beginUpdateResource(&shaderCbv);
@@ -1156,21 +1160,17 @@ void Application::Draw()
 
 
 
-
-		BufferUpdateDesc planeViewProjCbv = { pPlaneUniformBuffer[gFrameIndex] };
-		beginUpdateResource(&planeViewProjCbv);
-		*(UniformBlockPlane*)planeViewProjCbv.pMappedData = gUniformDataPlane;
-		endUpdateResource(&planeViewProjCbv, NULL);
-
+		
 		BufferUpdateDesc boneBufferUpdateDesc = { pUniformBufferBones[gFrameIndex] };
 		beginUpdateResource(&boneBufferUpdateDesc);
 		memcpy(boneBufferUpdateDesc.pMappedData, &animatedObj->gUniformDataBones, sizeof(mat4) * animatedObj->gStickFigureRig.GetNumJoints());
 		endUpdateResource(&boneBufferUpdateDesc, NULL);
 
 		cmdBindPipeline(cmd, pPipelineSkinning);
-		cmdBindDescriptorSet(cmd, 0, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_NONE]);
-		cmdBindDescriptorSet(cmd, gFrameIndex, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_DRAW]);
+		cmdBindDescriptorSet(cmd, gFrameIndex, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+		cmdBindDescriptorSet(cmd, gFrameIndex, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
 		animatedObj->draw(cmd);
+		
 
 
 

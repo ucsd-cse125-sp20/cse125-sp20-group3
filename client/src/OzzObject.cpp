@@ -12,9 +12,11 @@ VertexLayout OzzObject::pVertexLayoutSkinned = {
 	}
 };
 
-OzzObject::OzzObject(std::string directory)
+OzzObject::OzzObject(Renderer* renderer, std::string directory)
 {
+	this->modelID = modelCount++;
 	this->directory = directory;
+	this->pRenderer = renderer;
 
 	PathHandle skeletonPath = fsCopyPathInResourceDirectory(RD_ANIMATIONS, (directory + "/skeleton.ozz").c_str());
 	
@@ -22,9 +24,7 @@ OzzObject::OzzObject(std::string directory)
 	gStickFigureRig.Initialize(skeletonPath);
 
 	// Add the rig to the list of skeletons to render
-	gSkeletonBatcher.AddRig(&gStickFigureRig);
-
-
+	//gSkeletonBatcher.AddRig(&gStickFigureRig);
 
 	PathHandle meshPath = fsCopyPathInResourceDirectory(RD_ANIMATIONS, (directory + "/riggedMesh.gltf").c_str());
 
@@ -61,14 +61,50 @@ OzzObject::OzzObject(std::string directory)
 	loadDesc.ppGeometry = &pGeom;
 	addResource(&loadDesc, NULL, LOAD_PRIORITY_NORMAL);
 
-	PathHandle texturePath = fsCopyPathInResourceDirectory(RD_TEXTURES, (directory + "_tex.png").c_str());
-	TextureLoadDesc diffuseTextureDesc = {};
-	diffuseTextureDesc.pFilePath = texturePath;
-	diffuseTextureDesc.ppTexture = &pTextureDiffuse;
-	addResource(&diffuseTextureDesc, NULL, LOAD_PRIORITY_NORMAL);
+	uint32_t res = gltfLoadContainer(meshPath, GLTF_FLAG_CALCULATE_BOUNDS, &pData);
+	ASSERT(!res);
 
-	//SkeletonRenderDesc skeletonRenderDesc = {};
-	//gSkeletonBatcher.Initialize(skeletonRenderDesc);
+	mSamplers.resize(pData->mSamplerCount);
+	for (uint32_t i = 0; i < pData->mSamplerCount; ++i)
+		addSampler(pRenderer, pData->pSamplers + i, &mSamplers[i]);
+
+	mTextures.resize(pData->pHandle->images_count);
+	SyncToken token = {};
+	for (uint32_t i = 0; i < pData->pHandle->images_count; ++i)
+		gltfLoadTextureAtIndex(pData, meshPath, i, false, &token, &mTextures[i]);
+
+	// Missing texture handling (Might need to move)
+	TextureDesc defaultTextureDesc = {};
+	defaultTextureDesc.mArraySize = 1;
+	defaultTextureDesc.mDepth = 1;
+	defaultTextureDesc.mFormat = TinyImageFormat_R8G8B8A8_UNORM;
+	defaultTextureDesc.mWidth = 4;
+	defaultTextureDesc.mHeight = 4;
+	defaultTextureDesc.mMipLevels = 1;
+	defaultTextureDesc.mSampleCount = SAMPLE_COUNT_1;
+	defaultTextureDesc.mStartState = RESOURCE_STATE_COMMON;
+	defaultTextureDesc.mDescriptors = DESCRIPTOR_TYPE_TEXTURE;
+	defaultTextureDesc.mFlags = TEXTURE_CREATION_FLAG_OWN_MEMORY_BIT;
+	defaultTextureDesc.pDebugName = L"MissingTexture";
+	TextureLoadDesc defaultLoadDesc = {};
+	defaultLoadDesc.pDesc = &defaultTextureDesc;
+	RawImageData idata = {};
+	unsigned char blackData[64];
+	memset(blackData, 0, sizeof(unsigned char) * 64);
+
+	idata.mArraySize = 1;
+	idata.mDepth = defaultTextureDesc.mDepth;
+	idata.mWidth = defaultTextureDesc.mWidth;
+	idata.mHeight = defaultTextureDesc.mHeight;
+	idata.mFormat = defaultTextureDesc.mFormat;
+	idata.mMipLevels = defaultTextureDesc.mMipLevels;
+	idata.pRawData = (uint8_t*)blackData;
+	defaultLoadDesc.pRawImageData = &idata;
+
+	defaultLoadDesc.ppTexture = &pTextureBlack;
+	addResource(&defaultLoadDesc, NULL, LOAD_PRIORITY_NORMAL);
+
+	waitForAllResourceLoads();
 }
 
 void OzzObject::AddClip(std::string clipName)
@@ -102,8 +138,7 @@ void OzzObject::AddClip(std::string clipName)
 
 void OzzObject::removeResources()
 {
-	removeResource(pGeom);
-	removeResource(pTextureDiffuse);
+	GLTFObject::removeResources();
 
 	gStickFigureRig.Destroy();
 	gClip.Destroy();
@@ -119,6 +154,7 @@ void OzzObject::update(float deltaTime)
 	if (!gStickFigureAnimObject.Update(deltaTime))
 		LOGF(eINFO, "Animation NOT Updating!");
 
+	//gStickFigureAnimObject.PoseRigInBind();
 	gStickFigureAnimObject.PoseRig();
 
 
@@ -129,8 +165,8 @@ void OzzObject::update(float deltaTime)
 	//gSkeletonBatcher.SetSharedUniforms(Application::projMat * Application::viewMat, vec3(0.0f, 1000.0f, 0.0f), vec3(1.0f, 1.0f, 1.0f));
 
 	for (uint i = 0; i < pGeom->mJointCount; ++i) {
-		gUniformDataBones.mBoneMatrix[i] = mat4::scale(vec3(100, 100, 100)) * gStickFigureRig.GetJointWorldMat(pGeom->pJointRemaps[i]) *
-			mat4::scale(vec3(1, 1, -1)) *
+		gUniformDataBones.mBoneMatrix[i] = mat4::scale(vec3(100, 100, -100)) * gStickFigureRig.GetJointWorldMat(pGeom->pJointRemaps[i]) *
+			mat4::scale(vec3(1, 1, 1)) *
 			pGeom->pInverseBindPoses[i];
 		//print(gUniformDataBones.mBoneMatrix[i]);
 	}
@@ -142,5 +178,6 @@ void OzzObject::draw(Cmd* cmd)
 
 	cmdBindVertexBuffer(cmd, 1, &pGeom->pVertexBuffers[0], pGeom->mVertexStrides, (uint64_t*)NULL);
 	cmdBindIndexBuffer(cmd, pGeom->pIndexBuffer, pGeom->mIndexType, (uint64_t)NULL);
+	cmdBindDescriptorSet(cmd, 0, pMaterialSet);
 	cmdDrawIndexed(cmd, pGeom->mIndexCount, 0, 0);
 }

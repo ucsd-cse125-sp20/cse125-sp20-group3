@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "Object.h"
+#include "GLTFObject.h"
 
 #include "../The-Forge/Common_3/OS/Interfaces/IFileSystem.h"
 #include "../The-Forge/Common_3/OS/Interfaces/ITime.h"
@@ -18,7 +18,7 @@
 
 #define MAX_NUM_BONES 200
 
-class OzzObject : public Object{//GLTFObject {
+class OzzObject : public GLTFObject {
 public:
 
 	struct UniformDataBones
@@ -52,11 +52,9 @@ public:
 	std::string directory;
 	float time;
 
-	Geometry* pGeom = NULL;
 	UniformDataBones gUniformDataBones;
-	Texture* pTextureDiffuse = NULL;
 
-	OzzObject(std::string directory);
+	OzzObject(Renderer* renderer, std::string directory);
 
 	// TODO Make better
 	void AddClip(std::string clipName);

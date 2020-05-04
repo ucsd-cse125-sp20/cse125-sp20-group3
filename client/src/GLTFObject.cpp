@@ -19,6 +19,7 @@ Buffer* GLTFObject::pNodeTransformsBuffer = NULL;
 
 void GLTFObject::Init(const Path* path, Renderer* renderer)
 {
+	modelID = modelCount++;
 	pRenderer = renderer;
 
 	mSamplers.resize(pData->mSamplerCount);
@@ -206,8 +207,6 @@ void GLTFObject::createNodeTransformsBuffer()
 	{
 		nodeTransforms[i] = translateScale * nodeTransforms[i];
 	}
-
-	modelID = modelCount++;
 		
 	if (!pNodeTransformsBuffer) {
 		BufferLoadDesc nodeTransformsBufferLoadDesc = {};

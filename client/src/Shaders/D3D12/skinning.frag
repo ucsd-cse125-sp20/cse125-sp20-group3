@@ -22,19 +22,19 @@
  * under the License.
 */
 
-struct VSOutput 
-{
-	float4 Position : SV_POSITION;
-    float3 Normal : NORMAL;
-	float2 UV : TEXCOORD0;
+struct PsIn
+{    
+    float3 pos               : POSITION;
+	float3 normal	         : NORMAL;
+	float2 texCoord          : TEXCOORD0;
 };
 
 Texture2D DiffuseTexture : register(t0);
 SamplerState DefaultSampler : register(s0);
 
-float4 main(VSOutput input) : SV_TARGET
+float4 main(PsIn input) : SV_TARGET
 {
-	float nDotl =  saturate((dot(normalize(input.Normal), float3(0, 1, 0)) + 1.0f) * 0.5f);
-	float3 color = DiffuseTexture.Sample(DefaultSampler, input.UV).rgb;
+	float nDotl =  saturate((dot(normalize(input.normal), float3(0, 1, 0)) + 1.0f) * 0.5f);
+	float3 color = DiffuseTexture.Sample(DefaultSampler, input.texCoord).rgb;
     return float4(color * nDotl, 1.0f);
 }

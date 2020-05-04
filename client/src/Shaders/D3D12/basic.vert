@@ -42,12 +42,11 @@ cbuffer cbPerPass : register(b0, UPDATE_FREQ_PER_FRAME)
 	float4      camPos;
 	float4      lightColor[4];
 	float4      lightDirection[3];
-}
+};
 
 struct InstanceData
 {
 	float4x4	sceneToWorld;
-	//float3		baseColor;
 };
 
 cbuffer cbRootConstants : register(b2) {

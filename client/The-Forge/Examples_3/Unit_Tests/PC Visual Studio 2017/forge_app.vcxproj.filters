@@ -34,18 +34,18 @@
     <Filter Include="Header Files\Asset Loading">
       <UniqueIdentifier>{b280c579-d225-446e-a27f-bc3cf3b71e0b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Networking">
+      <UniqueIdentifier>{b50b7abf-a91f-4380-a87f-17a1af46aa6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asset Loading">
+      <UniqueIdentifier>{76e39935-a8f5-4a49-a079-94efaaae9bf0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\GLTFObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\src\Input.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\src\Client.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\GLTFGeode.cpp">
@@ -66,8 +66,14 @@
     <ClCompile Include="..\..\..\..\..\common\GameObject.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\Client.cpp">
+      <Filter>Source Files\Networking</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\src\OzzObject.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Asset Loading</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\GLTFObject.cpp">
+      <Filter>Source Files\Asset Loading</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

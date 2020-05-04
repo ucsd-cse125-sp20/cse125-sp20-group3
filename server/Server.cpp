@@ -119,10 +119,9 @@ Server::Server() {
 	
 }
 
-int Server::sendData(char sendbuf[], int buflen, int flags) {
+int Server::sendDataAll(char sendbuf[], int buflen, int flags) {
 	int err = 0;
 	int iResult;
-	std::string s(sendbuf);
 
 	for (int i = 0; i < NUM_PLAYERS; i++) {
 		iResult = send(ClientSockets[i], sendbuf, buflen, flags);
@@ -135,6 +134,21 @@ int Server::sendData(char sendbuf[], int buflen, int flags) {
 		}
 	}
 	if (err) return err;
+	else return iResult;
+}
+
+int Server::sendDataPlayer(int conn_socket, char sendbuf[], int buflen, int flags) {
+	int iResult;
+
+	iResult = send(ClientSockets[conn_socket], sendbuf, buflen, flags);
+	if (iResult == SOCKET_ERROR) {
+		// printf("send failed with error: %d\n", WSAGetLastError());
+		std::cout << "send failed with error: " << WSAGetLastError() << std::endl;
+		closesocket(ClientSockets[conn_socket]);
+		WSACleanup();
+		return -1;
+	}
+
 	else return iResult;
 }
 
@@ -180,16 +194,12 @@ int Server::recvData(char recvbuf[], int buflen, int flags) {
 
 		int begin_data_ind = recvbufind;
 
-		for (int j = 0; j < recvlens[i]; j++) {
+		if (recvlens[i] != sizeof(PlayerInput)) {
+			std::cout << "non PlayerInput received\n";
+		}
+		for (int j = 0; j < min(recvlens[i], sizeof(PlayerInput)); j++) { //only copy one playerinput in
 			recvbuf[recvbufind] = tempbufs[i][j];
 			recvbufind++;
-		}
-
-		if (recvlens[i] == 12) {
-			int move_x = ((int*)(recvbuf + begin_data_ind))[0];
-			int move_z = ((int*)(recvbuf + begin_data_ind))[1];
-			float view_y_rot = ((float*)(recvbuf + begin_data_ind))[2];
-			//std::cout << "wrote to recvbuf: x: " << move_x << " z: " << move_z << " y: " << view_y_rot << "\n";
 		}
 
 		recvbuf[recvbufind] = DELIMITER;

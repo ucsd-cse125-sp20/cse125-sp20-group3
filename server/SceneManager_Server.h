@@ -25,7 +25,7 @@ private:
 public:
 	SceneManager_Server();
 	void processInput(std::string player, PlayerInput in);
-	std::string addPlayer(std::string player_id);
+	bool addPlayer(std::string player_id);
 	void spawnEntity(char spawnType, float pos_x, float pos_z, float rot_y);
 	void resetClocks();
 	void update();

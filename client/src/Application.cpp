@@ -386,12 +386,6 @@ void Application::ToggleClient()
 	}
 	else {
 		client = conf_new(Client, serverName);
-		client->sendData("1234", 4, 0);
-		char recvBuf[DEFAULT_BUFLEN];
-		int bytesReceived = client->recvData(recvBuf, DEFAULT_BUFLEN, 0);
-		GameObject::GameObjectData data = ((GameObject::GameObjectData*)recvBuf)[0];
-		//printf("%f %f %f\n", data.x, data.z, data.rot);
-		client->sendData("lol", 3, 0);
 	}
 }
 
@@ -875,13 +869,11 @@ void Application::Update(float deltaTime)
 	/************************************************************************/
 	// Server Contact
 	/************************************************************************/
-	
+	int recvbufsize = 0;
 	if (connected) {
 		int size = Input::EncodeToBuf(sendbuf);
 		client->sendData(sendbuf, size, 0);
-		client->recvData(recvbuf, DEFAULT_BUFLEN, 0);
-		GameObject::GameObjectData data = ((GameObject::GameObjectData*)recvbuf)[0];
-		printf("%f %f %f\n", data.x, data.z, data.rot);
+		recvbufsize = client->recvData(recvbuf, DEFAULT_BUFLEN, 0);
 	}
 
 	/************************************************************************/
@@ -917,14 +909,14 @@ void Application::Update(float deltaTime)
 	gUniformData.mLightDirection[2] = vec4(-sunDirection.getX(), -sunDirection.getY(), -sunDirection.getZ(), 0.0f);
 
 	if (connected) {
-		scene->updateFromClientBuf(recvbuf);
+		scene->updateFromClientBuf(recvbuf, recvbufsize);
 	}
 	else {
 		scene->updateFromInputBuf(deltaTime);
 	}
-	scene->update(deltaTime);
+	//scene->update(deltaTime);
 
-	pCameraController->moveTo(scene->transforms[0]->M[3].getXYZ());
+	pCameraController->moveTo(scene->getPlayerTransformMat()[3].getXYZ());
 	//pCameraController->lookAt(scene->transforms[0]->M[3].getXYZ() + vec3(0, 0, 1));
 
 

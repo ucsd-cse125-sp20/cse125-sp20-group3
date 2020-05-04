@@ -22,15 +22,12 @@ int __cdecl main(void)
 
 	Server* server = new Server();
 	SceneManager_Server* manager = new SceneManager_Server();
-	//Player* player = new Player(mat4::identity());
     bool firstMessage = true;
 
     // Game State data
     float deltaTime = 0.001f;
 
     std::cout << "server started" << std::endl;
-
-	manager->addPlayer("0"); //TODO change this to happen on client connection
 
     // Receive until the peer shuts down the connection
     do {
@@ -52,43 +49,43 @@ int __cdecl main(void)
 			// read id, handle player input
 			std::string s(recvbuf);
 			//std::cout << "recvbuf: " << s << "\n";
-			if (s != "01234," && s != "0lol,") {
-				int ind = 0;
-				for (int b = 0; b < NUM_PLAYERS; b++) {
-					char player_num = recvbuf[ind];
-					ind++;
+			int ind = 0;
+			for (int b = 0; b < NUM_PLAYERS; b++) {
+				char player_num = recvbuf[ind];
+				std::string player_str = std::string(1, player_num);
+				ind++;
 
-					//std::cout << "processing player " << player_num << "\n";
+				//std::cout << "processing player " << player_num << "\n";
 
-					/*int move_x = ((int*)(recvbuf + ind))[0];
-					int move_z = ((int*)(recvbuf + ind))[1];
-					float view_y_rot = ((float*)(recvbuf + ind))[2];
-					std::cout << "read recvbuf: x: " << move_x << " z: " << move_z << " y: " << view_y_rot << "\n";*/
-
-					PlayerInput input = ((PlayerInput*)(recvbuf + ind))[0]; //TODO modify this to allow for build tower commands
-					ind += sizeof PlayerInput;
-
-					if (recvbuf[ind] == DELIMITER) {
-						manager->processInput(std::string(1, player_num), input);
-					}
-					else {
-						std::cout << "buf size mismatch in receive, delimiter not found when expected\n";
-					}
-					ind++;
+				if (manager->addPlayer(player_str)) { //if this player's communication is new, create new player
+					char id_buf[1] = { player_num };
+					server->sendDataPlayer(stoi(player_str), id_buf, 1, 0);
 				}
 
-				//Update Game State
-				manager->update();
+				/*int move_x = ((int*)(recvbuf + ind))[0];
+				int move_z = ((int*)(recvbuf + ind))[1];
+				float view_y_rot = ((float*)(recvbuf + ind))[2];
+				std::cout << "read recvbuf: x: " << move_x << " z: " << move_z << " y: " << view_y_rot << "\n";*/
+
+				PlayerInput input = ((PlayerInput*)(recvbuf + ind))[0]; //TODO modify this to allow for build tower commands
+				ind += sizeof PlayerInput;
+
+				if (recvbuf[ind] == DELIMITER) {
+					manager->processInput(std::string(1, player_num), input);
+				}
+				else {
+					std::cout << "buf size mismatch in receive, delimiter not found when expected\n";
+				}
+				ind++;
 			}
+
+			//Update Game State
+			manager->update();
 
 			//Send updated data back to clients
 			float sendbufSize = manager->encodeScene(sendbuf);
-			//float xpos = ((float*)sendbuf)[0];
-			//float zpos = ((float*)sendbuf)[1];
-			//float yrot = ((float*)sendbuf)[2];
-			//std::cout << "sending x: " << xpos << " z: " << zpos << " y: " << yrot << "\n";
-			//std::cout << "sending " << sendbuf << std::endl;
-            iSendResult = server->sendData(sendbuf, sendbufSize, 0);
+			std::cout << "sendbufSize: " << sendbufSize << std::endl;
+            iSendResult = server->sendDataAll(sendbuf, sendbufSize, 0);
             if (iSendResult == -1) {
                 return 1;
             }

@@ -35,7 +35,7 @@ void GLTFGeode::draw(Cmd* cmd)
 {
 	countingInstances = false;
 	int instanceID = instanceIDs.front();
-	instanceIDs.pop();
+	instanceIDs.pop_front();
 	bool culling = shouldCull.front();
 	shouldCull.pop();
 

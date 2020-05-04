@@ -166,7 +166,7 @@ void OzzObject::update(float deltaTime)
 
 	for (uint i = 0; i < pGeom->mJointCount; ++i) {
 		gUniformDataBones.mBoneMatrix[i] = mat4::scale(vec3(100, 100, -100)) * gStickFigureRig.GetJointWorldMat(pGeom->pJointRemaps[i]) *
-			mat4::scale(vec3(1, 1, 1)) *
+			//mat4::scale(vec3(1, 1, 1)) *
 			pGeom->pInverseBindPoses[i];
 		//print(gUniformDataBones.mBoneMatrix[i]);
 	}

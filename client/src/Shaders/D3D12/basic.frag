@@ -127,11 +127,11 @@ cbuffer cbMaterialData : register(b0, UPDATE_FREQ_PER_DRAW) {
 	GLTFMaterialData materialData;
 };
 
-Texture2D baseColorMap			: register(t2, UPDATE_FREQ_PER_DRAW);
-Texture2D normalMap				: register(t3, UPDATE_FREQ_PER_DRAW);
-Texture2D metallicRoughnessMap	: register(t4, UPDATE_FREQ_PER_DRAW);
-Texture2D occlusionMap			: register(t5, UPDATE_FREQ_PER_DRAW);
-Texture2D emissiveMap			: register(t6, UPDATE_FREQ_PER_DRAW);
+Texture2D baseColorMap			: register(t3, UPDATE_FREQ_PER_DRAW);
+Texture2D normalMap				: register(t4, UPDATE_FREQ_PER_DRAW);
+Texture2D metallicRoughnessMap	: register(t5, UPDATE_FREQ_PER_DRAW);
+Texture2D occlusionMap			: register(t6, UPDATE_FREQ_PER_DRAW);
+Texture2D emissiveMap			: register(t7, UPDATE_FREQ_PER_DRAW);
 Texture2D ShadowTexture		    : register(t14, UPDATE_FREQ_NONE);
 
 SamplerState baseColorSampler			: register(s0, UPDATE_FREQ_PER_DRAW);

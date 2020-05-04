@@ -29,6 +29,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\..\common\GameObject.cpp" />
     <ClCompile Include="..\..\..\..\..\common\player.cpp" />
+    <ClCompile Include="..\..\..\..\src\OzzGeode.cpp" />
     <ClCompile Include="..\..\..\..\src\OzzObject.cpp" />
     <ClCompile Include="..\..\..\..\src\Application.cpp" />
     <ClCompile Include="..\..\..\..\src\Client.cpp" />
@@ -78,6 +79,8 @@
     <ClInclude Include="..\..\..\..\..\common\team.h" />
     <ClInclude Include="..\..\..\..\..\common\tower.h" />
     <ClInclude Include="..\..\..\..\..\common\unit.h" />
+    <ClInclude Include="..\..\..\..\src\Animator.h" />
+    <ClInclude Include="..\..\..\..\src\OzzGeode.h" />
     <ClInclude Include="..\..\..\..\src\OzzObject.h" />
     <ClInclude Include="..\..\..\..\src\Application.h" />
     <ClInclude Include="..\..\..\..\src\Client.h" />

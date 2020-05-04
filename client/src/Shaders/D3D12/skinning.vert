@@ -34,14 +34,14 @@ cbuffer cbPerPass : register(b0, UPDATE_FREQ_PER_FRAME)
 	float4      lightDirection[3];
 };
 
-cbuffer boneMatrices : register(b1, UPDATE_FREQ_PER_BATCH)
-{
-	float4x4 boneMatrix[MAX_NUM_BONES];
-};
-
 struct InstanceData
 {
-	float4x4	boneMatric;
+	float4x4	sceneToWorld;
+};
+
+struct BoneData
+{
+	float4x4	boneMatrix;
 };
 
 cbuffer cbRootConstants : register(b2) {
@@ -51,6 +51,8 @@ cbuffer cbRootConstants : register(b2) {
 };
 
 StructuredBuffer<InstanceData> instanceBuffer : register(t0, UPDATE_FREQ_PER_BATCH);
+
+StructuredBuffer<BoneData> boneMatrices : register(t2, UPDATE_FREQ_PER_BATCH);
 
 struct VSInput
 {
@@ -62,7 +64,7 @@ struct VSInput
 };
 
 struct PsIn
-{    
+{
     float3 pos               : POSITION;
 	float3 normal	         : NORMAL;
 	float2 texCoord          : TEXCOORD0;
@@ -73,15 +75,12 @@ PsIn main(VSInput input)
 {
     PsIn result;
 	
-	float4x4 boneTransform = (boneMatrix[input.BoneIndices[0]]) * input.BoneWeights[0];
-	boneTransform += (boneMatrix[input.BoneIndices[1]]) * input.BoneWeights[1];
-	boneTransform += (boneMatrix[input.BoneIndices[2]]) * input.BoneWeights[2];
-	boneTransform += (boneMatrix[input.BoneIndices[3]]) * input.BoneWeights[3];
+	float4x4 boneTransform = (boneMatrices[instanceIndex * MAX_NUM_BONES + input.BoneIndices[0]]) * input.BoneWeights[0];
+	boneTransform += (boneMatrices[instanceIndex * MAX_NUM_BONES + input.BoneIndices[1]]) * input.BoneWeights[1];
+	boneTransform += (boneMatrices[instanceIndex * MAX_NUM_BONES + input.BoneIndices[2]]) * input.BoneWeights[2];
+	boneTransform += (boneMatrices[instanceIndex * MAX_NUM_BONES + input.BoneIndices[3]]) * input.BoneWeights[3];
 	
-    float4x4 modelMatrix = float4x4(1, 0, 0, 0,
-                                    0, 1, 0, 0,
-                                    0, 0, 1, 0,
-                                    0, 0, 0, 1);
+    float4x4 modelMatrix = instanceBuffer[instanceIndex].sceneToWorld;
 
 	float4 skinnedPosition = mul(boneTransform, float4(input.Position, 1.0f));
 	float4 worldPosition = mul(modelMatrix, skinnedPosition);

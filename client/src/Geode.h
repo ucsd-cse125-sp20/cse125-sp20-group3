@@ -3,6 +3,7 @@
 #include "../The-Forge/Common_3/Renderer/IRenderer.h"
 #include "Node.h"
 #include <queue>
+#include <deque>
 
 #define MAX_GEOMETRY_INSTANCES 5000
 
@@ -21,7 +22,7 @@ public:
 	static bool countingInstances;
 	static uint32_t instanceCount;
 	int selfInstanceCount = 0;
-	std::queue<int> instanceIDs;
+	std::deque<int> instanceIDs;
 
 	std::queue<vec3> positions;
 	std::queue<bool> shouldCull;

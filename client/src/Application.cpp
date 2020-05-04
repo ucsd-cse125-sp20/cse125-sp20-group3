@@ -189,8 +189,8 @@ vec3 cameraOffset(0, 5, -5);
 float rot = 0.f;
 
 SceneManager* scene;
-OzzObject* animatedObj;
-
+//OzzObject* animatedObj;
+OzzGeode* animatedGeode;
 
 bool connected = false;
 const int serverNameSize = 32;
@@ -222,9 +222,9 @@ bool Application::InitSceneResources()
 
 	scene->createMaterialResources(pRootSignatureShaded, NULL, pDefaultSampler);
 
-	animatedObj = conf_new(OzzObject, pRenderer, "kyubey");
-	animatedObj->AddClip("ArmatureAction");
-	animatedObj->createMaterialResources(pRootSignatureSkinning, NULL, pDefaultSampler);
+	animatedGeode = conf_new(OzzGeode, pRenderer, "kyubey");
+	((OzzObject*)animatedGeode->obj)->AddClip("ArmatureAction");
+	animatedGeode->createMaterialResources(pRootSignatureSkinning, NULL, pDefaultSampler);
 
 	return true;
 }
@@ -233,8 +233,7 @@ void Application::RemoveSceneResources()
 {
 	conf_delete(scene);
 
-	animatedObj->removeResources();
-	conf_delete(animatedObj);
+	conf_delete(animatedGeode);
 }
 
 // ============================================================================
@@ -576,7 +575,7 @@ bool Application::Init()
 	boneBufferDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	boneBufferDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_CPU_TO_GPU;
 	boneBufferDesc.mDesc.mFlags = BUFFER_CREATION_FLAG_PERSISTENT_MAP_BIT;
-	boneBufferDesc.mDesc.mSize = sizeof(mat4) * 50;
+	boneBufferDesc.mDesc.mSize = sizeof(mat4) * MAX_GEOMETRY_INSTANCES * MAX_NUM_BONES;
 	boneBufferDesc.pData = NULL;
 	for (uint32_t i = 0; i < Application::gImageCount; ++i)
 	{
@@ -887,7 +886,7 @@ void Application::LoadPipelines()
 		pipelineSettings.mDepthStencilFormat = pDepthBuffer->mFormat;
 		pipelineSettings.pRootSignature = pRootSignatureSkinning;
 		pipelineSettings.pShaderProgram = pShaderSkinning;
-		pipelineSettings.pVertexLayout = &animatedObj->getVertexLayout();
+		pipelineSettings.pVertexLayout = &OzzObject::getVertexLayout();
 		pipelineSettings.pRasterizerState = &rasterizerStateDesc;
 		addPipeline(pRenderer, &desc, &pPipelineSkinning);
 	}
@@ -1032,7 +1031,7 @@ void Application::Update(float deltaTime)
 	vec3 playerPos = scene->transforms[0]->M[3].getXYZ();
 	pCameraController->moveTo(playerPos);
 
-	animatedObj->update(deltaTime);
+	animatedGeode->update(deltaTime);
 
 	/************************************************************************/
 	// Light Matrix Update - for shadow map
@@ -1160,16 +1159,19 @@ void Application::Draw()
 
 
 
+		Geode::GeodeShaderDesc skinShaderDesc;
+		skinShaderDesc.rootSignature = pRootSignatureSkinning;
+		skinShaderDesc.pipeline = pPipelineSkinning;
+		for (int i = 0; i < DESCRIPTOR_UPDATE_FREQ_COUNT; i++) {
+			skinShaderDesc.descriptorSets[i] = pDescriptorSetSkinning[i];
+		}
 		
 		BufferUpdateDesc boneBufferUpdateDesc = { pUniformBufferBones[gFrameIndex] };
 		beginUpdateResource(&boneBufferUpdateDesc);
-		memcpy(boneBufferUpdateDesc.pMappedData, &animatedObj->gUniformDataBones, sizeof(mat4) * animatedObj->gStickFigureRig.GetNumJoints());
+		animatedGeode->updateBoneBuffer(boneBufferUpdateDesc, NULL);
 		endUpdateResource(&boneBufferUpdateDesc, NULL);
-
-		cmdBindPipeline(cmd, pPipelineSkinning);
-		cmdBindDescriptorSet(cmd, gFrameIndex, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
-		cmdBindDescriptorSet(cmd, gFrameIndex, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
-		animatedObj->draw(cmd);
+		animatedGeode->setProgram(skinShaderDesc);
+		animatedGeode->draw(cmd);
 		
 
 

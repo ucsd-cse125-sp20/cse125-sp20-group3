@@ -11,6 +11,7 @@ class GLTFGeode : public Geode
 public:
 	static bool useMaterials;
 
+	GLTFGeode() {}
 	GLTFGeode(Renderer* renderer, std::string filename);
 	~GLTFGeode();
 

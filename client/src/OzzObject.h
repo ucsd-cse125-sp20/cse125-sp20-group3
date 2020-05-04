@@ -16,7 +16,7 @@
 #include "../The-Forge/Middleware_3/Animation/ClipController.h"
 #include "../The-Forge/Middleware_3/Animation/Rig.h"
 
-#define MAX_NUM_BONES 200
+#define MAX_NUM_BONES 100
 
 class OzzObject : public GLTFObject {
 public:
@@ -40,9 +40,6 @@ public:
 
 	// Rigs
 	Rig gStickFigureRig;
-
-	// SkeletonBatcher
-	SkeletonBatcher gSkeletonBatcher;
 
 	// Timer to get animationsystem update time
 	HiresTimer gAnimationUpdateTimer;

@@ -10,7 +10,7 @@
 
 #include "Object.h"
 
-#define MAX_GLTF_NODES 100
+#define MAX_GLTF_NODES 50
 #define MAX_GLTF_MODELS 50
 
 class GLTFObject : public Object

@@ -38,6 +38,13 @@ void Transform::updateTransformBuffer(BufferUpdateDesc& desc, mat4 parentTransfo
 	}
 }
 
+void Transform::updateBoneBuffer(BufferUpdateDesc& desc, OzzObject::UniformDataBones* boneData)
+{
+	for (auto child : children) {
+		child->updateBoneBuffer(desc, boneData);
+	}
+}
+
 void Transform::cull(const vec4 planes[6], bool doCull)
 {
 	for (auto child : children) {

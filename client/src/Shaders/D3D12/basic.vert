@@ -22,7 +22,7 @@
  * under the License.
 */
 
-#define MAX_GLTF_NODES 100
+#define MAX_GLTF_NODES 50
 
 struct VsIn
 {
@@ -71,7 +71,7 @@ PsIn main(VsIn In)
 {
 	//float4x4 modelToWorld = mul(sceneToWorld, modelToSceneMatrices[nodeIndex]);
 	//float4x4 modelToWorld = sceneToWorld;
-	float4x4 modelToWorld = mul(instanceBuffer[instanceIndex].sceneToWorld, modelToSceneMatrices[modelIndex * 100 + nodeIndex]);
+	float4x4 modelToWorld = mul(instanceBuffer[instanceIndex].sceneToWorld, modelToSceneMatrices[modelIndex * MAX_GLTF_NODES + nodeIndex]);
 	//modelToWorld = instanceBuffer[instanceIndex].sceneToWorld * modelToSceneMatrices[modelIndex * MAX_GLTF_NODES + nodeIndex];
 	
 	PsIn Out;

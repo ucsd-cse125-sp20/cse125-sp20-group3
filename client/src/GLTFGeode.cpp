@@ -17,8 +17,10 @@ GLTFGeode::GLTFGeode(Renderer* renderer, std::string filename)
 
 GLTFGeode::~GLTFGeode()
 {
-	unload();
-	conf_delete(obj);
+	if (obj) {
+		unload();
+		conf_delete(obj);
+	}
 }
 
 void GLTFGeode::createMaterialResources(RootSignature* pRootSignature, DescriptorSet* pBindlessTexturesSamplersSet, Sampler* defaultSampler)

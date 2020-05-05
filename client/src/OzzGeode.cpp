@@ -14,6 +14,12 @@ OzzGeode::~OzzGeode()
 {
 	unload();
 	conf_delete(obj);
+	obj = NULL;
+}
+
+void OzzGeode::unload()
+{
+	((OzzObject*)obj)->removeResources();
 }
 
 void OzzGeode::updateBoneBuffer(BufferUpdateDesc& desc, OzzObject::UniformDataBones* boneData)

@@ -130,14 +130,6 @@ DescriptorSet* pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_COUNT];
 
 VirtualJoystickUI   gVirtualJoystick = {};
 
-struct UniformBlockPlane
-{
-	mat4 mProjectView;
-	mat4 mToWorldMat;
-};
-UniformBlockPlane gUniformDataPlane;
-
-Buffer* pPlaneUniformBuffer[IMAGE_COUNT] = { NULL };
 Buffer* pUniformBuffer[IMAGE_COUNT] = { NULL };
 Buffer* pInstanceBuffer[IMAGE_COUNT] = { NULL };
 Buffer* pUniformBufferBones[IMAGE_COUNT] = { NULL };
@@ -190,7 +182,7 @@ float rot = 0.f;
 
 SceneManager* scene;
 //OzzObject* animatedObj;
-OzzGeode* animatedGeode;
+//OzzGeode* animatedGeode;
 
 bool connected = false;
 const int serverNameSize = 32;
@@ -216,15 +208,21 @@ Application::Application()
 
 bool Application::InitSceneResources()
 {
+	// This must be called after shaders and buffers have been initialized
+
 	scene = conf_new(SceneManager, pRenderer);
 
 	waitForAllResourceLoads();
 
-	scene->createMaterialResources(pRootSignatureShaded, NULL, pDefaultSampler);
+	scene->createMaterialResources(SceneManager::GeodeType::MESH, pRootSignatureShaded, NULL, pDefaultSampler);
+	scene->createMaterialResources(SceneManager::GeodeType::ANIMATED_MESH, pRootSignatureSkinning, NULL, pDefaultSampler);
 
-	animatedGeode = conf_new(OzzGeode, pRenderer, "kyubey");
-	((OzzObject*)animatedGeode->obj)->AddClip("ArmatureAction");
-	animatedGeode->createMaterialResources(pRootSignatureSkinning, NULL, pDefaultSampler);
+	scene->setBuffer(SceneManager::SceneBuffer::INSTANCE, pInstanceBuffer);
+	scene->setBuffer(SceneManager::SceneBuffer::BONE, pUniformBufferBones);
+
+	//animatedGeode = conf_new(OzzGeode, pRenderer, "kyubey");
+	//((OzzObject*)animatedGeode->obj)->AddClip("ArmatureAction");
+	//animatedGeode->createMaterialResources(pRootSignatureSkinning, NULL, pDefaultSampler);
 
 	return true;
 }
@@ -233,7 +231,7 @@ void Application::RemoveSceneResources()
 {
 	conf_delete(scene);
 
-	conf_delete(animatedGeode);
+	//conf_delete(animatedGeode);
 }
 
 // ============================================================================
@@ -546,7 +544,7 @@ bool Application::Init()
 	ibDesc.mDesc.mSize = sizeof(mat4) * MAX_GEOMETRY_INSTANCES;
 	ibDesc.mDesc.mFirstElement = 0;
 	ibDesc.mDesc.mElementCount = MAX_GEOMETRY_INSTANCES;
-	ibDesc.mDesc.mStructStride = sizeof(mat4) - 1;
+	ibDesc.mDesc.mStructStride = sizeof(mat4);
 	ibDesc.mDesc.pCounterBuffer = NULL;
 	for (uint32_t i = 0; i < Application::gImageCount; ++i)
 	{
@@ -572,27 +570,17 @@ bool Application::Init()
 	}
 
 	BufferLoadDesc boneBufferDesc = {};
-	boneBufferDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	boneBufferDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_BUFFER;
 	boneBufferDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_CPU_TO_GPU;
-	boneBufferDesc.mDesc.mFlags = BUFFER_CREATION_FLAG_PERSISTENT_MAP_BIT;
-	boneBufferDesc.mDesc.mSize = sizeof(mat4) * MAX_GEOMETRY_INSTANCES * MAX_NUM_BONES;
+	boneBufferDesc.mDesc.mFlags = BUFFER_CREATION_FLAG_NONE;
+	boneBufferDesc.mDesc.mSize = sizeof(mat4) * MAX_ANIMATED_INSTANCES * MAX_NUM_BONES;
+	boneBufferDesc.mDesc.mElementCount = MAX_ANIMATED_INSTANCES * MAX_NUM_BONES;
+	boneBufferDesc.mDesc.mStructStride = sizeof(mat4);
 	boneBufferDesc.pData = NULL;
 	for (uint32_t i = 0; i < Application::gImageCount; ++i)
 	{
 		boneBufferDesc.ppBuffer = &pUniformBufferBones[i];
 		addResource(&boneBufferDesc, NULL, LOAD_PRIORITY_NORMAL);
-	}
-
-	ubDesc = {};
-	ubDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	ubDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_CPU_TO_GPU;
-	ubDesc.mDesc.mSize = sizeof(UniformBlockPlane);
-	ubDesc.mDesc.mFlags = BUFFER_CREATION_FLAG_PERSISTENT_MAP_BIT;
-	ubDesc.pData = NULL;
-	for (uint32_t i = 0; i < gImageCount; ++i)
-	{
-		ubDesc.ppBuffer = &pPlaneUniformBuffer[i];
-		addResource(&ubDesc, NULL, LOAD_PRIORITY_NORMAL);
 	}
 
 	InitDebugGui();
@@ -653,7 +641,6 @@ void Application::Exit()
 		removeResource(pUniformBuffer[i]);
 		removeResource(pInstanceBuffer[i]);
 		removeResource(pUniformBufferBones[i]);
-		removeResource(pPlaneUniformBuffer[i]);
 		removeResource(pShadowInstanceBuffer[i]);
 	}
 
@@ -744,11 +731,11 @@ void Application::PrepareDescriptorSets()
 
 		for (uint32_t i = 0; i < gImageCount; ++i)
 		{
-			params[0].pName = "cbPerPass";
-			params[0].ppBuffers = &pUniformBuffer[i];
-			updateDescriptorSet(pRenderer, i, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_FRAME], 1, params);
+			//params[0].pName = "cbPerPass";
+			//params[0].ppBuffers = &pUniformBuffer[i];
+			//updateDescriptorSet(pRenderer, i, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_FRAME], 1, params);
 
-			params[0].pName = "boneMatrices";
+			params[0].pName = "boneBuffer";
 			params[0].ppBuffers = &pUniformBufferBones[i];
 			updateDescriptorSet(pRenderer, i, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_BATCH], 1, params);
 		}
@@ -1031,7 +1018,7 @@ void Application::Update(float deltaTime)
 	vec3 playerPos = scene->transforms[0]->M[3].getXYZ();
 	pCameraController->moveTo(playerPos);
 
-	animatedGeode->update(deltaTime);
+	//animatedGeode->update(deltaTime);
 
 	/************************************************************************/
 	// Light Matrix Update - for shadow map
@@ -1094,7 +1081,7 @@ void Application::Draw()
 	cmdBeginGpuFrameProfile(cmd, gGpuProfileToken);
 
 	// Draw depth map for shadows
-	drawShadowMap(cmd);
+	//drawShadowMap(cmd);
 
 	// draw scene
 	{
@@ -1124,40 +1111,13 @@ void Application::Draw()
 		// Start Drawing scene
 		cmdBeginGpuTimestampQuery(cmd, gGpuProfileToken, "Draw Scene");
 
+		// Collect rendering details
 		Geode::GeodeShaderDesc meshShaderDesc;
 		meshShaderDesc.rootSignature = pRootSignatureShaded;
 		meshShaderDesc.pipeline = pMeshOptDemoPipeline;
 		for (int i = 0; i < DESCRIPTOR_UPDATE_FREQ_COUNT; i++) {
 			meshShaderDesc.descriptorSets[i] = pDescriptorSetsShaded[i];
 		}
-
-		// Update general uniform buffers
-		BufferUpdateDesc shaderCbv = { pUniformBuffer[Application::gFrameIndex] };
-		beginUpdateResource(&shaderCbv);
-		*(UniformBlock*)shaderCbv.pMappedData = gUniformData;
-		endUpdateResource(&shaderCbv, NULL);
-
-		// Update per-instance uniforms
-		shaderCbv = { pInstanceBuffer[Application::gFrameIndex] };
-		beginUpdateResource(&shaderCbv);
-		scene->updateTransformBuffer(shaderCbv, mat4::identity());
-		endUpdateResource(&shaderCbv, NULL);
-
-		// Set render target
-		cmdBindRenderTargets(cmd, 1, &pRenderTarget, pDepthBuffer, NULL, NULL, NULL, -1, -1);
-		cmdSetViewport(cmd, 0.0f, 0.0f, (float)pRenderTarget->mWidth, (float)pRenderTarget->mHeight, 0.0f, 1.0f);
-		cmdSetScissor(cmd, 0, 0, pRenderTarget->mWidth, pRenderTarget->mHeight);
-
-		vec4 frustumPlanes[6];
-		mat4::extractFrustumClipPlanes(Application::projMat * Application::viewMat, frustumPlanes[0], frustumPlanes[1], frustumPlanes[2], frustumPlanes[3], frustumPlanes[4], frustumPlanes[5], true);
-		scene->cull(frustumPlanes, bToggleCull);
-
-		scene->setProgram(meshShaderDesc);
-		GLTFGeode::useMaterials = true;
-		scene->draw(cmd);
-
-
-
 
 		Geode::GeodeShaderDesc skinShaderDesc;
 		skinShaderDesc.rootSignature = pRootSignatureSkinning;
@@ -1166,16 +1126,22 @@ void Application::Draw()
 			skinShaderDesc.descriptorSets[i] = pDescriptorSetSkinning[i];
 		}
 		
-		BufferUpdateDesc boneBufferUpdateDesc = { pUniformBufferBones[gFrameIndex] };
-		beginUpdateResource(&boneBufferUpdateDesc);
-		animatedGeode->updateBoneBuffer(boneBufferUpdateDesc, NULL);
-		endUpdateResource(&boneBufferUpdateDesc, NULL);
-		animatedGeode->setProgram(skinShaderDesc);
-		animatedGeode->draw(cmd);
-		
+		// Set render target
+		cmdBindRenderTargets(cmd, 1, &pRenderTarget, pDepthBuffer, NULL, NULL, NULL, -1, -1);
+		cmdSetViewport(cmd, 0.0f, 0.0f, (float)pRenderTarget->mWidth, (float)pRenderTarget->mHeight, 0.0f, 1.0f);
+		cmdSetScissor(cmd, 0, 0, pRenderTarget->mWidth, pRenderTarget->mHeight);
 
+		// Update general uniform buffers
+		BufferUpdateDesc shaderCbv = { pUniformBuffer[Application::gFrameIndex] };
+		beginUpdateResource(&shaderCbv);
+		*(UniformBlock*)shaderCbv.pMappedData = gUniformData;
+		endUpdateResource(&shaderCbv, NULL);
 
-
+		scene->setProgram(SceneManager::GeodeType::MESH, meshShaderDesc);
+		scene->setProgram(SceneManager::GeodeType::ANIMATED_MESH, skinShaderDesc);
+		GLTFGeode::useMaterials = true;
+		SceneManager::enableCulling = bToggleCull;
+		scene->draw(cmd);
 
 		// Unbind render targets
 		cmdBindRenderTargets(cmd, 0, NULL, 0, NULL, NULL, NULL, -1, -1);
@@ -1374,7 +1340,7 @@ void Application::drawShadowMap(Cmd* cmd)
 	mat4::extractFrustumClipPlanes(gShadowUniformData.ViewProj, frustumPlanes[0], frustumPlanes[1], frustumPlanes[2], frustumPlanes[3], frustumPlanes[4], frustumPlanes[5], true);
 	scene->cull(frustumPlanes, bToggleCull);
 
-	scene->setProgram(meshShaderDesc);
+	scene->setProgram(SceneManager::GeodeType::MESH, meshShaderDesc);
 	GLTFGeode::useMaterials = false;
 	scene->draw(cmd);
 

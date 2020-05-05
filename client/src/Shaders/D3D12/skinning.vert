@@ -22,7 +22,7 @@
  * under the License.
 */
 
-#define MAX_NUM_BONES 100
+#define MAX_NUM_BONES 50
 
 cbuffer cbPerPass : register(b0, UPDATE_FREQ_PER_FRAME)
 {
@@ -41,7 +41,7 @@ struct InstanceData
 
 struct BoneData
 {
-	float4x4	boneMatrix;
+	float4x4	boneMat;
 };
 
 cbuffer cbRootConstants : register(b2) {
@@ -52,7 +52,7 @@ cbuffer cbRootConstants : register(b2) {
 
 StructuredBuffer<InstanceData> instanceBuffer : register(t0, UPDATE_FREQ_PER_BATCH);
 
-StructuredBuffer<BoneData> boneMatrices : register(t2, UPDATE_FREQ_PER_BATCH);
+StructuredBuffer<BoneData> boneBuffer : register(t2, UPDATE_FREQ_PER_BATCH);
 
 struct VSInput
 {
@@ -75,10 +75,10 @@ PsIn main(VSInput input)
 {
     PsIn result;
 	
-	float4x4 boneTransform = (boneMatrices[instanceIndex * MAX_NUM_BONES + input.BoneIndices[0]]) * input.BoneWeights[0];
-	boneTransform += (boneMatrices[instanceIndex * MAX_NUM_BONES + input.BoneIndices[1]]) * input.BoneWeights[1];
-	boneTransform += (boneMatrices[instanceIndex * MAX_NUM_BONES + input.BoneIndices[2]]) * input.BoneWeights[2];
-	boneTransform += (boneMatrices[instanceIndex * MAX_NUM_BONES + input.BoneIndices[3]]) * input.BoneWeights[3];
+	float4x4 boneTransform = (boneBuffer[instanceIndex * MAX_NUM_BONES + input.BoneIndices[0]].boneMat) * input.BoneWeights[0];
+	boneTransform += (boneBuffer[instanceIndex * MAX_NUM_BONES + input.BoneIndices[1]].boneMat) * input.BoneWeights[1];
+	boneTransform += (boneBuffer[instanceIndex * MAX_NUM_BONES + input.BoneIndices[2]].boneMat) * input.BoneWeights[2];
+	boneTransform += (boneBuffer[instanceIndex * MAX_NUM_BONES + input.BoneIndices[3]].boneMat) * input.BoneWeights[3];
 	
     float4x4 modelMatrix = instanceBuffer[instanceIndex].sceneToWorld;
 

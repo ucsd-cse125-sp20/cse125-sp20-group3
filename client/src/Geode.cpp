@@ -45,6 +45,7 @@ void Geode::updateTransformBuffer(BufferUpdateDesc& desc, mat4 parentTransform)
 	int instanceID = instanceCount++;
 	instanceIDs.push_back(instanceID);
 	positions.push(parentTransform[3].getXYZ());
+	//print(parentTransform[3].getXYZ());
 	mat4* instanceData = (mat4*)desc.pMappedData;
 	instanceData[instanceID] = parentTransform;
 }

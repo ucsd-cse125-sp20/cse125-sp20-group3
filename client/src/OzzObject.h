@@ -16,7 +16,7 @@
 #include "../The-Forge/Middleware_3/Animation/ClipController.h"
 #include "../The-Forge/Middleware_3/Animation/Rig.h"
 
-#define MAX_NUM_BONES 100
+#define MAX_NUM_BONES 50
 
 class OzzObject : public GLTFObject {
 public:

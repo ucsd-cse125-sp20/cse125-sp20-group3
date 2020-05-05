@@ -11,8 +11,21 @@
 
 class OzzGeode : public GLTFGeode {
 public:
+	struct MeshPushConstants
+	{
+		uint32_t nodeIndex;
+		uint32_t instanceIndex;
+		uint32_t modelIndex;
+		uint32_t animatedInstanceIndex;
+	};
+
 	OzzGeode(Renderer* renderer, std::string directory);
 	~OzzGeode();
+
+	static bool countingAnimatedInstances;
+	static uint32_t animatedInstanceCount;
+	int selfAnimatedInstanceCount = 0;
+	std::deque<int> animatedInstanceIDs;
 
 	void unload();
 

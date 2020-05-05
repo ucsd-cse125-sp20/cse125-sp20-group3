@@ -81,9 +81,12 @@ PsIn main(VSInput input)
 	boneTransform += (boneBuffer[instanceIndex * MAX_NUM_BONES + input.BoneIndices[3]].boneMat) * input.BoneWeights[3];
 	
     float4x4 modelMatrix = instanceBuffer[instanceIndex].sceneToWorld;
+    //modelMatrix = float4x4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
 
 	float4 skinnedPosition = mul(boneTransform, float4(input.Position, 1.0f));
+	//float4 skinnedPosition = float4(input.Position, 1.0f);
 	float4 worldPosition = mul(modelMatrix, skinnedPosition);
+	//float4 worldPosition = mul(modelMatrix + boneTransform - boneTransform, skinnedPosition);
 
 	result.position = mul(projView, worldPosition);
     result.pos = worldPosition.xyz;

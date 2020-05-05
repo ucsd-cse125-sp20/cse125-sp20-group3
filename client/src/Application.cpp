@@ -573,8 +573,8 @@ bool Application::Init()
 	boneBufferDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_BUFFER;
 	boneBufferDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_CPU_TO_GPU;
 	boneBufferDesc.mDesc.mFlags = BUFFER_CREATION_FLAG_NONE;
-	boneBufferDesc.mDesc.mSize = sizeof(mat4) * MAX_ANIMATED_INSTANCES * MAX_NUM_BONES;
-	boneBufferDesc.mDesc.mElementCount = MAX_ANIMATED_INSTANCES * MAX_NUM_BONES;
+	boneBufferDesc.mDesc.mSize = sizeof(mat4) * MAX_GEOMETRY_INSTANCES * MAX_NUM_BONES;
+	boneBufferDesc.mDesc.mElementCount = MAX_GEOMETRY_INSTANCES * MAX_NUM_BONES;
 	boneBufferDesc.mDesc.mStructStride = sizeof(mat4);
 	boneBufferDesc.pData = NULL;
 	for (uint32_t i = 0; i < Application::gImageCount; ++i)
@@ -727,17 +727,19 @@ void Application::PrepareDescriptorSets()
 	}
 
 	{
-		DescriptorData params[1] = {};
+		DescriptorData params[2] = {};
 
 		for (uint32_t i = 0; i < gImageCount; ++i)
 		{
-			//params[0].pName = "cbPerPass";
-			//params[0].ppBuffers = &pUniformBuffer[i];
-			//updateDescriptorSet(pRenderer, i, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_FRAME], 1, params);
+			params[0].pName = "cbPerPass";
+			params[0].ppBuffers = &pUniformBuffer[i];
+			updateDescriptorSet(pRenderer, i, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_FRAME], 1, params);
 
 			params[0].pName = "boneBuffer";
 			params[0].ppBuffers = &pUniformBufferBones[i];
-			updateDescriptorSet(pRenderer, i, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_BATCH], 1, params);
+			params[1].pName = "instanceBuffer";
+			params[1].ppBuffers = &pInstanceBuffer[i];
+			updateDescriptorSet(pRenderer, i, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_BATCH], 2, params);
 		}
 	}
 }

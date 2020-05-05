@@ -75,7 +75,9 @@
     <ClCompile Include="..\..\..\..\src\GLTFObject.cpp">
       <Filter>Source Files\Asset Loading</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\OzzGeode.cpp" />
+    <ClCompile Include="..\..\..\..\src\OzzGeode.cpp">
+      <Filter>Source Files\Scene Graph</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\src\Shaders\D3D12\basic.frag">

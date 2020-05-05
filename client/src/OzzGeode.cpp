@@ -24,9 +24,11 @@ void OzzGeode::unload()
 
 void OzzGeode::updateBoneBuffer(BufferUpdateDesc& desc, OzzObject::UniformDataBones* boneData)
 {
-	if (!boneData) boneData = &((OzzObject*)obj)->gUniformDataBones;
+	if (!boneData) boneData = &((OzzObject*)obj)->gUniformDataBones; // TODO move this into a transform node with a rig
 	for (int i = 0; i < instanceIDs.size(); i++) {
-		memcpy((mat4*)desc.pMappedData + instanceIDs[i], boneData, sizeof(mat4) * ((OzzObject*)obj)->gStickFigureRig.GetNumJoints());
+		memcpy((mat4*)desc.pMappedData + instanceIDs[i] * MAX_NUM_BONES, boneData, sizeof(mat4) * ((OzzObject*)obj)->gStickFigureRig.GetNumJoints());
+		//printf("%d=============================================================bones", i);
+		//for (int j = 0; j < (int)((OzzObject*)obj)->gStickFigureRig.GetNumJoints(); j++) print(((mat4*)desc.pMappedData + instanceIDs[i])[j]);
 	}
 }
 
@@ -46,10 +48,11 @@ void OzzGeode::draw(Cmd* cmd)
 				cmdBindDescriptorSet(cmd, i == 0 ? 0 : Application::gFrameIndex, shader.descriptorSets[i]);
 		}
 
-		GLTFObject::MeshPushConstants pushConstants = {};
+		OzzGeode::MeshPushConstants pushConstants = {};
 		pushConstants.nodeIndex = 0;
 		pushConstants.instanceIndex = instanceID;
 		pushConstants.modelIndex = ((GLTFObject*)obj)->modelID;
+		pushConstants.animatedInstanceIndex = 0;
 
 		//printf("%d %d %d\n", pushConstants.nodeIndex, pushConstants.instanceIndex, pushConstants.modelIndex);
 		

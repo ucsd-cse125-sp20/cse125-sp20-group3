@@ -63,6 +63,7 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 
 SceneManager_Client::~SceneManager_Client()
 {
+	for (std::pair<std::string, Entity*> e : idMap) conf_delete(e.second);
 	for (std::pair<std::string, Transform*> t : transforms) conf_delete(t.second);
 	for (std::pair<std::string, GLTFGeode*> g : gltfGeodes) conf_delete(g.second);
 }

@@ -20,6 +20,8 @@ bool SceneManager_Server::addPlayer(std::string player_id) {
 	if (idMap.find(player_id) == idMap.end()) { //player_id not in map, create a new player
 		idMap[player_id] = new Player();
 		std::cout << "created new player id: " << player_id << " at " << idMap[player_id] << "\n";
+
+		//this->populateScene();
 		return true; //return true that a player was added
 	}
 	else return false; //return false, player was not added
@@ -119,10 +121,10 @@ int SceneManager_Server::encodeScene(char buf[]) {
 void SceneManager_Server::populateScene() {
 	srand((unsigned int)time(NULL));
 	for (int i = 0; i < 10; i++) {
-		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
-		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
-		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
-		float s = 1.0f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
+		float x = (rand() % 41) - 20;//-100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
+		float z = (rand() % 41) - 20;//-100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
+		float rot = (rand() * PI) / RAND_MAX;//static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
+		float s = 1.0f + ((rand() * 1.0f) / RAND_MAX);//static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
 
 		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
 		Minion* m = new Minion(MINION_HEALTH, MINION_ATTACK);
@@ -132,10 +134,10 @@ void SceneManager_Server::populateScene() {
 		if (next_minion_id == ID_MINION_MAX) next_minion_id = ID_MINION_MIN;
 	}
 	for (int i = 0; i < 5; i++) {
-		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
-		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
-		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
-		float s = 0.75f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 0.5f));
+		float x = (rand() % 41) - 20;//-100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
+		float z = (rand() % 41) - 20;//-100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
+		float rot = (rand() * PI) / RAND_MAX;//static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
+		float s = 1.0f + ((rand() * 1.0f) / RAND_MAX);//static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
 
 		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
 		Tower* t = new Tower(TOWER_HEALTH, TOWER_ATTACK);

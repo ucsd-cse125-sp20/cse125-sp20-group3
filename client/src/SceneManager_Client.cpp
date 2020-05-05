@@ -125,7 +125,8 @@ void SceneManager_Client::updateFromClientBuf(char buf[], int bufsize)
 
 					if (idMap.find(id_str) == idMap.end()) { //new id encountered, spawn new object
 						int id_int = stoi(id_str);
-						if (ID_PLAYER_MIN < id_int || id_int < ID_PLAYER_MAX) {
+						std::cout << "id_int: " << id_int << "\n";
+						if (ID_PLAYER_MIN <= id_int && id_int <= ID_PLAYER_MAX) {
 							std::cout << "creating new player, id: " << id_str << "\n";
 							idMap[id_str] = conf_new(Player); //TODO use conf_new
 							transforms[id_str] = conf_new(Transform, mat4::identity());
@@ -135,20 +136,22 @@ void SceneManager_Client::updateFromClientBuf(char buf[], int bufsize)
 
 							player_adjustments.push_back(adjustment);
 						}
-						else if (ID_BASE_MIN < id_int && id_int < ID_BASE_MAX) {
+						else if (ID_BASE_MIN <= id_int && id_int <= ID_BASE_MAX) {
 							//idMap[id_str] = new Base();
 						}
-						else if (ID_MINION_MIN < id_int && id_int < ID_MINION_MAX) {
+						else if (ID_MINION_MIN <= id_int && id_int <= ID_MINION_MAX) {
+							std::cout << "creating new minion, id: " << id_str << "\n";
 							idMap[id_str] = conf_new(Minion, MINION_HEALTH, MINION_ATTACK);
 							transforms[id_str] = conf_new(Transform, mat4::identity());
 							transforms[id_str]->addChild(gltfGeodes[MINION_GEODE]);
 						}
-						else if (ID_TOWER_MIN < id_int && id_int < ID_TOWER_MAX) {
+						else if (ID_TOWER_MIN <= id_int && id_int <= ID_TOWER_MAX) {
+							std::cout << "creating new tower, id: " << id_str << "\n";
 							idMap[id_str] = conf_new(Tower, TOWER_HEALTH, TOWER_ATTACK);
 							transforms[id_str] = conf_new(Transform, mat4::identity());
 							transforms[id_str]->addChild(gltfGeodes[TOWER_GEODE]);
 						}
-						else if (ID_RESOURCE_MIN < id_int && id_int < ID_RESOURCE_MAX) {
+						else if (ID_RESOURCE_MIN <= id_int && id_int <= ID_RESOURCE_MAX) {
 							//idMap[id_str] = new Resource();
 						}
 					}

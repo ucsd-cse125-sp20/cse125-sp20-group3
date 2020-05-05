@@ -35,7 +35,7 @@
     <ClCompile Include="..\..\..\..\src\GLTFGeode.cpp" />
     <ClCompile Include="..\..\..\..\src\GLTFObject.cpp" />
     <ClCompile Include="..\..\..\..\src\Input.cpp" />
-    <ClCompile Include="..\..\..\..\src\SceneManager.cpp" />
+    <ClCompile Include="..\..\..\..\src\SceneManager_Client.cpp" />
     <ClCompile Include="..\..\..\..\src\Transform.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -11,5 +11,5 @@ public:
         Minion(mat4 model_mat, std::string objFilename);
         Minion(mat4 model_mat);
         ~Minion();
-        void update();
+        void update() override;
 };

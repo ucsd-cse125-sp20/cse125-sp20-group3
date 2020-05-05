@@ -17,10 +17,21 @@
 #define ID_RESOURCE_MIN 4000
 #define ID_RESOURCE_MAX 4999
 
-#define PLAYER_TYPE 'p'
 #define BASE_TYPE 'b'
 #define MINION_TYPE 'm'
 #define TOWER_TYPE 't'
 #define RESOURCE_TYPE 'r'
+
+#define PLAYER_HEALTH 200
+#define BASE_HEALTH 2000
+#define MINION_HEALTH 50
+#define TOWER_HEALTH 500
+#define RESOURCE_HEALTH 1
+
+#define PLAYER_ATTACK 25
+#define BASE_ATTACK 0
+#define MINION_ATTACK 10
+#define TOWER_ATTACK 20
+#define RESOURCE_ATTACK 0
 
 #endif

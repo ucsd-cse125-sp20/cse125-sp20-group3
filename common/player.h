@@ -7,6 +7,7 @@
 #include <ctime>
 #include "entity.h"
 #include "client2server.h"
+#include "macros.h"
 
 #define MOVE_SPEED 1
 
@@ -20,7 +21,7 @@ public:
     Player(); //client-side, init nothing
     Player(mat4 model_mat); //server-side, only init state management logic
 	
-    void update(); //server-side state management
+    void update() override; //server-side state management
 	void setVelocity(float vel_x, float vel_z);
 	void setMoveAndDir(PlayerInput in);
 

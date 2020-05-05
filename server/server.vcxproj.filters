@@ -56,9 +56,6 @@
     <ClInclude Include="..\common\tower.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\unit.h">
-      <Filter>Header Files\Game Objects</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\entity.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
@@ -69,6 +66,9 @@
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
     <ClInclude Include="SceneManager_Server.h">
+      <Filter>Header Files\Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\minion.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
   </ItemGroup>

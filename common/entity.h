@@ -8,17 +8,18 @@
 #include <ctime>
 
 class Entity : public GameObject {
-private:
+protected:
     int health;
     int attack;
     Team* team;
 public:
-	Entity() : GameObject() {};
-	Entity(mat4 m) : GameObject(m) {};
-	void update() { GameObject::update(); }
+	Entity(int h, int a) : GameObject() { health = h; attack = a; };
+	Entity(int h, int a, mat4 m) : GameObject(m) { health = h; attack = a; };
+	void update() override { GameObject::update(); }
     bool isEnemyTeam(Team* checkTeam);
 	int getHealth() { return health; }
-	void updateHealth(int attack);
+	void setHealth(int new_health) { health = new_health; }
+	void takeDamage(int attack);
 };
 
 #endif

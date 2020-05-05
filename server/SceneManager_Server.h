@@ -8,6 +8,10 @@
 #include "../common/macros.h"
 #include "../common/player.h"
 #include "../common/team.h"
+#include "../common/base.h"
+#include "../common/minion.h"
+#include "../common/tower.h"
+//#include "../common/resource.h"
 
 class SceneManager_Server {
 private:
@@ -21,7 +25,9 @@ private:
 public:
 	SceneManager_Server();
 	void processInput(std::string player, PlayerInput in);
-	void spawnEntity(char spawnType, float pos_x, float pos_z, float y_rot);
+	bool addPlayer(std::string player_id);
+	void spawnEntity(char spawnType, float pos_x, float pos_z, float rot_y);
+	void resetClocks();
 	void update();
 	int encodeScene(char buf[]);
 };

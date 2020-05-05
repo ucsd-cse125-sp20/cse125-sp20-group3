@@ -113,7 +113,7 @@
     <ClInclude Include="..\common\player.h" />
     <ClInclude Include="..\common\team.h" />
     <ClInclude Include="..\common\tower.h" />
-    <ClInclude Include="..\common\unit.h" />
+    <ClInclude Include="..\common\minion.h" />
     <ClInclude Include="SceneManager_Server.h" />
     <ClInclude Include="Server.h" />
   </ItemGroup>

@@ -54,11 +54,11 @@
     <ClCompile Include="..\..\..\..\..\common\player.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\SceneManager.cpp">
-      <Filter>Source Files\Scene Graph</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\..\common\GameObject.cpp">
       <Filter>Source Files\Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\SceneManager_Client.cpp">
+      <Filter>Source Files\Scene Graph</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

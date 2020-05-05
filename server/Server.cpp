@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
-#include <thread>
 #include "Server.h"
 
 // Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib
@@ -93,24 +92,23 @@ Server::Server() {
 		ClientSockets[number_of_clients] = accept (ListenSocket, NULL, NULL); 
 		if (ClientSockets[number_of_clients] == INVALID_SOCKET)
 		{ // error accepting connection
-			WSACleanup ();
+			printf("accept failed with error: %d\n", WSAGetLastError());
+			closesocket(ListenSocket);
+			WSACleanup();
+		//TODO handle failure
 			return;
 		}
 		else
 		{ // client connected successfully
 			// start a thread that will communicate with client
-			//startThread (client[number_of_clients]);
+			// startThread (client[number_of_clients]);
 			number_of_clients++;
 			std::cout << "Accepted " << number_of_clients << " of " << NUM_PLAYERS << " players" << std::endl;
+			
+			Players_State[number_of_clients].id = number_of_clients;
+			// Create the thread here
+			players_threads[number_of_clients] = std::thread(&handle_player_inputs, &Players_State[number_of_clients], 0);
 		}
-	}
-
-	
-	if (ClientSockets[0] == INVALID_SOCKET) {
-		printf("accept failed with error: %d\n", WSAGetLastError());
-		closesocket(ListenSocket);
-		WSACleanup();
-		//TODO handle failure
 	}
 
 	// No longer need server socket
@@ -182,4 +180,43 @@ int Server::cleanup(int how) {
 	WSACleanup();
 	if (err) return err;
 	return iResult;
+}
+
+int Server::handle_player_inputs(players_state* players_state, int flags) {
+	int err = 0;
+	int iResult;
+	int totaliResult = 0;
+	char temp_buf[DEFAULT_BUFLEN];
+	//std::stringstream ss (ios_base::app | std::stringstream::out);
+
+	while (1)
+	{
+		ZeroMemory(temp_buf, sizeof(temp_buf));
+		iResult = recv(ClientSockets[players_state->id], temp_buf, DEFAULT_BUFLEN, flags);
+		if (iResult < 0){
+		    // error
+			printf("Player id %d got %s\n", players_state->id, "SOCKET_ERROR");
+			players_state->disconnected = 1;
+
+			return 1;
+		} else if(iResult == 0){
+			printf("Player id %d disconnects\n", players_state->id);
+			players_state->disconnected = 1;
+			return 0;
+		}
+		else{
+			// concatenate the input
+			//ss.write(temp_buf, sizeof(temp_buf));
+			players_state_mtx[players_state->id].lock();
+			players_state->in = (PlayerInput*)temp_buf;
+			players_state_mtx[players_state->id].unlock();
+		}
+	}
+	//players_state->in = ss.str();
+}
+
+void Server::end_game(){
+	for (int i; i < NUM_PLAYERS; i++){
+		players_threads[i].join();
+	}
 }

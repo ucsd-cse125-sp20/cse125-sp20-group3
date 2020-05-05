@@ -6,7 +6,7 @@
 #include <map>
 #include <iostream>
 #include "Server.h"
-#include "GameObject.h"
+#include "../common/GameObject.h"
 #include "../common/client2server.h"
 
 int __cdecl main(void)
@@ -69,7 +69,7 @@ int __cdecl main(void)
             
         }
         else if (iResult == 0) {
-                
+            
         }
         else  {
             return 1;
@@ -78,6 +78,7 @@ int __cdecl main(void)
     } while (1);// (iResult > 0);
 
     // shutdown the connection since we're done
+    server->end_game();
     iResult = server->cleanup(SD_SEND);
     if (iResult == -1) {
         return 1;

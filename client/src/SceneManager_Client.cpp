@@ -125,7 +125,7 @@ void SceneManager_Client::updateFromClientBuf(char buf[], int bufsize)
 
 					if (idMap.find(id_str) == idMap.end()) { //new id encountered, spawn new object
 						int id_int = stoi(id_str);
-						std::cout << "id_int: " << id_int << "\n";
+						//std::cout << "id_int: " << id_int << "\n";
 						if (ID_PLAYER_MIN <= id_int && id_int <= ID_PLAYER_MAX) {
 							std::cout << "creating new player, id: " << id_str << "\n";
 							idMap[id_str] = conf_new(Player); //TODO use conf_new

@@ -47,7 +47,7 @@ int __cdecl main(void)
 
             // Process data
 			// read id, handle player input
-			std::string s(recvbuf);
+			//std::string s(recvbuf);
 			//std::cout << "recvbuf: " << s << "\n";
 			int ind = 0;
 			for (int b = 0; b < NUM_PLAYERS; b++) {
@@ -55,12 +55,13 @@ int __cdecl main(void)
 				std::string player_str = std::string(1, player_num);
 				ind++;
 
-				//std::cout << "processing player " << player_num << "\n";
-
+				std::cout << "processing player " << player_num << "\n";
+				
 				if (manager->addPlayer(player_str)) { //if this player's communication is new, create new player
 					char id_buf[1] = { player_num };
 					server->sendDataPlayer(stoi(player_str), id_buf, 1, 0);
 				}
+				std::cout << "addPlayer ok\n";
 
 				/*int move_x = ((int*)(recvbuf + ind))[0];
 				int move_z = ((int*)(recvbuf + ind))[1];
@@ -70,25 +71,37 @@ int __cdecl main(void)
 				PlayerInput input = ((PlayerInput*)(recvbuf + ind))[0]; //TODO modify this to allow for build tower commands
 				ind += sizeof PlayerInput;
 
+				std::cout << "a\n";
+				manager->addPlayer(player_str);
+
 				if (recvbuf[ind] == DELIMITER) {
 					manager->processInput(std::string(1, player_num), input);
+					std::cout << "b\n";
+					manager->addPlayer(player_str);
 				}
 				else {
 					std::cout << "buf size mismatch in receive, delimiter not found when expected\n";
 				}
 				ind++;
 			}
-
+			std::cout << "c\n";
+			manager->addPlayer("0");
 			//Update Game State
 			manager->update();
+			std::cout << "d\n";
+			manager->addPlayer("0");
 
 			//Send updated data back to clients
 			float sendbufSize = manager->encodeScene(sendbuf);
-			//std::cout << "sendbufSize: " << sendbufSize << std::endl;
+			std::cout << "sendbufSize: " << sendbufSize << std::endl;
+			std::cout << "e\n";
+			manager->addPlayer("0");
             iSendResult = server->sendDataAll(sendbuf, sendbufSize, 0);
             if (iSendResult == -1) {
                 return 1;
             }
+			std::cout << "f\n";
+			manager->addPlayer("0");
             
         }
         else if (iResult == 0) {

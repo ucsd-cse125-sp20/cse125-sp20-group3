@@ -84,7 +84,7 @@ int __cdecl main(void)
 
 			//Send updated data back to clients
 			float sendbufSize = manager->encodeScene(sendbuf);
-			std::cout << "sendbufSize: " << sendbufSize << std::endl;
+			//std::cout << "sendbufSize: " << sendbufSize << std::endl;
             iSendResult = server->sendDataAll(sendbuf, sendbufSize, 0);
             if (iSendResult == -1) {
                 return 1;

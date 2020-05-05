@@ -195,7 +195,7 @@ int Server::recvData(char recvbuf[], int buflen, int flags) {
 		int begin_data_ind = recvbufind;
 
 		if (recvlens[i] != sizeof(PlayerInput)) {
-			std::cout << "non PlayerInput received\n";
+			//std::cout << "non PlayerInput received\n";
 		}
 		for (int j = 0; j < min(recvlens[i], sizeof(PlayerInput)); j++) { //only copy one playerinput in
 			recvbuf[recvbufind] = tempbufs[i][j];

@@ -77,22 +77,49 @@ void SceneManager_Client::createMaterialResources(RootSignature* pRootSignature,
 void SceneManager_Client::updateFromClientBuf(char buf[], int bufsize)
 {
 	if (trackedPlayer_ID == "" && bufsize == 1) {	//first message from server should be 1 byte message
-		trackPlayer(std::string(1, buf[0]));			//of the player's connection id
+		trackPlayer(std::string(1, buf[0]));		//of the player's connection id
 	}
 	else {
 		std::string id_str = "";
 		GameObject::GameObjectData data;
 		int health;
-		int state = 0; // 0 for reading id, 1 for reading gameobjectdata, 2 for reading health
+		int state = 0; // 0 for reading id, 1 for reading gameobjectdata, 2 for reading health, 3 for checking closing delimiter
 		for (int i = 0; i < DEFAULT_BUFLEN; i++) {
-			if (buf[i] == DELIMITER) { //delimiter encountered, process bytes according to state
-				if (state == 2) {
-					std::cout << "state 2 delimiter | i: " << i << "\n";
-					std::cout << "id: " << id_str << " x: " << data.x << " z: " << data.z << " y: " << data.rot << " health: " << health << "\n";
+			if (state == 0) {
+				if (buf[i] == DELIMITER) {
+					state++; //end of state found, advance to next state
+				}
+				else { //read id bytes one by one, appending to id_str
+					id_str += buf[i];
+				}
+
+			}
+			else if (state == 1) {
+				int move_x = ((int*)(buf + i))[0];
+				int move_z = ((int*)(buf + i + 4))[0];
+				float rot_y = ((float*)(buf + i + 8))[0];
+				//std::cout << "move_x: " << move_x << " move_z: " << move_z << " rot_y: " << rot_y << "\n";
+				data = ((GameObject::GameObjectData*)(buf + i))[0];
+				i += (sizeof GameObject::GameObjectData); //advance i to where delimiter should be
+
+				if (buf[i] == DELIMITER) {
+					state++; //end of state found, advance to next state
+				}
+				else {
+					std::cout << "state 1 delimiter expected but not found, i: " << i << "\n";
+				}
+			}
+			else if (state == 2) {
+				health = ((int*)(buf + i))[0];
+				i += sizeof(int); //advance i to where delimiter should be
+
+				if (buf[i] == DELIMITER) { //end of data line found, write to map, advance to possible final state
+					//std::cout << "id: " << id_str << " x: " << data.x << " z: " << data.z << " y: " << data.rot << " health: " << health << "\n";
 
 					if (idMap.find(id_str) == idMap.end()) { //new id encountered, spawn new object
 
 						if (ID_PLAYER_MIN < stoi(id_str) || stoi(id_str) < ID_PLAYER_MAX) {
+							std::cout << "creating new player, id: " << id_str << "\n";
 							idMap[id_str] = conf_new(Player); //TODO use conf_new
 							transforms[id_str] = conf_new(Transform, mat4::identity());
 							transforms[id_str]->addChild(gltfGeodes[PLAYER_GEODE]);
@@ -113,39 +140,27 @@ void SceneManager_Client::updateFromClientBuf(char buf[], int bufsize)
 					idMap[id_str]->setData(data);
 					transforms[id_str]->setMatrix(idMap[id_str]->getMatrix());
 					idMap[id_str]->setHealth(health);
-					state = 0;
 					id_str = "";
-				}
-				else {
-					std::cout << "state " << state << " delimiter | i: " << i << "\n";
 					state++;
 				}
+				else {
+					std::cout << "state 2 delimiter not found when expected, i: " << i << "\n";
+				}
 			}
-			else { //non delimiter byte encountered
-				if (state == 0) { //read id bytes one by one, appending to id_str
-					std::cout << "state: 0 i: " << i << "\n";
-					id_str += buf[i];
-				}
-				else if (state == 1) { //grab all of the gameobjectdata at once, move to one before delimiter and allow i to inc
-					std::cout << "state: 1 i: " << i << "\n";
-					data = ((GameObject::GameObjectData*)(buf + i))[0];
-					i += (sizeof GameObject::GameObjectData) - 1; //-1 to account for i++
-				}
-				else if (state == 2) { //grab all of the health at once, move to one before delimiter and allow i to inc
-					std::cout << "state: 2 i: " << i << "\n";
-					health = ((int*)(buf + i))[0];
-					i += sizeof(int) - 1; //-1 to account for i++
+			else if (state == 3) {
+				if (buf[i] == DELIMITER) {
+					break;
 				}
 				else {
-					std::cout << "SceneManager_Client updateFromClientBuf state out of sync";
+					state = 0; //reset state and read this byte again
+					i--;
 				}
 			}
-
+			else {
+				std::cout << "SceneManager_Client updateFromClientBuf state out of sync";
+			}
 		}
 	}
-	//GameObject::GameObjectData data = ((GameObject::GameObjectData*)buf)[0];
-	//player.setData(data);
-	//transforms[0]->setMatrix(player.getMatrix());
 }
 
 void SceneManager_Client::updateFromInputBuf(float deltaTime)
@@ -174,7 +189,7 @@ void SceneManager_Client::trackPlayer(std::string player_id) {
 mat4 SceneManager_Client::getPlayerTransformMat() {
 	
 	if (trackedPlayer_ID != "" && transforms.find(trackedPlayer_ID) != transforms.end()) {
-		return transforms[trackedPlayer_ID]->M;
+		return transforms[trackedPlayer_ID]->getMatrix();
 	}
 	else return mat4::identity();
 }

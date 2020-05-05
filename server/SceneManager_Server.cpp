@@ -82,35 +82,36 @@ int SceneManager_Server::encodeScene(char buf[]) {
 	 * ID,{GameObjectData},health,
 	 * ID,{GameObjectData},health,
 	 * ...
+	 * ID,{GameObjectData},health,,
 	 */
 
 	//TODO implement SceneManager_Client to process data in this format
 	int i = 0;
 	for (std::pair<std::string, Entity*> idEntPair : idMap) { //iterate through all entities in scene
 		strncpy(buf + i, idEntPair.first.c_str(), idEntPair.first.length()); //write id bytes without null term
-		std::cout << "id: " << idEntPair.first;
+		//std::cout << "id: " << idEntPair.first;
 		i += idEntPair.first.length();
 
 		buf[i] = DELIMITER; //write delimiter
 		i++;
 
-		i += idEntPair.second->writeData(buf, i); //write GameObjectData at i, increase i by number of bytes written
-		std::cout << " x: " << idEntPair.second->model[3][0] << " z: " << idEntPair.second->model[3][2];
-		std::cout << " y: " << atan2(-idEntPair.second->model[2][2], -idEntPair.second->model[2][0]);
+		int bytes = idEntPair.second->writeData(buf, i); //write GameObjectData at i, increase i by number of bytes written
+		i += bytes;
+		//std::cout << " x: " << idEntPair.second->model[3][0] << " z: " << idEntPair.second->model[3][2];
+		//std::cout << " y: " << atan2(-idEntPair.second->model[2][2], -idEntPair.second->model[2][0]);
 
 		buf[i] = DELIMITER; //write delimiter
 		i++;
 
 		((int*)buf)[i] = idEntPair.second->getHealth(); //write entity's health
-		std::cout << " health: " << idEntPair.second->getHealth() << "\n";
+		//std::cout << " health: " << idEntPair.second->getHealth() << "\n";
 		i += sizeof(int);
 
 		buf[i] = DELIMITER; //write delimiter
 		i++;
 	}
+	buf[i] = DELIMITER; //append an extra delimiter to indicate the end of the data
+	i++;
 
 	return i;
-
-	//idMap["0"]->writeData(buf, 0);
-	//return sizeof(GameObject::GameObjectData);
 }

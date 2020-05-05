@@ -83,7 +83,6 @@ int Client::sendData(char sendbuf[], int buflen, int flags) {
 
 int Client::recvData(char recvbuf[], int buflen, int flags) {
 	int iResult = recv(ConnectSocket, recvbuf, buflen, flags);
-	//std::cout << "client recv: " << iResult << " bytes\n";
 	if (iResult == SOCKET_ERROR) {
 		// printf("send failed with error: %d\n", WSAGetLastError());
 		std::cout << "recv failed with error: " << WSAGetLastError() << std::endl;

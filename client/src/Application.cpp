@@ -917,7 +917,7 @@ void Application::Update(float deltaTime)
 	//scene->update(deltaTime);
 
 	mat4 playerMat = scene->getPlayerTransformMat();
-	std::cout << "tracked player position x: " << playerMat[3][0] << " y: " << playerMat[3][1] << " z: " << playerMat[3][2] << "\n";
+	//std::cout << "tracked player position x: " << playerMat[3][0] << " y: " << playerMat[3][1] << " z: " << playerMat[3][2] << "\n";
 	pCameraController->moveTo(scene->getPlayerTransformMat()[3].getXYZ());
 	//pCameraController->lookAt(scene->transforms[0]->M[3].getXYZ() + vec3(0, 0, 1));
 

@@ -27,8 +27,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\common\base.cpp" />
     <ClCompile Include="..\..\..\..\..\common\GameObject.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\minion.cpp" />
     <ClCompile Include="..\..\..\..\..\common\player.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\team.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\tower.cpp" />
     <ClCompile Include="..\..\..\..\src\Application.cpp" />
     <ClCompile Include="..\..\..\..\src\Client.cpp" />
     <ClCompile Include="..\..\..\..\src\Geode.cpp" />
@@ -75,10 +79,10 @@
     <ClInclude Include="..\..\..\..\..\common\entity.h" />
     <ClInclude Include="..\..\..\..\..\common\GameObject.h" />
     <ClInclude Include="..\..\..\..\..\common\macros.h" />
+    <ClInclude Include="..\..\..\..\..\common\minion.h" />
     <ClInclude Include="..\..\..\..\..\common\player.h" />
     <ClInclude Include="..\..\..\..\..\common\team.h" />
     <ClInclude Include="..\..\..\..\..\common\tower.h" />
-    <ClInclude Include="..\..\..\..\..\common\unit.h" />
     <ClInclude Include="..\..\..\..\src\Application.h" />
     <ClInclude Include="..\..\..\..\src\Client.h" />
     <ClInclude Include="..\..\..\..\src\Geode.h" />

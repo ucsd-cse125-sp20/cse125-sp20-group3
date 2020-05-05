@@ -1,3 +1,7 @@
+#ifndef _BASE_H_
+#define _BASE_H_
+
+#include "macros.h"
 #include "entity.h"
 #include "team.h"
 #include <iostream>
@@ -6,8 +10,9 @@
 
 class Base : public Entity {
 public:
-        Base(std::string objFilename);
         Base();
-        ~Base();
+        Base(mat4 model_mat);
         void update() override;
 };
+
+#endif

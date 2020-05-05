@@ -3,6 +3,7 @@
 
 //#include "GameObject.h"
 //#include "Player.h"
+#include "macros.h"
 #include <iostream>
 #include <chrono>
 #include <ctime>
@@ -19,11 +20,10 @@ private:
 public:
         Team(std::string objFilename);
         Team();
-        ~Team();
         void update();
         void incTower(int amount);
         void incUnit(int amount);
-        void checkResources(int attack);
+        bool checkResources(char entityType);
 };
 
 #endif

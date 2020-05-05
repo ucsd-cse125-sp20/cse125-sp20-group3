@@ -18,7 +18,7 @@ void GameObject::resetClock()
 }
 
 void GameObject::setData(GameObjectData data){
-	std::cout << "setting data x: " << data.x << " z: " << data.z << " y: " << data.rot << "\n";
+	//std::cout << "setting data x: " << data.x << " z: " << data.z << " y: " << data.rot << "\n";
 	vec3 forward = normalize(vec3(cos(data.rot), 0, sin(data.rot)));
 	vec3 right = cross(forward, vec3(0, 1, 0));
 

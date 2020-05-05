@@ -14,6 +14,9 @@
 #include "../../common/GameObject.h"
 #include "../../common/entity.h"
 #include "../../common/player.h"
+#include "../../common/base.h"
+#include "../../common/minion.h"
+#include "../../common/tower.h"
 #include "../../common/client2server.h"
 
 #define ENV_GEODE "env_geometry"

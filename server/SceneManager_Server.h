@@ -19,9 +19,6 @@ private:
 		int next_player_id, next_base_id, next_minion_id, next_tower_id, next_resource_id;
 		Team *team1, *team2;
 
-		//hardcode
-		Player* p;
-
 public:
 	SceneManager_Server();
 	void processInput(std::string player, PlayerInput in);
@@ -30,6 +27,8 @@ public:
 	void resetClocks();
 	void update();
 	int encodeScene(char buf[]);
+
+	void populateScene();
 };
 
 #endif

@@ -9,6 +9,8 @@ SceneManager_Server::SceneManager_Server() {
 
 	//team1 = new Team();
 	//team2 = new Team();
+
+	this->populateScene();
 }
 
 void SceneManager_Server::processInput(std::string player, PlayerInput in) {
@@ -17,18 +19,13 @@ void SceneManager_Server::processInput(std::string player, PlayerInput in) {
 }
 
 bool SceneManager_Server::addPlayer(std::string player_id) {
-	std::cout << "inside addPlayer\n";
 	if (idMap.find(player_id) == idMap.end()) { //player_id not in map, create a new player
-		//if (idMap.find(player_id) == idMap.end()) std::cout << "this worked?\n";
 		idMap[player_id] = new Player();
 		std::cout << "created new player id: " << player_id << " at " << idMap[player_id] << "\n";
-		//if (idMap.find(player_id) != idMap.end()) std::cout << "and this worked too???\n";
 
-		this->populateScene();
 		return true; //return true that a player was added
 	}
 	else {
-		std::cout << player_id << " found in idMap, not adding\n";
 		return false; //return false, player was not added
 	}
 }
@@ -74,19 +71,15 @@ void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, 
 }
 
 void SceneManager_Server::resetClocks() {
-	std::cout << "resetting clocks\n";
 	for (std::pair<std::string, Entity*> idEntPair : idMap) {
 		idEntPair.second->resetClock();
 	}
-	std::cout << "reset clocks ok\n";
 }
 
 void SceneManager_Server::update() {
-	std::cout << "update\n";
 	for (std::pair<std::string, Entity*> idEntPair: idMap) {
 		idEntPair.second->update();
 	}
-	std::cout << "update ok\n";
 }
 
 int SceneManager_Server::encodeScene(char buf[]) {
@@ -96,8 +89,6 @@ int SceneManager_Server::encodeScene(char buf[]) {
 	 * ...
 	 * ID,{GameObjectData},health,,
 	 */
-	//std::cout << "encodeScene 1\n";
-	//this->addPlayer("0");
 
 	int i = 0;
 	for (std::pair<std::string, Entity*> idEntPair : idMap) { //iterate through all entities in scene
@@ -114,53 +105,52 @@ int SceneManager_Server::encodeScene(char buf[]) {
 		//std::cout << "writing data at i: " << i << "\n";
 		int bytes = idEntPair.second->writeData(buf, i); //write GameObjectData at i, increase i by number of bytes written
 		i += bytes;
-		//std::cout << " x: " << idEntPair.second->model[3][0] << " z: " << idEntPair.second->model[3][2];
-		//std::cout << " y: " << atan2(-idEntPair.second->model[2][2], -idEntPair.second->model[2][0]);
 
 		//std::cout << "delimiter 2 at i: " << i << "\n";
 		buf[i] = DELIMITER; //write delimiter
 		i++;
 
 		//std::cout << "writing health at i: " << i << "\n";
-		((int*)buf)[i] = idEntPair.second->getHealth(); //write entity's health
+		((int*)(buf + i))[0] = idEntPair.second->getHealth(); //write entity's health
 		//std::cout << " health: " << idEntPair.second->getHealth() << "\n";
 		i += sizeof(int);
 
 		//std::cout << "delimiter 3 at i: " << i << "\n";
 		buf[i] = DELIMITER; //write delimiter
 		i++;
-		//std::cout << "encodeScene 2\n";
-		//this->addPlayer("0");
 	}
+	
 	//std::cout << "closing delimiter at i: " << i << "\n";
 	buf[i] = DELIMITER; //append an extra delimiter to indicate the end of the data
 	i++;
-	std::cout << "encodeScene 3\n";
-	this->addPlayer("0");
-	//std::cout << "returning i: " << i << "\n";
 	return i;
 }
 
-void SceneManager_Server::populateScene() {
+void SceneManager_Server::populateScene() { //testing only
+	//NOTE: number of objects should not exceed sendbuf capacity
+	//sendbufsize >= (NUM_PLAYERS * 20) + (# of minions and towers * 23) + 1
 	srand((unsigned int)time(NULL));
 	for (int i = 0; i < 12; i++) {
-		float x = (rand() % 41) - 20;//-100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
-		float z = (rand() % 41) - 20;//-100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
-		float rot = (rand() * PI) / RAND_MAX;//static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
-		float s = 1.0f + ((rand() * 1.0f) / RAND_MAX);//static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
+		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
+		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
+		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
+		float s = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
 
 		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
 		Minion* m = new Minion(MINION_HEALTH, MINION_ATTACK);
 		m->setMatrix(transform);
 		idMap[std::to_string(next_minion_id)] = m;
+
+		std::cout << "created new minion: " << std::to_string(next_minion_id) << " at " << idMap[std::to_string(next_minion_id)] << "\n";
+
 		next_minion_id++;
 		if (next_minion_id == ID_MINION_MAX) next_minion_id = ID_MINION_MIN;
 	}
-	for (int i = 0; i < 0; i++) {
-		float x = (rand() % 41) - 20;//-100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
-		float z = (rand() % 41) - 20;//-100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
-		float rot = (rand() * PI) / RAND_MAX;//static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
-		float s = 1.0f + ((rand() * 1.0f) / RAND_MAX);//static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
+	for (int i = 0; i < 5; i++) {
+		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
+		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
+		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
+		float s = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
 
 		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
 		Tower* t = new Tower(TOWER_HEALTH, TOWER_ATTACK);
@@ -169,15 +159,4 @@ void SceneManager_Server::populateScene() {
 		next_tower_id++;
 		if (next_tower_id == ID_TOWER_MAX) next_tower_id = ID_TOWER_MIN;
 	}
-	/*GameObject::GameObjectData data = { 10.f, 10.f, 5.f };
-	GameObject::GameObjectData data2 = { -10.f, -10.f, 10.f };
-	std::cout << "creating minion at " << std::to_string(ID_MINION_MIN) << "\n";
-	Minion* m = new Minion(MINION_HEALTH, MINION_ATTACK);
-	m->setData(data);
-	idMap[std::to_string(ID_MINION_MIN)] = m;
-	std::cout << "creating tower at " << std::to_string(ID_TOWER_MIN) << "\n";
-	Tower* t = new Tower(TOWER_HEALTH, TOWER_ATTACK);
-	t->setData(data2);
-	idMap[std::to_string(ID_TOWER_MIN)] = t;
-	std::cout << "creation ok\n";*/
 }

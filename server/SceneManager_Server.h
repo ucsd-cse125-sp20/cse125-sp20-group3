@@ -15,11 +15,13 @@
 
 class SceneManager_Server {
 private:
-		std::map<std::string, Entity*> idMap;
+		
 		int next_player_id, next_base_id, next_minion_id, next_tower_id, next_resource_id;
 		//Team *team1, *team2;
 
 public:
+	std::map<std::string, Entity*> idMap;
+
 	SceneManager_Server();
 	void processInput(std::string player, PlayerInput in);
 	bool addPlayer(std::string player_id);

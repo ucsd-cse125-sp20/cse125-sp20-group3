@@ -31,6 +31,8 @@ private:
 	std::map<std::string, GLTFGeode*> gltfGeodes;
 	std::string trackedPlayer_ID;
 
+	std::vector<Transform*> player_adjustments;
+
 public:
 	// This vector should eventually be split between tracked objects and client only objects
 	//std::vector<Transform*> transforms;

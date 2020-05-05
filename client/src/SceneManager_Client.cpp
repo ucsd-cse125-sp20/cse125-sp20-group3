@@ -19,6 +19,10 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 
 	trackedPlayer_ID = "";
 
+	transforms["ground"] = conf_new(Transform, mat4::identity());
+	transforms["ground"]->addChild(gltfGeodes[ENV_GEODE]);
+	this->addChild(transforms["ground"]);
+
 	/*
 	Transform* t = conf_new(Transform, mat4::identity());
 	Transform* t2 = conf_new(Transform, mat4::rotationY(-PI/2));
@@ -66,6 +70,8 @@ SceneManager_Client::~SceneManager_Client()
 	for (std::pair<std::string, Entity*> e : idMap) conf_delete(e.second);
 	for (std::pair<std::string, Transform*> t : transforms) conf_delete(t.second);
 	for (std::pair<std::string, GLTFGeode*> g : gltfGeodes) conf_delete(g.second);
+
+	for (Transform* a : player_adjustments) conf_delete(a);
 }
 
 void SceneManager_Client::createMaterialResources(RootSignature* pRootSignature, DescriptorSet* pBindlessTexturesSamplersSet, Sampler* defaultSampler)
@@ -123,7 +129,11 @@ void SceneManager_Client::updateFromClientBuf(char buf[], int bufsize)
 							std::cout << "creating new player, id: " << id_str << "\n";
 							idMap[id_str] = conf_new(Player); //TODO use conf_new
 							transforms[id_str] = conf_new(Transform, mat4::identity());
-							transforms[id_str]->addChild(gltfGeodes[PLAYER_GEODE]);
+							Transform* adjustment = conf_new(Transform, mat4::rotationY(-PI / 2));
+							adjustment->addChild(gltfGeodes[PLAYER_GEODE]);
+							transforms[id_str]->addChild(adjustment);
+
+							player_adjustments.push_back(adjustment);
 						}
 						else if (ID_BASE_MIN < stoi(id_str) || stoi(id_str) < ID_BASE_MAX) {
 							//idMap[id_str] = new Base();
@@ -138,6 +148,7 @@ void SceneManager_Client::updateFromClientBuf(char buf[], int bufsize)
 							//idMap[id_str] = new Resource();
 						}
 					}
+					this->addChild(transforms[id_str]);
 					idMap[id_str]->setData(data);
 					transforms[id_str]->setMatrix(idMap[id_str]->getMatrix());
 					idMap[id_str]->setHealth(health);

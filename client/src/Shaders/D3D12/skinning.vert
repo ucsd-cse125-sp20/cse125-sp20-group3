@@ -90,7 +90,7 @@ PsIn main(VSInput input)
 
 	result.position = mul(projView, worldPosition);
     result.pos = worldPosition.xyz;
-	result.normal = normalize(mul(modelMatrix, float4(input.Normal, 0.0f)).xyz);
+	result.normal = normalize(mul(mul(modelMatrix, boneTransform), float4(input.Normal, 0.0f)).xyz);
 	result.texCoord = input.UV;
 
     return result;

@@ -12,6 +12,8 @@
 
 #include "SceneManager.h"
 
+#include "UIManager.h"
+
 #include "GLTFGeode.h"
 #include "Transform.h"
 #include "OzzGeode.h"

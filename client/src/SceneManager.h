@@ -7,6 +7,7 @@
 #include "Transform.h"
 #include "GLTFGeode.h"
 #include "OzzGeode.h"
+#include "Animator.h"
 
 #include "Input.h"
 

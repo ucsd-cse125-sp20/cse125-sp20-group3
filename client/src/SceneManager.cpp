@@ -7,8 +7,8 @@ namespace {
 	const char* otherFile = "tower-1-laser.gltf";
 	const char* thingFile = "minion-retry.gltf";
 
-	const char* blarfDir = "kyubey";
-	const char* blarfClip = "ArmatureAction";
+	const char* blarfDir = "Gou";
+	const char* blarfActions[4] = { "Idle", "Walk", "Run", "Punch_Full" };
 }
 
 bool SceneManager::enableCulling = true;
@@ -22,7 +22,7 @@ SceneManager::SceneManager(Renderer* renderer)
 	meshes.push_back(conf_new(GLTFGeode, renderer, thingFile));
 	
 	animatedMeshes.push_back(conf_new(OzzGeode, renderer, blarfDir));
-	((OzzObject*)animatedMeshes.back()->obj)->AddClip(blarfClip); // TODO complete Animator Node that takes ozz geode.
+	((OzzObject*)animatedMeshes.back()->obj)->SetClip(blarfActions[0]);
 
 	Transform* t = conf_new(Transform, mat4::identity());
 	Transform* t2 = conf_new(Transform, mat4::rotationY(-PI/2));
@@ -42,7 +42,7 @@ SceneManager::SceneManager(Renderer* renderer)
 	for (int i = 0; i < 150; i++) {
 		float x = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
 		float z = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
-		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
+		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * PI)));
 		float s = 1.0f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
 
 		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
@@ -54,7 +54,7 @@ SceneManager::SceneManager(Renderer* renderer)
 	for (int i = 0; i < 50; i++) {
 		float x = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
 		float z = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
-		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
+		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * PI)));
 		float s = 0.75f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 0.5f));
 
 		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
@@ -64,18 +64,21 @@ SceneManager::SceneManager(Renderer* renderer)
 		transforms.push_back(t);
 	}
 	range = 20;
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < 30; i++) {
 		float x = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
 		float z = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
-		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
-		float s = 0.75f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 0.5f));
+		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * PI)));
+		float s = 0.1f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 0.1f));
+		int r = rand() % 4;
 
 		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
 		t = conf_new(Transform, transform);
-		// TODO add animator node in between
-		t->addChild(animatedMeshes[0]);
+		Animator* a = conf_new(Animator, animatedMeshes[0]);
+		a->SetClip(blarfActions[r]);
+		t->addChild(a);
 		this->addChild(t);
 		transforms.push_back(t);
+		transforms.push_back(a);
 	}
 }
 

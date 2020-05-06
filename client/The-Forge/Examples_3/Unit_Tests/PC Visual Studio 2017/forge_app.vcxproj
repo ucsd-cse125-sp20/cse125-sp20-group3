@@ -29,6 +29,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\..\common\GameObject.cpp" />
     <ClCompile Include="..\..\..\..\..\common\player.cpp" />
+    <ClCompile Include="..\..\..\..\src\Animator.cpp" />
     <ClCompile Include="..\..\..\..\src\OzzGeode.cpp" />
     <ClCompile Include="..\..\..\..\src\OzzObject.cpp" />
     <ClCompile Include="..\..\..\..\src\Application.cpp" />
@@ -39,6 +40,7 @@
     <ClCompile Include="..\..\..\..\src\Input.cpp" />
     <ClCompile Include="..\..\..\..\src\SceneManager.cpp" />
     <ClCompile Include="..\..\..\..\src\Transform.cpp" />
+    <ClCompile Include="..\..\..\..\src\UIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\src\Shaders\D3D12\basic.frag" />
@@ -92,6 +94,7 @@
     <ClInclude Include="..\..\..\..\src\Object.h" />
     <ClInclude Include="..\..\..\..\src\SceneManager.h" />
     <ClInclude Include="..\..\..\..\src\Transform.h" />
+    <ClInclude Include="..\..\..\..\src\UIManager.h" />
     <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\cgltf\cgltf.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

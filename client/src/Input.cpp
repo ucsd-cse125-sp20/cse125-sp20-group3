@@ -30,6 +30,7 @@ bool Input::Init(WindowsDesc* window, UIApp* appUI, IApp* app, ICameraController
 			setEnableCaptureInput(capture && INPUT_ACTION_PHASE_CANCELED != ctx->mPhase);
 			if (Input::appUI->WantTextInput() != virtualKeyboard)
 			{
+				printf("BEEP\n");
 				virtualKeyboard = Input::appUI->WantTextInput();
 				setVirtualKeyboard(virtualKeyboard);
 			}

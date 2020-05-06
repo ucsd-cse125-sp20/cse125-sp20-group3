@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <map>
 
 #include "GLTFObject.h"
 
@@ -36,7 +37,7 @@ public:
 	ClipController gClipController;
 
 	// Clips
-	Clip gClip;
+	std::map<std::string, Clip*> clips;
 
 	// Rigs
 	Rig gStickFigureRig;
@@ -54,7 +55,7 @@ public:
 	OzzObject(Renderer* renderer, std::string directory);
 
 	// TODO Make better
-	void AddClip(std::string clipName);
+	void SetClip(std::string clipName);
 
 	void removeResources();
 

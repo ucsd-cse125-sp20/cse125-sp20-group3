@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "../The-Forge/Middleware_3/Animation/AnimatedObject.h"
 #include "../The-Forge/Middleware_3/Animation/SkeletonBatcher.h"
 #include "../The-Forge/Middleware_3/Animation/Animation.h"
@@ -8,6 +10,7 @@
 #include "../The-Forge/Middleware_3/Animation/Rig.h"
 
 #include "Transform.h"
+#include "OzzGeode.h"
 
 class Animator : public Transform {
 public:
@@ -21,11 +24,29 @@ public:
 	ClipController gClipController;
 
 	// Clips
-	Clip gClip;
+	std::map<std::string, Clip*> clips;
 
 	// Rigs
 	Rig gStickFigureRig;
 
-	// Timer to get animationsystem update time
-	HiresTimer gAnimationUpdateTimer;
+	std::string directory;
+
+	float time;
+
+	bool updated = false;
+
+	mat4* inverseBindPoses;
+	uint32_t* jointRemaps;
+
+	OzzObject::UniformDataBones boneData;
+
+	Animator(OzzGeode* animatedGeode);
+
+	~Animator();
+
+	void SetClip(std::string clipName);
+
+	void update(float deltaTime) override;
+	
+	void updateBoneBuffer(BufferUpdateDesc& desc, OzzObject::UniformDataBones* boneData);
 };

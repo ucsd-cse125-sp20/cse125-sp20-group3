@@ -43,9 +43,6 @@
 #include "../The-Forge/Common_3/OS/Interfaces/IMemory.h"    // Must be last include in cpp file
 
 
-#include "../../common/player.h"
-
-
 //--------------------------------------------------------------------------------------------
 // GLOBAL DEFINTIONS
 //--------------------------------------------------------------------------------------------
@@ -153,7 +150,10 @@ std::vector<mat4> shadowInstanceData;
 ICameraController* pCameraController = NULL;
 ICameraController* pLightView = NULL;
 
-GuiComponent* pGuiWindow;
+GuiComponent* pDebugGui;
+GuiComponent* pTestGui;
+
+Texture* testImage;
 
 UIApp gAppUI;
 
@@ -191,9 +191,9 @@ Client* client;
 char sendbuf[DEFAULT_BUFLEN];
 char recvbuf[DEFAULT_BUFLEN];
 
-// ============================================================================
-// ==============================================[ CODE STARTS HERE ]==========
-// ============================================================================
+// ======================================================================================================
+// ==============================================[ CODE STARTS HERE ]====================================
+// ======================================================================================================
 
 Application::Application()
 {
@@ -202,9 +202,9 @@ Application::Application()
 #endif
 }
 
-// ============================================================================
-// ==============================================[ SCENE INITIALIZATION ]======
-// ============================================================================
+// ======================================================================================================
+// ==============================================[ SCENE INITIALIZATION ]================================
+// ======================================================================================================
 
 bool Application::InitSceneResources()
 {
@@ -234,9 +234,9 @@ void Application::RemoveSceneResources()
 	//conf_delete(animatedGeode);
 }
 
-// ============================================================================
-// ==============================================[ SHADER MANAGEMENT ]=========
-// ============================================================================
+// ======================================================================================================
+// ==============================================[ SHADER MANAGEMENT ]===================================
+// ======================================================================================================
 
 bool Application::InitShaderResources()
 {
@@ -354,33 +354,33 @@ void Application::RemoveShaderResources()
 	removeRootSignature(pRenderer, pRootSignaturePostEffects);
 }
 
-// ============================================================================
-// ==============================================[ APPLICATION MANAGEMENT ]====
-// ============================================================================
+// ======================================================================================================
+// ==============================================[ USER INTERFACE ]======================================
+// ======================================================================================================
 
 void Application::InitDebugGui()
 {
 	GuiDesc guiDesc = {};
 	guiDesc.mStartSize = vec2(400.0f, 20.0f);
 	guiDesc.mStartPosition = vec2(100, 0);
-	pGuiWindow = gAppUI.AddGuiComponent("Client Settings", &guiDesc);
+	pDebugGui = gAppUI.AddGuiComponent("Client Settings", &guiDesc);
 
 	CollapsingHeaderWidget NetworkWidgets("Network Settings", false, false);
 	NetworkWidgets.AddSubWidget(TextboxWidget("Server Name", serverName, serverNameSize));
 	CheckboxWidget toggleServerButtonWidget("Toggle Server Connection", &connected);
 	toggleServerButtonWidget.pOnEdited = Application::ToggleClient;
 	NetworkWidgets.AddSubWidget(toggleServerButtonWidget);
-	pGuiWindow->AddWidget(NetworkWidgets);
+	pDebugGui->AddWidget(NetworkWidgets);
 
 	CollapsingHeaderWidget PerformanceWidgets("Performance Settings");
 	PerformanceWidgets.AddSubWidget(CheckboxWidget("Toggle Culling", &bToggleCull));
 	PerformanceWidgets.AddSubWidget(CheckboxWidget("Toggle VSync", &bToggleVSync));
-	pGuiWindow->AddWidget(PerformanceWidgets);
+	pDebugGui->AddWidget(PerformanceWidgets);
 
 	CollapsingHeaderWidget RenderWidgets("Render Settings");
 	RenderWidgets.AddSubWidget(CheckboxWidget("Enable FXAA", &bToggleFXAA));
 	RenderWidgets.AddSubWidget(CheckboxWidget("Enable Vignetting", &bVignetting));
-	pGuiWindow->AddWidget(RenderWidgets);
+	pDebugGui->AddWidget(RenderWidgets);
 
 	CollapsingHeaderWidget LightWidgets("Lighting Settings");
 	LightWidgets.AddSubWidget(SliderFloatWidget("Light Azimuth", &gLightDirection.x, float(-180.0f), float(180.0f), float(0.001f)));
@@ -406,7 +406,33 @@ void Application::InitDebugGui()
 	LightColor4Intensity.AddSubWidget(SliderFloatWidget("Light Intensity", &gLightColorIntensity[3], 0.0f, 5.0f, 0.001f));
 	LightWidgets.AddSubWidget(LightColor4Intensity);
 
-	pGuiWindow->AddWidget(LightWidgets);
+	pDebugGui->AddWidget(LightWidgets);
+
+
+
+
+	GuiDesc testGuiDesc = {};
+	testGuiDesc.mStartSize = vec2(100, 100);
+	testGuiDesc.mStartPosition = vec2((float)mSettings.mWidth - 1000, (float)mSettings.mHeight - 1000);
+	pTestGui = gAppUI.AddGuiComponent("asdf", &testGuiDesc);
+	pTestGui->mFlags |= GUI_COMPONENT_FLAGS_NO_TITLE_BAR;
+	pTestGui->mFlags |= GUI_COMPONENT_FLAGS_ALWAYS_USE_WINDOW_PADDING;
+	pTestGui->mFlags |= GUI_COMPONENT_FLAGS_NO_RESIZE;
+	pTestGui->mFlags |= GUI_COMPONENT_FLAGS_NO_COLLAPSE;
+	pTestGui->mFlags |= GUI_COMPONENT_FLAGS_NO_SCROLLBAR;
+	pTestGui->mAlpha = 0.9f;
+
+	PathHandle testImagePath = fsCopyPathInResourceDirectory(RD_TEXTURES, "bot.png");
+	TextureLoadDesc texDesc = {};
+	texDesc.pFilePath = testImagePath;
+	texDesc.ppTexture = &testImage;
+	addResource(&texDesc, NULL, LOAD_PRIORITY_LOW);
+	waitForAllResourceLoads();
+	
+	TextureButtonWidget texWidget("");
+	texWidget.SetTexture(testImage, float2(200, 200));
+	texWidget.pOnDeactivatedAfterEdit = []() { printf("Boop\n"); };
+	pTestGui->AddWidget(texWidget);
 }
 
 void Application::ToggleClient()
@@ -426,9 +452,9 @@ void Application::ToggleClient()
 	}
 }
 
-// ============================================================================
-// ==============================================[ APPLICATION MANAGEMENT ]====
-// ============================================================================
+// ======================================================================================================
+// ==============================================[ APPLICATION MANAGEMENT ]==============================
+// ======================================================================================================
 
 bool Application::Init()
 {
@@ -634,6 +660,7 @@ void Application::Exit()
 #endif
 
 	gAppUI.Exit();
+	removeResource(testImage);
 
 	for (uint32_t i = 0; i < Application::gImageCount; ++i)
 	{
@@ -744,9 +771,9 @@ void Application::PrepareDescriptorSets()
 	}
 }
 
-// ============================================================================
-// ==============================================[ PIPELINE DEFINITION ]=======
-// ============================================================================
+// ======================================================================================================
+// ==============================================[ PIPELINE DEFINITION ]=================================
+// ======================================================================================================
 
 void Application::LoadPipelines()
 {
@@ -890,9 +917,9 @@ void Application::RemovePipelines()
 	removePipeline(pRenderer, pFXAAPipeline);
 }
 
-// ============================================================================
-// ==============================================[ LOAD/UNLAODING ]============
-// ============================================================================
+// ======================================================================================================
+// ==============================================[ LOAD/UNLAODING ]======================================
+// ======================================================================================================
 
 bool Application::Load()
 {
@@ -944,9 +971,9 @@ void Application::Unload()
 	removeRenderTarget(pRenderer, pShadowRT);
 }
 
-// ============================================================================
-// ==============================================[ CORE UPDATE/DRAW LOOP ]=====
-// ============================================================================
+// ======================================================================================================
+// ==============================================[ CORE UPDATE/DRAW LOOP ]===============================
+// ======================================================================================================
 
 void Application::Update(float deltaTime)
 {
@@ -1246,7 +1273,9 @@ void Application::Draw()
 
 		//cmdDrawProfilerUI();
 
-		gAppUI.Gui(pGuiWindow);
+		//ImGui::SetNextWindowBgAlpha(0);
+		gAppUI.Gui(pDebugGui);
+		gAppUI.Gui(pTestGui);
 
 		gAppUI.Draw(cmd);
 
@@ -1280,9 +1309,9 @@ void Application::Draw()
 	flipProfiler();
 }
 
-// ============================================================================
-// ==============================================[ MULTIPASS RENDERING ]=======
-// ============================================================================
+// ======================================================================================================
+// ==============================================[ MULTIPASS RENDERING ]=================================
+// ======================================================================================================
 
 void Application::setRenderTarget(Cmd* cmd, uint32_t count, RenderTarget** pDestinationRenderTargets, RenderTarget* pDepthStencilTarget, LoadActionsDesc* loadActions)
 {
@@ -1355,9 +1384,9 @@ void Application::drawShadowMap(Cmd* cmd)
 	cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);
 }
 
-// ============================================================================
-// ==============================================[ RENDER SETUP ]==============
-// ============================================================================
+// ======================================================================================================
+// ==============================================[ RENDER SETUP ]========================================
+// ======================================================================================================
 
 bool Application::addSwapChain()
 {

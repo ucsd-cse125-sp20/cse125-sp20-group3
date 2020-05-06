@@ -23,9 +23,6 @@ OzzObject::OzzObject(Renderer* renderer, std::string directory)
 	// Initialize the rig with the path to its ozz file
 	gStickFigureRig.Initialize(skeletonPath);
 
-	// Add the rig to the list of skeletons to render
-	//gSkeletonBatcher.AddRig(&gStickFigureRig);
-
 	PathHandle meshPath = fsCopyPathInResourceDirectory(RD_ANIMATIONS, (directory + "/riggedMesh.gltf").c_str());
 
 	OzzObject::pVertexLayoutSkinned.mAttribCount = 5;
@@ -105,19 +102,26 @@ OzzObject::OzzObject(Renderer* renderer, std::string directory)
 	addResource(&defaultLoadDesc, NULL, LOAD_PRIORITY_NORMAL);
 
 	waitForAllResourceLoads();
+
+	PathHandle animationDirectory = fsCopyPathInResourceDirectory(RD_ANIMATIONS, (directory + "/animations/").c_str());
+	eastl::vector<PathHandle> actions = fsGetFilesWithExtension(animationDirectory, ".ozz");
+	for (auto action : actions) {
+		std::string actionPath(fsGetPathAsNativeString(action));
+		char drive[256], dir[256], file[256], ext[256];
+		_splitpath(actionPath.c_str(), drive, dir, file, ext);
+		Clip* clip = conf_new(Clip);
+		clips.emplace(std::string(file), clip);
+		clips[file]->Initialize(action, &gStickFigureRig);
+	}
 }
 
-void OzzObject::AddClip(std::string clipName)
+void OzzObject::SetClip(std::string clipName)
 {
-	PathHandle clipPath = fsCopyPathInResourceDirectory(RD_ANIMATIONS, (directory + "/animations/" + clipName + ".ozz").c_str());
-
-	gClip.Initialize(clipPath, &gStickFigureRig);
-
 	// CLIP CONTROLLERS
 	//
 	// Initialize with the length of the clip they are controlling and an
 	// optional external time to set based on their updating
-	gClipController.Initialize(gClip.GetDuration(), &this->time);
+	gClipController.Initialize(clips[clipName]->GetDuration(), &this->time);
 
 
 	// ANIMATIONS
@@ -125,7 +129,7 @@ void OzzObject::AddClip(std::string clipName)
 	AnimationDesc animationDesc{};
 	animationDesc.mRig = &gStickFigureRig;
 	animationDesc.mNumLayers = 1;
-	animationDesc.mLayerProperties[0].mClip = &gClip;
+	animationDesc.mLayerProperties[0].mClip = clips[clipName];
 	animationDesc.mLayerProperties[0].mClipController = &gClipController;
 
 	gAnimation.Initialize(animationDesc);
@@ -141,14 +145,17 @@ void OzzObject::removeResources()
 	GLTFObject::removeResources();
 
 	gStickFigureRig.Destroy();
-	gClip.Destroy();
+	for (auto& clip : clips) {
+		clip.second->Destroy();
+		conf_delete(clip.second);
+	}
 	gAnimation.Destroy();
 	gStickFigureAnimObject.Destroy();
 }
 
 void OzzObject::update(float deltaTime)
 {
-	gAnimationUpdateTimer.Reset();
+	//gAnimationUpdateTimer.Reset();
 
 	// Update the animated object for this frame
 	if (!gStickFigureAnimObject.Update(deltaTime))
@@ -159,7 +166,7 @@ void OzzObject::update(float deltaTime)
 
 
 	// Record animation update time
-	gAnimationUpdateTimer.GetUSec(true);
+	//gAnimationUpdateTimer.GetUSec(true);
 
 	// Update uniforms that will be shared between all skeletons
 	//gSkeletonBatcher.SetSharedUniforms(Application::projMat * Application::viewMat, vec3(0.0f, 1000.0f, 0.0f), vec3(1.0f, 1.0f, 1.0f));

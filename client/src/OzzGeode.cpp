@@ -2,6 +2,8 @@
 
 #include "Application.h"
 
+uint32_t OzzGeode::animatedInstanceCount = 0;
+
 OzzGeode::OzzGeode(Renderer* renderer, std::string directory)
 {
 	this->obj = conf_new(OzzObject, renderer, directory);
@@ -24,17 +26,14 @@ void OzzGeode::unload()
 
 void OzzGeode::updateBoneBuffer(BufferUpdateDesc& desc, OzzObject::UniformDataBones* boneData)
 {
-	if (!boneData) boneData = &((OzzObject*)obj)->gUniformDataBones; // TODO move this into a transform node with a rig
-	for (int i = 0; i < instanceIDs.size(); i++) {
-		memcpy((mat4*)desc.pMappedData + instanceIDs[i] * MAX_NUM_BONES, boneData, sizeof(mat4) * ((OzzObject*)obj)->gStickFigureRig.GetNumJoints());
-		//printf("%d=============================================================bones", i);
-		//for (int j = 0; j < (int)((OzzObject*)obj)->gStickFigureRig.GetNumJoints(); j++) print(((mat4*)desc.pMappedData + instanceIDs[i])[j]);
-	}
+	if (!boneData) boneData = &((OzzObject*)obj)->gUniformDataBones;
+	memcpy((mat4*)desc.pMappedData + instanceIDs[selfAnimatedInstanceCount++] * (int)MAX_NUM_BONES, boneData, sizeof(mat4) * ((OzzObject*)obj)->gStickFigureRig.GetNumJoints());
 }
 
 void OzzGeode::draw(Cmd* cmd)
 {
 	countingInstances = false;
+	selfAnimatedInstanceCount = 0;
 	int instanceID = instanceIDs.front();
 	instanceIDs.pop_front();
 	bool culling = shouldCull.front();

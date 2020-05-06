@@ -1,3 +1,6 @@
+#ifndef _SERVER_H_
+#define _SERVER_H_
+
 #define WIN32_LEAN_AND_MEAN
 
 #pragma once
@@ -5,6 +8,7 @@
 #define _WIN32_WINNT  0x501
 
 #include "../common/macros.h"
+#include "../common/client2server.h"
 #include "game_state.h"
 #include <windows.h>
 #include <winsock2.h>
@@ -28,7 +32,8 @@ private:
 	static std::mutex players_state_mtx[NUM_PLAYERS];
 public:
 	Server(); //set up server listening
-	int sendData(char sendbuf[], int buflen, int flags); //send data to clients
+	int sendDataAll(char sendbuf[], int buflen, int flags); //send data to clients
+	int sendDataPlayer(int conn_socket, char sendbuf[], int buflen, int flags);
 	int recvData(char recvbuf[], int buflen, int flags); //recv data from clients
 	int cleanup(int how); //close all clients' connections with server
 	static int handle_player_inputs(players_state* players_state, int flags);

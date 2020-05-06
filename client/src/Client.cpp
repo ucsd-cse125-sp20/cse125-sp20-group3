@@ -23,8 +23,6 @@ Client::Client(std::string servername) {
 		//TODO handle failure
 	}
 
-	std::cout << "1" << std::endl;
-
 	ZeroMemory(&hints, sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
@@ -38,7 +36,6 @@ Client::Client(std::string servername) {
 		//TODO handle failure
 	}
 
-	std::cout << "2" << std::endl;
 	// Attempt to connect to an address until one succeeds
 	for (ptr = result; ptr != NULL; ptr = ptr->ai_next) {
 
@@ -61,7 +58,7 @@ Client::Client(std::string servername) {
 		break;
 	}
 
-	std::cout << "3" << std::endl;
+	std::cout << "connection established with server\n";
 
 	freeaddrinfo(result);
 
@@ -70,8 +67,6 @@ Client::Client(std::string servername) {
 		WSACleanup();
 		//TODO handle failure
 	}
-
-	std::cout << "4" << std::endl;
 }
 
 int Client::sendData(char sendbuf[], int buflen, int flags) {
@@ -88,6 +83,7 @@ int Client::sendData(char sendbuf[], int buflen, int flags) {
 
 int Client::recvData(char recvbuf[], int buflen, int flags) {
 	int iResult = recv(ConnectSocket, recvbuf, buflen, flags);
+	std::cout << "bytes received: " << iResult << "\n";
 	if (iResult == SOCKET_ERROR) {
 		// printf("send failed with error: %d\n", WSAGetLastError());
 		std::cout << "recv failed with error: " << WSAGetLastError() << std::endl;

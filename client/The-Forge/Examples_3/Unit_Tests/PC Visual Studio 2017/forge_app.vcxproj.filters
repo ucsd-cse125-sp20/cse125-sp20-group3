@@ -54,10 +54,22 @@
     <ClCompile Include="..\..\..\..\..\common\player.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\SceneManager.cpp">
+    <ClCompile Include="..\..\..\..\..\common\GameObject.cpp">
+      <Filter>Source Files\Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\SceneManager_Client.cpp">
       <Filter>Source Files\Scene Graph</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\common\GameObject.cpp">
+    <ClCompile Include="..\..\..\..\..\common\base.cpp">
+      <Filter>Source Files\Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\minion.cpp">
+      <Filter>Source Files\Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\team.cpp">
+      <Filter>Source Files\Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\tower.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
   </ItemGroup>
@@ -199,14 +211,16 @@
     <ClInclude Include="..\..\..\..\..\common\tower.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\common\unit.h">
+    <ClInclude Include="..\..\..\..\..\common\GameObject.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\SceneManager.h">
+    <ClInclude Include="..\..\..\..\..\common\client2server.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\SceneManager_Client.h">
       <Filter>Header Files\Scene Graph</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\common\client2server.h" />
-    <ClInclude Include="..\..\..\..\..\common\GameObject.h">
+    <ClInclude Include="..\..\..\..\..\common\minion.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
   </ItemGroup>

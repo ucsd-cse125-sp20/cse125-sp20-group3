@@ -2,6 +2,7 @@
 
 #include "../client/The-Forge/Common_3/OS/Math/MathTypes.h"
 #include <chrono>
+#include <iostream>
 
 class GameObject 
 {
@@ -19,12 +20,12 @@ public:
 	
 //	~GameObject();
 
-	void update();
+	virtual void update();
 	void resetClock();
 
-	void setPosRot(float pos_x, float pos_z, float rot_y);
+	void setData(GameObjectData data);
 	void setMatrix(mat4 m);
 	mat4 getMatrix();
 
-	int setData(char buf[], int index);
+	int writeData(char buf[], int index);
 };

@@ -1,6 +1,6 @@
 #ifndef _SERVER_H_
 #define _SERVER_H_
-
+#endif
 #define WIN32_LEAN_AND_MEAN
 
 #pragma once

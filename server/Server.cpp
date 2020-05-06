@@ -14,7 +14,8 @@
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
-
+SOCKET Server::ClientSockets[NUM_PLAYERS];
+std::mutex Server::players_state_mtx[NUM_PLAYERS];
 Server::Server() {
 	WSADATA wsaData;
 	SOCKET ListenSocket = INVALID_SOCKET;
@@ -89,7 +90,7 @@ Server::Server() {
 	int number_of_clients = 0;
 	while (number_of_clients < NUM_PLAYERS) // let MAX_CLIENTS connect
 	{
-		ClientSockets[number_of_clients] = accept (ListenSocket, NULL, NULL); 
+		ClientSockets[number_of_clients] = accept (ListenSocket, NULL, NULL);
 		if (ClientSockets[number_of_clients] == INVALID_SOCKET)
 		{ // error accepting connection
 			printf("accept failed with error: %d\n", WSAGetLastError());
@@ -107,7 +108,7 @@ Server::Server() {
 			
 			Players_State[number_of_clients].id = number_of_clients;
 			// Create the thread here
-			players_threads[number_of_clients] = std::thread(&handle_player_inputs, &Players_State[number_of_clients], 0);
+			players_threads[number_of_clients] = std::thread(&Server::handle_player_inputs, &Players_State[number_of_clients], 0);
 		}
 	}
 

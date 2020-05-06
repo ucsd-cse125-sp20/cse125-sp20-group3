@@ -628,7 +628,7 @@ int WindowsMain(int argc, char** argv, IApp* app)
 	pApp->pCommandLine = GetCommandLineA();
 	{
 		Timer t;
-		if (!pApp->Init())
+e		if (!pApp->Init())
 			return EXIT_FAILURE;
 
 		if (!pApp->Load())

@@ -27,15 +27,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\common\base.cpp" />
     <ClCompile Include="..\..\..\..\..\common\GameObject.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\minion.cpp" />
     <ClCompile Include="..\..\..\..\..\common\player.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\team.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\tower.cpp" />
     <ClCompile Include="..\..\..\..\src\Application.cpp" />
     <ClCompile Include="..\..\..\..\src\Client.cpp" />
     <ClCompile Include="..\..\..\..\src\Geode.cpp" />
     <ClCompile Include="..\..\..\..\src\GLTFGeode.cpp" />
     <ClCompile Include="..\..\..\..\src\GLTFObject.cpp" />
     <ClCompile Include="..\..\..\..\src\Input.cpp" />
-    <ClCompile Include="..\..\..\..\src\SceneManager.cpp" />
+    <ClCompile Include="..\..\..\..\src\SceneManager_Client.cpp" />
     <ClCompile Include="..\..\..\..\src\Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -75,10 +79,10 @@
     <ClInclude Include="..\..\..\..\..\common\entity.h" />
     <ClInclude Include="..\..\..\..\..\common\GameObject.h" />
     <ClInclude Include="..\..\..\..\..\common\macros.h" />
+    <ClInclude Include="..\..\..\..\..\common\minion.h" />
     <ClInclude Include="..\..\..\..\..\common\player.h" />
     <ClInclude Include="..\..\..\..\..\common\team.h" />
     <ClInclude Include="..\..\..\..\..\common\tower.h" />
-    <ClInclude Include="..\..\..\..\..\common\unit.h" />
     <ClInclude Include="..\..\..\..\src\Application.h" />
     <ClInclude Include="..\..\..\..\src\Client.h" />
     <ClInclude Include="..\..\..\..\src\Geode.h" />
@@ -87,7 +91,7 @@
     <ClInclude Include="..\..\..\..\src\Input.h" />
     <ClInclude Include="..\..\..\..\src\Node.h" />
     <ClInclude Include="..\..\..\..\src\Object.h" />
-    <ClInclude Include="..\..\..\..\src\SceneManager.h" />
+    <ClInclude Include="..\..\..\..\src\SceneManager_Client.h" />
     <ClInclude Include="..\..\..\..\src\Transform.h" />
     <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\cgltf\cgltf.h" />
   </ItemGroup>

@@ -8,9 +8,14 @@ Animator::Animator(OzzGeode* animatedGeode)
 	PathHandle skeletonPath = fsCopyPathInResourceDirectory(RD_ANIMATIONS, (directory + "/skeleton.ozz").c_str());
 	gStickFigureRig.Initialize(skeletonPath);
 
-	this->clips = ((OzzObject*)animatedGeode->obj)->clips;
-	this->inverseBindPoses = ((OzzObject*)animatedGeode->obj)->pGeom->pInverseBindPoses;
-	this->jointRemaps = ((OzzObject*)animatedGeode->obj)->pGeom->pJointRemaps;
+	this->clips = &((OzzObject*)animatedGeode->obj)->clips;
+	this->inverseBindPoses = &((OzzObject*)animatedGeode->obj)->pGeom->pInverseBindPoses;
+	this->jointRemaps = &((OzzObject*)animatedGeode->obj)->pGeom->pJointRemaps;
+}
+
+Animator::Animator(OzzGeode* animatedGeode, mat4 transformation) : Animator(animatedGeode)
+{
+	this->M = transformation;
 }
 
 Animator::~Animator()
@@ -22,12 +27,12 @@ Animator::~Animator()
 
 void Animator::SetClip(std::string clipName)
 {
-	gClipController.Initialize(clips[clipName]->GetDuration(), &this->time);
+	gClipController.Initialize((*clips)[clipName]->GetDuration(), &this->time);
 
 	AnimationDesc animationDesc{};
 	animationDesc.mRig = &gStickFigureRig;
 	animationDesc.mNumLayers = 1;
-	animationDesc.mLayerProperties[0].mClip = clips[clipName];
+	animationDesc.mLayerProperties[0].mClip = (*clips)[clipName];
 	animationDesc.mLayerProperties[0].mClipController = &gClipController;
 
 	gAnimation.Initialize(animationDesc);
@@ -44,7 +49,7 @@ void Animator::update(float deltaTime)
 		gStickFigureAnimObject.PoseRig();
 
 		for (uint i = 0; i < gStickFigureRig.GetNumJoints(); ++i) {
-			boneData.mBoneMatrix[i] = mat4::scale(vec3(100, 100, -100)) * gStickFigureRig.GetJointWorldMat(jointRemaps[i]) * inverseBindPoses[i];
+			boneData.mBoneMatrix[i] = mat4::scale(vec3(100, 100, -100)) * gStickFigureRig.GetJointWorldMat((*jointRemaps)[i]) * (*inverseBindPoses)[i];
 			//print(boneData.mBoneMatrix[i]);
 		}
 		updated = true;

@@ -2,16 +2,16 @@
 #include "Application.h"
 
 namespace {
-	const char* playerFile = "female-char.gltf";
-	const char* player2File = "male-char.gltf";
+	const char* playerFile1 = "char-1-female.gltf";
+	const char* player2File = "char-2-male.gltf";
 	const char* groundFile = "Ground.gltf";
-	const char* otherFile = "tower-1-laser.gltf";
+	const char* towerFile1 = "tower-1-laser.gltf";
 	const char* other2File = "tower-2-aoe.gltf";
-	const char* thingFile = "minion-retry.gltf";
-	const char* thingBIGFile = "super-minion.gltf";
+	const char* minionFile1 = "minion-retry.gltf";
+	const char* thingBIGFile = "minion-2-super.gltf";
 	const char* clearFile = "ClearBox.gltf";
-	const char* trashFile = "dumpster.gltf";
-	const char* trasherFile = "recycling-bin.gltf";
+	const char* trashFile = "resource-1-dumpster.gltf";
+	const char* trasherFile = "resource-2-recycling-bin.gltf";
 
 	const char* blarfDir = "Gou";
 	const char* blarfActions[4] = { "Idle", "Walk", "Run", "Punch_Full" };
@@ -22,15 +22,15 @@ bool SceneManager::enableCulling = true;
 SceneManager::SceneManager(Renderer* renderer)
 {
 	// It'd be nice if I could put this in a loop later
-	meshes.push_back(conf_new(GLTFGeode, renderer, player2File));//0
+	meshes.push_back(conf_new(GLTFGeode, renderer, playerFile1));//0
 	meshes.push_back(conf_new(GLTFGeode, renderer, groundFile));//1
-	meshes.push_back(conf_new(GLTFGeode, renderer, otherFile));//2
-	meshes.push_back(conf_new(GLTFGeode, renderer, thingFile));//3
-	meshes.push_back(conf_new(GLTFGeode, renderer, playerFile));//4
-	meshes.push_back(conf_new(GLTFGeode, renderer, other2File));//5
-	meshes.push_back(conf_new(GLTFGeode, renderer, thingBIGFile));//6
-	meshes.push_back(conf_new(GLTFGeode, renderer, trashFile));//7
-	meshes.push_back(conf_new(GLTFGeode, renderer, trasherFile));//8
+	meshes.push_back(conf_new(GLTFGeode, renderer, minionFile1));//2
+	meshes.push_back(conf_new(GLTFGeode, renderer, towerFile1));//3
+	//meshes.push_back(conf_new(GLTFGeode, renderer, player2File));//4
+	//meshes.push_back(conf_new(GLTFGeode, renderer, other2File));//5
+	//meshes.push_back(conf_new(GLTFGeode, renderer, thingBIGFile));//6
+	//meshes.push_back(conf_new(GLTFGeode, renderer, trashFile));//7
+	//meshes.push_back(conf_new(GLTFGeode, renderer, trasherFile));//8
 	
 	animatedMeshes.push_back(conf_new(OzzGeode, renderer, blarfDir));
 	((OzzObject*)animatedMeshes.back()->obj)->SetClip(blarfActions[0]);
@@ -49,115 +49,51 @@ SceneManager::SceneManager(Renderer* renderer)
 	transforms.push_back(t);
 
 	srand((unsigned int)time(NULL));
-	float range = 100;
-	for (int i = 0; i < 150; i++) {
-		float x = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
-		float z = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
-		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * PI)));
-		float s = 1.0f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
-
-		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		t = conf_new(Transform, transform);
-		t->addChild(meshes[3]);
-		this->addChild(t);
-		transforms.push_back(t);
-	}
-	for (int i = 0; i < 50; i++) {
-		float x = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
-		float z = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
-		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * PI)));
-		float s = 0.75f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 0.5f));
-
-		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		t = conf_new(Transform, transform);
-		t->addChild(meshes[2]);
-		this->addChild(t);
-		transforms.push_back(t);
-	}
-	for (int i = 0; i < 30; i++) {
-		float x = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
-		float z = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
-		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * PI)));
-		float s = 0.75f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 0.5f));
-
-		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		t = conf_new(Transform, transform);
-		t->addChild(meshes[4]);
-		this->addChild(t);
-		transforms.push_back(t);
-	}
-	for (int i = 0; i < 50; i++) {
-		float x = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
-		float z = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
-		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * PI)));
-		float s = 0.75f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 0.5f));
-
-		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		t = conf_new(Transform, transform);
-		t->addChild(meshes[5]);
-		this->addChild(t);
-		transforms.push_back(t);
-	}
-	for (int i = 0; i < 50; i++) {
-		float x = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
-		float z = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
-		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * PI)));
-		float s = 0.75f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 0.5f));
-
-		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		t = conf_new(Transform, transform);
-		t->addChild(meshes[6]);
-		this->addChild(t);
-		transforms.push_back(t);
-	}
-	for (int i = 0; i < 100; i++) {
-		float x = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
-		float z = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
-		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * PI)));
-		float s = 0.75f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 0.5f));
-
-		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		t = conf_new(Transform, transform);
-		t->addChild(meshes[7]);
-		this->addChild(t);
-		transforms.push_back(t);
-	}
-	for (int i = 0; i < 0; i++) {
-		float x = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
-		float z = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
-		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * PI)));
-		float s = 0.75f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 0.5f));
-
-		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		t = conf_new(Transform, transform);
-		t->addChild(meshes[8]);
-		this->addChild(t);
-		transforms.push_back(t);
-	}
-	range = 20;
-	for (int i = 0; i < 30; i++) {
-		float x = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
-		float z = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
-		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * PI)));
-		float s = 0.1f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 0.1f));
-		int r = rand() % 4;
-
-		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		t = conf_new(Transform, transform);
-		Animator* a = conf_new(Animator, animatedMeshes[0]);
-		a->SetClip(blarfActions[r]);
-		t->addChild(a);
-		this->addChild(t);
-		transforms.push_back(t);
-		transforms.push_back(a);
-	}
+	randomStaticInstantiation(meshes[2], 150, 100, 1.0f, 1.5f);
+	randomStaticInstantiation(meshes[3], 50, 100, 1.0f, 1.5f);
+	randomAnimatedInstantiation(animatedMeshes[0], 20, 20, 0.1f, 0.2f, blarfActions, 4);
 }
 
 SceneManager::~SceneManager()
 {
 	for (auto t : transforms) conf_delete(t);
+	for (auto a : animators) conf_delete(a);
 	for (auto g : meshes) conf_delete(g);
 	for (auto g : animatedMeshes) conf_delete(g);
+}
+
+void SceneManager::randomStaticInstantiation(Geode* g, int num, float range, float minSize, float maxSize) {
+	for (int i = 0; i < num; i++) {
+		float x = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
+		float z = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
+		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * PI)));
+		float s = minSize + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxSize - minSize)));
+
+		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
+		Transform* t = conf_new(Transform, transform);
+		t->addChild(g);
+		this->addChild(t);
+		transforms.push_back(t);
+	}
+}
+
+void SceneManager::randomAnimatedInstantiation(OzzGeode* g, int num, float range, float minSize, float maxSize, const char* actions[], int numActions) {
+	for (int i = 0; i < num; i++) {
+		float x = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
+		float z = -range + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * range)));
+		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (2 * PI)));
+		float s = minSize + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (maxSize - minSize)));
+		int r = rand() % numActions;
+
+		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
+		Transform* t = conf_new(Transform, transform);
+		Animator* a = conf_new(Animator, g);
+		a->SetClip(actions[r]);
+		t->addChild(a);
+		this->addChild(t);
+		transforms.push_back(t);
+		animators.push_back(a);
+	}
 }
 
 void SceneManager::createMaterialResources(SceneManager::GeodeType type, RootSignature* pRootSignature, DescriptorSet* pBindlessTexturesSamplersSet, Sampler* defaultSampler)

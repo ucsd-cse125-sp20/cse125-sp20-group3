@@ -24,7 +24,7 @@ public:
 	ClipController gClipController;
 
 	// Clips
-	std::map<std::string, Clip*> clips;
+	std::map<std::string, Clip*>* clips;
 
 	// Rigs
 	Rig gStickFigureRig;
@@ -32,15 +32,15 @@ public:
 	std::string directory;
 
 	float time;
-
 	bool updated = false;
 
-	mat4* inverseBindPoses;
-	uint32_t* jointRemaps;
+	mat4** inverseBindPoses;
+	uint32_t** jointRemaps;
 
 	OzzObject::UniformDataBones boneData;
 
 	Animator(OzzGeode* animatedGeode);
+	Animator(OzzGeode* animatedGeode, mat4 transformation);
 
 	~Animator();
 

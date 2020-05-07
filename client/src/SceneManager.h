@@ -28,6 +28,7 @@ public:
 	
 	// This vector should eventually be split between tracked objects and client only objects
 	std::vector<Transform*> transforms;
+	std::vector<Animator*> animators;
 
 	// Will likely try to convert to a dictionary
 	std::vector<GLTFGeode*> meshes;
@@ -43,6 +44,9 @@ public:
 
 	SceneManager(Renderer* renderer);
 	~SceneManager();
+
+	void randomStaticInstantiation(Geode* g, int num, float range, float minSize, float maxSize);
+	void randomAnimatedInstantiation(OzzGeode* g, int num, float range, float minSize, float maxSize, const char* actions[], int numActions);
 
 	void createMaterialResources(SceneManager::GeodeType type, RootSignature* pRootSignature, DescriptorSet* pBindlessTexturesSamplersSet, Sampler* defaultSampler);
 

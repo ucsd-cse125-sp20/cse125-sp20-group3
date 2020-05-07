@@ -2,32 +2,41 @@
 
 Animator::Animator(OzzGeode* animatedGeode)
 {
+	// parent the animated geode node
 	this->directory = ((OzzObject*)animatedGeode->obj)->directory;
 	this->addChild(animatedGeode);
 
+	// Initiatlize another rig
 	PathHandle skeletonPath = fsCopyPathInResourceDirectory(RD_ANIMATIONS, (directory + "/skeleton.ozz").c_str());
 	rig.Initialize(skeletonPath);
 
+	// Get a pointer to required data from child
 	this->clips = &((OzzObject*)animatedGeode->obj)->clips;
 	this->inverseBindPoses = &((OzzObject*)animatedGeode->obj)->pGeom->pInverseBindPoses;
 	this->jointRemaps = &((OzzObject*)animatedGeode->obj)->pGeom->pJointRemaps;
 
+	// Build animation
 	AnimationDesc animationDesc{};
 	animationDesc.mRig = &rig;
 	animationDesc.mNumLayers = (unsigned int)(*clips).size();
 	int layer = 0;
 	for (auto clipEntry : *clips) {
+		// Get time reference for external use (probably only for debugging)
 		float* time = conf_new(float);
 		times.emplace(clipEntry.first, time);
 
+		// Get clip controller
 		ClipController* cc = conf_new(ClipController);
 		cc->Initialize(clipEntry.second->GetDuration(), time);
 		clipControllers.emplace(clipEntry.first, cc);
 
+		// Get clip mask and zero weights
 		ClipMask* cm = conf_new(ClipMask);
 		cm->Initialize(&rig);
 		cm->DisableAllJoints();
 		clipMasks.emplace(clipEntry.first, cm);
+
+		//printf("Addresses: %p %p %p\n", (void*)time, (void*)cc, (void*)cm);
 
 		animationDesc.mLayerProperties[layer].mClip = clipEntry.second;
 		animationDesc.mLayerProperties[layer].mClipController = cc;
@@ -36,6 +45,7 @@ Animator::Animator(OzzGeode* animatedGeode)
 	}
 	animation.Initialize(animationDesc);
 
+	// Initialize animated object wrapper
 	animObject.Initialize(&rig, &animation);
 }
 
@@ -56,6 +66,7 @@ Animator::~Animator()
 		conf_delete(ccEntry.second);
 	}
 	for (auto cmEntry : clipMasks) {
+		cmEntry.second->Destroy();
 		conf_delete(cmEntry.second);
 	}
 }

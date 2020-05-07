@@ -51,7 +51,7 @@ SceneManager::SceneManager(Renderer* renderer)
 	srand((unsigned int)time(NULL));
 	randomStaticInstantiation(meshes[2], 150, 100, 1.0f, 1.5f);
 	randomStaticInstantiation(meshes[3], 50, 100, 1.0f, 1.5f);
-	randomAnimatedInstantiation(animatedMeshes[0], 20, 20, 0.1f, 0.2f, blarfActions, 4);
+	randomAnimatedInstantiation(animatedMeshes[0], 30, 20, 0.1f, 0.2f, blarfActions, 4);
 }
 
 SceneManager::~SceneManager()
@@ -171,9 +171,11 @@ void SceneManager::draw(Cmd* cmd)
 	updateBoneBuffer(shaderCbv, NULL);
 	endUpdateResource(&shaderCbv, NULL);
 
+	// Do culling check
 	vec4 frustumPlanes[6];
 	mat4::extractFrustumClipPlanes(Application::projMat * Application::viewMat, frustumPlanes[0], frustumPlanes[1], frustumPlanes[2], frustumPlanes[3], frustumPlanes[4], frustumPlanes[5], true);
 	cull(frustumPlanes, SceneManager::enableCulling);
 	
+	// Draw Graph
 	Transform::draw(cmd);
 }

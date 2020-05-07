@@ -59,8 +59,11 @@ int __cdecl main(void)
 		manager->update();
 
 		//Send updated data back to clients
-		float sendbufSize = manager->encodeScene(sendbuf);
+		int sendbufSize = manager->encodeScene(sendbuf);
 		//std::cout << "sendbufSize: " << sendbufSize << std::endl;
+		char sizebuf[4];
+		((int*)sizebuf)[0] = sendbufSize; //push size of data packet to players
+		server->pushDataAll(sizebuf, sizeof(int), 0); //and then push data packet
 		server->pushDataAll(sendbuf, sendbufSize, 0);
     } while (1);
 

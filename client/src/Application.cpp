@@ -173,14 +173,15 @@ vec3 cameraOffset(0, 5, -5);
 
 float rot = 0.f;
 
+Client* client;
 SceneManager_Client* scene;
 
 bool connected = false;
 const int serverNameSize = 32;
 char serverName[serverNameSize] = "localhost";
-Client* client;
 char sendbuf[DEFAULT_BUFLEN];
-char recvbuf[SERVER_SENDBUFLEN];
+//char recvbuf[SERVER_SENDBUFLEN];
+std::vector<Client::UpdateData> updateBuf;
 
 // ============================================================================
 // ==============================================[ CODE STARTS HERE ]==========
@@ -386,6 +387,10 @@ void Application::ToggleClient()
 	}
 	else {
 		client = conf_new(Client, serverName);
+		char myPlayerID = client->recvPlayerID();
+		std::cout << "char of myPlayerID " << myPlayerID << "\n";
+		std::cout << "myPlayerID: " << (std::string(1, myPlayerID)) << "\n";
+		scene->trackPlayer(std::string(1, myPlayerID));
 	}
 }
 
@@ -869,11 +874,11 @@ void Application::Update(float deltaTime)
 	/************************************************************************/
 	// Server Contact
 	/************************************************************************/
-	int recvbufsize = 0;
 	if (connected) {
 		int size = Input::EncodeToBuf(sendbuf);
 		client->sendData(sendbuf, size, 0);
-		recvbufsize = client->recvData(recvbuf, SERVER_SENDBUFLEN, 0);
+		updateBuf = client->recvAndFormatData();
+		std::cout << "size of updateBuf " << updateBuf.size() << "\n";
 	}
 
 	/************************************************************************/
@@ -909,12 +914,11 @@ void Application::Update(float deltaTime)
 	gUniformData.mLightDirection[2] = vec4(-sunDirection.getX(), -sunDirection.getY(), -sunDirection.getZ(), 0.0f);
 
 	if (connected) {
-		scene->updateFromClientBuf(recvbuf, recvbufsize);
+		scene->updateFromClientBuf(updateBuf);
 	}
 	else {
 		scene->updateFromInputBuf(deltaTime);
 	}
-	//scene->update(deltaTime);
 
 	mat4 playerMat = scene->getPlayerTransformMat();
 	//std::cout << "tracked player position x: " << playerMat[3][0] << " y: " << playerMat[3][1] << " z: " << playerMat[3][2] << "\n";

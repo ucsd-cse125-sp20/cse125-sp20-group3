@@ -23,9 +23,10 @@ public:
 	virtual void update();
 	void resetClock();
 
-	void setData(GameObjectData data);
+	void setGOData(GameObjectData data);
 	void setMatrix(mat4 m);
 	mat4 getMatrix();
 
-	int writeData(char buf[], int index);
+	GameObjectData getData();
+	virtual int writeData(char buf[], int index);
 };

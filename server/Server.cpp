@@ -126,9 +126,10 @@ Server::Server(SceneManager_Server* manager) {
 }
 
 void Server::pushDataAll(char sendbuf[], int buflen, int flags) {
-	std::cout << "pushing " << buflen << " bytes\n";
+	
 	for (int p = 0; p < NUM_PLAYERS; p++) { //append each byte in sendbuf to all the player outbound buffers
 		player_states_mtx[p].lock();
+		std::cout << "pushing " << buflen << " bytes\n";
 		for (int i = 0; i < buflen; i++) {
 			Player_States[p].out.push_back(sendbuf[i]);
 		}
@@ -187,10 +188,10 @@ int Server::handle_player_inputs(player_state* state, int flags) {
 			return 1;
 		} else if(iResult == 0){
 			printf("Player %d disconnected?\n", state->player_id);
-			//players_state->disconnected = 1;
-			//closesocket(players_state->socket_fd);
-			//player_states_mtx[state->player_id].unlock();
-			//return 0;
+			state->disconnected = 1;
+			closesocket(state->socket_fd);
+			player_states_mtx[state->player_id].unlock();
+			return 0;
 		}
 		else{
 			//format and save data to this connection's player state
@@ -199,7 +200,8 @@ int Server::handle_player_inputs(player_state* state, int flags) {
 			state->in = ((PlayerInput*)recvbuf)[0];
 			player_states_mtx[state->player_id].unlock();
 		}
-		if (state->out.size() > 0) {
+
+		if (state->out.size() > 0) { //if there's data in the outbound buffer, send it
 			std::cout << "locking to send data\n";
 			player_states_mtx[state->player_id].lock();
 			std::cout << "sending " << state->out.size() << " bytes\n";

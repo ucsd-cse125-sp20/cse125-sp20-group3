@@ -14,15 +14,17 @@
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
+
 SOCKET Server::ClientSockets[NUM_PLAYERS];
-std::mutex Server::players_state_mtx[NUM_PLAYERS];
-Server::Server() {
+std::mutex Server::player_states_mtx[NUM_PLAYERS];
+
+//kind of bad design to have the server receive a reference to the manager, but it cuts down on a lot of checks
+Server::Server(SceneManager_Server* manager) { 
 	WSADATA wsaData;
 	SOCKET ListenSocket = INVALID_SOCKET;
 	struct addrinfo* result = NULL;
 	struct addrinfo* ptr = NULL;
 	struct addrinfo hints;
-
 	
 	int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (iResult != 0) {
@@ -82,8 +84,6 @@ Server::Server() {
 		//TODO handle failure
 	}
 
-	
-
 	// // Accept a client socket
 	// ClientSockets[0] = accept(ListenSocket, NULL, NULL);
 	// //TODO iterate through all the ClientSockets eventually
@@ -103,21 +103,131 @@ Server::Server() {
 		{ // client connected successfully
 			// start a thread that will communicate with client
 			// startThread (client[number_of_clients]);
+			char id_buf[1] = { (std::to_string(number_of_clients))[0] };
+			iResult = send(ClientSockets[number_of_clients], id_buf, 1, 0); //tell client what their player id is
+			if (!manager->addPlayer(std::to_string(number_of_clients))) { //spawn a player object for the player
+				//if somehow the player object already exists
+				std::cout << "error spawning player object, player " << number_of_clients << " already exists\n";
+			}
+
+			Player_States[number_of_clients].socket_fd = ClientSockets[number_of_clients];
+			Player_States[number_of_clients].player_id = number_of_clients;
+			Player_States[number_of_clients].disconnected = false;
+			//start thread to handle client recvs and sends
+			player_threads[number_of_clients] = std::thread(&Server::handle_player_inputs, &Player_States[number_of_clients], 0);
+
 			number_of_clients++;
 			std::cout << "Accepted " << number_of_clients << " of " << NUM_PLAYERS << " players" << std::endl;
-			
-			Players_State[number_of_clients].id = number_of_clients;
-			// Create the thread here
-			players_threads[number_of_clients] = std::thread(&Server::handle_player_inputs, &Players_State[number_of_clients], 0);
 		}
 	}
 
-	// No longer need server socket
+	// No longer need listening socket
 	closesocket(ListenSocket);
-
-	
 }
 
+void Server::pushDataAll(char sendbuf[], int buflen, int flags) {
+	std::cout << "pushing " << buflen << " bytes\n";
+	for (int p = 0; p < NUM_PLAYERS; p++) { //append each byte in sendbuf to all the player outbound buffers
+		player_states_mtx[p].lock();
+		for (int i = 0; i < buflen; i++) {
+			Player_States[p].out.push_back(sendbuf[i]);
+		}
+		player_states_mtx[p].unlock();
+	}
+}
+
+void Server::pushDataPlayer(int conn_socket, char sendbuf[], int buflen, int flags) {
+	for (int i = 0; i < buflen; i++) { //append bytes of sendbuf to only designated player's outbound buffer
+		Player_States[conn_socket].out.push_back(sendbuf[i]);
+	}
+}
+
+std::vector<PlayerInput> Server::pullData() {
+	std::vector<PlayerInput> inputs;
+	for (int p = 0; p < NUM_PLAYERS; p++) {
+		inputs.push_back(Player_States[p].in);
+	}
+	return inputs;
+}
+
+int Server::cleanup(int how) {
+	int err = 0;
+	int iResult;
+
+	for (SOCKET clientSock : ClientSockets) {
+		iResult = shutdown(clientSock, how);
+		if (iResult == SOCKET_ERROR) {
+			std::cout << "shutdown failed with error: " << WSAGetLastError() << std::endl;
+			err = -1;
+		}
+		closesocket(clientSock);
+	}
+	WSACleanup();
+	if (err) return err;
+	return iResult;
+}
+
+int Server::handle_player_inputs(player_state* state, int flags) {
+	int err = 0;
+	int iResult;
+	char recvbuf[DEFAULT_BUFLEN];
+
+	while (1)
+	{
+		ZeroMemory(recvbuf, DEFAULT_BUFLEN);
+		std::cout << "recving\n";
+		iResult = recv(state->socket_fd, recvbuf, DEFAULT_BUFLEN, flags);
+		std::cout << "recv'd\n";
+		if (iResult < 0){
+		    // error
+			printf("Player %d recv failed with error %d\n", state->player_id, WSAGetLastError());
+			state->disconnected = 1;
+			closesocket(state->socket_fd);
+			player_states_mtx[state->player_id].unlock();
+			return 1;
+		} else if(iResult == 0){
+			printf("Player %d disconnected?\n", state->player_id);
+			//players_state->disconnected = 1;
+			//closesocket(players_state->socket_fd);
+			//player_states_mtx[state->player_id].unlock();
+			//return 0;
+		}
+		else{
+			//format and save data to this connection's player state
+			std::cout << "locking to write in\n";
+			player_states_mtx[state->player_id].lock();
+			state->in = ((PlayerInput*)recvbuf)[0];
+			player_states_mtx[state->player_id].unlock();
+		}
+		if (state->out.size() > 0) {
+			std::cout << "locking to send data\n";
+			player_states_mtx[state->player_id].lock();
+			std::cout << "sending " << state->out.size() << " bytes\n";
+
+			iResult = send(state->socket_fd, state->out.data(), state->out.size(), flags);
+			if (iResult == SOCKET_ERROR) {
+				// printf("send failed with error: %d\n", WSAGetLastError());
+				printf("Player %d send failed with error: %d\n", state->player_id, WSAGetLastError());
+				state->disconnected = 1;
+				closesocket(state->socket_fd);
+				player_states_mtx[state->player_id].unlock();
+				return 1;
+			}	
+
+			state->out.clear(); //clear out data
+			player_states_mtx[state->player_id].unlock();
+		}
+	}
+}
+
+void Server::end_game(){
+	for (int i; i < NUM_PLAYERS; i++){
+		player_threads[i].join();
+	}
+}
+
+/***** legacy code *****/
+/*
 int Server::sendDataAll(char sendbuf[], int buflen, int flags) {
 	int err = 0;
 	int iResult;
@@ -174,19 +284,12 @@ int Server::recvData(char recvbuf[], int buflen, int flags) {
 		recvlens[i] = iResult;
 		//std::cout << "recvlens from player " << i << ": " << recvlens[i] << "\n";
 		totaliResult += iResult;
-
-		if (recvlens[i] == 12) {
-			int move_x = ((int*)tempbufs[i])[0];
-			int move_z = ((int*)tempbufs[i])[1];
-			float view_y_rot = ((float*)tempbufs[i])[2];
-			//std::cout << "received: x: " << move_x << " z: " << move_z << " y: " << view_y_rot << "\n";
-		}
 	}
 	if (err) return err;
 	int recvbufind = 0;
 	for (int i = 0; i < NUM_PLAYERS; i++) {
 		char player_num = std::to_string(i).c_str()[0]; //convert player index in sockets array to char
-		
+
 		//std::cout << "writing recvbuf for player " << player_num << "\n";
 		recvbuf[recvbufind] = player_num; //write player number to recvbuf
 		recvbufind++;
@@ -206,59 +309,4 @@ int Server::recvData(char recvbuf[], int buflen, int flags) {
 	}
 	return totaliResult;
 }
-
-int Server::cleanup(int how) {
-	int err = 0;
-	int iResult;
-
-	for (SOCKET clientSock : ClientSockets) {
-		iResult = shutdown(clientSock, how);
-		if (iResult == SOCKET_ERROR) {
-			std::cout << "shutdown failed with error: " << WSAGetLastError() << std::endl;
-			err = -1;
-		}
-		closesocket(clientSock);
-	}
-	WSACleanup();
-	if (err) return err;
-	return iResult;
-}
-
-int Server::handle_player_inputs(players_state* players_state, int flags) {
-	int err = 0;
-	int iResult;
-	int totaliResult = 0;
-	char temp_buf[DEFAULT_BUFLEN];
-	//std::stringstream ss (ios_base::app | std::stringstream::out);
-
-	while (1)
-	{
-		ZeroMemory(temp_buf, sizeof(temp_buf));
-		iResult = recv(ClientSockets[players_state->id], temp_buf, DEFAULT_BUFLEN, flags);
-		if (iResult < 0){
-		    // error
-			printf("Player id %d got %s\n", players_state->id, "SOCKET_ERROR");
-			players_state->disconnected = 1;
-
-			return 1;
-		} else if(iResult == 0){
-			printf("Player id %d disconnects\n", players_state->id);
-			players_state->disconnected = 1;
-			return 0;
-		}
-		else{
-			// concatenate the input
-			//ss.write(temp_buf, sizeof(temp_buf));
-			players_state_mtx[players_state->id].lock();
-			players_state->in = (PlayerInput*)temp_buf;
-			players_state_mtx[players_state->id].unlock();
-		}
-	}
-	//players_state->in = ss.str();
-}
-
-void Server::end_game(){
-	for (int i; i < NUM_PLAYERS; i++){
-		players_threads[i].join();
-	}
-}
+*/

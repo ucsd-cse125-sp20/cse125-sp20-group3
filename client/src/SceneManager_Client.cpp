@@ -92,11 +92,11 @@ void SceneManager_Client::updateFromClientBuf(char buf[], int bufsize)
 		int health;
 		int state = 0; // 0 for reading id, 1 for reading gameobjectdata, 2 for reading health, 3 for checking closing delimiter
 		for (int i = 0; i < DEFAULT_BUFLEN; i++) {
-			std::cout << "i: " << i << "\n";
+			//std::cout << "i: " << i << "\n";
 			if (state == 0) {
 				if (buf[i] == DELIMITER) {
 					state++; //end of state found, advance to next state
-					std::cout << "id_str: " + id_str + "\n";
+					//std::cout << "id_str: " + id_str + "\n";
 				}
 				else { //read id bytes one by one, appending to id_str
 					id_str += buf[i];
@@ -112,11 +112,11 @@ void SceneManager_Client::updateFromClientBuf(char buf[], int bufsize)
 				i += (sizeof GameObject::GameObjectData); //advance i to where delimiter should be
 
 				if (buf[i] == DELIMITER) {
-					std::cout << "state 1 delimiter at i: " << i << "\n";
+					//std::cout << "state 1 delimiter at i: " << i << "\n";
 					state++; //end of state found, advance to next state
 				}
 				else {
-					std::cout << "state 1 delimiter expected but not found, i: " << i << "\n";
+					//std::cout << "state 1 delimiter expected but not found, i: " << i << "\n";
 				}
 			}
 			else if (state == 2) {
@@ -124,8 +124,8 @@ void SceneManager_Client::updateFromClientBuf(char buf[], int bufsize)
 				i += sizeof(int); //advance i to where delimiter should be
 
 				if (buf[i] == DELIMITER) { //end of data line found, write to map, advance to possible final state
-					std::cout << "id: " << id_str << " x: " << data.x << " z: " << data.z << " y: " << data.rot << " health: " << health << "\n";
-					std::cout << "state 2 delimiter at i: " << i << "\n";
+					//std::cout << "id: " << id_str << " x: " << data.x << " z: " << data.z << " y: " << data.rot << " health: " << health << "\n";
+					//std::cout << "state 2 delimiter at i: " << i << "\n";
 
 					if (idMap.find(id_str) == idMap.end()) { //new id encountered, spawn new object
 						int id_int = stoi(id_str);

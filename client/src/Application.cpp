@@ -180,7 +180,7 @@ const int serverNameSize = 32;
 char serverName[serverNameSize] = "localhost";
 Client* client;
 char sendbuf[DEFAULT_BUFLEN];
-char recvbuf[DEFAULT_BUFLEN];
+char recvbuf[SERVER_SENDBUFLEN];
 
 // ============================================================================
 // ==============================================[ CODE STARTS HERE ]==========
@@ -873,7 +873,7 @@ void Application::Update(float deltaTime)
 	if (connected) {
 		int size = Input::EncodeToBuf(sendbuf);
 		client->sendData(sendbuf, size, 0);
-		recvbufsize = client->recvData(recvbuf, DEFAULT_BUFLEN, 0);
+		recvbufsize = client->recvData(recvbuf, SERVER_SENDBUFLEN, 0);
 	}
 
 	/************************************************************************/

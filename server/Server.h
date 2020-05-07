@@ -9,13 +9,14 @@
 
 #include "../common/macros.h"
 #include "../common/client2server.h"
-#include "game_state.h"
+#include "SceneManager_Server.h"
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string>
+#include <vector>
 #include <thread>
 #include <mutex>
 
@@ -24,18 +25,26 @@
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
 
+struct player_state
+{
+	int socket_fd, player_id;
+	bool disconnected;
+	PlayerInput in;
+	std::vector<char> out;
+};
+
 class Server {
 private:
 	static SOCKET ClientSockets[NUM_PLAYERS];
-	players_state Players_State[NUM_PLAYERS];
-	std::thread players_threads[NUM_PLAYERS];
-	static std::mutex players_state_mtx[NUM_PLAYERS];
+	player_state Player_States[NUM_PLAYERS];
+	std::thread player_threads[NUM_PLAYERS];
+	static std::mutex player_states_mtx[NUM_PLAYERS];
 public:
-	Server(); //set up server listening
-	int sendDataAll(char sendbuf[], int buflen, int flags); //send data to clients
-	int sendDataPlayer(int conn_socket, char sendbuf[], int buflen, int flags);
-	int recvData(char recvbuf[], int buflen, int flags); //recv data from clients
+	Server(SceneManager_Server* manager); //set up server listening
+	void pushDataAll(char sendbuf[], int buflen, int flags); //send data to clients
+	void pushDataPlayer(int conn_socket, char sendbuf[], int buflen, int flags);
+	std::vector<PlayerInput> pullData(); //recv data from clients
 	int cleanup(int how); //close all clients' connections with server
-	static int handle_player_inputs(players_state* players_state, int flags);
+	static int handle_player_inputs(player_state* state, int flags);
 	void end_game();
 };

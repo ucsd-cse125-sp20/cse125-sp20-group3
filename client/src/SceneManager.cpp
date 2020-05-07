@@ -15,6 +15,9 @@ namespace {
 
 	const char* blarfDir = "Gou";
 	const char* blarfActions[4] = { "Idle", "Walk", "Run", "Punch_Full" };
+
+	int counter = 0;
+	int animCounter = 0;
 }
 
 bool SceneManager::enableCulling = true;
@@ -51,7 +54,7 @@ SceneManager::SceneManager(Renderer* renderer)
 	srand((unsigned int)time(NULL));
 	randomStaticInstantiation(meshes[2], 150, 100, 1.0f, 1.5f);
 	randomStaticInstantiation(meshes[3], 50, 100, 1.0f, 1.5f);
-	randomAnimatedInstantiation(animatedMeshes[0], 30, 20, 0.1f, 0.2f, blarfActions, 4);
+	randomAnimatedInstantiation(animatedMeshes[0], 1, 5, 0.15f, 0.2f, blarfActions, 4);
 }
 
 SceneManager::~SceneManager()
@@ -156,6 +159,12 @@ void SceneManager::setProgram(SceneManager::GeodeType type, Geode::GeodeShaderDe
 		}
 		break;
 	}
+}
+
+void SceneManager::update(float deltaTime)
+{
+	if (counter++ % 50 == 0) animators[0]->SetClip(blarfActions[animCounter = (animCounter + 1) % 4]);
+	Transform::update(deltaTime);
 }
 
 void SceneManager::draw(Cmd* cmd)

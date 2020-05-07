@@ -56,5 +56,6 @@ public:
 	void setBuffer(SceneManager::SceneBuffer type, Buffer** buffers); // TODO Could probably mange instance buffers within class, rather than app
 	void setProgram(SceneManager::GeodeType type, Geode::GeodeShaderDesc program);
 
+	void update(float deltaTime) override;
 	void draw(Cmd* cmd) override;
 };

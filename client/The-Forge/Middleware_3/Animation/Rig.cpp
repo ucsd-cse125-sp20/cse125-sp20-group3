@@ -34,7 +34,7 @@ void Rig::Initialize(const Path* skeletonFilePath)
 	mNumJoints = mSkeleton.num_joints();
 
 	// Find the root index
-	mRootIndex = mNumJoints - 1; // FIND OUT WHAT'S WRONG HERE TODO <====================================================================
+	mRootIndex = 0; // FIND OUT WHAT'S WRONG HERE TODO <====================================================================
 	for (unsigned int i = 0; i < mNumJoints; i++)
 	{
 		//printf("%d %d\n", mSkeleton.joint_properties()[i].parent, i);

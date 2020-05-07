@@ -14,24 +14,18 @@
 
 class Animator : public Transform {
 public:
-	// AnimatedObjects
-	AnimatedObject gStickFigureAnimObject;
+	AnimatedObject animObject;
+	Animation animation;
 
-	// Animations
-	Animation gAnimation;
-
-	// ClipControllers
-	ClipController gClipController;
-
-	// Clips
 	std::map<std::string, Clip*>* clips;
+	std::map<std::string, float*> times;
+	std::map<std::string, ClipController*> clipControllers;
+	std::map<std::string, ClipMask*> clipMasks;
 
-	// Rigs
-	Rig gStickFigureRig;
+	Rig rig;
 
 	std::string directory;
 
-	float time;
 	bool updated = false;
 
 	mat4** inverseBindPoses;

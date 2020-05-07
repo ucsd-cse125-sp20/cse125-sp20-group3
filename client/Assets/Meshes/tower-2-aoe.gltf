@@ -1,0 +1,162 @@
+{
+    "asset" : {
+        "generator" : "Khronos glTF Blender I/O v1.1.46",
+        "version" : "2.0"
+    },
+    "scene" : 0,
+    "scenes" : [
+        {
+            "name" : "Scene",
+            "nodes" : [
+                0
+            ]
+        }
+    ],
+    "nodes" : [
+        {
+            "mesh" : 0,
+            "name" : "Tower AOE",
+            "rotation" : [
+                0.10136783123016357,
+                0.6202580332756042,
+                -0.11737091094255447,
+                -0.7689139246940613
+            ],
+            "scale" : [
+                0.334070086479187,
+                0.334070086479187,
+                0.334070086479187
+            ],
+            "translation" : [
+                0.1250123679637909,
+                3.365098476409912,
+                1.200533390045166
+            ]
+        }
+    ],
+    "materials" : [
+        {
+            "doubleSided" : true,
+            "emissiveFactor" : [
+                0,
+                0,
+                0
+            ],
+            "name" : "Tower AOE Metal",
+            "pbrMetallicRoughness" : {
+                "baseColorFactor" : [
+                    0.1787736415863037,
+                    0.16119223833084106,
+                    0.11468560993671417,
+                    1
+                ],
+                "metallicFactor" : 0,
+                "roughnessFactor" : 0.2293577790260315
+            }
+        }
+    ],
+    "meshes" : [
+        {
+            "name" : "Tower AOE Base",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 0,
+                        "NORMAL" : 1,
+                        "TEXCOORD_0" : 2,
+                        "JOINTS_0" : 3,
+                        "WEIGHTS_0" : 4
+                    },
+                    "indices" : 5,
+                    "material" : 0
+                }
+            ]
+        }
+    ],
+    "accessors" : [
+        {
+            "bufferView" : 0,
+            "componentType" : 5126,
+            "count" : 11768,
+            "max" : [
+                4.685661315917969,
+                6.033595085144043,
+                7.540809154510498
+            ],
+            "min" : [
+                -10.81032943725586,
+                -10.389657974243164,
+                -8.370268821716309
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 1,
+            "componentType" : 5126,
+            "count" : 11768,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 2,
+            "componentType" : 5126,
+            "count" : 11768,
+            "type" : "VEC2"
+        },
+        {
+            "bufferView" : 3,
+            "componentType" : 5123,
+            "count" : 11768,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 4,
+            "componentType" : 5126,
+            "count" : 11768,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 5,
+            "componentType" : 5123,
+            "count" : 19176,
+            "type" : "SCALAR"
+        }
+    ],
+    "bufferViews" : [
+        {
+            "buffer" : 0,
+            "byteLength" : 141216,
+            "byteOffset" : 0
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 141216,
+            "byteOffset" : 141216
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 94144,
+            "byteOffset" : 282432
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 94144,
+            "byteOffset" : 376576
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 188288,
+            "byteOffset" : 470720
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 38352,
+            "byteOffset" : 659008
+        }
+    ],
+    "buffers" : [
+        {
+            "byteLength" : 697360,
+            "uri" : "tower-2-aoe.bin"
+        }
+    ]
+}

@@ -49,6 +49,7 @@ void Animator::update(float deltaTime)
 		}
 		updated = true;
 	}
+	Transform::update(deltaTime);
 }
 
 void Animator::updateBoneBuffer(BufferUpdateDesc& desc, OzzObject::UniformDataBones* boneData)

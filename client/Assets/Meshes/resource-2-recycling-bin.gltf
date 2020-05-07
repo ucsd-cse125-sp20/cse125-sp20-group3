@@ -1,0 +1,148 @@
+{
+    "asset" : {
+        "generator" : "Khronos glTF Blender I/O v1.1.46",
+        "version" : "2.0"
+    },
+    "scene" : 0,
+    "scenes" : [
+        {
+            "name" : "Scene",
+            "nodes" : [
+                0
+            ]
+        }
+    ],
+    "nodes" : [
+        {
+            "mesh" : 0,
+            "name" : "Recycling Bin",
+            "rotation" : [
+                0.006231586914509535,
+                -0.3324258625507355,
+                0.025605211034417152,
+                0.9427611231803894
+            ],
+            "scale" : [
+                0.2087201327085495,
+                0.001401421963237226,
+                0.2407505363225937
+            ],
+            "translation" : [
+                -2.068363666534424,
+                0.012355194427073002,
+                -0.05799131840467453
+            ]
+        }
+    ],
+    "materials" : [
+        {
+            "doubleSided" : true,
+            "emissiveFactor" : [
+                0,
+                0,
+                0
+            ],
+            "name" : "Material",
+            "pbrMetallicRoughness" : {
+                "baseColorTexture" : {
+                    "index" : 0,
+                    "texCoord" : 0
+                },
+                "metallicFactor" : 0,
+                "roughnessFactor" : 0.5
+            }
+        }
+    ],
+    "meshes" : [
+        {
+            "name" : "Cube.006",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 0,
+                        "NORMAL" : 1,
+                        "TEXCOORD_0" : 2
+                    },
+                    "indices" : 3,
+                    "material" : 0
+                }
+            ]
+        }
+    ],
+    "textures" : [
+        {
+            "source" : 0
+        }
+    ],
+    "images" : [
+        {
+            "mimeType" : "image/png",
+            "name" : "Recycling Bin Texture",
+            "uri" : "Recycling%20Bin%20Texture.png"
+        }
+    ],
+    "accessors" : [
+        {
+            "bufferView" : 0,
+            "componentType" : 5126,
+            "count" : 352490,
+            "max" : [
+                2.6825754642486572,
+                1293.2646484375,
+                4.0403594970703125
+            ],
+            "min" : [
+                -4.670231342315674,
+                -23.22732162475586,
+                -2.000659465789795
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 1,
+            "componentType" : 5126,
+            "count" : 352490,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 2,
+            "componentType" : 5126,
+            "count" : 352490,
+            "type" : "VEC2"
+        },
+        {
+            "bufferView" : 3,
+            "componentType" : 5125,
+            "count" : 530052,
+            "type" : "SCALAR"
+        }
+    ],
+    "bufferViews" : [
+        {
+            "buffer" : 0,
+            "byteLength" : 4229880,
+            "byteOffset" : 0
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 4229880,
+            "byteOffset" : 4229880
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 2819920,
+            "byteOffset" : 8459760
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 2120208,
+            "byteOffset" : 11279680
+        }
+    ],
+    "buffers" : [
+        {
+            "byteLength" : 13399888,
+            "uri" : "recycling-bin.bin"
+        }
+    ]
+}

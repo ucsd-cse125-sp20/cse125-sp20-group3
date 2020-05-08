@@ -42,47 +42,6 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	transforms["ground"] = conf_new(Transform, mat4::identity());
 	transforms["ground"]->addChild(gltfGeodes[ENV_GEODE]);
 	this->addChild(transforms["ground"]);
-
-	/*
-	Transform* t = conf_new(Transform, mat4::identity());
-	Transform* t2 = conf_new(Transform, mat4::rotationY(-PI/2));
-	t->addChild(t2);
-	t2->addChild(gltfGeodes[0]);
-	this->addChild(t);
-	transforms.push_back(t);
-	transforms.push_back(t2);
-
-	t = conf_new(Transform, mat4::identity());
-	t->addChild(gltfGeodes[1]);
-	this->addChild(t);
-	transforms.push_back(t);
-
-	srand((unsigned int)time(NULL));
-	for (int i = 0; i < 500; i++) {
-		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
-		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
-		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
-		float s = 1.0f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
-
-		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		t = conf_new(Transform, transform);
-		t->addChild(gltfGeodes[3]);
-		this->addChild(t);
-		transforms.push_back(t);
-	}
-	for (int i = 0; i < 100; i++) {
-		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
-		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
-		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
-		float s = 0.75f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 0.5f));
-
-		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		t = conf_new(Transform, transform);
-		t->addChild(gltfGeodes[2]);
-		this->addChild(t);
-		transforms.push_back(t);
-	}
-	*/
 }
 
 SceneManager_Client::~SceneManager_Client()
@@ -116,9 +75,9 @@ void SceneManager_Client::updateFromClientBuf(std::vector<Client::UpdateData> up
 {
 	//std::cout << "updating from client buf of size " << updateBuf.size() << "\n";
 	for (Client::UpdateData data : updateBuf) {
-		if (data.id_str == "0") {
+		/*if (data.id_str == "0") {
 			std::cout << "x: " << data.ent_data.GO_data.x << " z: " << data.ent_data.GO_data.z << " y: " << data.ent_data.GO_data.rot << "\n";
-		}
+		}*/
 		if (idMap.find(data.id_str) == idMap.end()) { //new id encountered, spawn new object
 			int id_int = stoi(data.id_str);
 			//std::cout << "id_int: " << id_int << "\n";
@@ -155,8 +114,17 @@ void SceneManager_Client::updateFromClientBuf(std::vector<Client::UpdateData> up
 			this->addChild(transforms[data.id_str]);
 		}
 		
-		idMap[data.id_str]->setEntData(data.ent_data);
-		transforms[data.id_str]->setMatrix(idMap[data.id_str]->getMatrix());
+		if (data.ent_data.health <= 0) { //updated health marks entity as dead
+			//play death animation
+			conf_delete(idMap[data.id_str]);
+			idMap[data.id_str] = NULL;
+			conf_delete(transforms[data.id_str]);
+			transforms[data.id_str] = NULL;
+		}
+		else { //otherwise, update the entity's data and transform
+			idMap[data.id_str]->setEntData(data.ent_data);
+			transforms[data.id_str]->setMatrix(idMap[data.id_str]->getMatrix());
+		}
 	}
 }
 

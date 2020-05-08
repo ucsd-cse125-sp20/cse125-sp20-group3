@@ -112,110 +112,51 @@ void SceneManager_Client::createMaterialResources(SceneManager_Client::GeodeType
 	}
 }
 
-void SceneManager_Client::updateFromClientBuf(char buf[], int bufsize)
+void SceneManager_Client::updateFromClientBuf(std::vector<Client::UpdateData> updateBuf)
 {
-	if (trackedPlayer_ID == "" && bufsize == 1) {	//first message from server should be 1 byte message
-		trackPlayer(std::string(1, buf[0]));		//of the player's connection id
-	}
-	else {
-		std::string id_str = "";
-		GameObject::GameObjectData data;
-		int health;
-		int state = 0; // 0 for reading id, 1 for reading gameobjectdata, 2 for reading health, 3 for checking closing delimiter
-		for (int i = 0; i < DEFAULT_BUFLEN; i++) {
-			//std::cout << "i: " << i << "\n";
-			if (state == 0) {
-				if (buf[i] == DELIMITER) {
-					state++; //end of state found, advance to next state
-					//std::cout << "id_str: " + id_str + "\n";
-				}
-				else { //read id bytes one by one, appending to id_str
-					id_str += buf[i];
-				}
-
-			}
-			else if (state == 1) {
-				int move_x = ((int*)(buf + i))[0];
-				int move_z = ((int*)(buf + i + 4))[0];
-				float rot_y = ((float*)(buf + i + 8))[0];
-				//std::cout << "move_x: " << move_x << " move_z: " << move_z << " rot_y: " << rot_y << "\n";
-				data = ((GameObject::GameObjectData*)(buf + i))[0];
-				i += (sizeof GameObject::GameObjectData); //advance i to where delimiter should be
-
-				if (buf[i] == DELIMITER) {
-					//std::cout << "state 1 delimiter at i: " << i << "\n";
-					state++; //end of state found, advance to next state
-				}
-				else {
-					//std::cout << "state 1 delimiter expected but not found, i: " << i << "\n";
-				}
-			}
-			else if (state == 2) {
-				health = ((int*)(buf + i))[0];
-				i += sizeof(int); //advance i to where delimiter should be
-
-				if (buf[i] == DELIMITER) { //end of data line found, write to map, advance to possible final state
-					//std::cout << "id: " << id_str << " x: " << data.x << " z: " << data.z << " y: " << data.rot << " health: " << health << "\n";
-					//std::cout << "state 2 delimiter at i: " << i << "\n";
-
-					if (idMap.find(id_str) == idMap.end()) { //new id encountered, spawn new object
-						int id_int = stoi(id_str);
-						//std::cout << "id_int: " << id_int << "\n";
-						if (ID_PLAYER_MIN <= id_int && id_int <= ID_PLAYER_MAX) {
-							std::cout << "creating new player, id: " << id_str << "\n";
-							idMap[id_str] = conf_new(Player); //TODO use conf_new
-							transforms[id_str] = conf_new(Transform, mat4::identity());
-							Transform* adjustment = conf_new(Transform, mat4::rotationY(-PI / 2));
-							adjustment->addChild(gltfGeodes[PLAYER_GEODE]);
-							transforms[id_str]->addChild(adjustment);
-
-							player_adjustments.push_back(adjustment);
-						}
-						else if (ID_BASE_MIN <= id_int && id_int <= ID_BASE_MAX) {
-							//idMap[id_str] = new Base();
-						}
-						else if (ID_MINION_MIN <= id_int && id_int <= ID_MINION_MAX) {
-							std::cout << "creating new minion, id: " << id_str << "\n";
-							idMap[id_str] = conf_new(Minion, MINION_HEALTH, MINION_ATTACK);
-							transforms[id_str] = conf_new(Transform, mat4::identity());
-							transforms[id_str]->addChild(gltfGeodes[MINION_GEODE]);
-						}
-						else if (ID_TOWER_MIN <= id_int && id_int <= ID_TOWER_MAX) {
-							std::cout << "creating new tower, id: " << id_str << "\n";
-							idMap[id_str] = conf_new(Tower, TOWER_HEALTH, TOWER_ATTACK);
-							transforms[id_str] = conf_new(Transform, mat4::identity());
-							transforms[id_str]->addChild(gltfGeodes[TOWER_GEODE]);
-						}
-						else if (ID_RESOURCE_MIN <= id_int && id_int <= ID_RESOURCE_MAX) {
-							//idMap[id_str] = new Resource();
-						}
-					}
-					this->addChild(transforms[id_str]);
-					idMap[id_str]->setData(data);
-					transforms[id_str]->setMatrix(idMap[id_str]->getMatrix());
-					idMap[id_str]->setHealth(health);
-					id_str = "";
-					state++;
-				}
-				else {
-					std::cout << "state 2 delimiter not found when expected, i: " << i << "\n";
-				}
-			}
-			else if (state == 3) {
-				if (buf[i] == DELIMITER) {
-					std::cout << "closing delimiter found at i: " << i << "\n";
-					break;
-				}
-				else {
-					std::cout << "non-closing byte in state 3 at i: " << i << ", rechecking\n";
-					state = 0; //reset state and read this byte again
-					i--;
-				}
-			}
-			else {
-				std::cout << "SceneManager_Client updateFromClientBuf state out of sync";
-			}
+	//std::cout << "updating from client buf of size " << updateBuf.size() << "\n";
+	for (Client::UpdateData data : updateBuf) {
+		if (data.id_str == "0") {
+			std::cout << "x: " << data.ent_data.GO_data.x << " z: " << data.ent_data.GO_data.z << " y: " << data.ent_data.GO_data.rot << "\n";
 		}
+		if (idMap.find(data.id_str) == idMap.end()) { //new id encountered, spawn new object
+			int id_int = stoi(data.id_str);
+			//std::cout << "id_int: " << id_int << "\n";
+			if (ID_PLAYER_MIN <= id_int && id_int <= ID_PLAYER_MAX) {
+				std::cout << "creating new player, id: " << data.id_str << "\n";
+
+				idMap[data.id_str] = conf_new(Player);
+				transforms[data.id_str] = conf_new(Transform, mat4::identity());
+				Transform* adjustment = conf_new(Transform, mat4::rotationY(-PI / 2));
+
+				adjustment->addChild(gltfGeodes[PLAYER_GEODE]);
+				transforms[data.id_str]->addChild(adjustment);
+
+				player_adjustments.push_back(adjustment); //save to be deleted upon closing
+			}
+			else if (ID_BASE_MIN <= id_int && id_int <= ID_BASE_MAX) {
+				//idMap[id_str] = new Base();
+			}
+			else if (ID_MINION_MIN <= id_int && id_int <= ID_MINION_MAX) {
+				std::cout << "creating new minion, id: " << data.id_str << "\n";
+				idMap[data.id_str] = conf_new(Minion, MINION_HEALTH, MINION_ATTACK);
+				transforms[data.id_str] = conf_new(Transform, mat4::identity());
+				transforms[data.id_str]->addChild(gltfGeodes[MINION_GEODE]);
+			}
+			else if (ID_TOWER_MIN <= id_int && id_int <= ID_TOWER_MAX) {
+				std::cout << "creating new tower, id: " << data.id_str << "\n";
+				idMap[data.id_str] = conf_new(Tower, TOWER_HEALTH, TOWER_ATTACK);
+				transforms[data.id_str] = conf_new(Transform, mat4::identity());
+				transforms[data.id_str]->addChild(gltfGeodes[TOWER_GEODE]);
+			}
+			else if (ID_RESOURCE_MIN <= id_int && id_int <= ID_RESOURCE_MAX) {
+				//idMap[id_str] = new Resource();
+			}
+			this->addChild(transforms[data.id_str]);
+		}
+		
+		idMap[data.id_str]->setEntData(data.ent_data);
+		transforms[data.id_str]->setMatrix(idMap[data.id_str]->getMatrix());
 	}
 }
 
@@ -298,3 +239,70 @@ void SceneManager_Client::draw(Cmd* cmd)
 	// Draw Graph
 	Transform::draw(cmd);
 }
+/***** legacy code *****/
+/*if (trackedPlayer_ID == "" && bufsize == 1) {	//first message from server should be 1 byte message
+	trackPlayer(std::string(1, buf[0]));		//of the player's connection id
+}
+else {
+	std::string id_str = "";
+	GameObject::GameObjectData data;
+	int health;
+	int state = 0; // 0 for reading id, 1 for reading gameobjectdata, 2 for reading health, 3 for checking closing delimiter
+	for (int i = 0; i < DEFAULT_BUFLEN; i++) {
+		//std::cout << "i: " << i << "\n";
+		if (state == 0) {
+			if (buf[i] == DELIMITER) {
+				state++; //end of state found, advance to next state
+				//std::cout << "id_str: " + id_str + "\n";
+			}
+			else { //read id bytes one by one, appending to id_str
+				id_str += buf[i];
+			}
+
+		}
+		else if (state == 1) {
+			int move_x = ((int*)(buf + i))[0];
+			int move_z = ((int*)(buf + i + 4))[0];
+			float rot_y = ((float*)(buf + i + 8))[0];
+			//std::cout << "move_x: " << move_x << " move_z: " << move_z << " rot_y: " << rot_y << "\n";
+			data = ((GameObject::GameObjectData*)(buf + i))[0];
+			i += (sizeof GameObject::GameObjectData); //advance i to where delimiter should be
+
+			if (buf[i] == DELIMITER) {
+				//std::cout << "state 1 delimiter at i: " << i << "\n";
+				state++; //end of state found, advance to next state
+			}
+			else {
+				//std::cout << "state 1 delimiter expected but not found, i: " << i << "\n";
+			}
+		}
+		else if (state == 2) {
+			health = ((int*)(buf + i))[0];
+			i += sizeof(int); //advance i to where delimiter should be
+
+			if (buf[i] == DELIMITER) { //end of data line found, write to map, advance to possible final state
+				//std::cout << "id: " << id_str << " x: " << data.x << " z: " << data.z << " y: " << data.rot << " health: " << health << "\n";
+				//std::cout << "state 2 delimiter at i: " << i << "\n";
+
+
+			}
+			else {
+				std::cout << "state 2 delimiter not found when expected, i: " << i << "\n";
+			}
+		}
+		else if (state == 3) {
+			if (buf[i] == DELIMITER) {
+				std::cout << "closing delimiter found at i: " << i << "\n";
+				break;
+			}
+			else {
+				std::cout << "non-closing byte in state 3 at i: " << i << ", rechecking\n";
+				state = 0; //reset state and read this byte again
+				i--;
+			}
+		}
+		else {
+			std::cout << "SceneManager_Client updateFromClientBuf state out of sync";
+		}
+	}
+}*/

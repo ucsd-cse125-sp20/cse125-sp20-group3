@@ -12,7 +12,7 @@ class Base : public Entity {
 public:
         Base();
         Base(mat4 model_mat);
-        void update() override;
+        void update(float deltaTime) override;
 };
 
 #endif

@@ -12,6 +12,7 @@
 
 #include "Input.h"
 
+#include "Client.h"
 #include "../../common/macros.h"
 #include "../../common/GameObject.h"
 #include "../../common/entity.h"
@@ -65,7 +66,7 @@ public:
 
 	void createMaterialResources(SceneManager_Client::GeodeType type, RootSignature* pRootSignature, DescriptorSet* pBindlessTexturesSamplersSet, Sampler* defaultSampler);
 
-	void updateFromClientBuf(char buf[], int bufsize);
+	void updateFromClientBuf(std::vector<Client::UpdateData> updateBuf);
 	void updateFromInputBuf(float deltaTime);
 
 	void setBuffer(SceneManager_Client::SceneBuffer type, Buffer** buffers); // TODO Could probably mange instance buffers within class, rather than app

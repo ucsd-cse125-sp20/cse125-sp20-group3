@@ -70,24 +70,18 @@ void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, 
 	idMap[std::to_string(id_int)] = ent;*/
 }
 
-void SceneManager_Server::resetClocks() {
-	for (std::pair<std::string, Entity*> idEntPair : idMap) {
-		idEntPair.second->resetClock();
-	}
-}
-
-void SceneManager_Server::update() {
+void SceneManager_Server::update(float deltaTime) {
 	for (std::pair<std::string, Entity*> idEntPair: idMap) {
-		idEntPair.second->update();
+		idEntPair.second->update(deltaTime);
 	}
 }
 
 int SceneManager_Server::encodeScene(char buf[]) {
 	/* buf structure
-	 * ID,{GameObjectData},health,
-	 * ID,{GameObjectData},health,
+	 * ID,{EntityData},
+	 * ID,{EntityData},
 	 * ...
-	 * ID,{GameObjectData},health,,
+	 * ID,{EntityData},,
 	 */
 
 	int i = 0;
@@ -103,19 +97,10 @@ int SceneManager_Server::encodeScene(char buf[]) {
 		i++;
 
 		//std::cout << "writing data at i: " << i << "\n";
-		int bytes = idEntPair.second->writeData(buf, i); //write GameObjectData at i, increase i by number of bytes written
+		int bytes = idEntPair.second->writeData(buf, i); //write EntityData at i, increase i by number of bytes written
 		i += bytes;
 
 		//std::cout << "delimiter 2 at i: " << i << "\n";
-		buf[i] = DELIMITER; //write delimiter
-		i++;
-
-		//std::cout << "writing health at i: " << i << "\n";
-		((int*)(buf + i))[0] = idEntPair.second->getHealth(); //write entity's health
-		//std::cout << " health: " << idEntPair.second->getHealth() << "\n";
-		i += sizeof(int);
-
-		//std::cout << "delimiter 3 at i: " << i << "\n";
 		buf[i] = DELIMITER; //write delimiter
 		i++;
 	}
@@ -160,3 +145,10 @@ void SceneManager_Server::populateScene() { //testing only
 		if (next_tower_id == ID_TOWER_MAX) next_tower_id = ID_TOWER_MIN;
 	}
 }
+
+/***** legacy code *****/
+/*void SceneManager_Server::resetClocks() {
+	for (std::pair<std::string, Entity*> idEntPair : idMap) {
+		idEntPair.second->resetClock();
+	}
+}*/

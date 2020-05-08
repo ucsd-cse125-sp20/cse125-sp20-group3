@@ -17,6 +17,10 @@
 #include <iostream>
 #include <string>
 
+#include "../../common/entity.h"
+#include <vector>
+#include <map>
+
 // Need to link with Ws2_32.lib, Mswsock.lib, and Advapi32.lib
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
@@ -26,8 +30,15 @@ class Client {
 private:
 	SOCKET ConnectSocket = INVALID_SOCKET;
 public:
+	struct UpdateData {
+		std::string id_str;
+		Entity::EntityData ent_data;
+	};
+
 	Client(std::string servername); //establish connection with given server
 	int sendData(char sendbuf[], int buflen, int flags); //send data to client's connected server
-	int recvData(char recvbuf[], int buflen, int flags); //recv data from client's connected server
+	//int recvData(char recvbuf[], int buflen, int flags); //recv data from client's connected server
+	char recvPlayerID();
+	std::vector<UpdateData> recvAndFormatData();
 	int closeConnection(int how); //close client's connection with server
 };

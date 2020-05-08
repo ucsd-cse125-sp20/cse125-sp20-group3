@@ -6,10 +6,9 @@ Minion::Minion(int health, int attack) : Entity(health, attack) {
 
 Minion::Minion(int health, int attack, mat4 model_mat) : Entity(health, attack, model_mat) {
 	//TODO: Initialize attackTarget?
-	lastTime = std::chrono::steady_clock::now();
 }
 
-void Minion::update() {
+void Minion::update(float deltaTime) {
 	//TODO: update attackTarget
 	//TODO: update health
 }

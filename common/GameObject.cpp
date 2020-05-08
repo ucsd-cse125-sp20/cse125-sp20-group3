@@ -2,22 +2,10 @@
 
 GameObject::GameObject() {
 	model = mat4::identity();
-	lastTime = std::chrono::steady_clock::now();
+	//lastTime = std::chrono::steady_clock::now();
 }
 
-void GameObject::update() {
-	auto currTime = std::chrono::steady_clock::now();
-	std::chrono::duration<float> deltaDuration = currTime - lastTime;
-	deltaTime = deltaDuration.count();
-	lastTime = std::chrono::steady_clock::now();
-}
-
-void GameObject::resetClock()
-{
-	lastTime = std::chrono::steady_clock::now();
-}
-
-void GameObject::setData(GameObjectData data){
+void GameObject::setGOData(GameObjectData data){
 	//std::cout << "setting data x: " << data.x << " z: " << data.z << " y: " << data.rot << "\n";
 	vec3 forward = normalize(vec3(cos(data.rot), 0, sin(data.rot)));
 	vec3 right = cross(forward, vec3(0, 1, 0));
@@ -38,3 +26,21 @@ int GameObject::writeData(char buf[], int index) {
 	((GameObjectData*)(buf + index))[0] = { model[3][0], model[3][2], atan2(-model[2][2], -model[2][0]) };
 	return sizeof(GameObjectData);
 }
+
+GameObject::GameObjectData GameObject::getData() {
+	GameObjectData data = { model[3][0], model[3][2], atan2(-model[2][2], -model[2][0]) };
+	return data;
+}
+
+/***** legacy code *****/
+/*void GameObject::resetClock()
+{
+	lastTime = std::chrono::steady_clock::now();
+}
+
+void GameObject::update() {
+	auto currTime = std::chrono::steady_clock::now();
+	std::chrono::duration<float> deltaDuration = currTime - lastTime;
+	deltaTime = deltaDuration.count();
+	lastTime = std::chrono::steady_clock::now();
+}*/

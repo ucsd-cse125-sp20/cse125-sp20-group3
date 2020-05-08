@@ -180,14 +180,15 @@ vec3 cameraOffset(0, 5, -5);
 
 float rot = 0.f;
 
+Client* client;
 SceneManager_Client* scene;
 
 bool connected = false;
 const int serverNameSize = 32;
 char serverName[serverNameSize] = "localhost";
-Client* client;
 char sendbuf[DEFAULT_BUFLEN];
-char recvbuf[SERVER_SENDBUFLEN];
+//char recvbuf[SERVER_SENDBUFLEN];
+std::vector<Client::UpdateData> updateBuf;
 
 // ======================================================================================================
 // ==============================================[ CODE STARTS HERE ]====================================
@@ -400,7 +401,7 @@ void Application::InitDebugGui()
 
 
 
-
+	/*
 	GuiDesc testGuiDesc = {};
 	testGuiDesc.mStartSize = vec2(100, 100);
 	testGuiDesc.mStartPosition = vec2((float)mSettings.mWidth - 1000, (float)mSettings.mHeight - 1000);
@@ -423,6 +424,7 @@ void Application::InitDebugGui()
 	texWidget.SetTexture(testImage, float2(200, 200));
 	texWidget.pOnDeactivatedAfterEdit = []() { printf("Boop\n"); };
 	pTestGui->AddWidget(texWidget);
+	*/
 }
 
 void Application::ToggleClient()
@@ -433,6 +435,10 @@ void Application::ToggleClient()
 	}
 	else {
 		client = conf_new(Client, serverName);
+		char myPlayerID = client->recvPlayerID();
+		std::cout << "char of myPlayerID " << myPlayerID << "\n";
+		std::cout << "myPlayerID: " << (std::string(1, myPlayerID)) << "\n";
+		scene->trackPlayer(std::string(1, myPlayerID));
 	}
 }
 
@@ -644,7 +650,7 @@ void Application::Exit()
 #endif
 
 	gAppUI.Exit();
-	removeResource(testImage);
+	//removeResource(testImage);
 
 	for (uint32_t i = 0; i < Application::gImageCount; ++i)
 	{
@@ -975,11 +981,10 @@ void Application::Update(float deltaTime)
 	/************************************************************************/
 	// Server Contact
 	/************************************************************************/
-	int recvbufsize = 0;
 	if (connected) {
 		int size = Input::EncodeToBuf(sendbuf);
 		client->sendData(sendbuf, size, 0);
-		recvbufsize = client->recvData(recvbuf, SERVER_SENDBUFLEN, 0);
+		updateBuf = client->recvAndFormatData();
 	}
 
 	/************************************************************************/
@@ -1019,7 +1024,7 @@ void Application::Update(float deltaTime)
 
 
 	if (connected) {
-		scene->updateFromClientBuf(recvbuf, recvbufsize);
+		scene->updateFromClientBuf(updateBuf);
 	}
 	else {
 		scene->updateFromInputBuf(deltaTime);
@@ -1259,7 +1264,7 @@ void Application::Draw()
 
 		//ImGui::SetNextWindowBgAlpha(0);
 		gAppUI.Gui(pDebugGui);
-		gAppUI.Gui(pTestGui);
+		//gAppUI.Gui(pTestGui);
 
 		gAppUI.Draw(cmd);
 

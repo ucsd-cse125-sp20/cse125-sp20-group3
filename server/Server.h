@@ -25,22 +25,24 @@
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
 
-struct player_state
-{
-	int socket_fd, player_id;
-	bool disconnected;
-	PlayerInput in;
-	std::vector<char> out;
-};
-
 class Server {
 private:
+	struct player_state
+	{
+		int socket_fd, player_id;
+		bool disconnected;
+		PlayerInput in;
+		std::vector<char> out;
+	};
+
 	static SOCKET ClientSockets[NUM_PLAYERS];
 	player_state Player_States[NUM_PLAYERS];
 	std::thread player_threads[NUM_PLAYERS];
 	static std::mutex player_states_mtx[NUM_PLAYERS];
 public:
+
 	Server(SceneManager_Server* manager); //set up server listening
+	bool gameInProgress();
 	void pushDataAll(char sendbuf[], int buflen, int flags); //send data to clients
 	void pushDataPlayer(int conn_socket, char sendbuf[], int buflen, int flags);
 	std::vector<PlayerInput> pullData(); //recv data from clients

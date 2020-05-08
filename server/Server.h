@@ -25,16 +25,16 @@
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
 
-struct player_state
-{
-	int socket_fd, player_id;
-	bool disconnected;
-	PlayerInput in;
-	std::vector<char> out;
-};
-
 class Server {
 private:
+	struct player_state
+	{
+		int socket_fd, player_id;
+		bool disconnected;
+		PlayerInput in;
+		std::vector<char> out;
+	};
+
 	static SOCKET ClientSockets[NUM_PLAYERS];
 	player_state Player_States[NUM_PLAYERS];
 	std::thread player_threads[NUM_PLAYERS];

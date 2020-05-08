@@ -70,9 +70,9 @@ Client::Client(std::string servername) {
 }
 
 int Client::sendData(char sendbuf[], int buflen, int flags) {
-	std::cout << "sending data\n";
+	//std::cout << "sending data\n";
 	int iResult = send(ConnectSocket, sendbuf, buflen, flags);
-	std::cout << "sent\n";
+	//std::cout << "sent\n";
 	if (iResult == SOCKET_ERROR) {
 		std::cout << "send failed with error: " << WSAGetLastError() << std::endl;
 		closesocket(ConnectSocket);
@@ -98,7 +98,7 @@ char Client::recvPlayerID() {
 }
 
 std::vector<Client::UpdateData> Client::recvAndFormatData() {
-	std::cout << "recvAndFormatData\n";
+	//std::cout << "recvAndFormatData\n";
 	char size_int_buf[sizeof(int)];
 	int bytes_to_receive;
 	std::vector<char> recvbuf;
@@ -111,12 +111,12 @@ std::vector<Client::UpdateData> Client::recvAndFormatData() {
 		if (iResult == SOCKET_ERROR) {
 			std::cout << "ioctlsocket before receiving packet size failed with error: " << WSAGetLastError() << "\n";
 		}
-		std::cout << "receiving data packet size\n";
+		//std::cout << "receiving data packet size\n";
 		iResult = recv(ConnectSocket, size_int_buf, sizeof(int), 0); //first receive size of data as an int
 		if (iResult == SOCKET_ERROR) { //nothing on queue, start processing data to return
 			int code = WSAGetLastError();
 			if (code == WSAEWOULDBLOCK) {
-				std::cout << "nothing on recv queue, breaking\n";
+				//std::cout << "nothing on recv queue, breaking\n";
 				break;
 			}
 			else {
@@ -128,7 +128,7 @@ std::vector<Client::UpdateData> Client::recvAndFormatData() {
 			}
 		}
 		bytes_to_receive = ((int*)size_int_buf)[0]; //save the bytes received as an int
-		std::cout << "found " << bytes_to_receive << " bytes to receive\n";
+		//std::cout << "found " << bytes_to_receive << " bytes to receive\n";
 
 		recvbuf.resize(bytes_to_receive); //resize vector buffer to be the size of the incoming data
 
@@ -144,13 +144,13 @@ std::vector<Client::UpdateData> Client::recvAndFormatData() {
 			std::vector<UpdateData> empty;
 			return empty;
 		}
-		std::cout << "received " << iResult << " bytes\n";
+		//std::cout << "received " << iResult << " bytes\n";
 
 		/* process and format data */
 		std::string id_str = "";
 		Entity::EntityData data;
 		int state = 0;
-		std::cout << "processing\n";
+		//std::cout << "processing\n";
 		for (int i = 0; i < recvbuf.size(); i++) {
 			if (state == 0) { //append bytes to id_str until delimiter encountered
 				if (recvbuf[i] == DELIMITER) {
@@ -187,7 +187,7 @@ std::vector<Client::UpdateData> Client::recvAndFormatData() {
 		UpdateData upData = { idDataPair.first, idDataPair.second }; //{id_str, data}
 		updateDataVec.push_back(upData); //associate data to id strings
 	}
-	std::cout << "returning\n";
+	//std::cout << "returning\n";
 	return updateDataVec;
 }
 

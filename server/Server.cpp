@@ -172,25 +172,34 @@ int Server::handle_player_inputs(player_state* state, int flags) {
 	int err = 0;
 	int iResult;
 	char recvbuf[DEFAULT_BUFLEN];
+	u_long blocking = 0, nonblocking = 1;
+
+	iResult = ioctlsocket(state->socket_fd, FIONBIO, &nonblocking);
+	if (iResult == SOCKET_ERROR) {
+		std::cout << "ioctlsocket before receiving packet size failed with error: " << WSAGetLastError() << "\n";
+	}
 
 	while (1)
 	{
 		ZeroMemory(recvbuf, DEFAULT_BUFLEN);
 		std::cout << "recving\n";
 		iResult = recv(state->socket_fd, recvbuf, DEFAULT_BUFLEN, flags);
-		std::cout << "recv'd\n";
-		if (iResult < 0){
-		    // error
-			printf("Player %d recv failed with error %d\n", state->player_id, WSAGetLastError());
-			state->disconnected = 1;
-			closesocket(state->socket_fd);
-			player_states_mtx[state->player_id].unlock();
-			return 1;
+		if (iResult == SOCKET_ERROR) {
+			int code = WSAGetLastError();
+			if (code == WSAEWOULDBLOCK) { //edge case, client waiting for server to send data, server shouldn't wait for client's input
+				std::cout << "would block\n"; //maintain what the player input was last frame
+			}
+			else {
+				// error
+				printf("Player %d recv failed with error %d\n", state->player_id, WSAGetLastError());
+				state->disconnected = 1;
+				closesocket(state->socket_fd);
+				return 1;
+			}
 		} else if(iResult == 0){
 			printf("Player %d disconnected?\n", state->player_id);
 			state->disconnected = 1;
 			closesocket(state->socket_fd);
-			player_states_mtx[state->player_id].unlock();
 			return 0;
 		}
 		else{

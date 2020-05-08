@@ -878,7 +878,6 @@ void Application::Update(float deltaTime)
 		int size = Input::EncodeToBuf(sendbuf);
 		client->sendData(sendbuf, size, 0);
 		updateBuf = client->recvAndFormatData();
-		std::cout << "size of updateBuf " << updateBuf.size() << "\n";
 	}
 
 	/************************************************************************/

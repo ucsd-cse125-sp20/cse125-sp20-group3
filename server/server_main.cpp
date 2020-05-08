@@ -1,5 +1,6 @@
 #undef UNICODE
 
+//#include <Windows.h>
 #include "../common/macros.h"
 #include "../common/player.h"
 #include <string>
@@ -25,7 +26,8 @@ int __cdecl main(void)
     bool firstMessage = true;
 
     // Game State data
-    float deltaTime = 0.001f;
+	std::chrono::steady_clock::time_point lastTime = std::chrono::steady_clock::now();
+	float deltaTime;
 
     std::cout << "server started" << std::endl;
 
@@ -36,6 +38,8 @@ int __cdecl main(void)
         // Update game states
         // send updated state to all clients
         // wait until end of time
+
+		std::chrono::steady_clock::time_point beginTick = std::chrono::steady_clock::now();
 
 		std::vector<PlayerInput> inputs = server->pullData();
 
@@ -56,7 +60,13 @@ int __cdecl main(void)
 		}
 
 		//Update Game State
+		auto currTime = std::chrono::steady_clock::now();
+		std::chrono::duration<float> deltaDuration = currTime - lastTime;
+		//std::chrono::seconds sec = std::chrono::duration_cast<std::chrono::seconds>(deltaDuration);
+		deltaTime = deltaDuration.count();
+		//std::cout << "deltaTime: " << deltaTime << "\n";
 		manager->update();
+		lastTime = std::chrono::steady_clock::now();
 
 		//Send updated data back to clients
 		int sendbufSize = manager->encodeScene(sendbuf);
@@ -65,6 +75,14 @@ int __cdecl main(void)
 		((int*)sizebuf)[0] = sendbufSize; //push size of data packet to players
 		server->pushDataAll(sizebuf, sizeof(int), 0); //and then push data packet
 		server->pushDataAll(sendbuf, sendbufSize, 0);
+
+		std::chrono::steady_clock::time_point endTick = std::chrono::steady_clock::now();
+		std::chrono::duration<float> tickDuration = endTick - beginTick;
+		float tickTime = tickDuration.count();
+		//std::cout << "tickTime: " << tickTime << "\n";
+		float sleepSeconds = max((1.0f / SERVER_TICKRATE) - tickTime, 0);
+		//std::cout << "sleeping for " << sleepSeconds << " seconds\n";
+		Sleep(sleepSeconds * 1000); //Sleep only accepts milliseconds
     } while (1);
 
     // shutdown the connection since we're done

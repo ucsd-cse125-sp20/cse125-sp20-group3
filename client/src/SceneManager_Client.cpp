@@ -83,9 +83,11 @@ void SceneManager_Client::createMaterialResources(RootSignature* pRootSignature,
 
 void SceneManager_Client::updateFromClientBuf(std::vector<Client::UpdateData> updateBuf)
 {
-	std::cout << "updating from client buf of size " << updateBuf.size() << "\n";
+	//std::cout << "updating from client buf of size " << updateBuf.size() << "\n";
 	for (Client::UpdateData data : updateBuf) {
-		std::cout << "update obj\n";
+		if (data.id_str == "0") {
+			std::cout << "x: " << data.ent_data.GO_data.x << " z: " << data.ent_data.GO_data.z << " y: " << data.ent_data.GO_data.rot << "\n";
+		}
 		if (idMap.find(data.id_str) == idMap.end()) { //new id encountered, spawn new object
 			int id_int = stoi(data.id_str);
 			//std::cout << "id_int: " << id_int << "\n";

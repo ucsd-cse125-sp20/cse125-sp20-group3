@@ -27,18 +27,22 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\common\base.cpp" />
     <ClCompile Include="..\..\..\..\..\common\GameObject.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\minion.cpp" />
     <ClCompile Include="..\..\..\..\..\common\player.cpp" />
     <ClCompile Include="..\..\..\..\src\Animator.cpp" />
     <ClCompile Include="..\..\..\..\src\OzzGeode.cpp" />
     <ClCompile Include="..\..\..\..\src\OzzObject.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\team.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\tower.cpp" />
     <ClCompile Include="..\..\..\..\src\Application.cpp" />
     <ClCompile Include="..\..\..\..\src\Client.cpp" />
     <ClCompile Include="..\..\..\..\src\Geode.cpp" />
     <ClCompile Include="..\..\..\..\src\GLTFGeode.cpp" />
     <ClCompile Include="..\..\..\..\src\GLTFObject.cpp" />
     <ClCompile Include="..\..\..\..\src\Input.cpp" />
-    <ClCompile Include="..\..\..\..\src\SceneManager.cpp" />
+    <ClCompile Include="..\..\..\..\src\SceneManager_Client.cpp" />
     <ClCompile Include="..\..\..\..\src\Transform.cpp" />
     <ClCompile Include="..\..\..\..\src\UIManager.cpp" />
   </ItemGroup>
@@ -77,10 +81,10 @@
     <ClInclude Include="..\..\..\..\..\common\entity.h" />
     <ClInclude Include="..\..\..\..\..\common\GameObject.h" />
     <ClInclude Include="..\..\..\..\..\common\macros.h" />
+    <ClInclude Include="..\..\..\..\..\common\minion.h" />
     <ClInclude Include="..\..\..\..\..\common\player.h" />
     <ClInclude Include="..\..\..\..\..\common\team.h" />
     <ClInclude Include="..\..\..\..\..\common\tower.h" />
-    <ClInclude Include="..\..\..\..\..\common\unit.h" />
     <ClInclude Include="..\..\..\..\src\Animator.h" />
     <ClInclude Include="..\..\..\..\src\OzzGeode.h" />
     <ClInclude Include="..\..\..\..\src\OzzObject.h" />
@@ -92,7 +96,7 @@
     <ClInclude Include="..\..\..\..\src\Input.h" />
     <ClInclude Include="..\..\..\..\src\Node.h" />
     <ClInclude Include="..\..\..\..\src\Object.h" />
-    <ClInclude Include="..\..\..\..\src\SceneManager.h" />
+    <ClInclude Include="..\..\..\..\src\SceneManager_Client.h" />
     <ClInclude Include="..\..\..\..\src\Transform.h" />
     <ClInclude Include="..\..\..\..\src\UIManager.h" />
     <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\cgltf\cgltf.h" />
@@ -101,7 +105,7 @@
     <ProjectGuid>{72714A3C-1FFA-412F-A6B0-130550B1DD2C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Samples_GLFW</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
     <ProjectName>forge_app</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

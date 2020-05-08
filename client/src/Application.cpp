@@ -180,16 +180,14 @@ vec3 cameraOffset(0, 5, -5);
 
 float rot = 0.f;
 
-SceneManager* scene;
-//OzzObject* animatedObj;
-//OzzGeode* animatedGeode;
+SceneManager_Client* scene;
 
 bool connected = false;
 const int serverNameSize = 32;
 char serverName[serverNameSize] = "localhost";
 Client* client;
 char sendbuf[DEFAULT_BUFLEN];
-char recvbuf[DEFAULT_BUFLEN];
+char recvbuf[SERVER_SENDBUFLEN];
 
 // ======================================================================================================
 // ==============================================[ CODE STARTS HERE ]====================================
@@ -208,21 +206,15 @@ Application::Application()
 
 bool Application::InitSceneResources()
 {
-	// This must be called after shaders and buffers have been initialized
-
-	scene = conf_new(SceneManager, pRenderer);
+	scene = conf_new(SceneManager_Client, pRenderer);
 
 	waitForAllResourceLoads();
 
-	scene->createMaterialResources(SceneManager::GeodeType::MESH, pRootSignatureShaded, NULL, pDefaultSampler);
-	scene->createMaterialResources(SceneManager::GeodeType::ANIMATED_MESH, pRootSignatureSkinning, NULL, pDefaultSampler);
+	scene->createMaterialResources(SceneManager_Client::GeodeType::MESH, pRootSignatureShaded, NULL, pDefaultSampler);
+	scene->createMaterialResources(SceneManager_Client::GeodeType::ANIMATED_MESH, pRootSignatureSkinning, NULL, pDefaultSampler);
 
-	scene->setBuffer(SceneManager::SceneBuffer::INSTANCE, pInstanceBuffer);
-	scene->setBuffer(SceneManager::SceneBuffer::BONE, pUniformBufferBones);
-
-	//animatedGeode = conf_new(OzzGeode, pRenderer, "kyubey");
-	//((OzzObject*)animatedGeode->obj)->AddClip("ArmatureAction");
-	//animatedGeode->createMaterialResources(pRootSignatureSkinning, NULL, pDefaultSampler);
+	scene->setBuffer(SceneManager_Client::SceneBuffer::INSTANCE, pInstanceBuffer);
+	scene->setBuffer(SceneManager_Client::SceneBuffer::BONE, pUniformBufferBones);
 
 	return true;
 }
@@ -230,8 +222,6 @@ bool Application::InitSceneResources()
 void Application::RemoveSceneResources()
 {
 	conf_delete(scene);
-
-	//conf_delete(animatedGeode);
 }
 
 // ======================================================================================================
@@ -443,12 +433,6 @@ void Application::ToggleClient()
 	}
 	else {
 		client = conf_new(Client, serverName);
-		client->sendData("1234", 4, 0);
-		char recvBuf[DEFAULT_BUFLEN];
-		int bytesReceived = client->recvData(recvBuf, DEFAULT_BUFLEN, 0);
-		GameObject::GameObjectData data = ((GameObject::GameObjectData*)recvBuf)[0];
-		//printf("%f %f %f\n", data.x, data.z, data.rot);
-		client->sendData("lol", 3, 0);
 	}
 }
 
@@ -991,13 +975,11 @@ void Application::Update(float deltaTime)
 	/************************************************************************/
 	// Server Contact
 	/************************************************************************/
-	
+	int recvbufsize = 0;
 	if (connected) {
 		int size = Input::EncodeToBuf(sendbuf);
 		client->sendData(sendbuf, size, 0);
-		client->recvData(recvbuf, DEFAULT_BUFLEN, 0);
-		GameObject::GameObjectData data = ((GameObject::GameObjectData*)recvbuf)[0];
-		printf("%f %f %f\n", data.x, data.z, data.rot);
+		recvbufsize = client->recvData(recvbuf, SERVER_SENDBUFLEN, 0);
 	}
 
 	/************************************************************************/
@@ -1037,15 +1019,17 @@ void Application::Update(float deltaTime)
 
 
 	if (connected) {
-		scene->updateFromClientBuf(recvbuf);
+		scene->updateFromClientBuf(recvbuf, recvbufsize);
 	}
 	else {
 		scene->updateFromInputBuf(deltaTime);
 	}
 	scene->update(deltaTime);
 
-	vec3 playerPos = scene->transforms[0]->M[3].getXYZ();
+	vec3 playerPos = scene->getPlayerTransformMat()[3].getXYZ();
+	//std::cout << "tracked player position x: " << playerMat[3][0] << " y: " << playerMat[3][1] << " z: " << playerMat[3][2] << "\n";
 	pCameraController->moveTo(playerPos);
+	//pCameraController->lookAt(scene->transforms[0]->M[3].getXYZ() + vec3(0, 0, 1));
 
 	//animatedGeode->update(deltaTime);
 
@@ -1166,10 +1150,10 @@ void Application::Draw()
 		*(UniformBlock*)shaderCbv.pMappedData = gUniformData;
 		endUpdateResource(&shaderCbv, NULL);
 
-		scene->setProgram(SceneManager::GeodeType::MESH, meshShaderDesc);
-		scene->setProgram(SceneManager::GeodeType::ANIMATED_MESH, skinShaderDesc);
+		scene->setProgram(SceneManager_Client::GeodeType::MESH, meshShaderDesc);
+		scene->setProgram(SceneManager_Client::GeodeType::ANIMATED_MESH, skinShaderDesc);
 		GLTFGeode::useMaterials = true;
-		SceneManager::enableCulling = bToggleCull;
+		SceneManager_Client::enableCulling = bToggleCull;
 		scene->draw(cmd);
 
 		// Unbind render targets
@@ -1371,7 +1355,7 @@ void Application::drawShadowMap(Cmd* cmd)
 	mat4::extractFrustumClipPlanes(gShadowUniformData.ViewProj, frustumPlanes[0], frustumPlanes[1], frustumPlanes[2], frustumPlanes[3], frustumPlanes[4], frustumPlanes[5], true);
 	scene->cull(frustumPlanes, bToggleCull);
 
-	scene->setProgram(SceneManager::GeodeType::MESH, meshShaderDesc);
+	scene->setProgram(SceneManager_Client::GeodeType::MESH, meshShaderDesc);
 	GLTFGeode::useMaterials = false;
 	scene->draw(cmd);
 

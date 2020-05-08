@@ -6,7 +6,8 @@
 #include <map>
 #include <iostream>
 #include "Server.h"
-#include "GameObject.h"
+#include "SceneManager_Server.h"
+#include "../common/GameObject.h"
 #include "../common/client2server.h"
 
 int __cdecl main(void)
@@ -14,16 +15,13 @@ int __cdecl main(void)
     std::cout << "starting..." << std::endl;
     int iResult;
 	int iSendResult;
-    char sendbuf[DEFAULT_BUFLEN] = "I'm server";
-	const int RECV_BUFLEN = DEFAULT_BUFLEN * NUM_PLAYERS;
-    char recvbuf[RECV_BUFLEN];
+    char sendbuf[SERVER_SENDBUFLEN] = "I'm server";
+	//recvbuf structure: [(player number + received bytes + delimiter) for each player]
+	//const int RECV_BUFLEN = NUM_PLAYERS + (DEFAULT_BUFLEN * NUM_PLAYERS) + NUM_PLAYERS; //worst case, player num + default buflen + delim
+    //char recvbuf[RECV_BUFLEN];
 
-	Server* server = new Server();
-	std::map<std::string, GameObject*> idMap;
-    int next_id = 0;
-	Player* player = new Player(mat4::identity());
-    idMap[std::to_string(next_id)] = player;
-    next_id++;
+	SceneManager_Server* manager = new SceneManager_Server();
+	Server* server = new Server(manager);
     bool firstMessage = true;
 
     // Game State data
@@ -38,46 +36,36 @@ int __cdecl main(void)
         // Update game states
         // send updated state to all clients
         // wait until end of time
-        ZeroMemory( recvbuf, RECV_BUFLEN );
-        iResult = server->recvData(recvbuf, RECV_BUFLEN, 0);
-        if (iResult > 0) {
 
-            if (firstMessage) {
-                player->resetClock();
-                firstMessage = false;
-            }
+		std::vector<PlayerInput> inputs = server->pullData();
 
-            // Process data
-			// read id, handle player input
-            PlayerInput in = ((PlayerInput*)recvbuf)[0];
-			//populate in with received data
+		if (firstMessage) {
+			manager->resetClocks();
+			firstMessage = false;
+		}
 
-			player->setMoveAndDir(in);
+		// Process data
+		for (int p = 0; p < inputs.size(); p++) {
+			std::string player_str = std::to_string(p);
+			//std::cout << "processing player " << p << "\n";
 
-			//Update Game State
-			player->update();
+			//manager->addPlayer(player_str) now handled by Server on accept
 
-			//Send updated data back to clients
-			float sendbufSize = 0;
-            player->setData(sendbuf, 0);
-            sendbufSize += sizeof(GameObject::GameObjectData);
-			//std::cout << "sending " << sendbuf << std::endl;
-            iSendResult = server->sendData(sendbuf, sendbufSize, 0);
-            if (iSendResult == -1) {
-                return 1;
-            }
-            
-        }
-        else if (iResult == 0) {
-                
-        }
-        else  {
-            return 1;
-        }
+			manager->processInput(player_str, inputs[p]);
+			//TODO check for ending game?
+		}
 
-    } while (1);// (iResult > 0);
+		//Update Game State
+		manager->update();
+
+		//Send updated data back to clients
+		float sendbufSize = manager->encodeScene(sendbuf);
+		//std::cout << "sendbufSize: " << sendbufSize << std::endl;
+		server->pushDataAll(sendbuf, sendbufSize, 0);
+    } while (1);
 
     // shutdown the connection since we're done
+    server->end_game();
     iResult = server->cleanup(SD_SEND);
     if (iResult == -1) {
         return 1;

@@ -30,10 +30,22 @@
     <ClCompile Include="..\common\player.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\ObjectManager.cpp">
+    <ClCompile Include="..\common\GameObject.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\GameObject.cpp">
+    <ClCompile Include="SceneManager_Server.cpp">
+      <Filter>Source Files\Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\base.cpp">
+      <Filter>Source Files\Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\minion.cpp">
+      <Filter>Source Files\Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\team.cpp">
+      <Filter>Source Files\Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\tower.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
   </ItemGroup>
@@ -56,19 +68,19 @@
     <ClInclude Include="..\common\tower.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\unit.h">
-      <Filter>Header Files\Game Objects</Filter>
-    </ClInclude>
     <ClInclude Include="..\common\entity.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
     <ClInclude Include="..\common\client2server.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\ObjectManager.h">
+    <ClInclude Include="..\common\GameObject.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\GameObject.h">
+    <ClInclude Include="SceneManager_Server.h">
+      <Filter>Header Files\Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\minion.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
   </ItemGroup>

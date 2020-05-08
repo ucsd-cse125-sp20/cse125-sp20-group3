@@ -8,10 +8,10 @@
 #include "Node.h"
 
 class Transform : public Node {
-public:
+protected:
 	mat4 M;
 	std::vector<Node*> children;
-
+public:
 	Transform();
 	Transform(mat4 transformation);
 	~Transform();
@@ -26,6 +26,7 @@ public:
 	void draw(Cmd* cmd) override;
 
 	void setMatrix(mat4 m);
+	mat4 getMatrix() { return M; }
 	void setPositionDirection(vec3 position, vec3 direction, vec3 up);
 	void setPositionDirection(vec3 position, vec3 direction);
 	void setPositionDirection(vec3 position, float angle);

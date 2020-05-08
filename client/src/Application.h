@@ -10,7 +10,7 @@
 
 #include "Input.h"
 
-#include "SceneManager.h"
+#include "SceneManager_Client.h"
 
 #include "UIManager.h"
 

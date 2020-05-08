@@ -72,7 +72,7 @@ bool Input::Init(WindowsDesc* window, UIApp* appUI, IApp* app, ICameraController
 			else {
 				inputs[INPUT_DOWN] = 0.0f;
 			}
-			//printf("%f %f\n", ctx->mFloat2.x, ctx->mFloat2.y);
+			printf("%f %f\n", ctx->mFloat2.x, ctx->mFloat2.y);
 		}
 		return true;
 	};

@@ -1,9 +1,10 @@
 #include "Input.h"
 
-float Input::inputs[] = {0.0, 0.0, 0.0, 0.0};
+float Input::inputs[] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 UIApp* Input::appUI = NULL;
 IApp* Input::app = NULL;
 ICameraController* Input::camera = NULL;
+int currSel = 1;
 
 bool Input::Init(WindowsDesc* window, UIApp* appUI, IApp* app, ICameraController* camera)
 {
@@ -20,7 +21,23 @@ bool Input::Init(WindowsDesc* window, UIApp* appUI, IApp* app, ICameraController
 
 	actionDesc = { InputBindings::BUTTON_EXIT, [](InputActionContext* ctx) { requestShutdown(); return true; } };
 	addInputAction(&actionDesc);
-	
+
+	actionDesc = { InputBindings::BUTTON_L2, [](InputActionContext* ctx) { inputs[INPUT_SELECT_1] = (ctx->mBool) ? 1.0f : 0.0f; return true; } };
+	addInputAction(&actionDesc);
+	actionDesc = { InputBindings::BUTTON_R2, [](InputActionContext* ctx) { inputs[INPUT_SELECT_2] = (ctx->mBool) ? 1.0f : 0.0f; return true; } };
+	addInputAction(&actionDesc);
+	actionDesc = { InputBindings::BUTTON_L3, [](InputActionContext* ctx) { inputs[INPUT_SELECT_3] = (ctx->mBool) ? 1.0f : 0.0f; return true; } };
+	addInputAction(&actionDesc);
+
+	actionDesc = { InputBindings::BUTTON_L1, [](InputActionContext* ctx) { inputs[INPUT_ACTION_1] = (ctx->mBool) ? 1.0f : 0.0f; return true; } };
+	addInputAction(&actionDesc);
+	actionDesc = { InputBindings::BUTTON_R1, [](InputActionContext* ctx) { inputs[INPUT_ACTION_2] = (ctx->mBool) ? 1.0f : 0.0f; return true; } };
+	addInputAction(&actionDesc);
+	actionDesc = { InputBindings::BUTTON_EAST, [](InputActionContext* ctx) { inputs[INPUT_ACTION_3] = (ctx->mBool) ? 1.0f : 0.0f; return true; } };
+	addInputAction(&actionDesc);
+	actionDesc = { InputBindings::BUTTON_NORTH, [](InputActionContext* ctx) { inputs[INPUT_ACTION_4] = (ctx->mBool) ? 1.0f : 0.0f; return true; } };
+	addInputAction(&actionDesc);
+
 	actionDesc =
 	{
 		InputBindings::BUTTON_ANY, [](InputActionContext* ctx)
@@ -86,7 +103,7 @@ bool Input::Init(WindowsDesc* window, UIApp* appUI, IApp* app, ICameraController
 			//printf("%f %f\n", Input::camera->getRotationXY().getX(), Input::camera->getRotationXY().getY());
 			//printf("%d %d %d %d", ctx->pCaptured[0], ctx->mBinding, ctx->mPhase, ctx->mDeviceType);
 			if ((Input::camera->getRotationXY().getX() < 0 && ctx->mFloat2.y > 0)
-					|| (Input::camera->getRotationXY().getX() > PI / 3 && ctx->mFloat2.y < 0)) {
+				|| (Input::camera->getRotationXY().getX() > PI / 3 && ctx->mFloat2.y < 0)) {
 				float2 clipped(ctx->mFloat2.x, 0.0f);
 				Input::camera->onRotate(clipped);
 			}
@@ -112,8 +129,14 @@ int Input::EncodeToBuf(char buf[])
 	int move_x = (inputs[INPUT_RIGHT] ? 1 : 0) + (inputs[INPUT_LEFT] ? -1 : 0);
 	int move_z = (inputs[INPUT_UP] ? 1 : 0) + (inputs[INPUT_DOWN] ? -1 : 0);
 	float view_y_rot = -camera->getRotationXY().getY();
+	currSel = inputs[INPUT_SELECT_1] ? 1 : (inputs[INPUT_SELECT_2] ? 2 : (inputs[INPUT_SELECT_3] ? 3 : 0));
+	char buildType = currSel == 1 ? LASER_TYPE : (currSel == 2 ? CLAW_TYPE : (currSel == 3 ? CLAW_TYPE : NO_BUILD_TYPE )); //1 = LASER_TYPE, 2 = CLAW_TYPE, 3 = SUPER_MINION_TYPE 
+	int buildConfirm = inputs[INPUT_ACTION_3] ? 1 : (inputs[INPUT_ACTION_2] ? -1 : 0); //enter or something to confirm building
+	bool harvestResource = inputs[INPUT_ACTION_1] != 0.0f; //e to harvest resource player is looking at
 
-	((PlayerInput*)buf)[0] = { move_x, move_z, view_y_rot };
+	//printf("%d %d %f %c %d %d\n", move_x, move_z, view_y_rot, buildType, buildConfirm, harvestResource);
+
+	((PlayerInput*)buf)[0] = { move_x, move_z, view_y_rot, buildType, buildConfirm, harvestResource };
 
 	return sizeof(PlayerInput);
 }

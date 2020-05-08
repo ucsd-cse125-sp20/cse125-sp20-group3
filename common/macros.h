@@ -5,7 +5,7 @@
 #define SERVER_SENDBUFLEN 1024
 #define SERVER_TICKRATE 20 // times per second
 #define DEFAULT_PORT "27015"
-#define NUM_PLAYERS 1 //change to 4 eventually //upper bound, no more than 15 (1 byte) because of Server recv
+#define NUM_PLAYERS 2 //change to 4 eventually //upper bound, no more than 15 (1 byte) because of Server recv
 #define DELIMITER ','
 
 #define ID_PLAYER_MIN 0
@@ -20,9 +20,15 @@
 #define ID_RESOURCE_MAX 4999
 
 #define BASE_TYPE 'b'
+#define NO_BUILD_TYPE 'n'
 #define MINION_TYPE 'm'
+#define SUPER_MINION_TYPE 's'
 #define TOWER_TYPE 't'
-#define RESOURCE_TYPE 'r'
+#define LASER_TYPE 'L'
+#define CLAW_TYPE 'c'
+//#define RESOURCE_TYPE 'r'
+#define DUMPSTER_TYPE 'd'
+#define RECYCLING_BIN_TYPE 'r'
 
 #define PLAYER_HEALTH 200
 #define BASE_HEALTH 2000

@@ -68,7 +68,7 @@ void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, 
 			}
 		} while (idMap.find(std::to_string(next_tower_id)) != idMap.end());
 		break;
-	case RESOURCE_TYPE:
+	/*case RESOURCE_TYPE:
 		ent = new Minion(MINION_HEALTH, MINION_ATTACK); // Resource();
 		id_int = next_resource_id;
 		do {
@@ -78,7 +78,7 @@ void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, 
 				break;
 			}
 		} while (idMap.find(std::to_string(next_resource_id)) != idMap.end());
-		break;
+		break;*/
 	default:
 		ent = new Minion(MINION_HEALTH, MINION_ATTACK);
 		id_int = -1;

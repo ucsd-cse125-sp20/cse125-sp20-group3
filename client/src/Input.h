@@ -12,10 +12,17 @@
 #include "../The-Forge/Common_3/OS/Interfaces/IApp.h"
 
 enum InputEnum {
-	INPUT_UP,
-	INPUT_DOWN,
-	INPUT_LEFT,
-	INPUT_RIGHT,
+	INPUT_UP,		// W
+	INPUT_DOWN,		// S
+	INPUT_LEFT,		// A
+	INPUT_RIGHT,	// D
+	INPUT_SELECT_1, // 1
+	INPUT_SELECT_2,	// 2
+	INPUT_SELECT_3,	// 3
+	INPUT_ACTION_1,	// E
+	INPUT_ACTION_2,	// R
+	INPUT_ACTION_3,	// F
+	INPUT_ACTION_4,	// Space
 	INPUT_LAST
 };
 

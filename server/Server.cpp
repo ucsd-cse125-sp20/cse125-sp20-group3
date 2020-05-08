@@ -125,6 +125,15 @@ Server::Server(SceneManager_Server* manager) {
 	closesocket(ListenSocket);
 }
 
+bool Server::gameInProgress() {
+	for (int p = 0; p < NUM_PLAYERS; p++) {
+		if (!Player_States[p].disconnected) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void Server::pushDataAll(char sendbuf[], int buflen, int flags) {
 	
 	for (int p = 0; p < NUM_PLAYERS; p++) { //append each byte in sendbuf to all the player outbound buffers
@@ -197,7 +206,7 @@ int Server::handle_player_inputs(player_state* state, int flags) {
 				return 1;
 			}
 		} else if(iResult == 0){
-			printf("Player %d disconnected?\n", state->player_id);
+			printf("Player %d disconnected\n", state->player_id);
 			state->disconnected = 1;
 			closesocket(state->socket_fd);
 			return 0;
@@ -232,7 +241,7 @@ int Server::handle_player_inputs(player_state* state, int flags) {
 }
 
 void Server::end_game(){
-	for (int i; i < NUM_PLAYERS; i++){
+	for (int i = 0; i < NUM_PLAYERS; i++){
 		player_threads[i].join();
 	}
 }

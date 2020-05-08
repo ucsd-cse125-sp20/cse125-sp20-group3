@@ -20,7 +20,7 @@ public:
 
 	Entity(int h, int a) : GameObject() { health = h; attack = a; };
 	Entity(int h, int a, mat4 m) : GameObject(m) { health = h; attack = a; };
-	void update() override { GameObject::update(); }
+	virtual void update(float deltaTime) {}
     bool isEnemyTeam(Team* checkTeam);
 	int getHealth() { return health; }
 	void setHealth(int new_health) { health = new_health; }

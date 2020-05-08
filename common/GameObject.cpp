@@ -2,19 +2,7 @@
 
 GameObject::GameObject() {
 	model = mat4::identity();
-	lastTime = std::chrono::steady_clock::now();
-}
-
-void GameObject::update() {
-	auto currTime = std::chrono::steady_clock::now();
-	std::chrono::duration<float> deltaDuration = currTime - lastTime;
-	deltaTime = deltaDuration.count();
-	lastTime = std::chrono::steady_clock::now();
-}
-
-void GameObject::resetClock()
-{
-	lastTime = std::chrono::steady_clock::now();
+	//lastTime = std::chrono::steady_clock::now();
 }
 
 void GameObject::setGOData(GameObjectData data){
@@ -43,3 +31,16 @@ GameObject::GameObjectData GameObject::getData() {
 	GameObjectData data = { model[3][0], model[3][2], atan2(-model[2][2], -model[2][0]) };
 	return data;
 }
+
+/***** legacy code *****/
+/*void GameObject::resetClock()
+{
+	lastTime = std::chrono::steady_clock::now();
+}
+
+void GameObject::update() {
+	auto currTime = std::chrono::steady_clock::now();
+	std::chrono::duration<float> deltaDuration = currTime - lastTime;
+	deltaTime = deltaDuration.count();
+	lastTime = std::chrono::steady_clock::now();
+}*/

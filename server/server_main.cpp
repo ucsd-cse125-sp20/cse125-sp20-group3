@@ -23,7 +23,6 @@ int __cdecl main(void)
 
 	SceneManager_Server* manager = new SceneManager_Server();
 	Server* server = new Server(manager);
-    bool firstMessage = true;
 
     // Game State data
 	std::chrono::steady_clock::time_point lastTime = std::chrono::steady_clock::now();
@@ -43,12 +42,7 @@ int __cdecl main(void)
 
 		std::vector<PlayerInput> inputs = server->pullData();
 
-		if (firstMessage) {
-			manager->resetClocks();
-			firstMessage = false;
-		}
-
-		// Process data
+		/* Process player input */
 		for (int p = 0; p < inputs.size(); p++) {
 			std::string player_str = std::to_string(p);
 			//std::cout << "processing player " << p << "\n";
@@ -59,16 +53,16 @@ int __cdecl main(void)
 			//TODO check for ending game?
 		}
 
-		//Update Game State
+		/* Update Game State */
 		auto currTime = std::chrono::steady_clock::now();
 		std::chrono::duration<float> deltaDuration = currTime - lastTime;
 		//std::chrono::seconds sec = std::chrono::duration_cast<std::chrono::seconds>(deltaDuration);
 		deltaTime = deltaDuration.count();
 		//std::cout << "deltaTime: " << deltaTime << "\n";
-		manager->update();
+		manager->update(deltaTime);
 		lastTime = std::chrono::steady_clock::now();
 
-		//Send updated data back to clients
+		/* Send updated data back to clients */
 		int sendbufSize = manager->encodeScene(sendbuf);
 		//std::cout << "sendbufSize: " << sendbufSize << std::endl;
 		char sizebuf[4];
@@ -76,6 +70,7 @@ int __cdecl main(void)
 		server->pushDataAll(sizebuf, sizeof(int), 0); //and then push data packet
 		server->pushDataAll(sendbuf, sendbufSize, 0);
 
+		/* wait until end of tick */
 		std::chrono::steady_clock::time_point endTick = std::chrono::steady_clock::now();
 		std::chrono::duration<float> tickDuration = endTick - beginTick;
 		float tickTime = tickDuration.count();
@@ -83,7 +78,9 @@ int __cdecl main(void)
 		float sleepSeconds = max((1.0f / SERVER_TICKRATE) - tickTime, 0);
 		//std::cout << "sleeping for " << sleepSeconds << " seconds\n";
 		Sleep(sleepSeconds * 1000); //Sleep only accepts milliseconds
-    } while (1);
+    } while (server->gameInProgress());
+
+	std::cout << "all players disconnected, game over\n";
 
     // shutdown the connection since we're done
     server->end_game();
@@ -91,6 +88,10 @@ int __cdecl main(void)
     if (iResult == -1) {
         return 1;
     }
+
+	while (1) {
+		//hold before returning so that the window stays open for debugging
+	}
 
     return 0;
 }

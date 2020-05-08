@@ -7,10 +7,10 @@ Base::Base() : Entity(BASE_HEALTH, BASE_ATTACK) {
 //Not entirely sure why we need this constructor but put it in
 //for consistency
 Base::Base(mat4 model_mat) : Entity(BASE_HEALTH, BASE_ATTACK, model_mat) {
-	lastTime = std::chrono::steady_clock::now();
+	//init stuff
 }
 
-void Base::update() {
+void Base::update(float deltaTime) {
         //TODO send data about health
 }
 

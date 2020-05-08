@@ -13,7 +13,7 @@ private:
 public:
 	Tower(int health, int attack);
 	Tower(int health, int attack, mat4 model_mat);
-	void update() override;
+	void update(float deltaTime) override;
 };
 
 #endif

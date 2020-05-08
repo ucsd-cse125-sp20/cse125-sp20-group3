@@ -70,15 +70,9 @@ void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, 
 	idMap[std::to_string(id_int)] = ent;*/
 }
 
-void SceneManager_Server::resetClocks() {
-	for (std::pair<std::string, Entity*> idEntPair : idMap) {
-		idEntPair.second->resetClock();
-	}
-}
-
-void SceneManager_Server::update() {
+void SceneManager_Server::update(float deltaTime) {
 	for (std::pair<std::string, Entity*> idEntPair: idMap) {
-		idEntPair.second->update();
+		idEntPair.second->update(deltaTime);
 	}
 }
 
@@ -151,3 +145,10 @@ void SceneManager_Server::populateScene() { //testing only
 		if (next_tower_id == ID_TOWER_MAX) next_tower_id = ID_TOWER_MIN;
 	}
 }
+
+/***** legacy code *****/
+/*void SceneManager_Server::resetClocks() {
+	for (std::pair<std::string, Entity*> idEntPair : idMap) {
+		idEntPair.second->resetClock();
+	}
+}*/

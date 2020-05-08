@@ -14,7 +14,7 @@ private:
 public:
 	Minion(int health, int attack);
 	Minion(int health, int attack, mat4 model_mat);
-	void update() override;
+	void update(float deltaTime) override;
 };
 
 #endif

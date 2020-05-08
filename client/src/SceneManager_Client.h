@@ -10,6 +10,7 @@
 
 #include "Input.h"
 
+#include "Client.h"
 #include "../../common/macros.h"
 #include "../../common/GameObject.h"
 #include "../../common/entity.h"
@@ -48,7 +49,7 @@ public:
 
 	void createMaterialResources(RootSignature* pRootSignature, DescriptorSet* pBindlessTexturesSamplersSet, Sampler* defaultSampler);
 
-	void updateFromClientBuf(char buf[], int bufsize);
+	void updateFromClientBuf(std::vector<Client::UpdateData> updateBuf);
 	void updateFromInputBuf(float deltaTime);
 
 	void setProgram(Geode::GeodeShaderDesc program);

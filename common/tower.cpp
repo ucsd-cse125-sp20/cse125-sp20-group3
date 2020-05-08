@@ -5,9 +5,9 @@ Tower::Tower(int health, int attack) : Entity(health, attack) {
 }
 
 Tower::Tower(int health, int attack, mat4 model_mat) : Entity(health, attack, model_mat) {
-	lastTime = std::chrono::steady_clock::now();
+	//init stuff
 }
 
-void Tower::update() {
+void Tower::update(float deltaTime) {
 	//TODO: Update health
 }

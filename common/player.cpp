@@ -17,9 +17,8 @@ Player::Player(mat4 model_mat) : Entity(PLAYER_HEALTH, PLAYER_ATTACK, model_mat)
 	lastTime = std::chrono::steady_clock::now();
 }
 
-void Player::update() {
+void Player::update(float deltaTime) {
 	//should only execute on the server
-	Entity::update();
 	
 	velocity_x *= 0.9f;
 	velocity_z *= 0.9f;

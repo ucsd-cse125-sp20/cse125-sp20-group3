@@ -11,8 +11,8 @@ public:
 		float x, z, rot;
 	};
 
-	std::chrono::steady_clock::time_point lastTime;
-	float deltaTime = 0.f;
+	//std::chrono::steady_clock::time_point lastTime;
+	//float deltaTime = 0.f;
 	mat4 model;
 
 	GameObject();
@@ -20,12 +20,13 @@ public:
 	
 //	~GameObject();
 
-	virtual void update();
-	void resetClock();
+	//virtual void update();
+	//void resetClock();
 
-	void setData(GameObjectData data);
+	void setGOData(GameObjectData data);
 	void setMatrix(mat4 m);
 	mat4 getMatrix();
 
-	int writeData(char buf[], int index);
+	GameObjectData getData();
+	virtual int writeData(char buf[], int index);
 };

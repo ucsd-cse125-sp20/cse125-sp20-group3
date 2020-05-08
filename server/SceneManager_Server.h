@@ -26,8 +26,8 @@ public:
 	void processInput(std::string player, PlayerInput in);
 	bool addPlayer(std::string player_id);
 	void spawnEntity(char spawnType, float pos_x, float pos_z, float rot_y);
-	void resetClocks();
-	void update();
+	//void resetClocks();
+	void update(float deltaTime);
 	int encodeScene(char buf[]);
 
 	void populateScene();

@@ -125,10 +125,20 @@ Server::Server(SceneManager_Server* manager) {
 	closesocket(ListenSocket);
 }
 
+bool Server::gameInProgress() {
+	for (int p = 0; p < NUM_PLAYERS; p++) {
+		if (!Player_States[p].disconnected) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void Server::pushDataAll(char sendbuf[], int buflen, int flags) {
-	std::cout << "pushing " << buflen << " bytes\n";
+	
 	for (int p = 0; p < NUM_PLAYERS; p++) { //append each byte in sendbuf to all the player outbound buffers
 		player_states_mtx[p].lock();
+		std::cout << "pushing " << buflen << " bytes\n";
 		for (int i = 0; i < buflen; i++) {
 			Player_States[p].out.push_back(sendbuf[i]);
 		}
@@ -171,26 +181,35 @@ int Server::handle_player_inputs(player_state* state, int flags) {
 	int err = 0;
 	int iResult;
 	char recvbuf[DEFAULT_BUFLEN];
+	u_long blocking = 0, nonblocking = 1;
+
+	iResult = ioctlsocket(state->socket_fd, FIONBIO, &nonblocking);
+	if (iResult == SOCKET_ERROR) {
+		std::cout << "ioctlsocket before receiving packet size failed with error: " << WSAGetLastError() << "\n";
+	}
 
 	while (1)
 	{
 		ZeroMemory(recvbuf, DEFAULT_BUFLEN);
 		std::cout << "recving\n";
 		iResult = recv(state->socket_fd, recvbuf, DEFAULT_BUFLEN, flags);
-		std::cout << "recv'd\n";
-		if (iResult < 0){
-		    // error
-			printf("Player %d recv failed with error %d\n", state->player_id, WSAGetLastError());
+		if (iResult == SOCKET_ERROR) {
+			int code = WSAGetLastError();
+			if (code == WSAEWOULDBLOCK) { //edge case, client waiting for server to send data, server shouldn't wait for client's input
+				std::cout << "would block\n"; //maintain what the player input was last frame
+			}
+			else {
+				// error
+				printf("Player %d recv failed with error %d\n", state->player_id, WSAGetLastError());
+				state->disconnected = 1;
+				closesocket(state->socket_fd);
+				return 1;
+			}
+		} else if(iResult == 0){
+			printf("Player %d disconnected\n", state->player_id);
 			state->disconnected = 1;
 			closesocket(state->socket_fd);
-			player_states_mtx[state->player_id].unlock();
-			return 1;
-		} else if(iResult == 0){
-			printf("Player %d disconnected?\n", state->player_id);
-			//players_state->disconnected = 1;
-			//closesocket(players_state->socket_fd);
-			//player_states_mtx[state->player_id].unlock();
-			//return 0;
+			return 0;
 		}
 		else{
 			//format and save data to this connection's player state
@@ -199,7 +218,8 @@ int Server::handle_player_inputs(player_state* state, int flags) {
 			state->in = ((PlayerInput*)recvbuf)[0];
 			player_states_mtx[state->player_id].unlock();
 		}
-		if (state->out.size() > 0) {
+
+		if (state->out.size() > 0) { //if there's data in the outbound buffer, send it
 			std::cout << "locking to send data\n";
 			player_states_mtx[state->player_id].lock();
 			std::cout << "sending " << state->out.size() << " bytes\n";
@@ -221,7 +241,7 @@ int Server::handle_player_inputs(player_state* state, int flags) {
 }
 
 void Server::end_game(){
-	for (int i; i < NUM_PLAYERS; i++){
+	for (int i = 0; i < NUM_PLAYERS; i++){
 		player_threads[i].join();
 	}
 }

@@ -77,8 +77,8 @@
     "images" : [
         {
             "mimeType" : "image/png",
-            "name" : "Recycling Bin Texture",
-            "uri" : "Recycling%20Bin%20Texture.png"
+            "name" : "recycling_bin_tex",
+            "uri" : "recycling_bin_tex.png"
         }
     ],
     "accessors" : [
@@ -142,7 +142,7 @@
     "buffers" : [
         {
             "byteLength" : 13399888,
-            "uri" : "recycling-bin.bin"
+            "uri" : "resource-2-recycling-bin.bin"
         }
     ]
 }

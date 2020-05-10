@@ -18,6 +18,7 @@
 #include <string>
 
 #include "../../common/entity.h"
+#include "../../common/player.h"
 #include <vector>
 #include <map>
 

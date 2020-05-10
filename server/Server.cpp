@@ -138,7 +138,7 @@ void Server::pushDataAll(char sendbuf[], int buflen, int flags) {
 	
 	for (int p = 0; p < NUM_PLAYERS; p++) { //append each byte in sendbuf to all the player outbound buffers
 		player_states_mtx[p].lock();
-		std::cout << "pushing " << buflen << " bytes\n";
+		//std::cout << "pushing " << buflen << " bytes\n";
 		for (int i = 0; i < buflen; i++) {
 			Player_States[p].out.push_back(sendbuf[i]);
 		}
@@ -146,11 +146,11 @@ void Server::pushDataAll(char sendbuf[], int buflen, int flags) {
 	}
 }
 
-void Server::pushDataPlayer(int conn_socket, char sendbuf[], int buflen, int flags) {
-	for (int i = 0; i < buflen; i++) { //append bytes of sendbuf to only designated player's outbound buffer
+//void Server::pushDataPlayer(int conn_socket, char sendbuf[], int buflen, int flags) {
+/*	for (int i = 0; i < buflen; i++) { //append bytes of sendbuf to only designated player's outbound buffer
 		Player_States[conn_socket].out.push_back(sendbuf[i]);
 	}
-}
+}*/
 
 std::vector<PlayerInput> Server::pullData() {
 	std::vector<PlayerInput> inputs;
@@ -191,12 +191,12 @@ int Server::handle_player_inputs(player_state* state, int flags) {
 	while (1)
 	{
 		ZeroMemory(recvbuf, DEFAULT_BUFLEN);
-		std::cout << "recving\n";
+		//std::cout << "recving\n";
 		iResult = recv(state->socket_fd, recvbuf, DEFAULT_BUFLEN, flags);
 		if (iResult == SOCKET_ERROR) {
 			int code = WSAGetLastError();
 			if (code == WSAEWOULDBLOCK) { //edge case, client waiting for server to send data, server shouldn't wait for client's input
-				std::cout << "would block\n"; //maintain what the player input was last frame
+				//std::cout << "would block\n"; //maintain what the player input was last frame
 			}
 			else {
 				// error
@@ -213,16 +213,16 @@ int Server::handle_player_inputs(player_state* state, int flags) {
 		}
 		else{
 			//format and save data to this connection's player state
-			std::cout << "locking to write in\n";
+			//std::cout << "locking to write in\n";
 			player_states_mtx[state->player_id].lock();
 			state->in = ((PlayerInput*)recvbuf)[0];
 			player_states_mtx[state->player_id].unlock();
 		}
 
 		if (state->out.size() > 0) { //if there's data in the outbound buffer, send it
-			std::cout << "locking to send data\n";
+			//std::cout << "locking to send data\n";
 			player_states_mtx[state->player_id].lock();
-			std::cout << "sending " << state->out.size() << " bytes\n";
+			//std::cout << "sending " << state->out.size() << " bytes\n";
 
 			iResult = send(state->socket_fd, state->out.data(), state->out.size(), flags);
 			if (iResult == SOCKET_ERROR) {

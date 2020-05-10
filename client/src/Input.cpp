@@ -89,7 +89,7 @@ bool Input::Init(WindowsDesc* window, UIApp* appUI, IApp* app, ICameraController
 			else {
 				inputs[INPUT_DOWN] = 0.0f;
 			}
-			printf("%f %f\n", ctx->mFloat2.x, ctx->mFloat2.y);
+			//printf("%f %f\n", ctx->mFloat2.x, ctx->mFloat2.y);
 		}
 		return true;
 	};
@@ -131,7 +131,7 @@ int Input::EncodeToBuf(char buf[])
 	float view_y_rot = -camera->getRotationXY().getY();
 	currSel = inputs[INPUT_SELECT_1] ? 1 : (inputs[INPUT_SELECT_2] ? 2 : (inputs[INPUT_SELECT_3] ? 3 : 0));
 	char buildType = currSel == 1 ? LASER_TYPE : (currSel == 2 ? CLAW_TYPE : (currSel == 3 ? SUPER_MINION_TYPE : NO_BUILD_TYPE )); //1 = LASER_TYPE, 2 = CLAW_TYPE, 3 = SUPER_MINION_TYPE 
-	int buildConfirm = inputs[INPUT_ACTION_3] ? 1 : (inputs[INPUT_ACTION_2] ? -1 : 0); //enter or something to confirm building
+	int buildConfirm = inputs[INPUT_ACTION_3] ? BUILD_CONFIRM : (inputs[INPUT_ACTION_2] ? BUILD_CANCEL : 0); //enter or something to confirm building
 	bool harvestResource = inputs[INPUT_ACTION_1] != 0.0f; //e to harvest resource player is looking at
 
 	printf("%d %d %f %c %d %d\n", move_x, move_z, view_y_rot, buildType, buildConfirm, harvestResource);

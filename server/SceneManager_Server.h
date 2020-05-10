@@ -28,7 +28,8 @@ public:
 	void spawnEntity(char spawnType, float pos_x, float pos_z, float rot_y);
 	bool checkEntityAlive(std::string id);
 	void update(float deltaTime);
-	int encodeScene(char buf[]);
+	int encodeState(char buf[], int start_index);
+	int encodeScene(char buf[], int start_index);
 
 	void populateScene();
 };

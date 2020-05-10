@@ -63,7 +63,8 @@ int __cdecl main(void)
 		lastTime = std::chrono::steady_clock::now();
 
 		/* Send updated data back to clients */
-		int sendbufSize = manager->encodeScene(sendbuf);
+		int statebufSize = manager->encodeState(sendbuf, 0);
+		int sendbufSize = manager->encodeScene(sendbuf, statebufSize) + statebufSize;
 		//std::cout << "sendbufSize: " << sendbufSize << std::endl;
 		char sizebuf[4];
 		((int*)sizebuf)[0] = sendbufSize; //push size of data packet to players

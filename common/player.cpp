@@ -14,7 +14,6 @@ Player::Player(mat4 model_mat) : Entity(PLAYER_HEALTH, PLAYER_ATTACK, model_mat)
 	rotation_y = 0.f;
 	acceleration_x = 0.f;
 	acceleration_z = 0.f;
-	lastTime = std::chrono::steady_clock::now();
 }
 
 void Player::update(float deltaTime) {
@@ -42,19 +41,58 @@ void Player::update(float deltaTime) {
 	//std::cout << "player x: " << xpos << " z: " << zpos << " y: " << yrot << "\n";
 }
 
+void Player::processInput(PlayerInput in) {
+	this->setMoveAndDir(in.move_x, in.move_z, in.view_y_rot);
+
+	std::cout << "intent: " << in.buildIntent << " buildType: " << in.buildType << " harvestResource: " << in.harvestResource << "\n";
+
+	if (in.buildIntent == BUILD_CANCEL) {
+		buildMode = NEUTRAL;
+		std::cout << "cancelling\n";
+	}
+	else {
+		if (in.buildIntent == BUILD_CONFIRM && buildMode != NEUTRAL) {
+			//build something based on buildMode
+			//TODO: check plastic and metal cost against amount in team inventory
+			std::cout << "building\n";
+			//TODO: do math to figure out where to build
+		}
+		else {
+			buildMode = in.buildType == LASER_TYPE ? LASER : 
+						in.buildType == CLAW_TYPE ? CLAW : 
+						in.buildType == SUPER_MINION_TYPE ? SUPER_MINION : 
+						buildMode;
+			if (in.buildType != NO_BUILD_TYPE) {
+				std::cout << "buildMode: " << buildMode << "\n";
+			}
+		}
+	}
+
+	if (in.harvestResource) {
+		//TODO: check front of player based on position and rotation and harvest resource if present
+		std::cout << "harvesting\n";
+	}
+}
+
 void Player::setVelocity(float vel_x, float vel_z) {
 	velocity_x = vel_x;
 	velocity_z = vel_z;
 }
 
-void Player::setMoveAndDir(PlayerInput in) {
-	if (in.move_x < 0) acceleration_x = -1 * MOVE_SPEED;
-	else if (in.move_x > 0) acceleration_x = MOVE_SPEED;
+std::pair<float, float> Player::getVelocities() {
+	return std::make_pair(this->velocity_x, this->velocity_z);
+}
+
+//read the move_x, move_z, and view_y_rot from PlayerInput
+//ignore the other values
+void Player::setMoveAndDir(int move_x, int move_z, float view_y_rot) {
+	if (move_x < 0) acceleration_x = -1 * MOVE_SPEED;
+	else if (move_x > 0) acceleration_x = MOVE_SPEED;
 	else acceleration_x = 0;
 
-	if (in.move_z < 0) acceleration_z = -1 * MOVE_SPEED;
-	else if (in.move_z > 0) acceleration_z = MOVE_SPEED;
+	if (move_z < 0) acceleration_z = -1 * MOVE_SPEED;
+	else if (move_z > 0) acceleration_z = MOVE_SPEED;
 	else acceleration_z = 0;
 
-	rotation_y = in.view_y_rot;
+	rotation_y = view_y_rot;
 }

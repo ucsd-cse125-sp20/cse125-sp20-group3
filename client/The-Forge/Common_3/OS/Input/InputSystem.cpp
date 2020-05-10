@@ -209,8 +209,13 @@ struct InputSystemImpl : public gainput::InputListener
 		{ InputBindings::BUTTON_EXIT, gainput::KeyEscape },
 		{ InputBindings::BUTTON_BACK, gainput::KeyBackSpace },
 		{ InputBindings::BUTTON_NORTH, gainput::KeySpace },
+		{ InputBindings::BUTTON_EAST, gainput::KeyF },
+		{ InputBindings::BUTTON_L1, gainput::KeyE },
+		{ InputBindings::BUTTON_R1, gainput::KeyR },
+		{ InputBindings::BUTTON_L2, gainput::Key1 },
+		{ InputBindings::BUTTON_R2, gainput::Key2 },
 		{ InputBindings::BUTTON_R3, gainput::KeyF1 },
-		{ InputBindings::BUTTON_L3, gainput::KeyF2 },
+		{ InputBindings::BUTTON_L3, gainput::Key3 },
 		{ InputBindings::BUTTON_DUMP, gainput::KeyF3 },
 	};
 

@@ -6,12 +6,14 @@ namespace {
 	const char* groundFile = "Ground.gltf";
 	const char* minionFile = "minion-retry.gltf";
 	const char* towerFile = "tower-1-laser.gltf";
-    
-	const char* blarfDir = "Gou";
-	const char* blarfActions[4] = { "Idle", "Walk", "Run", "Punch_Full" };
+
+	const char* smallMinionDir = "small-minion";
+	const char* smallMinionActions[2] = { "Walk Animation", "Fight Animation" };
+	const char* superMinionDir = "super-minion";
+	const char* superMinionActions[2] = { "Walking Action", "Fight Animation" };
 
 	int counter = 0;
-	int animCounter = 0;
+	int animCounter = 1;
 }
 
 bool SceneManager_Client::enableCulling = true;
@@ -27,15 +29,26 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	//gltfGeodes[RESOURCE_GEODE] = conf_new(GLTFGeode, renderer, resourceFile);
 
     // TODO This is a hard coded animation example. Remove this later
-    ozzGeodes["blarf"] = conf_new(OzzGeode, renderer, blarfDir);
-	((OzzObject*)ozzGeodes["blarf"]->obj)->SetClip(blarfActions[0]);
-    Transform* t = conf_new(Transform, mat4::translation(vec3(0, 0, 5)) * mat4::scale(vec3(0.15f)));
+    ozzGeodes["blarf"] = conf_new(OzzGeode, renderer, smallMinionDir);
+	((OzzObject*)ozzGeodes["blarf"]->obj)->SetClip(smallMinionActions[0]);
+    Transform* t = conf_new(Transform, mat4::translation(vec3(-1, 0, 2)));
     Animator* a = conf_new(Animator, ozzGeodes["blarf"]);
-    a->SetClip(blarfActions[0]);
+    a->SetClip(smallMinionActions[0]);
     t->addChild(a);
     this->addChild(t);
     transforms["blarf"] = t;
     animators["blarf"] = a;
+
+	// TODO This is a hard coded animation example. Remove this later
+	ozzGeodes["blarf2"] = conf_new(OzzGeode, renderer, superMinionDir);
+	((OzzObject*)ozzGeodes["blarf2"]->obj)->SetClip(superMinionActions[0]);
+	t = conf_new(Transform, mat4::translation(vec3(1, 0, 2)));
+	a = conf_new(Animator, ozzGeodes["blarf2"]);
+	a->SetClip(superMinionActions[0]);
+	t->addChild(a);
+	this->addChild(t);
+	transforms["blarf2"] = t;
+	animators["blarf2"] = a;
 
 	trackedPlayer_ID = "";
 
@@ -182,7 +195,8 @@ mat4 SceneManager_Client::getPlayerTransformMat() {
 
 void SceneManager_Client::update(float deltaTime)
 {
-	if (counter++ % 50 == 0) animators["blarf"]->SetClip(blarfActions[animCounter = (animCounter + 1) % 4]);
+	if (counter % 100 == 0) animators["blarf"]->SetClip(smallMinionActions[animCounter]);
+	if (counter++ % 100 == 0) animators["blarf2"]->SetClip(superMinionActions[animCounter = (animCounter + 1) % 2]);
 	Transform::update(deltaTime);
 }
 

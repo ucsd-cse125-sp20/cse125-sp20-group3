@@ -7,19 +7,22 @@
 #include <chrono>
 #include <ctime>
 
+class SceneManager_Server;
+
 class Entity : public GameObject {
 protected:
     int health;
     int attack;
     Team* team;
+	SceneManager_Server* manager;
 public:
 	struct EntityData {
 		GameObjectData GO_data;
 		int health;
 	};
 
-	Entity(int h, int a) : GameObject() { health = h; attack = a; };
-	Entity(int h, int a, mat4 m) : GameObject(m) { health = h; attack = a; };
+	Entity(int h, int a, SceneManager_Server* sm) : GameObject() { health = h; attack = a; manager = sm; };
+	Entity(int h, int a, SceneManager_Server* sm, mat4 m) : GameObject(m) { health = h; attack = a; manager = sm; };
 	virtual void update(float deltaTime) {}
     bool isEnemyTeam(Team* checkTeam);
 	int getHealth() { return health; }

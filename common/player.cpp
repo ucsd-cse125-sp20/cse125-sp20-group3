@@ -1,19 +1,22 @@
 #include "player.h"
+#include "../server/SceneManager_Server.h"
 
-Player::Player() : Entity(PLAYER_HEALTH, PLAYER_ATTACK) {
+Player::Player(SceneManager_Server* sm) : Entity(PLAYER_HEALTH, PLAYER_ATTACK, sm) {
 	velocity_x = 0.f;
 	velocity_z = 0.f;
 	rotation_y = 0.f;
 	acceleration_x = 0.f;
 	acceleration_z = 0.f;
+	buildMode = NEUTRAL;
 }
 
-Player::Player(mat4 model_mat) : Entity(PLAYER_HEALTH, PLAYER_ATTACK, model_mat) {
+Player::Player(SceneManager_Server* sm, mat4 model_mat) : Entity(PLAYER_HEALTH, PLAYER_ATTACK, sm, model_mat) {
 	velocity_x = 0.f;
 	velocity_z = 0.f;
 	rotation_y = 0.f;
 	acceleration_x = 0.f;
 	acceleration_z = 0.f;
+	buildMode = NEUTRAL;
 }
 
 void Player::update(float deltaTime) {
@@ -44,7 +47,7 @@ void Player::update(float deltaTime) {
 void Player::processInput(PlayerInput in) {
 	this->setMoveAndDir(in.move_x, in.move_z, in.view_y_rot);
 
-	std::cout << "intent: " << in.buildIntent << " buildType: " << in.buildType << " harvestResource: " << in.harvestResource << "\n";
+	//std::cout << "intent: " << in.buildIntent << " buildType: " << in.buildType << " harvestResource: " << in.harvestResource << "\n";
 
 	if (in.buildIntent == BUILD_CANCEL) {
 		buildMode = NEUTRAL;
@@ -52,19 +55,30 @@ void Player::processInput(PlayerInput in) {
 	}
 	else {
 		if (in.buildIntent == BUILD_CONFIRM && buildMode != NEUTRAL) {
-			//build something based on buildMode
-			//TODO: check plastic and metal cost against amount in team inventory
 			std::cout << "building\n";
 			//TODO: do math to figure out where to build
+
+			switch (buildMode) { //build something based on buildMode
+			case LASER: //TODO: check plastic and metal cost against amount in team inventory
+				//manager->spawnEntity(LASER_TYPE, x, z, y);
+				break;
+			case CLAW:
+				//manager->spawnEntity(CLAW_TYPE, x, z, y);
+				break;
+			case SUPER_MINION:
+				//manager->spawnEntity(SUPER_MINION_TYPE, x, z, y);
+				break;
+			default:
+				std::cout << "invalid buildMode\n";
+			}
+
+			buildMode = NEUTRAL; //reset to neutral after building
 		}
 		else {
 			buildMode = in.buildType == LASER_TYPE ? LASER : 
 						in.buildType == CLAW_TYPE ? CLAW : 
 						in.buildType == SUPER_MINION_TYPE ? SUPER_MINION : 
 						buildMode;
-			if (in.buildType != NO_BUILD_TYPE) {
-				std::cout << "buildMode: " << buildMode << "\n";
-			}
 		}
 	}
 

@@ -39,7 +39,7 @@ private:
 	std::map<std::string, OzzGeode*> ozzGeodes;
 	std::string trackedPlayer_ID;
 
-	std::vector<Transform*> player_adjustments;
+	std::vector<Transform*> otherTransforms;
     
     Buffer** instanceBuffer = NULL;
 	Buffer** boneBuffer = NULL;

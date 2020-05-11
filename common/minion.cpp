@@ -1,10 +1,11 @@
 #include "minion.h"
+#include "../server/SceneManager_Server.h"
 
-Minion::Minion(int health, int attack) : Entity(health, attack) {
+Minion::Minion(int health, int attack, SceneManager_Server* sm) : Entity(health, attack, sm) {
 	//init stuff
 }
 
-Minion::Minion(int health, int attack, mat4 model_mat) : Entity(health, attack, model_mat) {
+Minion::Minion(int health, int attack, SceneManager_Server* sm, mat4 model_mat) : Entity(health, attack, sm, model_mat) {
 	//TODO: Initialize attackTarget?
 }
 

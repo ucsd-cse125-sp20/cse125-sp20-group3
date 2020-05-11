@@ -12,8 +12,8 @@ class Minion : public Entity {
 private:
 	Entity* attackTarget;
 public:
-	Minion(int health, int attack);
-	Minion(int health, int attack, mat4 model_mat);
+	Minion(int health, int attack, SceneManager_Server* sm);
+	Minion(int health, int attack, SceneManager_Server* sm, mat4 model_mat);
 	void update(float deltaTime) override;
 };
 

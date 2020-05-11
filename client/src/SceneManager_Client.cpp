@@ -65,7 +65,7 @@ SceneManager_Client::~SceneManager_Client()
 	for (std::pair<std::string, GLTFGeode*> g : gltfGeodes) conf_delete(g.second);
 	for (std::pair<std::string, OzzGeode*> g : ozzGeodes) conf_delete(g.second);
 
-	for (Transform* a : player_adjustments) conf_delete(a);
+	for (Transform* a : otherTransforms) conf_delete(a);
 }
 
 void SceneManager_Client::createMaterialResources(SceneManager_Client::GeodeType type, RootSignature* pRootSignature, DescriptorSet* pBindlessTexturesSamplersSet, Sampler* defaultSampler)
@@ -97,27 +97,27 @@ void SceneManager_Client::updateFromClientBuf(std::vector<Client::UpdateData> up
 			if (ID_PLAYER_MIN <= id_int && id_int <= ID_PLAYER_MAX) {
 				std::cout << "creating new player, id: " << data.id_str << "\n";
 
-				idMap[data.id_str] = conf_new(Player);
+				idMap[data.id_str] = conf_new(Player, nullptr);
 				transforms[data.id_str] = conf_new(Transform, mat4::identity());
 				Transform* adjustment = conf_new(Transform, mat4::rotationY(-PI / 2));
 
 				adjustment->addChild(gltfGeodes[PLAYER_GEODE]);
 				transforms[data.id_str]->addChild(adjustment);
 
-				player_adjustments.push_back(adjustment); //save to be deleted upon closing
+				otherTransforms.push_back(adjustment); //save to be deleted upon closing
 			}
 			else if (ID_BASE_MIN <= id_int && id_int <= ID_BASE_MAX) {
 				//idMap[id_str] = new Base();
 			}
 			else if (ID_MINION_MIN <= id_int && id_int <= ID_MINION_MAX) {
 				std::cout << "creating new minion, id: " << data.id_str << "\n";
-				idMap[data.id_str] = conf_new(Minion, MINION_HEALTH, MINION_ATTACK);
+				idMap[data.id_str] = conf_new(Minion, MINION_HEALTH, MINION_ATTACK, nullptr);
 				transforms[data.id_str] = conf_new(Transform, mat4::identity());
 				transforms[data.id_str]->addChild(gltfGeodes[MINION_GEODE]);
 			}
 			else if (ID_TOWER_MIN <= id_int && id_int <= ID_TOWER_MAX) {
 				std::cout << "creating new tower, id: " << data.id_str << "\n";
-				idMap[data.id_str] = conf_new(Tower, TOWER_HEALTH, TOWER_ATTACK);
+				idMap[data.id_str] = conf_new(Tower, TOWER_HEALTH, TOWER_ATTACK, nullptr);
 				transforms[data.id_str] = conf_new(Transform, mat4::identity());
 				transforms[data.id_str]->addChild(gltfGeodes[TOWER_GEODE]);
 			}

@@ -14,13 +14,12 @@ SceneManager_Server::SceneManager_Server() {
 }
 
 void SceneManager_Server::processInput(std::string player, PlayerInput in) {
-	((Player*)idMap[player])->setMoveAndDir(in);
-	//std::cout << "processing input for player " << player << ": " << in.move_x << " " << in.move_z << " " << in.view_y_rot << "\n";
+	((Player*)idMap[player])->processInput(in);
 }
 
 bool SceneManager_Server::addPlayer(std::string player_id) {
 	if (idMap.find(player_id) == idMap.end()) { //player_id not in map, create a new player
-		idMap[player_id] = new Player();
+		idMap[player_id] = new Player(this);
 		std::cout << "created new player id: " << player_id << " at " << idMap[player_id] << "\n";
 
 		return true; //return true that a player was added
@@ -31,52 +30,118 @@ bool SceneManager_Server::addPlayer(std::string player_id) {
 }
 
 void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, float rot_y) {
-	/*Entity* ent;
+	Entity* ent;
 	int id_int;
 
-	switch (spawnType) { //WARN: possible id wrap issues
+	switch (spawnType) {
 	case BASE_TYPE:
-		ent = new Base();
+		ent = new Base(this);
 		id_int = next_base_id;
-		next_base_id++;
-		if (next_base_id == ID_BASE_MAX) next_base_id = ID_BASE_MIN;
+		do {
+			next_base_id = next_base_id + 1 > ID_BASE_MAX ? ID_BASE_MIN : next_base_id + 1;
+			if (next_base_id == id_int) { //wrapped all the way around, all id's taken
+				std::cout << "maximum number of bases reached, consider expanding id ranges\n";
+				break;
+			}
+		} while (idMap.find(std::to_string(next_base_id)) != idMap.end());
 		break;
 	case MINION_TYPE:
-		ent = new Minion();
+		ent = new Minion(MINION_HEALTH, MINION_ATTACK, this);
 		id_int = next_minion_id;
-		next_minion_id++;
-		if (next_minion_id == ID_MINION_MAX) next_minion_id = ID_MINION_MIN;
+		do {
+			next_minion_id = next_minion_id + 1 > ID_MINION_MAX ? ID_MINION_MIN : next_minion_id + 1;
+			if (next_minion_id == id_int) { //wrapped all the way around, all id's taken
+				std::cout << "maximum number of minions reached, consider expanding id ranges\n";
+				break;
+			}
+		} while (idMap.find(std::to_string(next_minion_id)) != idMap.end());
 		break;
 	case TOWER_TYPE:
-		ent = new Tower();
+		ent = new Tower(TOWER_HEALTH, TOWER_ATTACK, this);
 		id_int = next_tower_id;
-		next_tower_id++;
-		if (next_tower_id == ID_TOWER_MAX) next_tower_id = ID_TOWER_MIN;
+		do {
+			next_tower_id = next_tower_id + 1 > ID_TOWER_MAX ? ID_TOWER_MIN : next_tower_id + 1;
+			if (next_tower_id == id_int) { //wrapped all the way around, all id's taken
+				std::cout << "maximum number of towers reached, consider expanding id ranges\n";
+				break;
+			}
+		} while (idMap.find(std::to_string(next_tower_id)) != idMap.end());
 		break;
-	case RESOURCE_TYPE:
-		ent = new Resource();
+	/*case RESOURCE_TYPE:
+		ent = new Minion(MINION_HEALTH, MINION_ATTACK, this); // Resource();
 		id_int = next_resource_id;
-		next_resource_id++;
-		if (next_resource_id == ID_RESOURCE_MAX) next_resource_id = ID_RESOURCE_MIN;
-		break;
+		do {
+			next_resource_id = next_resource_id + 1 > ID_RESOURCE_MAX ? ID_RESOURCE_MIN : next_resource_id + 1;
+			if (next_resource_id == id_int) { //wrapped all the way around, all id's taken
+				std::cout << "maximum number of resources reached, consider expanding id ranges\n";
+				break;
+			}
+		} while (idMap.find(std::to_string(next_resource_id)) != idMap.end());
+		break;*/
 	default:
-		ent = new Minion();
+		ent = new Minion(MINION_HEALTH, MINION_ATTACK, this);
 		id_int = -1;
 		std::cout << "spawnEntity encountered unknown entity type\n";
 	}
 
 	GameObject::GameObjectData data = { pos_x, pos_z, rot_y };
-	ent->setData(data);
-	idMap[std::to_string(id_int)] = ent;*/
+	ent->setGOData(data);
+	idMap[std::to_string(id_int)] = ent;
+}
+
+bool SceneManager_Server::checkEntityAlive(std::string id) {
+	return idMap.find(id) != idMap.end();
 }
 
 void SceneManager_Server::update(float deltaTime) {
 	for (std::pair<std::string, Entity*> idEntPair: idMap) {
-		idEntPair.second->update(deltaTime);
+		if (idEntPair.second->getHealth() <= 0) {	//entity was marked as dead last cycle, 
+			delete idEntPair.second;				//delete the object
+			idMap.erase(idEntPair.first);			//clear the key out of idMap
+		}
+		else { //otherwise, update normally
+			idEntPair.second->update(deltaTime);
+		}
 	}
 }
 
-int SceneManager_Server::encodeScene(char buf[]) {
+int SceneManager_Server::encodeState(char buf[], int start_index) {
+	int i = start_index;
+
+	/*((int*)(buf + i))[0] = team1.getPlasticCount();
+	((int*)(buf + i))[1] = team1.getMetalCount();
+	((int*)(buf + i))[2] = team2.getPlasticCount();
+	((int*)(buf + i))[3] = team2.getMetalCount();
+	i += 4 * sizeof(int);
+
+	buf[i] = DELIMITER;
+	i++;*/
+
+	/*for (int p = ID_PLAYER_MIN; p < ID_PLAYER_MIN + NUM_PLAYERS; p++) {
+		std::string id_str = std::to_string(p);
+
+		strncpy(buf + i, id_str.c_str(), id_str.length()); //copy player id into buf
+		i += id_str.length();
+
+		buf[i] = DELIMITER;
+		i++;
+
+		std::pair<float, float> p_velocities = ((Player*)idMap[std::to_string(p)])->getVelocities();
+		((float*)(buf + i))[0] = p_velocities.first; //write velocity_x
+		((float*)(buf + i))[1] = p_velocities.second; //write velocity_z
+		i += 2 * sizeof(float);
+
+		buf[i] = DELIMITER;
+		i++;
+	}
+
+	buf[i] = DELIMITER;
+	i++;*/
+
+	return i;
+}
+
+int SceneManager_Server::encodeScene(char buf[], int start_index) {
 	/* buf structure
 	 * ID,{EntityData},
 	 * ID,{EntityData},
@@ -84,7 +149,7 @@ int SceneManager_Server::encodeScene(char buf[]) {
 	 * ID,{EntityData},,
 	 */
 
-	int i = 0;
+	int i = start_index;
 	for (std::pair<std::string, Entity*> idEntPair : idMap) { //iterate through all entities in scene
 		//std::cout << "id: " << idEntPair.first << "\n";
 
@@ -122,7 +187,7 @@ void SceneManager_Server::populateScene() { //testing only
 		float s = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
 
 		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		Minion* m = new Minion(MINION_HEALTH, MINION_ATTACK);
+		Minion* m = new Minion(MINION_HEALTH, MINION_ATTACK, this);
 		m->setMatrix(transform);
 		idMap[std::to_string(next_minion_id)] = m;
 
@@ -138,7 +203,7 @@ void SceneManager_Server::populateScene() { //testing only
 		float s = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
 
 		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		Tower* t = new Tower(TOWER_HEALTH, TOWER_ATTACK);
+		Tower* t = new Tower(TOWER_HEALTH, TOWER_ATTACK, this);
 		t->setMatrix(transform);
 		idMap[std::to_string(next_tower_id)] = t;
 		next_tower_id++;

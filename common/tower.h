@@ -11,8 +11,8 @@ class Tower : public Entity {
 private:
 	Entity* attackTarget;
 public:
-	Tower(int health, int attack);
-	Tower(int health, int attack, mat4 model_mat);
+	Tower(int health, int attack, SceneManager_Server* sm);
+	Tower(int health, int attack, SceneManager_Server* sm, mat4 model_mat);
 	void update(float deltaTime) override;
 };
 

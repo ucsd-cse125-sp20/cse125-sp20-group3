@@ -6,12 +6,14 @@ namespace {
 	const char* groundFile = "Ground.gltf";
 	const char* minionFile = "minion-retry.gltf";
 	const char* towerFile = "tower-1-laser.gltf";
-    
-	const char* blarfDir = "Gou";
-	const char* blarfActions[4] = { "Idle", "Walk", "Run", "Punch_Full" };
+
+	const char* smallMinionDir = "small-minion";
+	const char* smallMinionActions[2] = { "Walk Animation", "Fight Animation" };
+	const char* superMinionDir = "super-minion";
+	const char* superMinionActions[2] = { "Walking Action", "Fight Animation" };
 
 	int counter = 0;
-	int animCounter = 0;
+	int animCounter = 1;
 }
 
 bool SceneManager_Client::enableCulling = true;
@@ -27,62 +29,32 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	//gltfGeodes[RESOURCE_GEODE] = conf_new(GLTFGeode, renderer, resourceFile);
 
     // TODO This is a hard coded animation example. Remove this later
-    ozzGeodes["blarf"] = conf_new(OzzGeode, renderer, blarfDir);
-	((OzzObject*)ozzGeodes["blarf"]->obj)->SetClip(blarfActions[0]);
-    Transform* t = conf_new(Transform, mat4::translation(vec3(0, 0, 5)) * mat4::scale(vec3(0.15f)));
+    ozzGeodes["blarf"] = conf_new(OzzGeode, renderer, smallMinionDir);
+	((OzzObject*)ozzGeodes["blarf"]->obj)->SetClip(smallMinionActions[0]);
+    Transform* t = conf_new(Transform, mat4::translation(vec3(-1, 0, 2)));
     Animator* a = conf_new(Animator, ozzGeodes["blarf"]);
-    a->SetClip(blarfActions[0]);
+    a->SetClip(smallMinionActions[0]);
     t->addChild(a);
     this->addChild(t);
     transforms["blarf"] = t;
     animators["blarf"] = a;
+
+	// TODO This is a hard coded animation example. Remove this later
+	ozzGeodes["blarf2"] = conf_new(OzzGeode, renderer, superMinionDir);
+	((OzzObject*)ozzGeodes["blarf2"]->obj)->SetClip(superMinionActions[0]);
+	t = conf_new(Transform, mat4::translation(vec3(1, 0, 2)));
+	a = conf_new(Animator, ozzGeodes["blarf2"]);
+	a->SetClip(superMinionActions[0]);
+	t->addChild(a);
+	this->addChild(t);
+	transforms["blarf2"] = t;
+	animators["blarf2"] = a;
 
 	trackedPlayer_ID = "";
 
 	transforms["ground"] = conf_new(Transform, mat4::identity());
 	transforms["ground"]->addChild(gltfGeodes[ENV_GEODE]);
 	this->addChild(transforms["ground"]);
-
-	/*
-	Transform* t = conf_new(Transform, mat4::identity());
-	Transform* t2 = conf_new(Transform, mat4::rotationY(-PI/2));
-	t->addChild(t2);
-	t2->addChild(gltfGeodes[0]);
-	this->addChild(t);
-	transforms.push_back(t);
-	transforms.push_back(t2);
-
-	t = conf_new(Transform, mat4::identity());
-	t->addChild(gltfGeodes[1]);
-	this->addChild(t);
-	transforms.push_back(t);
-
-	srand((unsigned int)time(NULL));
-	for (int i = 0; i < 500; i++) {
-		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
-		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
-		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
-		float s = 1.0f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
-
-		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		t = conf_new(Transform, transform);
-		t->addChild(gltfGeodes[3]);
-		this->addChild(t);
-		transforms.push_back(t);
-	}
-	for (int i = 0; i < 100; i++) {
-		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
-		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
-		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
-		float s = 0.75f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 0.5f));
-
-		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		t = conf_new(Transform, transform);
-		t->addChild(gltfGeodes[2]);
-		this->addChild(t);
-		transforms.push_back(t);
-	}
-	*/
 }
 
 SceneManager_Client::~SceneManager_Client()
@@ -93,7 +65,7 @@ SceneManager_Client::~SceneManager_Client()
 	for (std::pair<std::string, GLTFGeode*> g : gltfGeodes) conf_delete(g.second);
 	for (std::pair<std::string, OzzGeode*> g : ozzGeodes) conf_delete(g.second);
 
-	for (Transform* a : player_adjustments) conf_delete(a);
+	for (Transform* a : otherTransforms) conf_delete(a);
 }
 
 void SceneManager_Client::createMaterialResources(SceneManager_Client::GeodeType type, RootSignature* pRootSignature, DescriptorSet* pBindlessTexturesSamplersSet, Sampler* defaultSampler)
@@ -116,36 +88,36 @@ void SceneManager_Client::updateFromClientBuf(std::vector<Client::UpdateData> up
 {
 	//std::cout << "updating from client buf of size " << updateBuf.size() << "\n";
 	for (Client::UpdateData data : updateBuf) {
-		if (data.id_str == "0") {
+		/*if (data.id_str == "0") {
 			std::cout << "x: " << data.ent_data.GO_data.x << " z: " << data.ent_data.GO_data.z << " y: " << data.ent_data.GO_data.rot << "\n";
-		}
+		}*/
 		if (idMap.find(data.id_str) == idMap.end()) { //new id encountered, spawn new object
 			int id_int = stoi(data.id_str);
 			//std::cout << "id_int: " << id_int << "\n";
 			if (ID_PLAYER_MIN <= id_int && id_int <= ID_PLAYER_MAX) {
 				std::cout << "creating new player, id: " << data.id_str << "\n";
 
-				idMap[data.id_str] = conf_new(Player);
+				idMap[data.id_str] = conf_new(Player, nullptr);
 				transforms[data.id_str] = conf_new(Transform, mat4::identity());
 				Transform* adjustment = conf_new(Transform, mat4::rotationY(-PI / 2));
 
 				adjustment->addChild(gltfGeodes[PLAYER_GEODE]);
 				transforms[data.id_str]->addChild(adjustment);
 
-				player_adjustments.push_back(adjustment); //save to be deleted upon closing
+				otherTransforms.push_back(adjustment); //save to be deleted upon closing
 			}
 			else if (ID_BASE_MIN <= id_int && id_int <= ID_BASE_MAX) {
 				//idMap[id_str] = new Base();
 			}
 			else if (ID_MINION_MIN <= id_int && id_int <= ID_MINION_MAX) {
 				std::cout << "creating new minion, id: " << data.id_str << "\n";
-				idMap[data.id_str] = conf_new(Minion, MINION_HEALTH, MINION_ATTACK);
+				idMap[data.id_str] = conf_new(Minion, MINION_HEALTH, MINION_ATTACK, nullptr);
 				transforms[data.id_str] = conf_new(Transform, mat4::identity());
 				transforms[data.id_str]->addChild(gltfGeodes[MINION_GEODE]);
 			}
 			else if (ID_TOWER_MIN <= id_int && id_int <= ID_TOWER_MAX) {
 				std::cout << "creating new tower, id: " << data.id_str << "\n";
-				idMap[data.id_str] = conf_new(Tower, TOWER_HEALTH, TOWER_ATTACK);
+				idMap[data.id_str] = conf_new(Tower, TOWER_HEALTH, TOWER_ATTACK, nullptr);
 				transforms[data.id_str] = conf_new(Transform, mat4::identity());
 				transforms[data.id_str]->addChild(gltfGeodes[TOWER_GEODE]);
 			}
@@ -155,8 +127,17 @@ void SceneManager_Client::updateFromClientBuf(std::vector<Client::UpdateData> up
 			this->addChild(transforms[data.id_str]);
 		}
 		
-		idMap[data.id_str]->setEntData(data.ent_data);
-		transforms[data.id_str]->setMatrix(idMap[data.id_str]->getMatrix());
+		if (data.ent_data.health <= 0) { //updated health marks entity as dead
+			//play death animation
+			conf_delete(idMap[data.id_str]);
+			idMap[data.id_str] = NULL;
+			conf_delete(transforms[data.id_str]);
+			transforms[data.id_str] = NULL;
+		}
+		else { //otherwise, update the entity's data and transform
+			idMap[data.id_str]->setEntData(data.ent_data);
+			transforms[data.id_str]->setMatrix(idMap[data.id_str]->getMatrix());
+		}
 	}
 }
 
@@ -214,7 +195,8 @@ mat4 SceneManager_Client::getPlayerTransformMat() {
 
 void SceneManager_Client::update(float deltaTime)
 {
-	if (counter++ % 50 == 0) animators["blarf"]->SetClip(blarfActions[animCounter = (animCounter + 1) % 4]);
+	if (counter % 100 == 0) animators["blarf"]->SetClip(smallMinionActions[animCounter]);
+	if (counter++ % 100 == 0) animators["blarf2"]->SetClip(superMinionActions[animCounter = (animCounter + 1) % 2]);
 	Transform::update(deltaTime);
 }
 

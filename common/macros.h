@@ -19,10 +19,19 @@
 #define ID_RESOURCE_MIN 4000
 #define ID_RESOURCE_MAX 4999
 
+#define BUILD_CONFIRM 1
+#define BUILD_CANCEL -1
+
 #define BASE_TYPE 'b'
+#define NO_BUILD_TYPE 'n'
 #define MINION_TYPE 'm'
+#define SUPER_MINION_TYPE 's'
 #define TOWER_TYPE 't'
-#define RESOURCE_TYPE 'r'
+#define LASER_TYPE 'L'
+#define CLAW_TYPE 'c'
+//#define RESOURCE_TYPE 'r'
+#define DUMPSTER_TYPE 'd'
+#define RECYCLING_BIN_TYPE 'r'
 
 #define PLAYER_HEALTH 200
 #define BASE_HEALTH 2000

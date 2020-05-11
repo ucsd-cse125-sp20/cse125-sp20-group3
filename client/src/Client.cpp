@@ -147,11 +147,58 @@ std::vector<Client::UpdateData> Client::recvAndFormatData() {
 		//std::cout << "received " << iResult << " bytes\n";
 
 		/* process and format data */
+		int i = 0;
+		/*TeamData t_data;
+		char* recvData = &recvbuf[0];
+		t_data.team1plastic = ((int*)(recvData + i))[0];
+		t_data.team1metal = ((int*)(recvData + i))[1];
+		t_data.team2plastic = ((int*)(recvData + i))[2];
+		t_data.team2metal = ((int*)(recvData + i))[3];
+		i += 4 * sizeof(int);
+		if(recvbuf[i] != DELIMITER) std::cout "delimiter after teamData expected but not found\n";
+		i++;
+		*/
+		/*int state = 0;
+		std::string id_str = "";
+		Player::PlayerData p_data;
+		for (; i < recvbuf.size(); i++) {
+			if (state == 0) {
+				if (recvbuf[i] == DELIMITER) state++;
+				else id_str += recvbuf[i];
+			}
+			else if (state == 1) {
+				char* recvData = &recvbuf[0];
+				float velocity_x = ((float*)(recvData + i))[0];
+				float velocity_z = ((float*)(recvData + i))[1];
+				i += 2 * sizeof(float);
+
+				if (recvbuf[i] == DELIMITER) {
+					p_data.id = id_str;
+					p_data.velocity_x = velocity_x;
+					p_data.velocity_z = velocity_z;
+					push p_data to a vector that gets returned along with updateDataVec
+				}
+				else {
+					std::cout << "recvAndFormatData processing state data, state 1 delimiter not found when expected\n";
+				}
+				state++;
+			}
+			else if (state == 2) {
+				if (recvbuf[i] == DELIMITER) {
+					break;
+				}
+				else {
+					state = 0;	//reset state
+					i--;		//and read this byte again
+				}
+			}
+		}*/
+
+		int state = 0;
 		std::string id_str = "";
 		Entity::EntityData data;
-		int state = 0;
 		//std::cout << "processing\n";
-		for (int i = 0; i < recvbuf.size(); i++) {
+		for (; i < recvbuf.size(); i++) {
 			if (state == 0) { //append bytes to id_str until delimiter encountered
 				if (recvbuf[i] == DELIMITER) {
 					state++; //end of id bytes found, advance to reading data

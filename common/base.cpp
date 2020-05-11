@@ -1,12 +1,13 @@
 #include "base.h"
+#include "../server/SceneManager_Server.h"
 
-Base::Base() : Entity(BASE_HEALTH, BASE_ATTACK) {
+Base::Base(SceneManager_Server* sm) : Entity(BASE_HEALTH, BASE_ATTACK, sm) {
     //init stuff
 }
 
 //Not entirely sure why we need this constructor but put it in
 //for consistency
-Base::Base(mat4 model_mat) : Entity(BASE_HEALTH, BASE_ATTACK, model_mat) {
+Base::Base(SceneManager_Server* sm, mat4 model_mat) : Entity(BASE_HEALTH, BASE_ATTACK, sm, model_mat) {
 	//init stuff
 }
 

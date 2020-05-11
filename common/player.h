@@ -25,8 +25,8 @@ public:
 		float velocity_z;
 	};*/
 
-    Player(); //client-side, init nothing
-    Player(mat4 model_mat); //server-side, only init state management logic
+    Player(SceneManager_Server* sm);
+    Player(SceneManager_Server* sm, mat4 model_mat);
 	
     void update(float deltaTime) override; //server-side state management
 	void processInput(PlayerInput in);

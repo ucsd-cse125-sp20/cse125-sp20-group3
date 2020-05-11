@@ -10,8 +10,8 @@
 
 class Base : public Entity {
 public:
-        Base();
-        Base(mat4 model_mat);
+        Base(SceneManager_Server* sm);
+        Base(SceneManager_Server* sm, mat4 model_mat);
         void update(float deltaTime) override;
 };
 

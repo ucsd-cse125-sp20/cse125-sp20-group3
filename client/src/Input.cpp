@@ -134,7 +134,7 @@ int Input::EncodeToBuf(char buf[])
 	int buildConfirm = inputs[INPUT_ACTION_3] ? BUILD_CONFIRM : (inputs[INPUT_ACTION_2] ? BUILD_CANCEL : 0); //enter or something to confirm building
 	bool harvestResource = inputs[INPUT_ACTION_1] != 0.0f; //e to harvest resource player is looking at
 
-	printf("%d %d %f %c %d %d\n", move_x, move_z, view_y_rot, buildType, buildConfirm, harvestResource);
+	//printf("%d %d %f %c %d %d\n", move_x, move_z, view_y_rot, buildType, buildConfirm, harvestResource);
 
 	((PlayerInput*)buf)[0] = { move_x, move_z, view_y_rot, buildType, buildConfirm, harvestResource };
 

@@ -102,6 +102,7 @@
     <ClCompile Include="..\common\base.cpp" />
     <ClCompile Include="..\common\GameObject.cpp" />
     <ClCompile Include="..\common\minion.cpp" />
+    <ClCompile Include="..\common\ObjectDetection.cpp" />
     <ClCompile Include="..\common\player.cpp" />
     <ClCompile Include="..\common\team.cpp" />
     <ClCompile Include="..\common\tower.cpp" />
@@ -115,6 +116,7 @@
     <ClInclude Include="..\common\entity.h" />
     <ClInclude Include="..\common\GameObject.h" />
     <ClInclude Include="..\common\macros.h" />
+    <ClInclude Include="..\common\ObjectDetection.h" />
     <ClInclude Include="..\common\player.h" />
     <ClInclude Include="..\common\team.h" />
     <ClInclude Include="..\common\tower.h" />

@@ -1,16 +1,16 @@
 #include "ObjectDetection.h"
 
-std::unordered_map<std::pair<int, int>, SpatialCell> ObjectDetection::spatialHash = std::unordered_map<std::pair<int, int>, SpatialCell>();
+std::unordered_map<uint64_t, SpatialCell> ObjectDetection::spatialHash = std::unordered_map<uint64_t, SpatialCell>();
 
-std::pair<int, int> ObjectDetection::keyOf(GameObject* obj)
+uint64_t ObjectDetection::keyOf(GameObject* obj)
 {
 	GameObject::GameObjectData data = obj->getData();
-	return std::make_pair(int(floor(data.x / SPATIAL_HASH_SIZE)), int(floor(data.z / SPATIAL_HASH_SIZE)));
+	return keyOf(vec2(data.x, data.z));
 }
 
-std::pair<int, int> ObjectDetection::keyOf(vec2 position)
+uint64_t ObjectDetection::keyOf(vec2 position)
 {
-	return std::make_pair(int(floor(position[0] / SPATIAL_HASH_SIZE)), int(floor(position[1] / SPATIAL_HASH_SIZE)));
+	return (uint64_t(floor(position[0] / SPATIAL_HASH_SIZE)) << 32) | (uint64_t(floor(position[1] / SPATIAL_HASH_SIZE)) & 0xFFFFFFFF);
 }
 
 void ObjectDetection::addObject(GameObject* obj, int flag)
@@ -41,17 +41,17 @@ GameObject* ObjectDetection::getNearestObject(vec2 position, int flags, int radi
 {
 	int checkRadius = radius / SPATIAL_HASH_SIZE + 1;
 
-	auto key = keyOf(position);
-	int x = key.first;
-	int z = key.second;
+	uint64_t key = keyOf(position);
+	int x = key >> 32;
+	int z = key & 0xFFFFFFFF;
 	float shortestDistance = FLT_MAX;
 	GameObject* closestObject = NULL;
 	for (int i = x - checkRadius; i <= x + checkRadius; i++) {
 		for (int j = z - checkRadius; j <= z + checkRadius; j++) {
-			key = std::make_pair(i, j);
-			if (spatialHash.find(key) != spatialHash.end) {
+			key = (((uint64_t)i) << 32) | ((uint64_t)j & 0xFFFFFFFF);
+			if (spatialHash.find(key) != spatialHash.end()) {
 				for (auto ce : spatialHash[key].objects) {
-					if (flags == DETECTION_FLAG_NONE || flags & ce.first == flags) {
+					if (flags == DETECTION_FLAG_NONE || (flags & ce.first) == flags) {
 						GameObject::GameObjectData data = ce.second->getData();
 						vec2 objPosition = vec2(data.x, data.z);
 						if (length(position - objPosition) < shortestDistance) {
@@ -73,17 +73,17 @@ GameObject* ObjectDetection::getNearestObject(GameObject* ref, int flags, int ra
 	GameObject::GameObjectData data = ref->getData();
 	vec2 position = vec2(data.x, data.z);
 
-	auto key = keyOf(ref);
-	int x = key.first;
-	int z = key.second;
+	uint64_t key = keyOf(ref);
+	int x = key >> 32;
+	int z = key & 0xFFFFFFFF;
 	float shortestDistance = FLT_MAX;
 	GameObject* closestObject = NULL;
 	for (int i = x - checkRadius; i <= x + checkRadius; i++) {
 		for (int j = z - checkRadius; j <= z + checkRadius; j++) {
-			key = std::make_pair(i, j);
-			if (spatialHash.find(key) != spatialHash.end) {
+			key = (((uint64_t)i) << 32) | ((uint64_t)j & 0xFFFFFFFF);
+			if (spatialHash.find(key) != spatialHash.end()) {
 				for (auto ce : spatialHash[key].objects) {
-					if (ref != ce.second && (flags == DETECTION_FLAG_NONE || flags & ce.first == flags)) {
+					if (ref != ce.second && (flags == DETECTION_FLAG_NONE || (flags & ce.first) == flags)) {
 						GameObject::GameObjectData data = ce.second->getData();
 						vec2 objPosition = vec2(data.x, data.z);
 						if (length(position - objPosition) < shortestDistance) {

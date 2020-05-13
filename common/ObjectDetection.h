@@ -30,10 +30,10 @@ struct SpatialCell {
 
 class ObjectDetection {
 public:
-	static std::unordered_map<std::pair<int, int>, SpatialCell> spatialHash;
+	static std::unordered_map<uint64_t, SpatialCell> spatialHash;
 
-	static std::pair<int, int> keyOf(GameObject* obj);
-	static std::pair<int, int> keyOf(vec2 position);
+	static uint64_t keyOf(GameObject* obj);
+	static uint64_t keyOf(vec2 position);
 
 	static void addObject(GameObject* obj, int flags=DETECTION_FLAG_NONE);
 	static void updateObject(GameObject* obj, int flags=0);

@@ -5,7 +5,11 @@ namespace {
 	const char* playerFile ="char-1-female.gltf";
 	const char* groundFile = "Ground.gltf";
 	const char* minionFile = "minion-retry.gltf";
-	const char* towerFile = "tower-1-laser.gltf";
+	const char* superMinionFile = "minion-2-super.gltf";
+	const char* laserTowerFile = "tower-1-laser.gltf";
+	const char* clawTowerFile = "tower-3-claw-machine.gltf";
+	const char* dumpsterFile = "resource-1-dumpster.gltf";
+	const char* recyclingBinFile = "resource-2-recycling-bin.gltf";
 
 	const char* smallMinionDir = "small-minion";
 	const char* smallMinionActions[2] = { "Walk Animation", "Fight Animation" };
@@ -25,8 +29,11 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	gltfGeodes[PLAYER_GEODE] = conf_new(GLTFGeode, renderer, playerFile);
 	//gltfGeodes[BASE_GEODE] = conf_new(GLTFGeode, renderer, baseFile);
 	gltfGeodes[MINION_GEODE] = conf_new(GLTFGeode, renderer, minionFile);
-	gltfGeodes[TOWER_GEODE] = conf_new(GLTFGeode, renderer, towerFile);
-	//gltfGeodes[RESOURCE_GEODE] = conf_new(GLTFGeode, renderer, resourceFile);
+	gltfGeodes[SUPER_MINION_GEODE] = conf_new(GLTFGeode, renderer, superMinionFile);
+	gltfGeodes[LASER_TOWER_GEODE] = conf_new(GLTFGeode, renderer, laserTowerFile);
+	gltfGeodes[CLAW_TOWER_GEODE] = conf_new(GLTFGeode, renderer, clawTowerFile);
+	gltfGeodes[DUMPSTER_GEODE] = conf_new(GLTFGeode, renderer, dumpsterFile);
+	gltfGeodes[RECYCLING_BIN_GEODE] = conf_new(GLTFGeode, renderer, recyclingBinFile);
 
     // TODO This is a hard coded animation example. Remove this later
     ozzGeodes["blarf"] = conf_new(OzzGeode, renderer, smallMinionDir);
@@ -111,28 +118,50 @@ void SceneManager_Client::updateFromClientBuf(std::vector<Client::UpdateData> up
 			}
 			else if (ID_MINION_MIN <= id_int && id_int <= ID_MINION_MAX) {
 				std::cout << "creating new minion, id: " << data.id_str << "\n";
-				idMap[data.id_str] = conf_new(Minion, MINION_HEALTH, MINION_ATTACK, nullptr);
+				idMap[data.id_str] = conf_new(Minion, nullptr);
 				transforms[data.id_str] = conf_new(Transform, mat4::identity());
 				transforms[data.id_str]->addChild(gltfGeodes[MINION_GEODE]);
 			}
-			else if (ID_TOWER_MIN <= id_int && id_int <= ID_TOWER_MAX) {
-				std::cout << "creating new tower, id: " << data.id_str << "\n";
-				idMap[data.id_str] = conf_new(Tower, TOWER_HEALTH, TOWER_ATTACK, nullptr);
+			/*else if (ID_SUPER_MINION_MIN <= id_int && id_int <= ID_SUPER_MINION_MAX) {
+				std::cout << "creating new uper minion, id: " << data.id_str << "\n";
+				idMap[data.id_str] = conf_new(SuperMinion, nullptr);
 				transforms[data.id_str] = conf_new(Transform, mat4::identity());
-				transforms[data.id_str]->addChild(gltfGeodes[TOWER_GEODE]);
+				transforms[data.id_str]->addChild(gltfGeodes[SUPER_MINION_GEODE]);
+			}*/
+			/*else if (ID_LASER_MIN <= id_int && id_int <= ID_LASER_MAX) {
+				std::cout << "creating new laser tower, id: " << data.id_str << "\n";
+				idMap[data.id_str] = conf_new(LaserTower, nullptr);
+				transforms[data.id_str] = conf_new(Transform, mat4::identity());
+				transforms[data.id_str]->addChild(gltfGeodes[LASER_TOWER_GEODE]);
+			}*/
+			else if (ID_CLAW_MIN <= id_int && id_int <= ID_CLAW_MAX) {
+				std::cout << "creating new claw tower, id: " << data.id_str << "\n";
+				idMap[data.id_str] = conf_new(ClawTower, nullptr);
+				transforms[data.id_str] = conf_new(Transform, mat4::identity());
+				transforms[data.id_str]->addChild(gltfGeodes[CLAW_TOWER_GEODE]);
 			}
-			else if (ID_RESOURCE_MIN <= id_int && id_int <= ID_RESOURCE_MAX) {
-				//idMap[id_str] = new Resource();
-			}
+			/*else if (ID_DUMPSTER_MIN <= id_int && id_int <= ID_DUMPSTER_MAX) {
+				std::cout << "creating new dumpster, id: " << data.id_str << "\n";
+				idMap[data.id_str] = conf_new(Dumpster, nullptr);
+				transforms[data.id_str] = conf_new(Transform, mat4::identity());
+				transforms[data.id_str]->addChild(gltfGeodes[DUMPSTER_GEODE]);
+			}*/
+			/*else if (ID_RECYCLING_BIN_MIN <= id_int && id_int <= ID_RECYCLING_BIN_MAX) {
+				std::cout << "creating new recycling bin id: " << data.id_str << "\n";
+				idMap[data.id_str] = conf_new(RecyclingBin, nullptr);
+				transforms[data.id_str] = conf_new(Transform, mat4::identity());
+				transforms[data.id_str]->addChild(gltfGeodes[RECYCLING_BIN_GEODE]);
+			}*/
+
 			this->addChild(transforms[data.id_str]);
 		}
 		
 		if (data.ent_data.health <= 0) { //updated health marks entity as dead
 			//play death animation
 			conf_delete(idMap[data.id_str]);
-			idMap[data.id_str] = NULL;
+			idMap.erase(data.id_str);
 			conf_delete(transforms[data.id_str]);
-			transforms[data.id_str] = NULL;
+			transforms.erase(data.id_str);
 		}
 		else { //otherwise, update the entity's data and transform
 			idMap[data.id_str]->setEntData(data.ent_data);

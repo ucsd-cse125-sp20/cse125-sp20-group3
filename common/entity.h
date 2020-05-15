@@ -24,10 +24,10 @@ public:
 	Entity(int h, int a, SceneManager_Server* sm) : GameObject() { health = h; attack = a; manager = sm; };
 	Entity(int h, int a, SceneManager_Server* sm, mat4 m) : GameObject(m) { health = h; attack = a; manager = sm; };
 	virtual void update(float deltaTime) {}
-    bool isEnemyTeam(Team* checkTeam);
+	bool isEnemyTeam(Team* checkTeam) { return this->team != checkTeam; }
 	int getHealth() { return health; }
-	void setHealth(int new_health) { health = new_health; }
-	void takeDamage(int attack);
+	virtual void setHealth(int new_health) { health = new_health; }
+	void takeDamage(int attack) { health = max(health - attack, 0);	}
 
 	void setEntData(EntityData data) {
 		this->GameObject::setGOData(data.GO_data);

@@ -8,12 +8,13 @@
 #include <ctime>
 
 class Tower : public Entity {
-private:
+protected:
 	Entity* attackTarget;
-public:
 	Tower(int health, int attack, SceneManager_Server* sm);
 	Tower(int health, int attack, SceneManager_Server* sm, mat4 model_mat);
-	void update(float deltaTime) override;
+public:
+	void update(float deltaTime) override {};
+	void setHealth(int new_health) override;
 };
 
 #endif

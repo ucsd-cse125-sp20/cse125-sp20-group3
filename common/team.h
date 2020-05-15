@@ -10,20 +10,25 @@
 
 class Team {
 private:
-        /*Player* player1;
-        Player* player2;
-		Team* enemyTeam;*/
-        int baseHealth;
-        int unitCount;
-        int towerCount;
-        //TODO: Add resources
+    /*Player* player1;
+    Player* player2;
+	Team* enemyTeam;*/
+	int winStatus;
+	int metalCount;
+	int plasticCount;
+    int baseHealth;
+    int unitCount;
+    int towerCount;
+    //TODO: Add resources
 public:
-        Team(std::string objFilename);
-        Team();
-        void update();
-        void incTower(int amount);
-        void incUnit(int amount);
-        bool checkResources(char entityType);
+    Team(std::string objFilename);
+    Team();
+    void update();
+    void incTower();
+	void decTower();
+    void incUnit();
+	void decUnit();
+    bool checkResources(char entityType);
 };
 
 #endif

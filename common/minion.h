@@ -11,6 +11,8 @@
 class Minion : public Entity {
 private:
 	Entity* attackTarget;
+	int pathPtr;
+	vector<tuple<float, float>> path;
 protected:
 	Minion(int health, int attack, SceneManager_Server* sm); //accept values for super minion spawned by player
 	Minion(int health, int attack, SceneManager_Server* sm, mat4 model_mat);
@@ -20,6 +22,7 @@ public:
 	
 	void update(float deltaTime) override;
 	void setHealth(int new_health) override;
+	void move();
 };
 
 #endif

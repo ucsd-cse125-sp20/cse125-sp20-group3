@@ -1,11 +1,15 @@
 #include "SceneManager_Server.h"
 
-SceneManager_Server::SceneManager_Server() {
-	next_player_id = ID_PLAYER_MIN;
-	next_base_id = ID_BASE_MIN;
-	next_minion_id = ID_MINION_MIN;
-	next_tower_id = ID_TOWER_MIN;
-	next_resource_id = ID_RESOURCE_MIN;
+SceneManager_Server::SceneManager_Server() :
+	next_player_id(ID_PLAYER_MIN),
+	next_base_id(ID_BASE_MIN),
+	next_minion_id(ID_MINION_MIN),
+	next_super_minion_id(ID_SUPER_MINION_MIN),
+	next_laser_id(ID_LASER_MIN),
+	next_claw_id(ID_CLAW_MIN),
+	next_dumpster_id(ID_DUMPSTER_MIN),
+	next_recycling_bin_id(ID_RECYCLING_BIN_MIN)
+{
 
 	//team1 = new Team();
 	//team2 = new Team();
@@ -46,7 +50,7 @@ void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, 
 		} while (idMap.find(std::to_string(next_base_id)) != idMap.end());
 		break;
 	case MINION_TYPE:
-		ent = new Minion(MINION_HEALTH, MINION_ATTACK, this);
+		ent = new Minion(this);
 		id_int = next_minion_id;
 		do {
 			next_minion_id = next_minion_id + 1 > ID_MINION_MAX ? ID_MINION_MIN : next_minion_id + 1;
@@ -56,32 +60,65 @@ void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, 
 			}
 		} while (idMap.find(std::to_string(next_minion_id)) != idMap.end());
 		break;
-	case TOWER_TYPE:
-		ent = new Tower(TOWER_HEALTH, TOWER_ATTACK, this);
-		id_int = next_tower_id;
+	case SUPER_MINION_TYPE:
+		/*ent = new Minion(this);
+		id_int = next_super_minion_id;
 		do {
-			next_tower_id = next_tower_id + 1 > ID_TOWER_MAX ? ID_TOWER_MIN : next_tower_id + 1;
-			if (next_tower_id == id_int) { //wrapped all the way around, all id's taken
-				std::cout << "maximum number of towers reached, consider expanding id ranges\n";
+			next_super_minion_id = next_super_minion_id + 1 > ID_SUPER_MINION_MAX ? ID_SUPER_MINION_MIN : next_super_minion_id + 1;
+			if (next_super_minion_id == id_int) { //wrapped all the way around, all id's taken
+				std::cout << "maximum number of super minions reached, consider expanding id ranges\n";
 				break;
 			}
-		} while (idMap.find(std::to_string(next_tower_id)) != idMap.end());
+		} while (idMap.find(std::to_string(next_super_minion_id)) != idMap.end());*/
 		break;
-	/*case RESOURCE_TYPE:
-		ent = new Minion(MINION_HEALTH, MINION_ATTACK, this); // Resource();
-		id_int = next_resource_id;
+	case LASER_TYPE:
+		/*ent = new LaserTower(this);
+		id_int = next_laser_id;
 		do {
-			next_resource_id = next_resource_id + 1 > ID_RESOURCE_MAX ? ID_RESOURCE_MIN : next_resource_id + 1;
-			if (next_resource_id == id_int) { //wrapped all the way around, all id's taken
-				std::cout << "maximum number of resources reached, consider expanding id ranges\n";
+			next_laser_id = next_laser_id + 1 > ID_LASER_MAX ? ID_LASER_MIN : next_laser_id + 1;
+			if (next_laser_id == id_int) { //wrapped all the way around, all id's taken
+				std::cout << "maximum number of laser towers reached, consider expanding id ranges\n";
 				break;
 			}
-		} while (idMap.find(std::to_string(next_resource_id)) != idMap.end());
-		break;*/
+		} while (idMap.find(std::to_string(next_laser_id)) != idMap.end());*/
+		break;
+	case CLAW_TYPE:
+		ent = new ClawTower(this);
+		id_int = next_claw_id;
+		do {
+			next_claw_id = next_claw_id + 1 > ID_CLAW_MAX ? ID_CLAW_MIN : next_claw_id + 1;
+			if (next_claw_id == id_int) { //wrapped all the way around, all id's taken
+				std::cout << "maximum number of claw machines reached, consider expanding id ranges\n";
+				break;
+			}
+		} while (idMap.find(std::to_string(next_claw_id)) != idMap.end());
+		break;
+	case DUMPSTER_TYPE:
+		ent = new Resource(DUMPSTER_TYPE, this);
+		id_int = next_dumpster_id;
+		do {
+			next_dumpster_id = next_dumpster_id + 1 > ID_DUMPSTER_MAX ? ID_DUMPSTER_MIN : next_dumpster_id + 1;
+			if (next_dumpster_id == id_int) { //wrapped all the way around, all id's taken
+				std::cout << "maximum number of dumpsters reached, consider expanding id ranges\n";
+				break;
+			}
+		} while (idMap.find(std::to_string(next_dumpster_id)) != idMap.end());
+		break;
+	case RECYCLING_BIN_TYPE:
+		ent = new Resource(RECYCLING_BIN_TYPE, this);
+		id_int = next_recycling_bin_id;
+		do {
+			next_recycling_bin_id = next_recycling_bin_id + 1 > ID_RECYCLING_BIN_MAX ? ID_RECYCLING_BIN_MIN : next_recycling_bin_id + 1;
+			if (next_recycling_bin_id == id_int) { //wrapped all the way around, all id's taken
+				std::cout << "maximum number of recycling bins reached, consider expanding id ranges\n";
+				break;
+			}
+		} while (idMap.find(std::to_string(next_recycling_bin_id)) != idMap.end());
+		break;
 	default:
-		ent = new Minion(MINION_HEALTH, MINION_ATTACK, this);
+		ent = new Minion(this);
 		id_int = -1;
-		std::cout << "spawnEntity encountered unknown entity type\n";
+		std::cout << "spawnEntity encountered unknown entity type " << spawnType << "\n";
 	}
 
 	GameObject::GameObjectData data = { pos_x, pos_z, rot_y };
@@ -187,7 +224,7 @@ void SceneManager_Server::populateScene() { //testing only
 		float s = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
 
 		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		Minion* m = new Minion(MINION_HEALTH, MINION_ATTACK, this);
+		Minion* m = new Minion(this);
 		m->setMatrix(transform);
 		idMap[std::to_string(next_minion_id)] = m;
 
@@ -203,11 +240,14 @@ void SceneManager_Server::populateScene() { //testing only
 		float s = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
 
 		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		Tower* t = new Tower(TOWER_HEALTH, TOWER_ATTACK, this);
+		ClawTower* t = new ClawTower(this);
 		t->setMatrix(transform);
-		idMap[std::to_string(next_tower_id)] = t;
-		next_tower_id++;
-		if (next_tower_id == ID_TOWER_MAX) next_tower_id = ID_TOWER_MIN;
+		idMap[std::to_string(next_claw_id)] = t;
+
+		std::cout << "created new claw tower: " << std::to_string(next_claw_id) << " at " << idMap[std::to_string(next_claw_id)] << "\n";
+
+		next_claw_id++;
+		if (next_claw_id == ID_CLAW_MAX) next_claw_id = ID_CLAW_MIN;
 	}
 }
 

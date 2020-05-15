@@ -13,6 +13,8 @@
 #include "../common/tower.h"
 //#include "../common/resource.h"
 
+#include "../common/ObjectDetection.h"
+
 class SceneManager_Server {
 private:
 		

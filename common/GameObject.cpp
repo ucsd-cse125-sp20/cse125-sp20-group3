@@ -22,6 +22,10 @@ mat4 GameObject::getMatrix(){
 	return model;
 }
 
+vec3 GameObject::getPosition() {
+	return getMatrix()[3].getXYZ();
+}
+
 int GameObject::writeData(char buf[], int index) {
 	((GameObjectData*)(buf + index))[0] = { model[3][0], model[3][2], atan2(-model[2][2], -model[2][0]) };
 	return sizeof(GameObjectData);

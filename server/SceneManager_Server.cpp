@@ -20,6 +20,7 @@ void SceneManager_Server::processInput(std::string player, PlayerInput in) {
 bool SceneManager_Server::addPlayer(std::string player_id) {
 	if (idMap.find(player_id) == idMap.end()) { //player_id not in map, create a new player
 		idMap[player_id] = new Player(this);
+		ObjectDetection::addObject(idMap[player_id], DETECTION_FLAG_PLAYER | DETECTION_FLAG_ENTITY); // It might be easier if this statement is moved into the constructor, but I want to minimize the cpp files I touch
 		std::cout << "created new player id: " << player_id << " at " << idMap[player_id] << "\n";
 
 		return true; //return true that a player was added
@@ -101,6 +102,13 @@ void SceneManager_Server::update(float deltaTime) {
 		}
 		else { //otherwise, update normally
 			idEntPair.second->update(deltaTime);
+
+			// THIS IS FOR OBJECT DETECTIOPN DEBUGGING. REMOVE LATER
+			ObjectDetection::updateObject(idMap["0"]);
+			GameObject* nearest = ObjectDetection::getNearestObject(idMap["0"], DETECTION_FLAG_TOWER, 10);
+			if (nearest) {
+				printf("nearest tower at (%f,%f)\n", nearest->getData().x, nearest->getData().z);
+			}
 		}
 	}
 }
@@ -189,6 +197,7 @@ void SceneManager_Server::populateScene() { //testing only
 		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
 		Minion* m = new Minion(MINION_HEALTH, MINION_ATTACK, this);
 		m->setMatrix(transform);
+		ObjectDetection::addObject(m, DETECTION_FLAG_MINION | DETECTION_FLAG_ENTITY); // It might be easier if this statement is moved into the constructor, but I want to minimize the cpp files I touch
 		idMap[std::to_string(next_minion_id)] = m;
 
 		std::cout << "created new minion: " << std::to_string(next_minion_id) << " at " << idMap[std::to_string(next_minion_id)] << "\n";
@@ -205,6 +214,7 @@ void SceneManager_Server::populateScene() { //testing only
 		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
 		Tower* t = new Tower(TOWER_HEALTH, TOWER_ATTACK, this);
 		t->setMatrix(transform);
+		ObjectDetection::addObject(t, DETECTION_FLAG_TOWER | DETECTION_FLAG_ENTITY); // It might be easier if this statement is moved into the constructor, but I want to minimize the cpp files I touch
 		idMap[std::to_string(next_tower_id)] = t;
 		next_tower_id++;
 		if (next_tower_id == ID_TOWER_MAX) next_tower_id = ID_TOWER_MIN;

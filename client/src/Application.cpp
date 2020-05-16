@@ -990,6 +990,22 @@ void Application::Update(float deltaTime)
 	/************************************************************************/
 	// Scene Update
 	/************************************************************************/
+
+	if (connected) {
+		scene->updateFromClientBuf(updateBuf);
+	}
+	else {
+		scene->updateFromInputBuf(deltaTime);
+	}
+	scene->update(deltaTime);
+
+	/************************************************************************/
+	// Uniform Data Updates
+	/************************************************************************/
+
+	vec3 playerPos = scene->getPlayerTransformMat()[3].getXYZ();
+	pCameraController->moveTo(playerPos);
+
 	pCameraController->update(deltaTime);
 	Application::viewMat = mat4::translation(vec3(0,-2,10)) * pCameraController->getViewMatrix();
 	const float aspectInverse = (float)mSettings.mHeight / (float)mSettings.mWidth;
@@ -1022,21 +1038,6 @@ void Application::Update(float deltaTime)
 	gUniformData.mLightDirection[2] = vec4(-sunDirection.getX(), -sunDirection.getY(), -sunDirection.getZ(), 0.0f);
 
 
-
-	if (connected) {
-		scene->updateFromClientBuf(updateBuf);
-	}
-	else {
-		scene->updateFromInputBuf(deltaTime);
-	}
-	scene->update(deltaTime);
-
-	vec3 playerPos = scene->getPlayerTransformMat()[3].getXYZ();
-	//std::cout << "tracked player position x: " << playerMat[3][0] << " y: " << playerMat[3][1] << " z: " << playerMat[3][2] << "\n";
-	pCameraController->moveTo(playerPos);
-	//pCameraController->lookAt(scene->transforms[0]->M[3].getXYZ() + vec3(0, 0, 1));
-
-	//animatedGeode->update(deltaTime);
 
 	/************************************************************************/
 	// Light Matrix Update - for shadow map

@@ -17,9 +17,6 @@ void Base::update(float deltaTime) {
 
 /*void Base::updateHealth(int attack) {
         health = health-attack;
-        if (health == 0) {
-                //lose the game
-        }
 }
 
 bool Base::isEnemyTeam(Team checkTeam) {

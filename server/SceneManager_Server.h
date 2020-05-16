@@ -11,12 +11,15 @@
 #include "../common/base.h"
 #include "../common/minion.h"
 #include "../common/tower.h"
-//#include "../common/resource.h"
+#include "../common/clawtower.h"
+#include "../common/resource.h"
+
+#include "../common/ObjectDetection.h"
 
 class SceneManager_Server {
 private:
 		
-		int next_player_id, next_base_id, next_minion_id, next_tower_id, next_resource_id;
+		int next_player_id, next_base_id, next_minion_id, next_super_minion_id, next_laser_id, next_claw_id, next_dumpster_id, next_recycling_bin_id;
 		//Team *team1, *team2;
 
 public:

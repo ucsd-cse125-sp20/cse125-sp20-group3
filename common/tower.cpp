@@ -9,6 +9,7 @@ Tower::Tower(int health, int attack, SceneManager_Server* sm, mat4 model_mat) : 
 	//init stuff
 }
 
-void Tower::update(float deltaTime) {
-	//TODO: Update health
+void Tower::setHealth(int new_health) {
+	Entity::setHealth(new_health);
+	if (health <= 0) team->decTower();
 }

@@ -96,6 +96,12 @@
     <ClCompile Include="..\..\..\..\src\UIManager.cpp">
       <Filter>Source Files\Asset Loading</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\clawtower.cpp">
+      <Filter>Source Files\Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\resource.cpp">
+      <Filter>Source Files\Game Objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\src\Shaders\D3D12\basic.frag">
@@ -255,6 +261,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\UIManager.h">
       <Filter>Header Files\Asset Loading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\clawtower.h">
+      <Filter>Header Files\Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\resource.h">
+      <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -60,13 +60,13 @@ void Player::processInput(PlayerInput in) {
 
 			switch (buildMode) { //build something based on buildMode
 			case LASER: //TODO: check plastic and metal cost against amount in team inventory
-				//manager->spawnEntity(LASER_TYPE, x, z, y);
+				if (team->checkResources(LASER_TYPE))//manager->spawnEntity(LASER_TYPE, x, z, y);
 				break;
 			case CLAW:
-				//manager->spawnEntity(CLAW_TYPE, x, z, y);
+				if (team->checkResources(CLAW_TYPE))//manager->spawnEntity(CLAW_TYPE, x, z, y);
 				break;
 			case SUPER_MINION:
-				//manager->spawnEntity(SUPER_MINION_TYPE, x, z, y);
+				if (team->checkResources(SUPER_MINION_TYPE))//manager->spawnEntity(SUPER_MINION_TYPE, x, z, y);
 				break;
 			default:
 				std::cout << "invalid buildMode\n";

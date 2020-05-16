@@ -1,30 +1,29 @@
 #include "minion.h"
 #include "../server/SceneManager_Server.h"
 
-Minion::Minion(SceneManager_Server* sm) : Entity(MINION_HEALTH, MINION_ATTACK, sm) {
-	pathPtr = 0;
-}
-
-Minion::Minion(SceneManager_Server* sm, mat4 model_mat) : Entity(MINION_HEALTH, MINION_ATTACK, sm, model_mat) {
-	pathPtr = 0;
-}
-
-/*
-
-Minion::Minion(int health, int attack, SceneManager_Server* sm) : Entity(health, attack, sm) {
+Minion::Minion(std::string id, SceneManager_Server* sm) : Entity(id, MINION_HEALTH, MINION_ATTACK, sm) {
 	//init stuff
+	pathPtr = 0;
+	timeElapsed = 0;
+	attackTarget = NULL;
+	attackRange = MINION_ATK_RANGE;
+	attackInterval = MINION_ATK_INTERVAL;
+	ObjectDetection::addObject(this, DETECTION_FLAG_MINION | DETECTION_FLAG_ENTITY);
 }
 
-Minion::Minion(int health, int attack, SceneManager_Server* sm, mat4 model_mat) : Entity(health, attack, sm, model_mat) {
-	//TODO: Initialize attackTarget?
+Minion::Minion(std::string id, int health, int attack, float range, SceneManager_Server* sm) : Entity(id, health, attack, sm) {
+	timeElapsed = 0;
+	pathPtr = 0;
+	attackTarget = NULL;
+	attackRange = range;
+	attackInterval = MINION_ATK_INTERVAL;
+	ObjectDetection::addObject(this, DETECTION_FLAG_MINION | DETECTION_FLAG_ENTITY);
 }
 
-*/
-
-void Minion::update(float deltaTime) {
-	timeElapsed += deltaTime; 
-	if (timeElapsed >= actionInterval) {
-		this->attack(MINION_ATTACK_RANGE);
+void Minion::update(float deltaTime) { //should they be able to switch attack targets instantaneously?
+	timeElapsed += deltaTime;
+	if (timeElapsed >= attackInterval) {
+		this->attack();
 		timeElapsed = 0;
 	}
 	else {
@@ -36,6 +35,18 @@ void Minion::setHealth(int new_health) {
 	Entity::setHealth(new_health);
 	if (health <= 0) team->decUnit();
 }
+
+void attack() {
+		if (this->attackTarget == nullptr) {
+			attackTarget = (Entity*)ObjectDetection::getNearestObject(this, 1, attackRange);
+			if (this->isEnemyTeam(attackTarget->team) == false || !manager->checkEntityAlive(attackTarget->getIDstr())) attackTarget = nullptr; 
+		}
+		if (attackTarget != nullptr) {
+			attackTarget->takeDamage(attackDamage);
+			int enemyHealth = attackTarget->getHealth();
+			if (!manager->checkEntityAlive(attackTarget->getIDstr())) attackTarget = nullptr;
+		}	
+	}
 
 void Minion::move() {
 	/*if (pathPtr < path.size) {

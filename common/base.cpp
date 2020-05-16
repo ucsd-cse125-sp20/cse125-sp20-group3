@@ -1,14 +1,8 @@
 #include "base.h"
 #include "../server/SceneManager_Server.h"
 
-Base::Base(SceneManager_Server* sm) : Entity(BASE_HEALTH, BASE_ATTACK, sm) {
+Base::Base(std::string id, SceneManager_Server* sm) : Entity(id, BASE_HEALTH, BASE_ATTACK, sm) {
     //init stuff
-}
-
-//Not entirely sure why we need this constructor but put it in
-//for consistency
-Base::Base(SceneManager_Server* sm, mat4 model_mat) : Entity(BASE_HEALTH, BASE_ATTACK, sm, model_mat) {
-	//init stuff
 }
 
 void Base::update(float deltaTime) {

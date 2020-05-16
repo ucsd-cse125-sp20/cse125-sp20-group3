@@ -1,22 +1,15 @@
 #include "player.h"
 #include "../server/SceneManager_Server.h"
 
-Player::Player(SceneManager_Server* sm) : Entity(PLAYER_HEALTH, PLAYER_ATTACK, sm) {
+Player::Player(std::string id, SceneManager_Server* sm) : Entity(id, PLAYER_HEALTH, PLAYER_ATTACK, sm) {
 	velocity_x = 0.f;
 	velocity_z = 0.f;
 	rotation_y = 0.f;
 	acceleration_x = 0.f;
 	acceleration_z = 0.f;
 	buildMode = NEUTRAL;
-}
 
-Player::Player(SceneManager_Server* sm, mat4 model_mat) : Entity(PLAYER_HEALTH, PLAYER_ATTACK, sm, model_mat) {
-	velocity_x = 0.f;
-	velocity_z = 0.f;
-	rotation_y = 0.f;
-	acceleration_x = 0.f;
-	acceleration_z = 0.f;
-	buildMode = NEUTRAL;
+	ObjectDetection::addObject(this, DETECTION_FLAG_PLAYER | DETECTION_FLAG_ENTITY);
 }
 
 void Player::update(float deltaTime) {

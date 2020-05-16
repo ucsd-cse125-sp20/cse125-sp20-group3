@@ -12,39 +12,25 @@ class SceneManager_Server;
 
 class Entity : public GameObject {
 protected:
-    int health;
-    int attackDamage;
-    float timeElapsed;
-    float actionInterval;
-    Team* team;
-    Entity* attackTarget;
+	std::string id_str;
+	int health;
+	int attack;
+	Team* team;
 	SceneManager_Server* manager;
+
 public:
 	struct EntityData {
 		GameObjectData GO_data;
 		int health;
 	};
 
-	Entity(int h, int a, SceneManager_Server* sm) : GameObject() { health = h; attackDamage = a; manager = sm; attackTarget = nullptr; timeElapsed = 0;
-										actionInterval=ATTACK_INTERVAL;};
-	Entity(int h, int a, SceneManager_Server* sm, mat4 m) : GameObject(m) { health = h; attackDamage = a; manager = sm; attackTarget = nullptr; timeElapsed=0;
-										actionInterval=ATTACK_INTERVAL;};
+	Entity(std::string id, int h, int a, SceneManager_Server* sm) : GameObject() { id_str = id; health = h; attack = a; manager = sm; };
 	virtual void update(float deltaTime) {}
 	bool isEnemyTeam(Team* checkTeam) { return this->team != checkTeam; }
+	std::string getIDstr() { return id_str; }
 	int getHealth() { return health; }
 	virtual void setHealth(int new_health) { health = new_health; }
 	void takeDamage(int attack) { health = max(health - attack, 0);	}
-	void attack(int attackRange) {
-		if (attackTarget == nullptr) {
-			attackTarget = (Entity*)ObjectDetection::getNearestObject(this, 1, attackRange);
-			if (this->isEnemyTeam(attackTarget->team) == false) attackTarget = nullptr; 
-		}
-		if (attackTarget != nullptr) {
-			attackTarget->takeDamage(attackDamage);
-			int enemyHealth = attackTarget->getHealth();
-			if (enemyHealth <= 0) attackTarget = nullptr;
-		}	
-	}
 
 	void setEntData(EntityData data) {
 		this->GameObject::setGOData(data.GO_data);

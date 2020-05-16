@@ -10,7 +10,9 @@
 #include "../common/team.h"
 #include "../common/base.h"
 #include "../common/minion.h"
+#include "../common/superminion.h"
 #include "../common/tower.h"
+#include "../common/lasertower.h"
 #include "../common/clawtower.h"
 #include "../common/resource.h"
 

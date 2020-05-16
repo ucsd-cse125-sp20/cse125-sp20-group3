@@ -13,6 +13,7 @@
 class Minion : public Entity {
 private:
 	int pathPtr;
+	static std::map<std::tuple<float, float>, std::vector<std::tuple<float, float>>> pathMap; 
 	std::vector<std::tuple<float, float>> path;
 protected:
 	float timeElapsed;

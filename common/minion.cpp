@@ -4,6 +4,9 @@
 Minion::Minion(std::string id, SceneManager_Server* sm) : Entity(id, MINION_HEALTH, MINION_ATTACK, sm) {
 	//init stuff
 	pathPtr = 0;
+	//path initialization
+	std::tuple<float, float> bornLoc = std::make_tuple(model[3][0], model[3][2]);
+	path = pathMap[bornLoc];
 	timeElapsed = 0;
 	attackTarget = NULL;
 	attackRange = MINION_ATK_RANGE;
@@ -14,6 +17,9 @@ Minion::Minion(std::string id, SceneManager_Server* sm) : Entity(id, MINION_HEAL
 Minion::Minion(std::string id, int health, int attack, float range, SceneManager_Server* sm) : Entity(id, health, attack, sm) {
 	timeElapsed = 0;
 	pathPtr = 0;
+	//path initialization
+	std::tuple<float, float> bornLoc = std::make_tuple(model[3][0], model[3][2]);
+	path = pathMap[bornLoc];
 	attackTarget = NULL;
 	attackRange = range;
 	attackInterval = MINION_ATK_INTERVAL;

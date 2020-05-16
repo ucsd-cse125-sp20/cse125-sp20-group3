@@ -4,19 +4,21 @@
 #include "macros.h"
 #include "entity.h"
 #include "team.h"
+#include "ObjectDetection.h"
 #include <iostream>
 #include <chrono>
 #include <ctime>
 
 class Minion : public Entity {
-private:
-	Entity* attackTarget;
 protected:
-	Minion(int health, int attack, SceneManager_Server* sm); //accept values for super minion spawned by player
-	Minion(int health, int attack, SceneManager_Server* sm, mat4 model_mat);
+	float timeElapsed;
+	Entity* attackTarget;
+	float attackRange;
+	float attackInterval;
+
+	Minion(int health, int attack, float range, SceneManager_Server* sm); //accept values for other types of minions
 public:
 	Minion(SceneManager_Server* sm); //basic minion spawned by claw tower
-	Minion(SceneManager_Server* sm, mat4 model_mat);
 	
 	void update(float deltaTime) override;
 	void setHealth(int new_health) override;

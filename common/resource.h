@@ -11,7 +11,6 @@ protected:
 	char type;
 public:
 	Resource(char resourceType, SceneManager_Server* sm_server);
-	Resource(char resourceType, SceneManager_Server* sm_server, mat4 model_mat);
 	std::pair<char, int> harvest();
 };
 

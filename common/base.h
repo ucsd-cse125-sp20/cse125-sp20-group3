@@ -11,7 +11,6 @@
 class Base : public Entity {
 public:
         Base(SceneManager_Server* sm);
-        Base(SceneManager_Server* sm, mat4 model_mat);
         void update(float deltaTime) override;
 };
 

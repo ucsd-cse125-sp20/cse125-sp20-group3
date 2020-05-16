@@ -122,18 +122,18 @@ void SceneManager_Client::updateFromClientBuf(std::vector<Client::UpdateData> up
 				transforms[data.id_str] = conf_new(Transform, mat4::identity());
 				transforms[data.id_str]->addChild(gltfGeodes[MINION_GEODE]);
 			}
-			/*else if (ID_SUPER_MINION_MIN <= id_int && id_int <= ID_SUPER_MINION_MAX) {
-				std::cout << "creating new uper minion, id: " << data.id_str << "\n";
+			else if (ID_SUPER_MINION_MIN <= id_int && id_int <= ID_SUPER_MINION_MAX) {
+				std::cout << "creating new super minion, id: " << data.id_str << "\n";
 				idMap[data.id_str] = conf_new(SuperMinion, nullptr);
 				transforms[data.id_str] = conf_new(Transform, mat4::identity());
 				transforms[data.id_str]->addChild(gltfGeodes[SUPER_MINION_GEODE]);
-			}*/
-			/*else if (ID_LASER_MIN <= id_int && id_int <= ID_LASER_MAX) {
+			}
+			else if (ID_LASER_MIN <= id_int && id_int <= ID_LASER_MAX) {
 				std::cout << "creating new laser tower, id: " << data.id_str << "\n";
 				idMap[data.id_str] = conf_new(LaserTower, nullptr);
 				transforms[data.id_str] = conf_new(Transform, mat4::identity());
 				transforms[data.id_str]->addChild(gltfGeodes[LASER_TOWER_GEODE]);
-			}*/
+			}
 			else if (ID_CLAW_MIN <= id_int && id_int <= ID_CLAW_MAX) {
 				std::cout << "creating new claw tower, id: " << data.id_str << "\n";
 				idMap[data.id_str] = conf_new(ClawTower, nullptr);

@@ -2,11 +2,7 @@
 #include "../server/SceneManager_Server.h"
 
 Tower::Tower(int health, int attack, SceneManager_Server* sm) : Entity(health, attack, sm) {
-	//init stuff
-}
-
-Tower::Tower(int health, int attack, SceneManager_Server* sm, mat4 model_mat) : Entity(health, attack, sm, model_mat) {
-	//init stuff
+	ObjectDetection::addObject(this, DETECTION_FLAG_TOWER | DETECTION_FLAG_ENTITY);
 }
 
 void Tower::setHealth(int new_health) {

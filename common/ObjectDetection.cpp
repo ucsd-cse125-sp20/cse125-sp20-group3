@@ -1,7 +1,5 @@
 #include "ObjectDetection.h"
 
-
-
 std::unordered_map<uint64_t, SpatialCell> ObjectDetection::spatialHash = std::unordered_map<uint64_t, SpatialCell>();
 
 uint64_t ObjectDetection::keyOf(GameObject* obj)
@@ -27,7 +25,6 @@ std::pair<int, int> ObjectDetection::unkey(uint64_t key)
 	int z = key & 0xFFFFFFFF;
 	return std::make_pair(x, z);
 }
-
 
 
 

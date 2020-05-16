@@ -26,7 +26,6 @@ public:
 	};*/
 
     Player(SceneManager_Server* sm);
-    Player(SceneManager_Server* sm, mat4 model_mat);
 	
     void update(float deltaTime) override; //server-side state management
 	void processInput(PlayerInput in);

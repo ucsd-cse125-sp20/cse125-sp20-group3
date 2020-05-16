@@ -23,7 +23,7 @@ void LaserTower::attack() {
 		if (this->isEnemyTeam(attackTarget->team) == false || !manager->checkEntityAlive(attackTarget->getIDstr())) attackTarget = nullptr; 
 	}
 	if (attackTarget != nullptr) {
-		attackTarget->takeDamage(attackDamage);
+		attackTarget->takeDamage(this->attackDamage);
 		int enemyHealth = attackTarget->getHealth();
 		if (!manager->checkEntityAlive(attackTarget->getIDstr())) attackTarget = nullptr;
 	}	

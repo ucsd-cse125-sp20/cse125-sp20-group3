@@ -8,22 +8,23 @@
 #include <iostream>
 #include <chrono>
 #include <ctime>
-
+#include <map>
+using namespace std;
 
 class Minion : public Entity {
 private:
 	int pathPtr;
-	static std::map<std::tuple<float, float>, std::vector<std::tuple<float, float>>> pathMap; 
-	std::vector<std::tuple<float, float>> path;
+	static map<tuple<float, float>, vector<tuple<float, float>>> pathMap; 
+	vector<tuple<float, float>> path;
 protected:
 	float timeElapsed;
 	Entity* attackTarget;
 	float attackRange;
 	float attackInterval;
 
-	Minion(std::string id, int health, int attack, float range, SceneManager_Server* sm); //accept values for other types of minions
+	Minion(string id, int health, int attack, float range, SceneManager_Server* sm); //accept values for other types of minions
 public:
-	Minion(std::string id, SceneManager_Server* sm); //basic minion spawned by claw tower
+	Minion(string id, SceneManager_Server* sm); //basic minion spawned by claw tower
 	
 	void update(float deltaTime) override;
 	void setHealth(int new_health) override;

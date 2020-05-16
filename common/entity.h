@@ -14,23 +14,23 @@ class Entity : public GameObject {
 protected:
 	std::string id_str;
 	int health;
-	int attack;
-	Team* team;
+	int attackDamage;
 	SceneManager_Server* manager;
 
 public:
+	Team* team;
 	struct EntityData {
 		GameObjectData GO_data;
 		int health;
 	};
 
-	Entity(std::string id, int h, int a, SceneManager_Server* sm) : GameObject() { id_str = id; health = h; attack = a; manager = sm; };
+	Entity(std::string id, int h, int a, SceneManager_Server* sm) : GameObject() { id_str = id; health = h; attackDamage = a; manager = sm; };
 	virtual void update(float deltaTime) {}
 	bool isEnemyTeam(Team* checkTeam) { return this->team != checkTeam; }
 	std::string getIDstr() { return id_str; }
 	int getHealth() { return health; }
 	virtual void setHealth(int new_health) { health = new_health; }
-	void takeDamage(int attack) { health = max(health - attack, 0);	}
+	void takeDamage(int attack) { health = Vectormath::max(health - attack, 0);	}
 
 	void setEntData(EntityData data) {
 		this->GameObject::setGOData(data.GO_data);

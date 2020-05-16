@@ -36,17 +36,17 @@ void Minion::setHealth(int new_health) {
 	if (health <= 0) team->decUnit();
 }
 
-void attack() {
-		if (this->attackTarget == nullptr) {
-			attackTarget = (Entity*)ObjectDetection::getNearestObject(this, 1, attackRange);
-			if (this->isEnemyTeam(attackTarget->team) == false || !manager->checkEntityAlive(attackTarget->getIDstr())) attackTarget = nullptr; 
-		}
-		if (attackTarget != nullptr) {
-			attackTarget->takeDamage(attackDamage);
-			int enemyHealth = attackTarget->getHealth();
-			if (!manager->checkEntityAlive(attackTarget->getIDstr())) attackTarget = nullptr;
-		}	
+void Minion::attack() {
+	if (this->attackTarget == nullptr) {
+		attackTarget = (Entity*)ObjectDetection::getNearestObject(this, 1, attackRange);
+		if (this->isEnemyTeam(attackTarget->team) == false || !manager->checkEntityAlive(attackTarget->getIDstr())) attackTarget = nullptr; 
 	}
+	if (attackTarget != nullptr) {
+		attackTarget->takeDamage(attackDamage);
+		int enemyHealth = attackTarget->getHealth();
+		if (!manager->checkEntityAlive(attackTarget->getIDstr())) attackTarget = nullptr;
+	}	
+}
 
 void Minion::move() {
 	/*if (pathPtr < path.size) {

@@ -108,10 +108,6 @@
     <ClCompile Include="..\..\..\..\..\common\resource.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
-<<<<<<< HEAD
-    <ClCompile Include="..\..\..\..\..\common\ObjectDetection.cpp">
-      <Filter>Source Files</Filter>
-=======
     <ClCompile Include="..\..\..\..\..\common\lasertower.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
@@ -123,7 +119,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\common\ObjectDetection.cpp">
       <Filter>Source Files\Server Files</Filter>
->>>>>>> 0ba0bc4855c19c9f70575b47ca15206f83d6a0d0
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -291,10 +286,6 @@
     <ClInclude Include="..\..\..\..\..\common\resource.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
-<<<<<<< HEAD
-    <ClInclude Include="..\..\..\..\..\common\ObjectDetection.h">
-      <Filter>Header Files</Filter>
-=======
     <ClInclude Include="..\..\..\..\..\common\lasertower.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
@@ -306,7 +297,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\server\SceneManager_Server.h">
       <Filter>Header Files\Server Files</Filter>
->>>>>>> 0ba0bc4855c19c9f70575b47ca15206f83d6a0d0
     </ClInclude>
   </ItemGroup>
 </Project>

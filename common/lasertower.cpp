@@ -10,16 +10,21 @@ LaserTower::LaserTower(std::string id, SceneManager_Server* sm_server) : Tower(i
 }
 
 void LaserTower::update(float deltaTime) { //should they be able to switch attack targets instantaneously?
-	if (attackTarget == NULL || !manager->checkEntityAlive(attackTarget->getIDstr()) /*|| attackTarget->getHealth() > 0*/) {
-		//look for new attack target within attackRange
-		//if none found in range, set attackTarget = NULL
+	timeElapsed += deltaTime;
+	if (timeElapsed >= attackInterval) {
+		this->attack();
+		timeElapsed = 0;
 	}
+}
 
-	if (attackTarget != NULL) {
-		timeElapsed += deltaTime;
-		if (timeElapsed >= attackInterval) {
-			//attack attackTarget
-			timeElapsed = 0;
-		}
+void LaserTower::attack() {
+	if (this->attackTarget == nullptr) {
+		attackTarget = (Entity*)ObjectDetection::getNearestObject(this, 1, attackRange);
+		if (this->isEnemyTeam(attackTarget->team) == false || !manager->checkEntityAlive(attackTarget->getIDstr())) attackTarget = nullptr; 
 	}
+	if (attackTarget != nullptr) {
+		attackTarget->takeDamage(attackDamage);
+		int enemyHealth = attackTarget->getHealth();
+		if (!manager->checkEntityAlive(attackTarget->getIDstr())) attackTarget = nullptr;
+	}	
 }

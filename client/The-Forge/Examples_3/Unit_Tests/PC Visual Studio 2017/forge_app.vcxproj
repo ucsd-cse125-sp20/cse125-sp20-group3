@@ -31,6 +31,7 @@
     <ClCompile Include="..\..\..\..\..\common\clawtower.cpp" />
     <ClCompile Include="..\..\..\..\..\common\GameObject.cpp" />
     <ClCompile Include="..\..\..\..\..\common\minion.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\ObjectDetection.cpp" />
     <ClCompile Include="..\..\..\..\..\common\player.cpp" />
     <ClCompile Include="..\..\..\..\..\common\resource.cpp" />
     <ClCompile Include="..\..\..\..\src\Animator.cpp" />
@@ -85,6 +86,7 @@
     <ClInclude Include="..\..\..\..\..\common\GameObject.h" />
     <ClInclude Include="..\..\..\..\..\common\macros.h" />
     <ClInclude Include="..\..\..\..\..\common\minion.h" />
+    <ClInclude Include="..\..\..\..\..\common\ObjectDetection.h" />
     <ClInclude Include="..\..\..\..\..\common\player.h" />
     <ClInclude Include="..\..\..\..\..\common\resource.h" />
     <ClInclude Include="..\..\..\..\..\common\team.h" />

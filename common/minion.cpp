@@ -38,14 +38,16 @@ void Minion::setHealth(int new_health) {
 }
 
 void Minion::move() {
-	tuple<float, float> nextPos = path[pathPtr];
-	lastXPos = model[3][0];
-	lastZPos = model[3][2];
-	model[3][0] = get<0>(nextPos);
-	model[3][2] = get<1>(nextPos);
-	vec3 forward = normalize(vec3(model[3][0]-lastXPos, 0, model[3][2]-lastZPos));
-	vec3 right = cross(forward, vec3(0, 1, 0));
-	model[0] = vec4(right, 0);
-	model[2] = vec4(-forward, 0);
-	pathPtr++;
+	/*if (pathPtr < path.size) {
+		std::tuple<float, float> nextPos = path[pathPtr];
+		float lastXPos = model[3][0];
+		float lastZPos = model[3][2];
+		model[3][0] = std::get<0>(nextPos);
+		model[3][2] = std::get<1>(nextPos);
+		vec3 forward = normalize(vec3(model[3][0]-lastXPos, 0, model[3][2]-lastZPos));
+		vec3 right = cross(forward, vec3(0, 1, 0));
+		model[0] = vec4(right, 0);
+		model[2] = vec4(-forward, 0);
+		pathPtr++;
+	}*/
 }

@@ -36,7 +36,7 @@ public:
 	void takeDamage(int attack) { health = max(health - attack, 0);	}
 	void attack(int attackRange) {
 		if (attackTarget == nullptr) {
-			attackTarget = ObjectDetection::getNearestObject(this, int radius=attackRange);
+			attackTarget = (Entity*)ObjectDetection::getNearestObject(this, 1, attackRange);
 			if (this->isEnemyTeam(attackTarget->team) == false) attackTarget = nullptr; 
 		}
 		if (attackTarget != nullptr) {

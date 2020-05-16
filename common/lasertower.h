@@ -10,8 +10,8 @@ private:
 	float attackRange;
 	float attackInterval;
 public:
-	LaserTower(SceneManager_Server* sm_server);
-	//LaserTower(SceneManager_Server* sm_server, mat4 model_mat);
+	LaserTower(std::string id, SceneManager_Server* sm_server);
+
 	void update(float deltaTime) override;
 };
 

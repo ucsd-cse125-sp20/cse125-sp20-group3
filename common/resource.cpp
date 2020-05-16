@@ -1,12 +1,20 @@
 #include "resource.h"
 #include "../server/SceneManager_Server.h"
 
-Resource::Resource(char resourceType, SceneManager_Server* sm_server) : Entity(RESOURCE_HEALTH, RESOURCE_ATTACK, sm_server) {
+Resource::Resource(char resourceType, std::string id, SceneManager_Server* sm_server) : Entity(id, RESOURCE_HEALTH, RESOURCE_ATTACK, sm_server) {
 	type = resourceType;
 }
 
 std::pair<char, int> Resource::harvest() {
-	//TODO figure out how much to return, kill this once harvested
-	std::pair<char, int> res = std::make_pair(type, 1);
+	std::pair<char, int> res;
+	if (type == DUMPSTER_TYPE) {
+		res = std::make_pair(PLASTIC_RES_TYPE, DUMPSTER_PLASTIC);
+	}
+	else if (type == RECYCLING_BIN_TYPE) {
+		res = std::make_pair(METAL_RES_TYPE, RECYCLING_BIN_METAL);
+	}
+
+	this->takeDamage(RESOURCE_HEALTH); //mark as "dead" to indicate used
+
 	return res;
 }

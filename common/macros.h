@@ -33,10 +33,13 @@
 #define MINION_TYPE 'm'
 #define SUPER_MINION_TYPE 's'
 #define TOWER_TYPE 't'
-#define LASER_TYPE 'L'
+#define LASER_TYPE 'l'
 #define CLAW_TYPE 'c'
 #define DUMPSTER_TYPE 'd'
 #define RECYCLING_BIN_TYPE 'r'
+
+#define METAL_RES_TYPE 'M'
+#define PLASTIC_RES_TYPE 'P'
 
 #define PLAYER_HEALTH 200
 #define BASE_HEALTH 2000
@@ -67,12 +70,15 @@
 #define WIN_STATUS_WON 10
 #define	WIN_STATUS_LOST -10
 
+#define DUMPSTER_PLASTIC 3
+#define RECYCLING_BIN_METAL 2
+
 #define MINION_METAL_REQ 2
 #define MINION_PLASTIC_REQ 8
 #define SUPER_MINION_METAL_REQ 4
 #define SUPER_MINION_PLASTIC_REQ 12
-#define TOWER_METAL_REQ 5
-#define TOWER_PLASTIC_REQ 20
+//#define TOWER_METAL_REQ 5
+//#define TOWER_PLASTIC_REQ 20
 #define LASER_METAL_REQ 2
 #define LASER_PLASTIC_REQ 4
 #define CLAW_METAL_REQ 8

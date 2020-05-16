@@ -1,7 +1,7 @@
 #include "player.h"
 #include "../server/SceneManager_Server.h"
 
-Player::Player(SceneManager_Server* sm) : Entity(PLAYER_HEALTH, PLAYER_ATTACK, sm) {
+Player::Player(std::string id, SceneManager_Server* sm) : Entity(id, PLAYER_HEALTH, PLAYER_ATTACK, sm) {
 	velocity_x = 0.f;
 	velocity_z = 0.f;
 	rotation_y = 0.f;

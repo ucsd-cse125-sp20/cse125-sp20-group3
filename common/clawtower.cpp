@@ -1,7 +1,7 @@
 #include "clawtower.h"
 #include "../server/SceneManager_Server.h"
 
-ClawTower::ClawTower(SceneManager_Server* sm_server) : Tower(CLAW_TOWER_HEALTH, CLAW_TOWER_ATTACK, sm_server) {
+ClawTower::ClawTower(std::string id, SceneManager_Server* sm_server) : Tower(id, CLAW_TOWER_HEALTH, CLAW_TOWER_ATTACK, sm_server) {
     //init stuff
 	timeElapsed = 0;
 	spawnOffset = vec3(2.f, 0, 2.f);

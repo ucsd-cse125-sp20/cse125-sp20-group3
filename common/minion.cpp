@@ -1,7 +1,7 @@
 #include "minion.h"
 #include "../server/SceneManager_Server.h"
 
-Minion::Minion(SceneManager_Server* sm) : Entity(MINION_HEALTH, MINION_ATTACK, sm) {
+Minion::Minion(std::string id, SceneManager_Server* sm) : Entity(id, MINION_HEALTH, MINION_ATTACK, sm) {
 	//init stuff
 	timeElapsed = 0;
 	attackTarget = NULL;
@@ -11,7 +11,7 @@ Minion::Minion(SceneManager_Server* sm) : Entity(MINION_HEALTH, MINION_ATTACK, s
 	ObjectDetection::addObject(this, DETECTION_FLAG_MINION | DETECTION_FLAG_ENTITY);
 }
 
-Minion::Minion(int health, int attack, float range, SceneManager_Server* sm) : Entity(health, attack, sm) {
+Minion::Minion(std::string id, int health, int attack, float range, SceneManager_Server* sm) : Entity(id, health, attack, sm) {
 	timeElapsed = 0;
 	attackTarget = NULL;
 	attackRange = range;
@@ -20,20 +20,11 @@ Minion::Minion(int health, int attack, float range, SceneManager_Server* sm) : E
 	ObjectDetection::addObject(this, DETECTION_FLAG_MINION | DETECTION_FLAG_ENTITY);
 }
 
-/*Minion::Minion(int health, int attack, float range, SceneManager_Server* sm, mat4 model_mat) : Entity(health, attack, sm, model_mat) {
-	attackTarget = NULL;
-	attackRange = range;
-	timeElapsed = 0;
-	actionInterval = MINION_ATK_INTERVAL;
-
-	ObjectDetection::addObject(this, DETECTION_FLAG_MINION | DETECTION_FLAG_ENTITY);
-}*/
-
-void Minion::update(float deltaTime) {
-	/*if (!manager->checkEntityAlive(attackTarget.getID())) {
+void Minion::update(float deltaTime) { //should they be able to switch attack targets instantaneously?
+	if (attackTarget == NULL || !manager->checkEntityAlive(attackTarget->getIDstr()) /*|| attackTarget->getHealth() > 0*/) {
 		//look for new attack target within attackRange
 		//if none found in range, set attackTarget = NULL
-	}*/
+	}
 	
 	if (attackTarget != NULL) {
 		timeElapsed += deltaTime;

@@ -10,7 +10,7 @@
 
 class Base : public Entity {
 public:
-        Base(SceneManager_Server* sm);
+        Base(std::string id, SceneManager_Server* sm);
         void update(float deltaTime) override;
 };
 

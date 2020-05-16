@@ -104,7 +104,7 @@ void SceneManager_Client::updateFromClientBuf(std::vector<Client::UpdateData> up
 			if (ID_PLAYER_MIN <= id_int && id_int <= ID_PLAYER_MAX) {
 				std::cout << "creating new player, id: " << data.id_str << "\n";
 
-				idMap[data.id_str] = conf_new(Player, nullptr);
+				idMap[data.id_str] = conf_new(Player, data.id_str, nullptr);
 				transforms[data.id_str] = conf_new(Transform, mat4::identity());
 				Transform* adjustment = conf_new(Transform, mat4::rotationY(-PI / 2));
 
@@ -118,40 +118,40 @@ void SceneManager_Client::updateFromClientBuf(std::vector<Client::UpdateData> up
 			}
 			else if (ID_MINION_MIN <= id_int && id_int <= ID_MINION_MAX) {
 				std::cout << "creating new minion, id: " << data.id_str << "\n";
-				idMap[data.id_str] = conf_new(Minion, nullptr);
+				idMap[data.id_str] = conf_new(Minion, data.id_str, nullptr);
 				transforms[data.id_str] = conf_new(Transform, mat4::identity());
 				transforms[data.id_str]->addChild(gltfGeodes[MINION_GEODE]);
 			}
 			else if (ID_SUPER_MINION_MIN <= id_int && id_int <= ID_SUPER_MINION_MAX) {
 				std::cout << "creating new super minion, id: " << data.id_str << "\n";
-				idMap[data.id_str] = conf_new(SuperMinion, nullptr);
+				idMap[data.id_str] = conf_new(SuperMinion, data.id_str, nullptr);
 				transforms[data.id_str] = conf_new(Transform, mat4::identity());
 				transforms[data.id_str]->addChild(gltfGeodes[SUPER_MINION_GEODE]);
 			}
 			else if (ID_LASER_MIN <= id_int && id_int <= ID_LASER_MAX) {
 				std::cout << "creating new laser tower, id: " << data.id_str << "\n";
-				idMap[data.id_str] = conf_new(LaserTower, nullptr);
+				idMap[data.id_str] = conf_new(LaserTower, data.id_str, nullptr);
 				transforms[data.id_str] = conf_new(Transform, mat4::identity());
 				transforms[data.id_str]->addChild(gltfGeodes[LASER_TOWER_GEODE]);
 			}
 			else if (ID_CLAW_MIN <= id_int && id_int <= ID_CLAW_MAX) {
 				std::cout << "creating new claw tower, id: " << data.id_str << "\n";
-				idMap[data.id_str] = conf_new(ClawTower, nullptr);
+				idMap[data.id_str] = conf_new(ClawTower, data.id_str, nullptr);
 				transforms[data.id_str] = conf_new(Transform, mat4::identity());
 				transforms[data.id_str]->addChild(gltfGeodes[CLAW_TOWER_GEODE]);
 			}
-			/*else if (ID_DUMPSTER_MIN <= id_int && id_int <= ID_DUMPSTER_MAX) {
+			else if (ID_DUMPSTER_MIN <= id_int && id_int <= ID_DUMPSTER_MAX) {
 				std::cout << "creating new dumpster, id: " << data.id_str << "\n";
-				idMap[data.id_str] = conf_new(Dumpster, nullptr);
+				idMap[data.id_str] = conf_new(Resource, DUMPSTER_TYPE, data.id_str, nullptr);
 				transforms[data.id_str] = conf_new(Transform, mat4::identity());
 				transforms[data.id_str]->addChild(gltfGeodes[DUMPSTER_GEODE]);
-			}*/
-			/*else if (ID_RECYCLING_BIN_MIN <= id_int && id_int <= ID_RECYCLING_BIN_MAX) {
+			}
+			else if (ID_RECYCLING_BIN_MIN <= id_int && id_int <= ID_RECYCLING_BIN_MAX) {
 				std::cout << "creating new recycling bin id: " << data.id_str << "\n";
-				idMap[data.id_str] = conf_new(RecyclingBin, nullptr);
+				idMap[data.id_str] = conf_new(Resource, RECYCLING_BIN_TYPE, data.id_str, nullptr);
 				transforms[data.id_str] = conf_new(Transform, mat4::identity());
 				transforms[data.id_str]->addChild(gltfGeodes[RECYCLING_BIN_GEODE]);
-			}*/
+			}
 
 			this->addChild(transforms[data.id_str]);
 		}

@@ -16,9 +16,9 @@ protected:
 	float attackRange;
 	float attackInterval;
 
-	Minion(int health, int attack, float range, SceneManager_Server* sm); //accept values for other types of minions
+	Minion(std::string id, int health, int attack, float range, SceneManager_Server* sm); //accept values for other types of minions
 public:
-	Minion(SceneManager_Server* sm); //basic minion spawned by claw tower
+	Minion(std::string id, SceneManager_Server* sm); //basic minion spawned by claw tower
 	
 	void update(float deltaTime) override;
 	void setHealth(int new_health) override;

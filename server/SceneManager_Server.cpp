@@ -25,7 +25,7 @@ void SceneManager_Server::processInput(std::string player, PlayerInput in) {
 
 bool SceneManager_Server::addPlayer(std::string player_id) {
 	if (idMap.find(player_id) == idMap.end()) { //player_id not in map, create a new player
-		idMap[player_id] = new Player(this);
+		idMap[player_id] = new Player(player_id, this);
 		std::cout << "created new player id: " << player_id << " at " << idMap[player_id] << "\n";
 
 		return true; //return true that a player was added
@@ -38,11 +38,14 @@ bool SceneManager_Server::addPlayer(std::string player_id) {
 void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, float rot_y) {
 	Entity* ent;
 	int id_int;
+	std::string id_str;
 
 	switch (spawnType) {
 	case BASE_TYPE:
-		ent = new Base(this);
 		id_int = next_base_id;
+		id_str = std::to_string(id_int);
+		ent = new Base(id_str, this);
+
 		do {
 			next_base_id = next_base_id + 1 > ID_BASE_MAX ? ID_BASE_MIN : next_base_id + 1;
 			if (next_base_id == id_int) { //wrapped all the way around, all id's taken
@@ -52,8 +55,10 @@ void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, 
 		} while (idMap.find(std::to_string(next_base_id)) != idMap.end());
 		break;
 	case MINION_TYPE:
-		ent = new Minion(this);
+		
 		id_int = next_minion_id;
+		id_str = std::to_string(id_int);
+		ent = new Minion(id_str, this);
 		do {
 			next_minion_id = next_minion_id + 1 > ID_MINION_MAX ? ID_MINION_MIN : next_minion_id + 1;
 			if (next_minion_id == id_int) { //wrapped all the way around, all id's taken
@@ -63,8 +68,10 @@ void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, 
 		} while (idMap.find(std::to_string(next_minion_id)) != idMap.end());
 		break;
 	case SUPER_MINION_TYPE:
-		ent = new SuperMinion(this);
 		id_int = next_super_minion_id;
+		id_str = std::to_string(id_int);
+		ent = new SuperMinion(id_str, this);
+
 		do {
 			next_super_minion_id = next_super_minion_id + 1 > ID_SUPER_MINION_MAX ? ID_SUPER_MINION_MIN : next_super_minion_id + 1;
 			if (next_super_minion_id == id_int) { //wrapped all the way around, all id's taken
@@ -74,8 +81,10 @@ void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, 
 		} while (idMap.find(std::to_string(next_super_minion_id)) != idMap.end());
 		break;
 	case LASER_TYPE:
-		ent = new LaserTower(this);
 		id_int = next_laser_id;
+		id_str = std::to_string(id_int);
+		ent = new LaserTower(id_str, this);
+
 		do {
 			next_laser_id = next_laser_id + 1 > ID_LASER_MAX ? ID_LASER_MIN : next_laser_id + 1;
 			if (next_laser_id == id_int) { //wrapped all the way around, all id's taken
@@ -85,8 +94,10 @@ void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, 
 		} while (idMap.find(std::to_string(next_laser_id)) != idMap.end());
 		break;
 	case CLAW_TYPE:
-		ent = new ClawTower(this);
 		id_int = next_claw_id;
+		id_str = std::to_string(id_int);
+		ent = new ClawTower(id_str, this);
+
 		do {
 			next_claw_id = next_claw_id + 1 > ID_CLAW_MAX ? ID_CLAW_MIN : next_claw_id + 1;
 			if (next_claw_id == id_int) { //wrapped all the way around, all id's taken
@@ -96,8 +107,10 @@ void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, 
 		} while (idMap.find(std::to_string(next_claw_id)) != idMap.end());
 		break;
 	case DUMPSTER_TYPE:
-		ent = new Resource(DUMPSTER_TYPE, this);
 		id_int = next_dumpster_id;
+		id_str = std::to_string(id_int);
+		ent = new Resource(DUMPSTER_TYPE, id_str, this);
+
 		do {
 			next_dumpster_id = next_dumpster_id + 1 > ID_DUMPSTER_MAX ? ID_DUMPSTER_MIN : next_dumpster_id + 1;
 			if (next_dumpster_id == id_int) { //wrapped all the way around, all id's taken
@@ -107,8 +120,10 @@ void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, 
 		} while (idMap.find(std::to_string(next_dumpster_id)) != idMap.end());
 		break;
 	case RECYCLING_BIN_TYPE:
-		ent = new Resource(RECYCLING_BIN_TYPE, this);
 		id_int = next_recycling_bin_id;
+		id_str = std::to_string(id_int);
+		ent = new Resource(RECYCLING_BIN_TYPE, id_str, this);
+
 		do {
 			next_recycling_bin_id = next_recycling_bin_id + 1 > ID_RECYCLING_BIN_MAX ? ID_RECYCLING_BIN_MIN : next_recycling_bin_id + 1;
 			if (next_recycling_bin_id == id_int) { //wrapped all the way around, all id's taken
@@ -118,14 +133,15 @@ void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, 
 		} while (idMap.find(std::to_string(next_recycling_bin_id)) != idMap.end());
 		break;
 	default:
-		ent = new Minion(this);
 		id_int = -1;
+		id_str = std::to_string(id_int);
+		ent = new Minion(id_str, this);
 		std::cout << "spawnEntity encountered unknown entity type " << spawnType << "\n";
 	}
 
 	GameObject::GameObjectData data = { pos_x, pos_z, rot_y };
 	ent->setGOData(data);
-	idMap[std::to_string(id_int)] = ent;
+	idMap[id_str] = ent;
 }
 
 bool SceneManager_Server::checkEntityAlive(std::string id) {
@@ -141,7 +157,7 @@ void SceneManager_Server::update(float deltaTime) {
 		else { //otherwise, update normally
 			idEntPair.second->update(deltaTime);
 
-			// THIS IS FOR OBJECT DETECTIOPN DEBUGGING. REMOVE LATER
+			// THIS IS FOR OBJECT DETECTION DEBUGGING. REMOVE LATER
 			//ObjectDetection::updateObject(idMap["0"]);
 			//GameObject* nearest = ObjectDetection::getNearestObject(idMap["0"], DETECTION_FLAG_TOWER, 10);
 			//if (nearest) {
@@ -226,37 +242,113 @@ void SceneManager_Server::populateScene() { //testing only
 	//NOTE: number of objects should not exceed sendbuf capacity
 	//sendbufsize >= (NUM_PLAYERS * 20) + (# of minions and towers * 23) + 1
 	srand((unsigned int)time(NULL));
-	for (int i = 0; i < 12; i++) {
+	//spawn standard minions
+	for (int i = 0; i < 4; i++) {
 		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
 		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
 		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
 		float s = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
 
+		std::string id_str = std::to_string(next_minion_id);
 		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		Minion* m = new Minion(this);
+		Minion* m = new Minion(id_str, this);
 		m->setMatrix(transform);
-		idMap[std::to_string(next_minion_id)] = m;
+		idMap[id_str] = m;
 
-		std::cout << "created new minion: " << std::to_string(next_minion_id) << " at " << idMap[std::to_string(next_minion_id)] << "\n";
+		std::cout << "created new minion: " << id_str << " at " << idMap[id_str] << "\n";
 
 		next_minion_id++;
 		if (next_minion_id == ID_MINION_MAX) next_minion_id = ID_MINION_MIN;
 	}
-	for (int i = 0; i < 5; i++) {
+	//spawn super minions
+	for (int i = 0; i < 4; i++) {
 		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
 		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
 		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
 		float s = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
 
+		std::string id_str = std::to_string(next_super_minion_id);
 		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		ClawTower* t = new ClawTower(this);
-		t->setMatrix(transform);
-		idMap[std::to_string(next_claw_id)] = t;
+		SuperMinion* sm = new SuperMinion(id_str, this);
+		sm->setMatrix(transform);
+		idMap[id_str] = sm;
 
-		std::cout << "created new claw tower: " << std::to_string(next_claw_id) << " at " << idMap[std::to_string(next_claw_id)] << "\n";
+		std::cout << "created new super minion: " << id_str << " at " << idMap[id_str] << "\n";
+
+		next_super_minion_id++;
+		if (next_super_minion_id == ID_SUPER_MINION_MAX) next_super_minion_id = ID_SUPER_MINION_MIN;
+	}
+	//spawn laser towers
+	for (int i = 0; i < 4; i++) { 
+		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
+		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
+		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
+		float s = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
+
+		std::string id_str = std::to_string(next_laser_id);
+		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
+		LaserTower* l = new LaserTower(id_str, this);
+		l->setMatrix(transform);
+		idMap[id_str] = l;
+
+		std::cout << "created new laser tower: " << id_str << " at " << idMap[id_str] << "\n";
+
+		next_laser_id++;
+		if (next_laser_id == ID_LASER_MAX) next_laser_id = ID_LASER_MIN;
+	}
+	//spawn claw towers
+	for (int i = 0; i < 4; i++) {
+		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
+		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
+		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
+		float s = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
+
+		std::string id_str = std::to_string(next_claw_id);
+		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
+		ClawTower* c = new ClawTower(id_str, this);
+		c->setMatrix(transform);
+		idMap[id_str] = c;
+
+		std::cout << "created new claw tower: " << id_str << " at " << idMap[id_str] << "\n";
 
 		next_claw_id++;
 		if (next_claw_id == ID_CLAW_MAX) next_claw_id = ID_CLAW_MIN;
+	}
+	//spawn dumpsters
+	for (int i = 0; i < 4; i++) {
+		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
+		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
+		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
+		float s = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
+
+		std::string id_str = std::to_string(next_dumpster_id);
+		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
+		Resource* d = new Resource(DUMPSTER_TYPE, id_str, this);
+		d->setMatrix(transform);
+		idMap[id_str] = d;
+
+		std::cout << "created new dumpster: " << id_str << " at " << idMap[id_str] << "\n";
+
+		next_dumpster_id++;
+		if (next_dumpster_id == ID_DUMPSTER_MAX) next_dumpster_id = ID_DUMPSTER_MIN;
+	}
+	//spawn recycling bins
+	for (int i = 0; i < 4; i++) {
+		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
+		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
+		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
+		float s = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
+
+		std::string id_str = std::to_string(next_recycling_bin_id);
+		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
+		Resource* r = new Resource(RECYCLING_BIN_TYPE, id_str, this);
+		r->setMatrix(transform);
+		idMap[id_str] = r;
+
+		std::cout << "created new recycling bin: " << id_str << " at " << idMap[id_str] << "\n";
+
+		next_recycling_bin_id++;
+		if (next_recycling_bin_id == ID_RECYCLING_BIN_MAX) next_recycling_bin_id = ID_RECYCLING_BIN_MIN;
 	}
 }
 

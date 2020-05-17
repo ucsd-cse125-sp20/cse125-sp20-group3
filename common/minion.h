@@ -5,6 +5,7 @@
 #include "entity.h"
 #include "team.h"
 #include "ObjectDetection.h"
+#include "mapNode.h"
 #include <iostream>
 #include <chrono>
 #include <ctime>

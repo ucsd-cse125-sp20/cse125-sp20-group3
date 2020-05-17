@@ -438,8 +438,4 @@ void SceneManager_Server::populateMap() {
 	(*map)[29]->setNextBlue((*map)[8]);
 	(*map)[30] = new mapNode(32.5, 42.5);
 	(*map)[30]->setNextBlue((*map)[2]);
-	for(int i = 0; i <= map->size(); i++)
-	{
-		ObjectDetection::addObject((*map)[i]);
-	}
 }

@@ -29,7 +29,7 @@ public:
 	
 	void update(float deltaTime) override;
 	void setHealth(int new_health) override;
-	void move();
+	void move(float deltaTime);
 	void attack();
 };
 

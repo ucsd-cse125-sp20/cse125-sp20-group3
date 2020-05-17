@@ -8,7 +8,7 @@ Minion::Minion(string id, SceneManager_Server* sm) : Entity(id, MINION_HEALTH, M
 	attackRange = MINION_ATK_RANGE;
 	attackInterval = MINION_ATK_INTERVAL;
 	ObjectDetection::addObject(this, DETECTION_FLAG_MINION | DETECTION_FLAG_ENTITY);
-	curNode = ObjectDetection::getNearestObject(this, DETECTION_FLAG_MAP_NODE, MINION_MV_RANGE);
+	curNode = (mapNode*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_MAP_NODE, MINION_MV_RANGE);
 }
 
 Minion::Minion(string id, int health, int attack, float range, SceneManager_Server* sm) : Entity(id, health, attack, sm) {
@@ -17,7 +17,7 @@ Minion::Minion(string id, int health, int attack, float range, SceneManager_Serv
 	attackRange = range;
 	attackInterval = MINION_ATK_INTERVAL;
 	ObjectDetection::addObject(this, DETECTION_FLAG_MINION | DETECTION_FLAG_ENTITY);
-	curNode = ObjectDetection::getNearestObject(this, DETECTION_FLAG_MAP_NODE, MINION_MV_RANGE);
+	curNode = (mapNode*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_MAP_NODE, MINION_MV_RANGE);
 }
 
 void Minion::update(float deltaTime) { //should they be able to switch attack targets instantaneously?
@@ -70,18 +70,18 @@ void Minion::move(float deltaTime) {
 				else velocity_x = -1 * MINION_VELOCITY;
 			}
 			else {
-				if (velocity_y > 0) velocity_y = MINION_VELOCITY;
-				else velocity_y = -1 * MINION_VELOCITY;
+				if (velocity_z > 0) velocity_z = MINION_VELOCITY;
+				else velocity_z = -1 * MINION_VELOCITY;
 			}
 		}
 		else {
 			velocity_x = 0;
-			velocity_y = 0;
+			velocity_z = 0;
 		}
 		curNode = nextPtr;
 	}
 	model[3][0] += velocity_x*deltaTime + model[3][0];
-	model[3][2] += velocity_y*deltaTime + model[3][2];
+	model[3][2] += velocity_z*deltaTime + model[3][2];
 	vec3 forward = normalize(vec3(model[3][0]-lastXPos, 0, model[3][2]-lastZPos));
 	vec3 right = cross(forward, vec3(0, 1, 0));
 	model[0] = vec4(right, 0);

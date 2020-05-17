@@ -1,6 +1,7 @@
 #ifndef _MAPNODE_H_
 #define _MAPNODE_H_
 #include "GameObject.h"
+#include "ObjectDetection.h"
 
 class mapNode : public GameObject {
     public:

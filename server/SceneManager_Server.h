@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 #include "../common/entity.h"
 #include "../common/client2server.h"
 #include "../common/macros.h"
@@ -17,6 +18,7 @@
 #include "../common/resource.h"
 
 #include "../common/ObjectDetection.h"
+#include "../common/mapNode.h"
 
 class SceneManager_Server {
 private:
@@ -26,6 +28,7 @@ private:
 
 public:
 	std::map<std::string, Entity*> idMap;
+	std::vector<mapNode*> *map;
 
 	SceneManager_Server();
 	void processInput(std::string player, PlayerInput in);
@@ -37,6 +40,8 @@ public:
 	int encodeScene(char buf[], int start_index);
 
 	void populateScene();
+
+	void populateMap();
 };
 
 #endif

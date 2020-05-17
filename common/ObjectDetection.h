@@ -21,6 +21,7 @@
 #define DETECTION_FLAG_MINION 1 << 5
 #define DETECTION_FLAG_TOWER 1 << 6
 #define DETECTION_FLAG_COLLIDABLE 1 << 7
+#define DETECTION_FLAG_MAP_NODE 1 << 8
 
 class ObjectDetection {
 private:

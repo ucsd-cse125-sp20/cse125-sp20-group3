@@ -13,6 +13,11 @@ Team::Team() {
     towerCount = 0;
 }
 
+Team::Team(int color) {
+	this->teamColor = color;
+	Team::Team();
+}
+
 void Team::update() {
     //send the base health, unitCount and towerCount
 }

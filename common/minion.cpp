@@ -1,31 +1,23 @@
 #include "minion.h"
 #include "../server/SceneManager_Server.h"
 
-map<tuple<float, float>, vector<tuple<float, float>>> Minion::pathMap;
-
 Minion::Minion(string id, SceneManager_Server* sm) : Entity(id, MINION_HEALTH, MINION_ATTACK, sm) {
 	//init stuff
-	pathPtr = 0;
-	//path initialization
-	tuple<float, float> bornLoc = make_tuple(model[3][0], model[3][2]);
-	path = pathMap[bornLoc];
 	timeElapsed = 0;
 	attackTarget = NULL;
 	attackRange = MINION_ATK_RANGE;
 	attackInterval = MINION_ATK_INTERVAL;
 	ObjectDetection::addObject(this, DETECTION_FLAG_MINION | DETECTION_FLAG_ENTITY);
+	curNode = ObjectDetection::getNearestObject(this, 1, MINION_MV_RANGE);
 }
 
 Minion::Minion(string id, int health, int attack, float range, SceneManager_Server* sm) : Entity(id, health, attack, sm) {
 	timeElapsed = 0;
-	pathPtr = 0;
-	//path initialization
-	tuple<float, float> bornLoc = make_tuple(model[3][0], model[3][2]);
-	path = pathMap[bornLoc];
 	attackTarget = NULL;
 	attackRange = range;
 	attackInterval = MINION_ATK_INTERVAL;
 	ObjectDetection::addObject(this, DETECTION_FLAG_MINION | DETECTION_FLAG_ENTITY);
+	curNode = ObjectDetection::getNearestObject(this, 1, MINION_MV_RANGE);
 }
 
 void Minion::update(float deltaTime) { //should they be able to switch attack targets instantaneously?
@@ -35,7 +27,7 @@ void Minion::update(float deltaTime) { //should they be able to switch attack ta
 		timeElapsed = 0;
 	}
 	else {
-		this->move();
+		this->move(deltaTime);
 	}
 }
 
@@ -56,17 +48,42 @@ void Minion::attack() {
 	}	
 }
 
-void Minion::move() {
-	/*if (pathPtr < path.size) {
-		tuple<float, float> nextPos = path[pathPtr];
-		float lastXPos = model[3][0];
-		float lastZPos = model[3][2];
-		model[3][0] += (get<0>(nextPos) - lastXPos) * deltaTime;
-		model[3][2] += (get<1>(nextPos) - lastZPos) * deltaTime;
-		vec3 forward = normalize(vec3(model[3][0]-lastXPos, 0, model[3][2]-lastZPos));
-		vec3 right = cross(forward, vec3(0, 1, 0));
-		model[0] = vec4(right, 0);
-		model[2] = vec4(-forward, 0);
-		pathPtr++;
-	}*/
+void Minion::move(float deltaTime) {
+	float lastXPos = model[3][0];
+	float lastZPos = model[3][2];
+	GameObjectData curNodeData = curNode->getData();
+	float curXPos = curNodeData.x;
+	float curZPos = curNodeData.z;
+	if (curXPos == lastXPos && curZPos == lastZPos) {
+		mapNode* nextPtr;
+		if (this->team->teamColor == RED_TEAM) nextPtr = this->curNode->next_red;
+		else nextPtr = this->curNode->next_blue;
+		if (nextPtr != nullptr) {
+			//recalculating velocity
+			GameObjectData nextNodeData = nextPtr->getData();
+			float nextXPos = nextNodeData.x;
+			float nextZPos = nextNodeData.z;
+			velocity_x = nextXPos - curXPos;
+			velocity_z = nextZPos - curZPos;
+			if (velocity_x != 0) {
+				if (velocity_x > 0) velocity_x = MINION_VELOCITY;
+				else velocity_x = -1 * MINION_VELOCITY;
+			}
+			else {
+				if (velocity_y > 0) velocity_y = MINION_VELOCITY;
+				else velocity_y = -1 * MINION_VELOCITY;
+			}
+		}
+		else {
+			velocity_x = 0;
+			velocity_y = 0;
+		}
+		curNode = nextPtr;
+	}
+	model[3][0] += velocity_x*deltaTime + model[3][0];
+	model[3][2] += velocity_y*deltaTime + model[3][2];
+	vec3 forward = normalize(vec3(model[3][0]-lastXPos, 0, model[3][2]-lastZPos));
+	vec3 right = cross(forward, vec3(0, 1, 0));
+	model[0] = vec4(right, 0);
+	model[2] = vec4(-forward, 0);
 }

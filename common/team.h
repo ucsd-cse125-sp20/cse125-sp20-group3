@@ -21,8 +21,10 @@ private:
     int towerCount;
     //TODO: Add resources
 public:
+    int teamColor;
     Team(std::string objFilename);
     Team();
+    Team(int color);
     void update();
     void incTower();
 	void decTower();

@@ -13,10 +13,10 @@ using namespace std;
 
 class Minion : public Entity {
 private:
-	int pathPtr;
-	static map<tuple<float, float>, vector<tuple<float, float>>> pathMap; 
-	vector<tuple<float, float>> path;
+	mapNode* curNode;
 protected:
+	float velocity_x;
+	float velocity_z;
 	float timeElapsed;
 	Entity* attackTarget;
 	float attackRange;

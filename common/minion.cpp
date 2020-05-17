@@ -8,7 +8,7 @@ Minion::Minion(string id, SceneManager_Server* sm) : Entity(id, MINION_HEALTH, M
 	attackRange = MINION_ATK_RANGE;
 	attackInterval = MINION_ATK_INTERVAL;
 	ObjectDetection::addObject(this, DETECTION_FLAG_MINION | DETECTION_FLAG_ENTITY);
-	curNode = ObjectDetection::getNearestObject(this, 1, MINION_MV_RANGE);
+	curNode = ObjectDetection::getNearestObject(this, DETECTION_FLAG_MAP_NODE, MINION_MV_RANGE);
 }
 
 Minion::Minion(string id, int health, int attack, float range, SceneManager_Server* sm) : Entity(id, health, attack, sm) {
@@ -17,7 +17,7 @@ Minion::Minion(string id, int health, int attack, float range, SceneManager_Serv
 	attackRange = range;
 	attackInterval = MINION_ATK_INTERVAL;
 	ObjectDetection::addObject(this, DETECTION_FLAG_MINION | DETECTION_FLAG_ENTITY);
-	curNode = ObjectDetection::getNearestObject(this, 1, MINION_MV_RANGE);
+	curNode = ObjectDetection::getNearestObject(this, DETECTION_FLAG_MAP_NODE, MINION_MV_RANGE);
 }
 
 void Minion::update(float deltaTime) { //should they be able to switch attack targets instantaneously?

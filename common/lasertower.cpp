@@ -10,11 +10,11 @@ LaserTower::LaserTower(std::string id, SceneManager_Server* sm_server) : Tower(i
 }
 
 void LaserTower::update(float deltaTime) { //should they be able to switch attack targets instantaneously?
-	timeElapsed += deltaTime;
+	/*timeElapsed += deltaTime;
 	if (timeElapsed >= attackInterval) {
 		this->attack();
 		timeElapsed = 0;
-	}
+	}*/
 }
 
 void LaserTower::attack() {

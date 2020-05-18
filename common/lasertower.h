@@ -7,7 +7,7 @@ class LaserTower : public Tower {
 private:
 	float timeElapsed;
 	Entity* attackTarget;
-	float attackRange;
+	int attackRange;
 	float attackInterval;
 public:
 	LaserTower(std::string id, SceneManager_Server* sm_server);

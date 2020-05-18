@@ -4,86 +4,82 @@
 Minion::Minion(string id, SceneManager_Server* sm) : Entity(id, MINION_HEALTH, MINION_ATTACK, sm) {
 	//init stuff
 	timeElapsed = 0;
-	attackTarget = NULL;
+	attackTarget = nullptr;
 	attackRange = MINION_ATK_RANGE;
 	attackInterval = MINION_ATK_INTERVAL;
-	ObjectDetection::addObject(this, DETECTION_FLAG_MINION | DETECTION_FLAG_ENTITY);
-	curNode = (mapNode*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_MAP_NODE, MINION_MV_RANGE);
+	ObjectDetection::addObject(this, DETECTION_FLAG_MINION | DETECTION_FLAG_ENTITY); //TODO do team flag stuff
+	destNode = (mapNode*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_MAP_NODE, 50); //TODO unbounded radius check
 }
 
-Minion::Minion(string id, int health, int attack, float range, SceneManager_Server* sm) : Entity(id, health, attack, sm) {
+Minion::Minion(string id, int health, int attack, int range, SceneManager_Server* sm) : Entity(id, health, attack, sm) {
 	timeElapsed = 0;
-	attackTarget = NULL;
+	attackTarget = nullptr;
 	attackRange = range;
 	attackInterval = MINION_ATK_INTERVAL;
 	ObjectDetection::addObject(this, DETECTION_FLAG_MINION | DETECTION_FLAG_ENTITY);
-	curNode = (mapNode*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_MAP_NODE, MINION_MV_RANGE);
+	destNode = (mapNode*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_MAP_NODE, MINION_MV_RANGE);
 }
 
 void Minion::update(float deltaTime) { //should they be able to switch attack targets instantaneously?
-	timeElapsed += deltaTime;
-	if (timeElapsed >= attackInterval) {
-		this->attack();
-		timeElapsed = 0;
+	timeElapsed += deltaTime; //increase elapsedTime
+
+	if (attackTarget != nullptr && !manager->checkEntityAlive(attackTarget->getIDstr())) //first, if there was an attack target, check if it's still alive
+			attackTarget = nullptr; //do this check here instead of after attacking in the case of multiple entities targeting one entity
+
+	if (this->attackTarget == nullptr) //next, if not currently targeting something, check if there is a valid enemy in range
+			attackTarget = (Entity*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_MINION | DETECTION_FLAG_TOWER, attackRange);
+
+	if (attackTarget != nullptr) { //if this minion should be attacking something, don't move
+		if (timeElapsed >= attackInterval) { //only attack on an interval
+			this->attack();
+			timeElapsed = 0;
+		}
 	}
-	else {
+	else { //no attack target after all checks, move
 		this->move(deltaTime);
 	}
 }
 
 void Minion::setHealth(int new_health) {
 	Entity::setHealth(new_health);
-	if (health <= 0) team->decUnit();
+	if (health <= 0) team->decUnit(); //TODO move this into an overriden takeDamage
 }
 
 void Minion::attack() {
-	if (this->attackTarget == nullptr) {
-		attackTarget = (Entity*)ObjectDetection::getNearestObject(this, 1, attackRange);
-		if (this->isEnemyTeam(attackTarget->team) == false || !manager->checkEntityAlive(attackTarget->getIDstr())) attackTarget = nullptr; 
-	}
-	if (attackTarget != nullptr) {
-		attackTarget->takeDamage(this->attackDamage);
-		int enemyHealth = attackTarget->getHealth();
-		if (!manager->checkEntityAlive(attackTarget->getIDstr())) attackTarget = nullptr;
-	}	
+	attackTarget->takeDamage(this->attackDamage);
+	//TODO manipulate necessary data to spawn particle systems
 }
 
 void Minion::move(float deltaTime) {
-	float lastXPos = model[3][0];
-	float lastZPos = model[3][2];
-	GameObjectData curNodeData = curNode->getData();
-	float curXPos = curNodeData.x;
-	float curZPos = curNodeData.z;
-	if (curXPos == lastXPos && curZPos == lastZPos) {
-		mapNode* nextPtr;
-		if (this->team->teamColor == RED_TEAM) nextPtr = this->curNode->next_red;
-		else nextPtr = this->curNode->next_blue;
-		if (nextPtr != nullptr) {
-			//recalculating velocity
-			GameObjectData nextNodeData = nextPtr->getData();
-			float nextXPos = nextNodeData.x;
-			float nextZPos = nextNodeData.z;
-			velocity_x = nextXPos - curXPos;
-			velocity_z = nextZPos - curZPos;
-			if (velocity_x != 0) {
-				if (velocity_x > 0) velocity_x = MINION_VELOCITY;
-				else velocity_x = -1 * MINION_VELOCITY;
-			}
+	float remaining_move_dist = MINION_VELOCITY * deltaTime; //full movement distance this minion travels this tick
+
+	while (remaining_move_dist > 0) { //while this minion still has distance to move
+		vec3 dest_vec = destNode->getPosition() - this->getPosition(); //vector to reach destNode
+		float dest_dist = length(dest_vec); //distance between this and destNode
+		float move_dist = std::min(remaining_move_dist, dest_dist); //this iteration, move full move_dist, or only to destNode if closer
+
+		vec3 move_vec = normalize(dest_vec) * move_dist; //move calculated distance along vector to destination
+
+		float lastXPos = model[3][0];
+		float lastZPos = model[3][2];
+		model[3][0] += move_vec[0];
+		model[3][2] += move_vec[2];
+		remaining_move_dist -= move_dist; //decrease remaining movement distance
+		vec3 forward = normalize(vec3(model[3][0] - lastXPos, 0, model[3][2] - lastZPos)); //TODO check vectors?
+		vec3 right = cross(forward, vec3(0, 1, 0));
+		model[0] = vec4(right, 0);
+		model[2] = vec4(-forward, 0);
+
+		if (this->getPosition() == destNode->getPosition()) { //reached destNode with this iteration
+			mapNode* nextNode; //continue moving to the next node
+			if (true/*this->team->teamColor == RED_TEAM*/) nextNode = this->destNode->next_red; //TODO do team stuff
+			else nextNode = this->destNode->next_blue;
+
+			if (nextNode != nullptr) this->destNode = nextNode; 
 			else {
-				if (velocity_z > 0) velocity_z = MINION_VELOCITY;
-				else velocity_z = -1 * MINION_VELOCITY;
+				std::cout << "minion reached the end of the path!\n";
+				break;
 			}
 		}
-		else {
-			velocity_x = 0;
-			velocity_z = 0;
-		}
-		curNode = nextPtr;
 	}
-	model[3][0] += velocity_x*deltaTime + model[3][0];
-	model[3][2] += velocity_z*deltaTime + model[3][2];
-	vec3 forward = normalize(vec3(model[3][0]-lastXPos, 0, model[3][2]-lastZPos));
-	vec3 right = cross(forward, vec3(0, 1, 0));
-	model[0] = vec4(right, 0);
-	model[2] = vec4(-forward, 0);
 }

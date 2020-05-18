@@ -14,16 +14,14 @@ using namespace std;
 
 class Minion : public Entity {
 private:
-	mapNode* curNode;
+	mapNode* destNode;
 protected:
-	float velocity_x;
-	float velocity_z;
 	float timeElapsed;
 	Entity* attackTarget;
-	float attackRange;
+	int attackRange;
 	float attackInterval;
 
-	Minion(string id, int health, int attack, float range, SceneManager_Server* sm); //accept values for other types of minions
+	Minion(string id, int health, int attack, int range, SceneManager_Server* sm); //accept values for other types of minions
 public:
 	Minion(string id, SceneManager_Server* sm); //basic minion spawned by claw tower
 	

@@ -13,9 +13,10 @@ SceneManager_Server::SceneManager_Server() :
 	next_dumpster_id(ID_DUMPSTER_MIN),
 	next_recycling_bin_id(ID_RECYCLING_BIN_MIN)
 {
-
 	//team1 = new Team();
 	//team2 = new Team();
+
+	this->populateMap();
 
 	this->populateScene();
 }
@@ -239,6 +240,86 @@ int SceneManager_Server::encodeScene(char buf[], int start_index) {
 	return i;
 }
 
+void SceneManager_Server::populateMap() {
+	std::vector<mapNode*> nodeMap;
+	nodeMap.push_back(new mapNode(7.5, 17.5));
+	nodeMap.push_back(new mapNode(22.5, 17.5));
+	nodeMap[0]->setNextRed(nodeMap[1]);
+	nodeMap.push_back(new mapNode(22.5, 42.5));
+	nodeMap[1]->setNextRed(nodeMap[2]);
+	nodeMap.push_back(new mapNode(22.5, 57.5));
+	nodeMap[2]->setNextRed(nodeMap[3]);
+	nodeMap.push_back(new mapNode(22.5, 72.5));
+	nodeMap[3]->setNextRed(nodeMap[4]);
+	nodeMap.push_back(new mapNode(57.5, 72.5));
+	nodeMap[4]->setNextRed(nodeMap[5]);
+	nodeMap.push_back(new mapNode(57.5, 52.5));
+	nodeMap[5]->setNextRed(nodeMap[6]);
+	nodeMap.push_back(new mapNode(67.5, 52.5));
+	nodeMap[6]->setNextRed(nodeMap[7]);
+	nodeMap.push_back(new mapNode(82.5, 52.5));
+	nodeMap[7]->setNextRed(nodeMap[8]);
+	nodeMap.push_back(new mapNode(107.5, 52.5));
+	nodeMap[8]->setNextRed(nodeMap[9]);
+	nodeMap.push_back(new mapNode(107.5, 72.5));
+	nodeMap[9]->setNextRed(nodeMap[10]);
+	nodeMap.push_back(new mapNode(117.5, 72.5));
+	nodeMap[10]->setNextRed(nodeMap[11]);
+	nodeMap.push_back(new mapNode(32.5, 17.5));
+	nodeMap[12]->setNextRed(nodeMap[1]);
+	nodeMap.push_back(new mapNode(47.5, 32.5));
+	nodeMap.push_back(new mapNode(67.5, 32.5));
+	nodeMap[13]->setNextRed(nodeMap[14]);
+	nodeMap[14]->setNextRed(nodeMap[7]);
+	nodeMap.push_back(new mapNode(67.5, 17.5));
+	nodeMap[15]->setNextRed(nodeMap[14]);
+	nodeMap.push_back(new mapNode(107.5, 17.5));
+	nodeMap[16]->setNextRed(nodeMap[9]);
+	nodeMap.push_back(new mapNode(67.5, 7.5));
+	nodeMap[17]->setNextRed(nodeMap[15]);
+	nodeMap.push_back(new mapNode(17.5, 72.5));
+	nodeMap[18]->setNextRed(nodeMap[4]);
+	nodeMap.push_back(new mapNode(82.5, 82.5));
+	nodeMap.push_back(new mapNode(102.5, 82.5));
+	nodeMap[19]->setNextRed(nodeMap[20]);
+	nodeMap.push_back(new mapNode(102.5, 72.5));
+	nodeMap[20]->setNextRed(nodeMap[21]);
+	nodeMap.push_back(new mapNode(47.5, 57.5));
+	nodeMap[22]->setNextRed(nodeMap[13]);
+	nodeMap[11]->setNextBlue(nodeMap[10]);
+	nodeMap[10]->setNextBlue(nodeMap[9]);
+	nodeMap[9]->setNextBlue(nodeMap[8]);
+	nodeMap[8]->setNextBlue(nodeMap[7]);
+	nodeMap[7]->setNextBlue(nodeMap[6]);
+	nodeMap[6]->setNextBlue(nodeMap[5]);
+	nodeMap[5]->setNextBlue(nodeMap[4]);
+	nodeMap[4]->setNextBlue(nodeMap[3]);
+	nodeMap[3]->setNextBlue(nodeMap[2]);
+	nodeMap[2]->setNextBlue(nodeMap[1]);
+	nodeMap[1]->setNextBlue(nodeMap[0]);
+	nodeMap[12]->setNextBlue(nodeMap[1]);
+	nodeMap.push_back(new mapNode(12.5, 92.5));
+	nodeMap[23]->setNextBlue(nodeMap[18]);
+	nodeMap[18]->setNextBlue(nodeMap[4]);
+	nodeMap.push_back(new mapNode(82.5, 67.5));
+	nodeMap[24]->setNextBlue(nodeMap[8]);
+	nodeMap[19]->setNextBlue(nodeMap[24]);
+	nodeMap[20]->setNextBlue(nodeMap[19]);
+	nodeMap[16]->setNextBlue(nodeMap[9]);
+	nodeMap.push_back(new mapNode(92.5, 2.5));
+	nodeMap.push_back(new mapNode(92.5, 17.5));
+	nodeMap[25]->setNextBlue(nodeMap[26]);
+	nodeMap[26]->setNextBlue(nodeMap[16]);
+	nodeMap.push_back(new mapNode(122.5, 27.5));
+	nodeMap.push_back(new mapNode(107.5, 27.5));
+	nodeMap[27]->setNextBlue(nodeMap[28]);
+	nodeMap[28]->setNextBlue(nodeMap[9]);
+	nodeMap.push_back(new mapNode(82.5, 32.5));
+	nodeMap[29]->setNextBlue(nodeMap[8]);
+	nodeMap.push_back(new mapNode(32.5, 42.5));
+	nodeMap[30]->setNextBlue(nodeMap[2]);
+}
+
 void SceneManager_Server::populateScene() { //testing only
 	//NOTE: number of objects should not exceed sendbuf capacity
 	//sendbufsize >= (NUM_PLAYERS * 20) + (# of minions and towers * 23) + 1
@@ -359,83 +440,3 @@ void SceneManager_Server::populateScene() { //testing only
 		idEntPair.second->resetClock();
 	}
 }*/
-
-void SceneManager_Server::populateMap() {
-	map = new std::vector<mapNode*>();
-	(*map)[0] = new mapNode(7.5,17.5);
-	(*map)[1] = new mapNode(22.5, 17.5);
-	(*map)[0]->setNextRed((*map)[1]);
-	(*map)[2] = new mapNode(22.5, 42.5);
-	(*map)[1]->setNextRed((*map)[2]);
-	(*map)[3] = new mapNode(22.5, 57.5);
-	(*map)[2]->setNextRed((*map)[3]);
-	(*map)[4] = new mapNode(22.5, 72.5);
-	(*map)[3]->setNextRed((*map)[4]);
-	(*map)[5] = new mapNode(57.5, 72.5);
-	(*map)[4]->setNextRed((*map)[5]);
-	(*map)[6] = new mapNode(57.5, 52.5);
-	(*map)[5]->setNextRed((*map)[6]);
-	(*map)[7] = new mapNode(67.5, 52.5);
-	(*map)[6]->setNextRed((*map)[7]);
-	(*map)[8] = new mapNode(82.5, 52.5);
-	(*map)[7]->setNextRed((*map)[8]);
-	(*map)[9] = new mapNode(107.5, 52.5);
-	(*map)[8]->setNextRed((*map)[9]);
-	(*map)[10] = new mapNode(107.5, 72.5);
-	(*map)[9]->setNextRed((*map)[10]);
-	(*map)[11] = new mapNode(117.5, 72.5);
-	(*map)[10]->setNextRed((*map)[11]);
-	(*map)[12] = new mapNode(32.5, 17.5);
-	(*map)[12]->setNextRed((*map)[1]);
-	(*map)[13] = new mapNode(47.5, 32.5);
-	(*map)[14] = new mapNode(67.5, 32.5);
-	(*map)[13]->setNextRed((*map)[14]);
-	(*map)[14]->setNextRed((*map)[7]);
-	(*map)[15] = new mapNode(67.5, 17.5);
-	(*map)[15]->setNextRed((*map)[14]);
-	(*map)[16] = new mapNode(107.5, 17.5);
-	(*map)[16]->setNextRed((*map)[9]);
-	(*map)[17] = new mapNode(67.5, 7.5);
-	(*map)[17]->setNextRed((*map)[15]);
-	(*map)[18] = new mapNode(17.5, 72.5);
-	(*map)[18]->setNextRed((*map)[4]);
-	(*map)[19] = new mapNode(82.5, 82.5);
-	(*map)[20] = new mapNode(102.5, 82.5);
-	(*map)[19]->setNextRed((*map)[20]);
-	(*map)[21] = new mapNode(102.5, 72.5);
-	(*map)[20]->setNextRed((*map)[21]);
-	(*map)[22] = new mapNode(47.5, 57.5);
-	(*map)[22]->setNextRed((*map)[13]);
-	(*map)[11]->setNextBlue((*map)[10]);
-	(*map)[10]->setNextBlue((*map)[9]);
-	(*map)[9]->setNextBlue((*map)[8]);
-	(*map)[8]->setNextBlue((*map)[7]);
-	(*map)[7]->setNextBlue((*map)[6]);
-	(*map)[6]->setNextBlue((*map)[5]);
-	(*map)[5]->setNextBlue((*map)[4]);
-	(*map)[4]->setNextBlue((*map)[3]);
-	(*map)[3]->setNextBlue((*map)[2]);
-	(*map)[2]->setNextBlue((*map)[1]);
-	(*map)[1]->setNextBlue((*map)[0]);
-	(*map)[12]->setNextBlue((*map)[1]);
-	(*map)[23] = new mapNode(12.5, 92.5);
-	(*map)[23]->setNextBlue((*map)[18]);
-	(*map)[18]->setNextBlue((*map)[4]);
-	(*map)[24] = new mapNode(82.5, 67.5);
-	(*map)[24]->setNextBlue((*map)[8]);
-	(*map)[19]->setNextBlue((*map)[24]);
-	(*map)[20]->setNextBlue((*map)[19]);
-	(*map)[16]->setNextBlue((*map)[9]);
-	(*map)[25] = new mapNode(92.5, 2.5);
-	(*map)[26] = new mapNode(92.5, 17.5);
-	(*map)[25]->setNextBlue((*map)[26]);
-	(*map)[26]->setNextBlue((*map)[16]);
-	(*map)[27] = new mapNode(122.5, 27.5);
-	(*map)[28] = new mapNode(107.5, 27.5);
-	(*map)[27]->setNextBlue((*map)[28]);
-	(*map)[28]->setNextBlue((*map)[9]);
-	(*map)[29] = new mapNode(82.5, 32.5);
-	(*map)[29]->setNextBlue((*map)[8]);
-	(*map)[30] = new mapNode(32.5, 42.5);
-	(*map)[30]->setNextBlue((*map)[2]);
-}

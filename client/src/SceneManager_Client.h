@@ -16,6 +16,7 @@
 #include "../../common/macros.h"
 #include "../../common/GameObject.h"
 #include "../../common/entity.h"
+#include "../../common/team.h"
 #include "../../common/player.h"
 #include "../../common/base.h"
 #include "../../common/minion.h"
@@ -50,6 +51,8 @@ private:
     
     Buffer** instanceBuffer = NULL;
 	Buffer** boneBuffer = NULL;
+
+	Team *red_team, *blue_team;
 
 public:
 	enum class GeodeType {

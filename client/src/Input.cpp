@@ -99,17 +99,18 @@ bool Input::Init(WindowsDesc* window, UIApp* appUI, IApp* app, ICameraController
 	typedef bool(*CameraInputHandler)(InputActionContext* ctx);
 	static CameraInputHandler onCameraInput = [](InputActionContext* ctx)
 	{
-		if (!Input::appUI->IsFocused() && *ctx->pCaptured && ctx->mPhase == InputActionPhase::INPUT_ACTION_PHASE_PERFORMED) {
+		if (!Input::appUI->IsFocused() && *ctx->pCaptured) {
 			//printf("%f %f\n", Input::camera->getRotationXY().getX(), Input::camera->getRotationXY().getY());
 			//printf("%d %d %d %d", ctx->pCaptured[0], ctx->mBinding, ctx->mPhase, ctx->mDeviceType);
-			if ((Input::camera->getRotationXY().getX() < 0 && ctx->mFloat2.y > 0)
-				|| (Input::camera->getRotationXY().getX() > PI / 3 && ctx->mFloat2.y < 0)) {
-				float2 clipped(ctx->mFloat2.x, 0.0f);
-				Input::camera->onRotate(clipped);
-			}
-			else {
+			
+			//if ((Input::camera->getRotationXY().getX() < 0 && ctx->mFloat2.y >= 0)
+			//	|| (Input::camera->getRotationXY().getX() > PI / 3 && ctx->mFloat2.y <= 0)) {
+			//	float2 clipped(ctx->mFloat2.x, 0.0f);
+			//	Input::camera->onRotate(clipped);
+			//}
+			//else {
 				Input::camera->onRotate(ctx->mFloat2);
-			}
+			//}
 		}
 		return true;
 	};

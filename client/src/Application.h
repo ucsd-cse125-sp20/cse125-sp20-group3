@@ -18,6 +18,8 @@
 #include "Transform.h"
 #include "OzzGeode.h"
 
+#include "ParticleSystem.h"
+
 #include "../../common/client2server.h"
 
 
@@ -31,7 +33,8 @@ public:
 	struct UniformBlock
 	{
 		mat4 mProjectView;
-		mat4 mModel;
+		mat4 mProj;
+		mat4 mView;
 		mat4 mShadowLightViewProj;
 		vec4 mCameraPosition;
 		vec4 mLightColor[LIGHT_COUNT + 1];

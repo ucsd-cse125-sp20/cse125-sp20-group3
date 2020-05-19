@@ -31,13 +31,13 @@
     <Filter Include="Header Files\Networking">
       <UniqueIdentifier>{0105a183-08b2-4441-b134-20bf3bb5bc42}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Asset Loading">
-      <UniqueIdentifier>{b280c579-d225-446e-a27f-bc3cf3b71e0b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Networking">
       <UniqueIdentifier>{b50b7abf-a91f-4380-a87f-17a1af46aa6a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Asset Loading">
+    <Filter Include="Header Files\Render Objects">
+      <UniqueIdentifier>{b280c579-d225-446e-a27f-bc3cf3b71e0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Render Objects">
       <UniqueIdentifier>{76e39935-a8f5-4a49-a079-94efaaae9bf0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -82,10 +82,10 @@
       <Filter>Source Files\Networking</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\OzzObject.cpp">
-      <Filter>Source Files\Asset Loading</Filter>
+      <Filter>Source Files\Render Objects</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\GLTFObject.cpp">
-      <Filter>Source Files\Asset Loading</Filter>
+      <Filter>Source Files\Render Objects</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\OzzGeode.cpp">
       <Filter>Source Files\Scene Graph</Filter>
@@ -94,13 +94,16 @@
       <Filter>Source Files\Scene Graph</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\UIManager.cpp">
-      <Filter>Source Files\Asset Loading</Filter>
+      <Filter>Source Files\Render Objects</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\common\clawtower.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\common\resource.cpp">
       <Filter>Source Files\Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\ParticleSystem.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -111,9 +114,6 @@
       <Filter>Shaders\D3D12</Filter>
     </None>
     <None Include="..\..\..\..\src\Shaders\D3D12\FXAA.frag">
-      <Filter>Shaders\D3D12</Filter>
-    </None>
-    <None Include="..\..\..\..\src\Shaders\D3D12\profile.frag">
       <Filter>Shaders\D3D12</Filter>
     </None>
     <None Include="..\..\..\..\src\Shaders\D3D12\profile.vert">
@@ -185,6 +185,15 @@
     <None Include="..\..\..\..\src\Shaders\D3D12\skinning.vert">
       <Filter>Shaders\D3D12</Filter>
     </None>
+    <None Include="..\..\..\..\src\Shaders\D3D12\particle.frag">
+      <Filter>Shaders\D3D12</Filter>
+    </None>
+    <None Include="..\..\..\..\src\Shaders\D3D12\particle.vert">
+      <Filter>Shaders\D3D12</Filter>
+    </None>
+    <None Include="..\..\..\..\src\Shaders\D3D12\profile.frag">
+      <Filter>Shaders\D3D12</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\src\Object.h">
@@ -245,13 +254,13 @@
       <Filter>Header Files\Networking</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\GLTFObject.h">
-      <Filter>Header Files\Asset Loading</Filter>
+      <Filter>Header Files\Render Objects</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\cgltf\cgltf.h">
-      <Filter>Header Files\Asset Loading</Filter>
+      <Filter>Header Files\Render Objects</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\OzzObject.h">
-      <Filter>Header Files\Asset Loading</Filter>
+      <Filter>Header Files\Render Objects</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\OzzGeode.h">
       <Filter>Header Files\Scene Graph</Filter>
@@ -260,13 +269,16 @@
       <Filter>Header Files\Scene Graph</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\UIManager.h">
-      <Filter>Header Files\Asset Loading</Filter>
+      <Filter>Header Files\Render Objects</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\common\clawtower.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\common\resource.h">
       <Filter>Header Files\Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\ParticleSystem.h">
+      <Filter>Header Files\Render Objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

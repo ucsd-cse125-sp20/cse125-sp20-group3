@@ -105,18 +105,21 @@ Semaphore* pRenderCompleteSemaphores[IMAGE_COUNT] = { NULL };
 Shader* pShaderZPass = NULL;
 Shader* pMeshOptDemoShader = NULL;
 Shader* pShaderSkinning = NULL;
+Shader* pShaderParticles = NULL;
 Shader* pVignetteShader = NULL;
 Shader* pFXAAShader = NULL;
 
 Pipeline* pPipelineShadowPass = NULL;
 Pipeline* pMeshOptDemoPipeline = NULL;
 Pipeline* pPipelineSkinning = NULL;
+Pipeline* pPipelineParticles = NULL;
 Pipeline* pVignettePipeline = NULL;
 Pipeline* pFXAAPipeline = NULL;
 
 RootSignature* pRootSignatureShadow = NULL;
 RootSignature* pRootSignatureShaded = NULL;
 RootSignature* pRootSignatureSkinning = NULL; // TODO merge into shaded RS
+RootSignature* pRootSignatureParticles = NULL; // TODO merge into shaded RS
 RootSignature* pRootSignaturePostEffects = NULL;
 
 DescriptorSet* pDescriptorSetVignette;
@@ -124,11 +127,13 @@ DescriptorSet* pDescriptorSetFXAA;
 DescriptorSet* pDescriptorSetsShadow[DESCRIPTOR_UPDATE_FREQ_COUNT];
 DescriptorSet* pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_COUNT];
 DescriptorSet* pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_COUNT];
+DescriptorSet* pDescriptorSetParticles[DESCRIPTOR_UPDATE_FREQ_COUNT];
 
 VirtualJoystickUI   gVirtualJoystick = {};
 
 Buffer* pUniformBuffer[IMAGE_COUNT] = { NULL };
 Buffer* pInstanceBuffer[IMAGE_COUNT] = { NULL };
+Buffer* pParticleBuffer[IMAGE_COUNT] = { NULL };
 Buffer* pUniformBufferBones[IMAGE_COUNT] = { NULL };
 Buffer* pShadowUniformBuffer[IMAGE_COUNT] = { NULL };
 Buffer* pShadowInstanceBuffer[IMAGE_COUNT] = { NULL };
@@ -183,11 +188,13 @@ float rot = 0.f;
 Client* client;
 SceneManager_Client* scene;
 
+ParticleSystem* particles;
+
 bool connected = false;
 const int serverNameSize = 32;
 char serverName[serverNameSize] = "localhost";
 char sendbuf[DEFAULT_BUFLEN];
-//char recvbuf[SERVER_SENDBUFLEN];
+char recvbuf[SERVER_SENDBUFLEN];
 std::vector<Client::UpdateData> updateBuf;
 
 // ======================================================================================================
@@ -217,12 +224,36 @@ bool Application::InitSceneResources()
 	scene->setBuffer(SceneManager_Client::SceneBuffer::INSTANCE, pInstanceBuffer);
 	scene->setBuffer(SceneManager_Client::SceneBuffer::BONE, pUniformBufferBones);
 
+
+	ParticleSystem::ParticleSystemParams params = {};
+	params.spriteFile = "circle_05.png";
+	params.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
+		float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2 * PI));
+		float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 2);
+
+		pd->position = float3(r * cos(a), z, r * sin(a));
+		pd->color = float4(1, 1, 0, 1);
+		pd->scale = 0.2f;
+		pad->velocity = pd->position;
+	};
+	params.updater = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad, float deltaTime) {
+		pad->velocity += float3(0.0f, -deltaTime, 0.0f);
+	};
+	params.numParticles = 1000;
+	params.life = 2.5f;
+	particles = conf_new(ParticleSystem, pRenderer, params);
+	particles->createSpriteResources(pRootSignatureParticles);
+
+
 	return true;
 }
 
 void Application::RemoveSceneResources()
 {
 	conf_delete(scene);
+
+	conf_delete(particles);
 }
 
 // ======================================================================================================
@@ -243,6 +274,11 @@ bool Application::InitShaderResources()
 	skinningShader.mStages[0] = { "skinning.vert", NULL, 0, RD_SHADER_SOURCES };
 	skinningShader.mStages[1] = { "basic.frag", NULL, 0, RD_SHADER_SOURCES };
 	addShader(pRenderer, &skinningShader, &pShaderSkinning);
+
+	ShaderLoadDesc particleShader = {};
+	particleShader.mStages[0] = { "particle.vert", NULL, 0, RD_SHADER_SOURCES };
+	particleShader.mStages[1] = { "particle.frag", NULL, 0, RD_SHADER_SOURCES };
+	addShader(pRenderer, &particleShader, &pShaderParticles);
 
 	ShaderLoadDesc VignetteShader = {};
 	VignetteShader.mStages[0] = { "Triangular.vert", NULL, 0, RD_SHADER_SOURCES };
@@ -280,6 +316,12 @@ bool Application::InitShaderResources()
 	rootDesc.ppShaders = &pShaderSkinning;
 	addRootSignature(pRenderer, &rootDesc, &pRootSignatureSkinning);
 
+	const char* pStaticSamplerName[] = { "uSampler0" };
+	rootDesc.ppStaticSamplerNames = pStaticSamplerName;
+	rootDesc.mShaderCount = 1;
+	rootDesc.ppShaders = &pShaderParticles;
+	addRootSignature(pRenderer, &rootDesc, &pRootSignatureParticles);
+
 	Shader* postShaders[] = { pVignetteShader, pFXAAShader };
 	rootDesc.mShaderCount = 2;
 	rootDesc.ppShaders = postShaders;
@@ -311,6 +353,13 @@ bool Application::InitShaderResources()
 	setDesc = { pRootSignatureSkinning, DESCRIPTOR_UPDATE_FREQ_PER_BATCH, Application::gImageCount };
 	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
 
+	setDesc = { pRootSignatureParticles, DESCRIPTOR_UPDATE_FREQ_NONE, 1 };
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetParticles[DESCRIPTOR_UPDATE_FREQ_NONE]);
+	setDesc = { pRootSignatureParticles, DESCRIPTOR_UPDATE_FREQ_PER_FRAME, Application::gImageCount };
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetParticles[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+	setDesc = { pRootSignatureParticles, DESCRIPTOR_UPDATE_FREQ_PER_BATCH, Application::gImageCount };
+	addDescriptorSet(pRenderer, &setDesc, &pDescriptorSetParticles[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
+
 	return true;
 }
 
@@ -333,15 +382,21 @@ void Application::RemoveShaderResources()
 	removeDescriptorSet(pRenderer, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
 	removeDescriptorSet(pRenderer, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
 
+	removeDescriptorSet(pRenderer, pDescriptorSetParticles[DESCRIPTOR_UPDATE_FREQ_NONE]);
+	removeDescriptorSet(pRenderer, pDescriptorSetParticles[DESCRIPTOR_UPDATE_FREQ_PER_FRAME]);
+	removeDescriptorSet(pRenderer, pDescriptorSetParticles[DESCRIPTOR_UPDATE_FREQ_PER_BATCH]);
+
 	removeShader(pRenderer, pShaderZPass);
 	removeShader(pRenderer, pVignetteShader);
 	removeShader(pRenderer, pMeshOptDemoShader);
 	removeShader(pRenderer, pShaderSkinning);
+	removeShader(pRenderer, pShaderParticles);
 	removeShader(pRenderer, pFXAAShader);
 
 	removeRootSignature(pRenderer, pRootSignatureShadow);
 	removeRootSignature(pRenderer, pRootSignatureShaded);
 	removeRootSignature(pRenderer, pRootSignatureSkinning);
+	removeRootSignature(pRenderer, pRootSignatureParticles);
 	removeRootSignature(pRenderer, pRootSignaturePostEffects);
 }
 
@@ -585,6 +640,7 @@ bool Application::Init()
 		addResource(&subDesc, NULL, LOAD_PRIORITY_NORMAL);
 	}
 
+	// Bone Buffer (might want to move this)
 	BufferLoadDesc boneBufferDesc = {};
 	boneBufferDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_BUFFER;
 	boneBufferDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_CPU_TO_GPU;
@@ -598,6 +654,23 @@ bool Application::Init()
 		boneBufferDesc.ppBuffer = &pUniformBufferBones[i];
 		addResource(&boneBufferDesc, NULL, LOAD_PRIORITY_NORMAL);
 	}
+	
+	// Instance buffer (might want to move this)
+	BufferLoadDesc spriteVbDesc = {};
+	spriteVbDesc.mDesc.mDescriptors = DESCRIPTOR_TYPE_BUFFER;
+	spriteVbDesc.mDesc.mMemoryUsage = RESOURCE_MEMORY_USAGE_CPU_TO_GPU;
+	spriteVbDesc.mDesc.mFlags = BUFFER_CREATION_FLAG_NONE;
+	spriteVbDesc.mDesc.mFirstElement = 0;
+	spriteVbDesc.mDesc.mElementCount = MAX_PARTICLES * MAX_PARTICLE_SYSTEMS;
+	spriteVbDesc.mDesc.mStructStride = sizeof(ParticleSystem::ParticleData);
+	spriteVbDesc.mDesc.mSize = MAX_PARTICLES * MAX_PARTICLE_SYSTEMS * sizeof(ParticleSystem::ParticleData);
+	spriteVbDesc.pData = NULL;
+	for (uint32_t i = 0; i < gImageCount; ++i)
+	{
+		spriteVbDesc.ppBuffer = &pParticleBuffer[i];
+		addResource(&spriteVbDesc, NULL, LOAD_PRIORITY_NORMAL);
+	}
+	printf("%d\n", (int)spriteVbDesc.mDesc.mStructStride);
 
 	InitDebugGui();
 
@@ -657,6 +730,7 @@ void Application::Exit()
 		removeResource(pShadowUniformBuffer[i]);
 		removeResource(pUniformBuffer[i]);
 		removeResource(pInstanceBuffer[i]);
+		removeResource(pParticleBuffer[i]);
 		removeResource(pUniformBufferBones[i]);
 		removeResource(pShadowInstanceBuffer[i]);
 	}
@@ -742,7 +816,7 @@ void Application::PrepareDescriptorSets()
 			updateDescriptorSet(pRenderer, i, pDescriptorSetsShaded[DESCRIPTOR_UPDATE_FREQ_PER_BATCH], 1, params);
 		}
 	}
-
+	// Skinning
 	{
 		DescriptorData params[2] = {};
 
@@ -757,6 +831,22 @@ void Application::PrepareDescriptorSets()
 			params[1].pName = "instanceBuffer";
 			params[1].ppBuffers = &pInstanceBuffer[i];
 			updateDescriptorSet(pRenderer, i, pDescriptorSetSkinning[DESCRIPTOR_UPDATE_FREQ_PER_BATCH], 2, params);
+		}
+	}
+	// Particles
+	{
+		DescriptorData params[2] = {};
+		for (uint32_t i = 0; i < gImageCount; ++i)
+		{
+			params[0].pName = "cbPerPass";
+			params[0].ppBuffers = &pUniformBuffer[i];
+			updateDescriptorSet(pRenderer, i, pDescriptorSetParticles[DESCRIPTOR_UPDATE_FREQ_PER_FRAME], 1, params);
+
+			params[0].pName = "instanceBuffer";
+			params[0].ppBuffers = &pInstanceBuffer[i];
+			params[1].pName = "particleInstanceBuffer";
+			params[1].ppBuffers = &pParticleBuffer[i];
+			updateDescriptorSet(pRenderer, i, pDescriptorSetParticles[DESCRIPTOR_UPDATE_FREQ_PER_BATCH], 2, params);
 		}
 	}
 }
@@ -896,6 +986,24 @@ void Application::LoadPipelines()
 		pipelineSettings.pRasterizerState = &rasterizerStateDesc;
 		addPipeline(pRenderer, &desc, &pPipelineSkinning);
 	}
+
+	{
+		PipelineDesc desc = {};
+		desc.mType = PIPELINE_TYPE_GRAPHICS;
+		GraphicsPipelineDesc& pipelineSettings = desc.mGraphicsDesc;
+		pipelineSettings.mPrimitiveTopo = PRIMITIVE_TOPO_TRI_LIST;
+		pipelineSettings.mRenderTargetCount = 1;
+		pipelineSettings.pDepthState = &depthStateDesc;
+		pipelineSettings.pColorFormats = &pForwardRT->mFormat;
+		pipelineSettings.mSampleCount = pForwardRT->mSampleCount;
+		pipelineSettings.mSampleQuality = pForwardRT->mSampleQuality;
+		pipelineSettings.mDepthStencilFormat = pDepthBuffer->mFormat;
+		pipelineSettings.pRootSignature = pRootSignatureParticles;
+		pipelineSettings.pShaderProgram = pShaderParticles;
+		pipelineSettings.pRasterizerState = &rasterizerStateDesc;
+		pipelineSettings.pBlendState = &blendStateAlphaDesc;
+		addPipeline(pRenderer, &desc, &pPipelineParticles);
+	}
 }
 
 void Application::RemovePipelines()
@@ -904,6 +1012,7 @@ void Application::RemovePipelines()
 	removePipeline(pRenderer, pVignettePipeline);
 	removePipeline(pRenderer, pMeshOptDemoPipeline);
 	removePipeline(pRenderer, pPipelineSkinning);
+	removePipeline(pRenderer, pPipelineParticles);
 	removePipeline(pRenderer, pFXAAPipeline);
 }
 
@@ -999,6 +1108,8 @@ void Application::Update(float deltaTime)
 	}
 	scene->update(deltaTime);
 
+	particles->update(deltaTime);
+
 	/************************************************************************/
 	// Uniform Data Updates
 	/************************************************************************/
@@ -1012,7 +1123,8 @@ void Application::Update(float deltaTime)
 	const float horizontal_fov = PI / 3.0f;
 	Application::projMat = mat4::perspectiveReverseZ(horizontal_fov, aspectInverse, 0.001f, 1000.0f);
 	gUniformData.mProjectView = projMat * viewMat;
-	gUniformData.mModel = mat4::identity();
+	gUniformData.mProj = projMat;
+	gUniformData.mView = viewMat;
 	gUniformData.mCameraPosition = vec4(pCameraController->getViewPosition() + cameraOffset, 1.0f);
 
 	mat4 viewProj = Application::projMat * Application::viewMat;
@@ -1161,6 +1273,27 @@ void Application::Draw()
 		GLTFGeode::useMaterials = true;
 		SceneManager_Client::enableCulling = bToggleCull;
 		scene->draw(cmd);
+
+
+
+
+		BufferUpdateDesc vboUpdateDesc = { pParticleBuffer[Application::gFrameIndex] };
+		beginUpdateResource(&vboUpdateDesc);
+		ParticleSystem::ParticleData* data = (ParticleSystem::ParticleData*)vboUpdateDesc.pMappedData;
+		particles->fillParticleData(data);
+		endUpdateResource(&vboUpdateDesc, NULL);
+		int index = 0;
+		cmdBindPipeline(cmd, pPipelineParticles);
+		//cmdBindPushConstants(cmd, pRootSignatureParticles, "cbRootConstants", &index);
+		for (int i = 0; i < DESCRIPTOR_UPDATE_FREQ_COUNT; i++) {
+			if (pDescriptorSetParticles[i])
+				cmdBindDescriptorSet(cmd, i == 0 ? 0 : Application::gFrameIndex, pDescriptorSetParticles[i]);
+		}
+		particles->draw(cmd);
+
+
+
+
 
 		// Unbind render targets
 		cmdBindRenderTargets(cmd, 0, NULL, 0, NULL, NULL, NULL, -1, -1);

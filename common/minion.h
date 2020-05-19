@@ -16,6 +16,7 @@ protected:
 	mapNode* destNode;
 	float timeElapsed;
 	Entity* attackTarget;
+	std::string attackTargetID;
 	int attackRange;
 	float attackInterval;
 	float velocity;

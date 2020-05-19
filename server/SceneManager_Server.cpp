@@ -152,12 +152,19 @@ bool SceneManager_Server::checkEntityAlive(std::string id) {
 }
 
 void SceneManager_Server::update(float deltaTime) {
+	std::vector<std::string> deadIDs;
+	std::vector<Entity*> deadEntities;
 	for (std::pair<std::string, Entity*> idEntPair : idMap) { //first pass, check for anything that died last cycle
-		if (idEntPair.second->getHealth() <= 0) {	//entity was marked as dead last cycle, 
-			std::cout << "deleting entity id " << idEntPair.first << " addr " << idEntPair.second << "\n";
-			delete idEntPair.second;				//delete the object
-			idMap.erase(idEntPair.first);			//clear the key out of idMap
+		if (idEntPair.second->getHealth() <= 0) {	//entity reached 0 health last cycle, mark it for deletion
+			std::cout << "marking entity id " << idEntPair.first << " addr " << idEntPair.second << " to be deleted\n";
+			deadIDs.push_back(idEntPair.first);
+			deadEntities.push_back(idEntPair.second);
 		}
+	}
+
+	for (int i = 0; i < deadIDs.size(); i++) {
+		delete deadEntities[i];			//delete the object
+		idMap.erase(deadIDs[i]);		//clear the key out of idMap
 	}
 
 	for (std::pair<std::string, Entity*> idEntPair : idMap) { //second pass, update as usual
@@ -431,9 +438,12 @@ void SceneManager_Server::populateScene() { //testing only
 }
 
 void SceneManager_Server::testAttacking() {
-	std::string id_str = std::to_string(next_minion_id);
+	std::string id_str;
+	mat4 transform;
+
+	/*id_str = std::to_string(next_minion_id);
 	next_minion_id++;
-	mat4 transform = mat4::translation(vec3(10, 0, 5));
+	transform = mat4::translation(vec3(10, 0, 5));
 	Minion* m1 = new Minion(id_str, red_team, this);
 	m1->setMatrix(transform);
 	idMap[id_str] = m1;
@@ -448,7 +458,7 @@ void SceneManager_Server::testAttacking() {
 	std::cout << "created super minion at id " << id_str << "\n";
 
 	m1->setAttackTarget(sm1);
-	sm1->setAttackTarget(m1);
+	sm1->setAttackTarget(m1);*/
 
 	/*id_str = std::to_string(next_super_minion_id);
 	next_super_minion_id++;
@@ -464,24 +474,24 @@ void SceneManager_Server::testAttacking() {
 	c1->setMatrix(transform);
 	idMap[id_str] = c1;
 
-	sm2->setAttackTarget(c1);
+	sm2->setAttackTarget(c1);*/
 
 	id_str = std::to_string(next_laser_id);
 	next_laser_id++;
-	transform = mat4::translation(vec3(-5, 0, -5));
+	transform = mat4::translation(vec3(5, 0, -5));
 	LaserTower* l1 = new LaserTower(id_str, red_team, this);
 	l1->setMatrix(transform);
 	idMap[id_str] = l1;
 
 	id_str = std::to_string(next_minion_id);
 	next_minion_id++;
-	transform = mat4::translation(vec3(5, 0, -5));
+	transform = mat4::translation(vec3(9, 0, -5));
 	Minion* m2 = new Minion(id_str, blue_team, this);
 	m2->setMatrix(transform);
 	idMap[id_str] = m2;
 
 	l1->setAttackTarget(m2);
-	m2->setAttackTarget(l1);*/
+	m2->setAttackTarget(l1);
 }
 
 /***** legacy code *****/

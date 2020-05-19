@@ -39,15 +39,15 @@ void Minion::update(float deltaTime) { //should they be able to switch attack ta
 	timeElapsed += deltaTime; //increase elapsedTime
 
 	if (attackTarget == nullptr ||																//first, if not targeting anything
-			!manager->checkEntityAlive(attackTarget->getIDstr()) ||								//or target is dead
+			!manager->checkEntityAlive(attackTargetID) ||										//or target is dead
 			length(attackTarget->getPosition() - this->getPosition()) > this->attackRange) {	//or target is out of range, null out ptr
-		std::cout << "minion " << this << " removing attackTarget ptr\n";
 		attackTarget = nullptr; //do this check here instead of after attacking in the case of multiple entities targeting one entity
 	}
 
 	if (this->attackTarget == nullptr) { //next, if not currently targeting something, check if there is a valid enemy in range
 		int flags = DETECTION_FLAG_MINION | DETECTION_FLAG_TOWER; //TODO set flags according to team; MINIONS CAN TARGET MINIONS OR TOWERS
 		attackTarget = (Entity*)ObjectDetection::getNearestObject(this, flags, attackRange);
+		if (attackTarget != nullptr) attackTargetID = attackTarget->getIDstr();
 	}
 
 	if (attackTarget != nullptr) { //if this minion should be attacking something, don't move
@@ -64,7 +64,7 @@ void Minion::update(float deltaTime) { //should they be able to switch attack ta
 
 void Minion::takeDamage(int damage) {
 	Entity::takeDamage(damage);
-	std::cout << "minion: " << this << "took " << damage << " damage | remaining health: " << health << "\n";
+	std::cout << "minion: " << this << " took " << damage << " damage | remaining health: " << health << "\n";
 	if (health <= 0) { team->decMinion(); std::cout << "i die\n"; }
 }
 
@@ -108,4 +108,4 @@ void Minion::move(float deltaTime) {
 }
 
 /* TESTING SPECIFIC FUNCTIONALITY - DO NOT USE */
-void Minion::setAttackTarget(Entity* e) { attackTarget = e; }
+void Minion::setAttackTarget(Entity* e) { attackTarget = e; attackTargetID = e->getIDstr(); }

@@ -12,6 +12,6 @@ Tower::Tower(std::string id, int health, int attack, Team* t, SceneManager_Serve
 
 void Tower::takeDamage(int damage) {
 	Entity::takeDamage(damage);
-	std::cout << "tower: " << this << "took " << damage << " damage | remaining health: " << health << "\n";
+	std::cout << "tower: " << this << " took " << damage << " damage | remaining health: " << health << "\n";
 	if (health <= 0) { team->decTower(); std::cout << "i die\n"; }
 }

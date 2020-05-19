@@ -7,6 +7,7 @@ class LaserTower : public Tower {
 private:
 	float timeElapsed;
 	Entity* attackTarget;
+	std::string attackTargetID;
 	int attackRange;
 	float attackInterval;
 public:

@@ -2,7 +2,7 @@
 #include "Application.h"
 
 namespace {
-	const char* playerFile ="char-1-female.gltf";
+	const char* playerFile = "char-1-female.gltf";
 	const char* groundFile = "Ground.gltf";
 	const char* minionFile = "minion-retry.gltf";
 	const char* superMinionFile = "minion-2-super.gltf";
@@ -11,10 +11,15 @@ namespace {
 	const char* dumpsterFile = "resource-1-dumpster.gltf";
 	const char* recyclingBinFile = "resource-2-recycling-bin.gltf";
 
+	// Animations
 	const char* smallMinionDir = "small-minion";
-	const char* smallMinionActions[2] = { "Walk Animation", "Fight Animation" };
+	const char* smallMinionActions[2] = { "Walking", "Fighting" };
 	const char* superMinionDir = "super-minion";
-	const char* superMinionActions[2] = { "Walking Action", "Fight Animation" };
+	const char* superMinionActions[2] = { "Walking", "Fighting" };
+	const char* playerMaleDir = "male-char";
+	const char* playerMaleActions[2] = { "Idle", "Walking" };
+	const char* playerFemaleDir = "female-char";
+	const char* playerFemaleActions[2] = { "Idle", "Walking" };
 
 	int counter = 0;
 	int animCounter = 1;
@@ -35,7 +40,9 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	gltfGeodes[DUMPSTER_GEODE] = conf_new(GLTFGeode, renderer, dumpsterFile);
 	gltfGeodes[RECYCLING_BIN_GEODE] = conf_new(GLTFGeode, renderer, recyclingBinFile);
 
-    // TODO This is a hard coded animation example. Remove this later
+	///////////////////////////////////////////////////////////////////////////////
+
+    // TODO This is a hard coded animation example. Remove this later (SMALL MINION)
     ozzGeodes["blarf"] = conf_new(OzzGeode, renderer, smallMinionDir);
 	((OzzObject*)ozzGeodes["blarf"]->obj)->SetClip(smallMinionActions[0]);
     Transform* t = conf_new(Transform, mat4::translation(vec3(-1, 0, 2)));
@@ -46,7 +53,7 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
     transforms["blarf"] = t;
     animators["blarf"] = a;
 
-	// TODO This is a hard coded animation example. Remove this later
+	// TODO This is a hard coded animation example. Remove this later (SUPER MINION)
 	ozzGeodes["blarf2"] = conf_new(OzzGeode, renderer, superMinionDir);
 	((OzzObject*)ozzGeodes["blarf2"]->obj)->SetClip(superMinionActions[0]);
 	t = conf_new(Transform, mat4::translation(vec3(1, 0, 2)));
@@ -56,6 +63,30 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	this->addChild(t);
 	transforms["blarf2"] = t;
 	animators["blarf2"] = a;
+
+	// TODO This is a hard coded animation example. Remove this later (MALE CHAR)
+	ozzGeodes["blarf3"] = conf_new(OzzGeode, renderer, playerMaleDir);
+	((OzzObject*)ozzGeodes["blarf3"]->obj)->SetClip(playerMaleActions[1]);
+	t = conf_new(Transform, mat4::translation(vec3(3, 0, 2)));
+	a = conf_new(Animator, ozzGeodes["blarf3"]);
+	a->SetClip(playerMaleActions[1]);
+	t->addChild(a);
+	this->addChild(t);
+	transforms["blarf3"] = t;
+	animators["blarf3"] = a;
+
+	// TODO This is a hard coded animation example. Remove this later (FEMALE CHAR)
+	ozzGeodes["blarf4"] = conf_new(OzzGeode, renderer, playerFemaleDir);
+	((OzzObject*)ozzGeodes["blarf4"]->obj)->SetClip(playerFemaleActions[1]);
+	t = conf_new(Transform, mat4::translation(vec3(4, 0, 2)));
+	a = conf_new(Animator, ozzGeodes["blarf4"]);
+	a->SetClip(playerFemaleActions[1]);
+	t->addChild(a);
+	this->addChild(t);
+	transforms["blarf4"] = t;
+	animators["blarf4"] = a;
+
+	///////////////////////////////////////////////////////////////////////////////
 
 	trackedPlayer_ID = "";
 

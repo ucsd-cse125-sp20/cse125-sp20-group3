@@ -120,6 +120,9 @@
     <ClCompile Include="..\..\..\..\..\common\ObjectDetection.cpp">
       <Filter>Source Files\Server Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\mapNode.cpp">
+      <Filter>Source Files\Server Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\src\Shaders\D3D12\basic.frag">
@@ -296,6 +299,9 @@
       <Filter>Header Files\Server Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\server\SceneManager_Server.h">
+      <Filter>Header Files\Server Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\mapNode.h">
       <Filter>Header Files\Server Files</Filter>
     </ClInclude>
   </ItemGroup>

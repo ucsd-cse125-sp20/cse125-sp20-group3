@@ -7,12 +7,17 @@ class LaserTower : public Tower {
 private:
 	float timeElapsed;
 	Entity* attackTarget;
-	float attackRange;
+	std::string attackTargetID;
+	int attackRange;
 	float attackInterval;
 public:
-	LaserTower(std::string id, SceneManager_Server* sm_server);
+	LaserTower(std::string id, Team* t, SceneManager_Server* sm_server);
 
 	void update(float deltaTime) override;
+	void attack();
+
+	/* TESTING SPECIFIC FUNCTIONALITY - DO NOT USE */
+	void setAttackTarget(Entity* e);
 };
 
 #endif

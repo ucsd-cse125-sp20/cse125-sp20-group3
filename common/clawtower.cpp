@@ -1,17 +1,17 @@
 #include "clawtower.h"
 #include "../server/SceneManager_Server.h"
 
-ClawTower::ClawTower(std::string id, SceneManager_Server* sm_server) : Tower(id, CLAW_TOWER_HEALTH, CLAW_TOWER_ATTACK, sm_server) {
+ClawTower::ClawTower(std::string id, Team* t, SceneManager_Server* sm_server) : Tower(id, CLAW_TOWER_HEALTH, CLAW_TOWER_ATTACK, t, sm_server) {
     //init stuff
 	timeElapsed = 0;
-	spawnOffset = vec3(2.f, 0, 2.f);
+	spawnPoint = this->getPosition() + vec3(2.f, 0, 2.f); //TODO find nearest path location and use as spawn point
 	spawnInterval = CLAW_SPAWN_INTERVAL; //interval between minion spawns
 }
 
 void ClawTower::update(float deltaTime) {
-	/*timeElapsed += deltaTime;
-	if (timeElapsed >= actionInterval) {
-		manager->spawnEntity(MINION_TYPE, model[3][0] + spawnOffset.getX(), model[3][2] + spawnOffset.getZ(), 0);
+	timeElapsed += deltaTime;
+	if (timeElapsed >= spawnInterval) {
+		manager->spawnEntity(MINION_TYPE, spawnPoint[0], spawnPoint[2], 0, this->team);
 		timeElapsed = 0;
-	}*/
+	}
 }

@@ -8,6 +8,9 @@
 #define NUM_PLAYERS 1 //change to 4 eventually //upper bound, no more than 15 (1 byte) because of Server recv
 #define DELIMITER ','
 
+#define RED_TEAM 0
+#define BLUE_TEAM 1
+
 #define ID_PLAYER_MIN 0
 #define ID_PLAYER_MAX 999
 #define ID_BASE_MIN 1000
@@ -57,14 +60,18 @@
 #define CLAW_TOWER_ATTACK 0
 #define RESOURCE_ATTACK 0
 
-#define MINION_ATK_RANGE 10.0
-#define SUPER_MINION_ATK_RANGE 5.0
-#define LASER_FIRE_RANGE 20.0
+#define MINION_ATK_RANGE 15
+//#define MINION_MV_RANGE 20
+#define SUPER_MINION_ATK_RANGE 10
+#define LASER_FIRE_RANGE 20
 
 #define MINION_ATK_INTERVAL 1.0
 #define SUPER_MINION_ATK_INTERVAL 3.0
 #define LASER_FIRE_INTERVAL 2.0
 #define CLAW_SPAWN_INTERVAL 5.0
+
+#define MINION_VELOCITY 3.0
+#define SUPER_MINION_VELOCITY 2.0
 
 #define WIN_STATUS_NEUTRAL 0
 #define WIN_STATUS_WON 10

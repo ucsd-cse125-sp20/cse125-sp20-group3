@@ -12,7 +12,8 @@ Minion::Minion(std::string id, Team* t, SceneManager_Server* sm) : Entity(id, MI
 	if (sm != nullptr) { //only execute on server
 		destNode = (mapNode*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_MAP_NODE, 50); //TODO unbounded radius check
 
-		int flags = DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE | DETECTION_FLAG_MINION;
+		int flags = DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE | DETECTION_FLAG_MINION | 
+					DETECTION_FLAG_MINION_TARGET | DETECTION_FLAG_LASER_TARGET;
 		if (t->teamColor == RED_TEAM) flags = flags | DETECTION_FLAG_RED_TEAM;
 		else flags = flags | DETECTION_FLAG_BLUE_TEAM;
 		ObjectDetection::addObject(this, flags);
@@ -30,7 +31,8 @@ Minion::Minion(std::string id, int health, int attack, int range, float interval
 	if (sm != nullptr) { //only execute on server
 		destNode = (mapNode*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_MAP_NODE, 50); //TODO unbounded radius check
 
-		int flags = DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE | DETECTION_FLAG_MINION;
+		int flags = DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE | DETECTION_FLAG_MINION |
+					DETECTION_FLAG_MINION_TARGET | DETECTION_FLAG_LASER_TARGET;
 		if (t->teamColor == RED_TEAM) flags = flags | DETECTION_FLAG_RED_TEAM;
 		else flags = flags | DETECTION_FLAG_BLUE_TEAM;
 		ObjectDetection::addObject(this, flags);
@@ -40,21 +42,38 @@ Minion::Minion(std::string id, int health, int attack, int range, float interval
 void Minion::update(float deltaTime) { //should they be able to switch attack targets instantaneously?
 	timeElapsed += deltaTime; //increase elapsedTime
 
-	if (attackTarget == nullptr ||																//first, if not targeting anything
-			!manager->checkEntityAlive(attackTargetID) ||										//or target is dead
-			length(attackTarget->getPosition() - this->getPosition()) > this->attackRange) {	//or target is out of range, null out ptr
+	if (attackTarget != nullptr &&																//first, if targeting something
+			(!manager->checkEntityAlive(attackTargetID) ||										//but either target is dead
+			length(attackTarget->getPosition() - this->getPosition()) > this->attackRange)) {	//or target is out of range, null out ptr
+		std::cout << "minion " << id_str << " nulling out attackTarget\n";
 		attackTarget = nullptr; //do this check here instead of after attacking in the case of multiple entities targeting one entity
 	}
 
 	if (this->attackTarget == nullptr) { //next, if not currently targeting something, check if there is a valid enemy in range
-		int flags = DETECTION_FLAG_MINION | DETECTION_FLAG_TOWER; //TODO set flags according to team; MINIONS CAN TARGET MINIONS OR TOWERS
+		int flags = DETECTION_FLAG_MINION_TARGET;
+		if (this->team->teamColor == RED_TEAM) flags = flags | DETECTION_FLAG_BLUE_TEAM;
+		else flags = flags | DETECTION_FLAG_RED_TEAM;
 		attackTarget = (Entity*)ObjectDetection::getNearestObject(this, flags, attackRange);
-		if (attackTarget != nullptr) attackTargetID = attackTarget->getIDstr();
+
+		if (attackTarget != nullptr && length(attackTarget->getPosition() - this->getPosition()) > this->attackRange) {
+			attackTarget = nullptr; //if target isn't actually in range, ignore it
+		} //object detection doesn't strictly follow distance, based on hashed block sections
+
+		if (attackTarget != nullptr) {
+			attackTargetID = attackTarget->getIDstr();
+			std::cout << "minion " << id_str << " found target " << attackTarget->getIDstr() << "\n";
+		}
 	}
 
 	if (attackTarget != nullptr) { //if this minion should be attacking something, don't move
+		//first face the attack target, regardless of timeElapsed
+		vec3 forward = normalize(attackTarget->getPosition() - this->getPosition()); //TODO check vectors?
+		vec3 right = cross(forward, vec3(0, 1, 0));
+		model[0] = vec4(right, 0);
+		model[2] = vec4(-forward, 0);
+
 		if (timeElapsed >= attackInterval) { //only attack on an interval
-			std::cout << "minion: " << this << " attacking that " << attackTarget << "\n";
+			std::cout << "minion: " << id_str << " attacking that " << attackTargetID << "\n";
 			this->attack();
 			timeElapsed = 0;
 		}
@@ -66,7 +85,7 @@ void Minion::update(float deltaTime) { //should they be able to switch attack ta
 
 void Minion::takeDamage(int damage) {
 	Entity::takeDamage(damage);
-	std::cout << "minion: " << this << " took " << damage << " damage | remaining health: " << health << "\n";
+	std::cout << "minion: " << id_str << " took " << damage << " damage | remaining health: " << health << "\n";
 	if (health <= 0) { team->decMinion(); std::cout << "i die\n"; }
 }
 
@@ -111,6 +130,8 @@ void Minion::move(float deltaTime) {
 			}
 		}
 	}
+
+	ObjectDetection::updateObject(this);
 }
 
 /* TESTING SPECIFIC FUNCTIONALITY - DO NOT USE */

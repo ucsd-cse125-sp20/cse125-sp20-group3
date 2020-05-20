@@ -23,6 +23,8 @@
 #define DETECTION_FLAG_RESOURCE 1 << 7
 #define DETECTION_FLAG_COLLIDABLE 1 << 8
 #define DETECTION_FLAG_MAP_NODE 1 << 9
+#define DETECTION_FLAG_MINION_TARGET 1 << 10
+#define DETECTION_FLAG_LASER_TARGET 1 << 11
 
 class ObjectDetection {
 private:

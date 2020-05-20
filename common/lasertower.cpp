@@ -12,20 +12,31 @@ LaserTower::LaserTower(std::string id, Team* t, SceneManager_Server* sm_server) 
 void LaserTower::update(float deltaTime) { //should they be able to switch attack targets instantaneously?
 	timeElapsed += deltaTime; //increase elapsedTime
 
-	if (attackTarget == nullptr ||																//first, if not targeting anything
-			!manager->checkEntityAlive(attackTargetID) ||										//or target is dead
-			length(attackTarget->getPosition() - this->getPosition()) > this->attackRange) {	//or target is out of range, null out ptr
+	if (attackTarget != nullptr &&																//first, if targeting something
+			(!manager->checkEntityAlive(attackTargetID) ||										//but either target is dead
+			length(attackTarget->getPosition() - this->getPosition()) > this->attackRange)) {	//or target is out of range, null out ptr
+		std::cout << "laser " << id_str << " nulling out attackTarget\n";
 		attackTarget = nullptr; //do this check here instead of after attacking in the case of multiple entities targeting one entity
 	}
 
 	if (this->attackTarget == nullptr) { //next, if not currently targeting something, check if there is a valid enemy in range
-		int flags = DETECTION_FLAG_MINION; //TODO set flags according to team; LASER TOWERS CAN ONLY TARGET MINIONS
+		int flags = DETECTION_FLAG_LASER_TARGET;
+		if (this->team->teamColor == RED_TEAM) flags = flags | DETECTION_FLAG_BLUE_TEAM;
+		else flags = flags | DETECTION_FLAG_RED_TEAM;
 		attackTarget = (Entity*)ObjectDetection::getNearestObject(this, flags, attackRange);
-		if (attackTarget != nullptr) attackTargetID = attackTarget->getIDstr();
+
+		if (attackTarget != nullptr && length(attackTarget->getPosition() - this->getPosition()) > this->attackRange) {
+			attackTarget = nullptr; //if target isn't actually in range, ignore it
+		} //object detection doesn't strictly follow distance, based on hashed block sections
+
+		if (attackTarget != nullptr) {
+			attackTargetID = attackTarget->getIDstr();
+			std::cout << "laser " << id_str << " found target " << attackTarget->getIDstr() << "\n";
+		}
 	}
 
 	if (attackTarget != nullptr && timeElapsed >= attackInterval) { //only attack on an interval
-		std::cout << "tower: " << this << " attacking that " << attackTarget << "\n";
+		std::cout << "laser " << id_str << " attacking " << attackTargetID << "\n";
 		this->attack();
 		timeElapsed = 0;
 	}

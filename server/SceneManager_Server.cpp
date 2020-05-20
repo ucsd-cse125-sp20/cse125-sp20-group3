@@ -245,49 +245,49 @@ int SceneManager_Server::encodeScene(char buf[], int start_index) {
 
 void SceneManager_Server::populateMap() {
 	std::vector<mapNode*> nodeMap;
-	nodeMap.push_back(new mapNode(7.5, 17.5));
-	nodeMap.push_back(new mapNode(22.5, 17.5));
+	nodeMap.push_back(new mapNode(7.5, 17.5)); //0
+	nodeMap.push_back(new mapNode(22.5, 17.5)); //1
 	nodeMap[0]->setNextRed(nodeMap[1]);
-	nodeMap.push_back(new mapNode(22.5, 42.5));
+	nodeMap.push_back(new mapNode(22.5, 42.5)); //2
 	nodeMap[1]->setNextRed(nodeMap[2]);
-	nodeMap.push_back(new mapNode(22.5, 57.5));
+	nodeMap.push_back(new mapNode(22.5, 57.5)); //3
 	nodeMap[2]->setNextRed(nodeMap[3]);
-	nodeMap.push_back(new mapNode(22.5, 72.5));
+	nodeMap.push_back(new mapNode(22.5, 72.5)); //4
 	nodeMap[3]->setNextRed(nodeMap[4]);
-	nodeMap.push_back(new mapNode(57.5, 72.5));
+	nodeMap.push_back(new mapNode(57.5, 72.5)); //5
 	nodeMap[4]->setNextRed(nodeMap[5]);
-	nodeMap.push_back(new mapNode(57.5, 52.5));
+	nodeMap.push_back(new mapNode(57.5, 52.5)); //6
 	nodeMap[5]->setNextRed(nodeMap[6]);
-	nodeMap.push_back(new mapNode(67.5, 52.5));
+	nodeMap.push_back(new mapNode(67.5, 52.5)); //7
 	nodeMap[6]->setNextRed(nodeMap[7]);
-	nodeMap.push_back(new mapNode(82.5, 52.5));
+	nodeMap.push_back(new mapNode(82.5, 52.5)); //8
 	nodeMap[7]->setNextRed(nodeMap[8]);
-	nodeMap.push_back(new mapNode(107.5, 52.5));
+	nodeMap.push_back(new mapNode(107.5, 52.5)); //9
 	nodeMap[8]->setNextRed(nodeMap[9]);
-	nodeMap.push_back(new mapNode(107.5, 72.5));
+	nodeMap.push_back(new mapNode(107.5, 72.5)); //10
 	nodeMap[9]->setNextRed(nodeMap[10]);
-	nodeMap.push_back(new mapNode(117.5, 72.5));
+	nodeMap.push_back(new mapNode(117.5, 72.5)); //11
 	nodeMap[10]->setNextRed(nodeMap[11]);
-	nodeMap.push_back(new mapNode(32.5, 17.5));
+	nodeMap.push_back(new mapNode(32.5, 17.5)); //12
 	nodeMap[12]->setNextRed(nodeMap[1]);
-	nodeMap.push_back(new mapNode(47.5, 32.5));
-	nodeMap.push_back(new mapNode(67.5, 32.5));
+	nodeMap.push_back(new mapNode(47.5, 32.5)); //13
+	nodeMap.push_back(new mapNode(67.5, 32.5)); //14
 	nodeMap[13]->setNextRed(nodeMap[14]);
 	nodeMap[14]->setNextRed(nodeMap[7]);
-	nodeMap.push_back(new mapNode(67.5, 17.5));
+	nodeMap.push_back(new mapNode(67.5, 17.5)); //15
 	nodeMap[15]->setNextRed(nodeMap[14]);
-	nodeMap.push_back(new mapNode(107.5, 17.5));
+	nodeMap.push_back(new mapNode(107.5, 17.5)); //16
 	nodeMap[16]->setNextRed(nodeMap[9]);
-	nodeMap.push_back(new mapNode(67.5, 7.5));
+	nodeMap.push_back(new mapNode(67.5, 7.5)); //17
 	nodeMap[17]->setNextRed(nodeMap[15]);
-	nodeMap.push_back(new mapNode(17.5, 72.5));
+	nodeMap.push_back(new mapNode(17.5, 72.5)); //18
 	nodeMap[18]->setNextRed(nodeMap[4]);
-	nodeMap.push_back(new mapNode(82.5, 82.5));
-	nodeMap.push_back(new mapNode(102.5, 82.5));
+	nodeMap.push_back(new mapNode(82.5, 82.5)); //19
+	nodeMap.push_back(new mapNode(102.5, 82.5)); //20
 	nodeMap[19]->setNextRed(nodeMap[20]);
-	nodeMap.push_back(new mapNode(102.5, 72.5));
+	nodeMap.push_back(new mapNode(102.5, 72.5)); //21
 	nodeMap[20]->setNextRed(nodeMap[21]);
-	nodeMap.push_back(new mapNode(47.5, 57.5));
+	nodeMap.push_back(new mapNode(47.5, 57.5)); //22
 	nodeMap[22]->setNextRed(nodeMap[13]);
 	nodeMap[11]->setNextBlue(nodeMap[10]);
 	nodeMap[10]->setNextBlue(nodeMap[9]);
@@ -301,25 +301,25 @@ void SceneManager_Server::populateMap() {
 	nodeMap[2]->setNextBlue(nodeMap[1]);
 	nodeMap[1]->setNextBlue(nodeMap[0]);
 	nodeMap[12]->setNextBlue(nodeMap[1]);
-	nodeMap.push_back(new mapNode(12.5, 92.5));
+	nodeMap.push_back(new mapNode(12.5, 92.5)); //23
 	nodeMap[23]->setNextBlue(nodeMap[18]);
 	nodeMap[18]->setNextBlue(nodeMap[4]);
-	nodeMap.push_back(new mapNode(82.5, 67.5));
+	nodeMap.push_back(new mapNode(82.5, 67.5)); //24
 	nodeMap[24]->setNextBlue(nodeMap[8]);
 	nodeMap[19]->setNextBlue(nodeMap[24]);
 	nodeMap[20]->setNextBlue(nodeMap[19]);
 	nodeMap[16]->setNextBlue(nodeMap[9]);
-	nodeMap.push_back(new mapNode(92.5, 2.5));
-	nodeMap.push_back(new mapNode(92.5, 17.5));
+	nodeMap.push_back(new mapNode(92.5, 2.5)); //25
+	nodeMap.push_back(new mapNode(92.5, 17.5)); //26
 	nodeMap[25]->setNextBlue(nodeMap[26]);
 	nodeMap[26]->setNextBlue(nodeMap[16]);
-	nodeMap.push_back(new mapNode(122.5, 27.5));
-	nodeMap.push_back(new mapNode(107.5, 27.5));
+	nodeMap.push_back(new mapNode(122.5, 27.5)); //27
+	nodeMap.push_back(new mapNode(107.5, 27.5)); //28
 	nodeMap[27]->setNextBlue(nodeMap[28]);
 	nodeMap[28]->setNextBlue(nodeMap[9]);
-	nodeMap.push_back(new mapNode(82.5, 32.5));
+	nodeMap.push_back(new mapNode(82.5, 32.5)); //29
 	nodeMap[29]->setNextBlue(nodeMap[8]);
-	nodeMap.push_back(new mapNode(32.5, 42.5));
+	nodeMap.push_back(new mapNode(32.5, 42.5)); //30
 	nodeMap[30]->setNextBlue(nodeMap[2]);
 }
 
@@ -441,7 +441,7 @@ void SceneManager_Server::testAttacking() {
 	std::string id_str;
 	mat4 transform;
 
-	id_str = std::to_string(next_minion_id);
+	/*id_str = std::to_string(next_minion_id);
 	next_minion_id++;
 	transform = mat4::translation(vec3(10, 0, 5));
 	Minion* m1 = new Minion(id_str, red_team, this);
@@ -449,7 +449,7 @@ void SceneManager_Server::testAttacking() {
 	idMap[id_str] = m1;
 	std::cout << "created minion at id " << id_str << "\n";
 
-	/*id_str = std::to_string(next_super_minion_id);
+	id_str = std::to_string(next_super_minion_id);
 	next_super_minion_id++;
 	transform = mat4::translation(vec3(14, 0, 5));
 	SuperMinion* sm1 = new SuperMinion(id_str, blue_team, this);
@@ -476,22 +476,29 @@ void SceneManager_Server::testAttacking() {
 
 	sm2->setAttackTarget(c1);*/
 
-	/*id_str = std::to_string(next_laser_id);
+	id_str = std::to_string(next_laser_id);
 	next_laser_id++;
-	transform = mat4::translation(vec3(5, 0, -5));
+	transform = mat4::translation(vec3(85, 0, 50));
 	LaserTower* l1 = new LaserTower(id_str, red_team, this);
 	l1->setMatrix(transform);
 	idMap[id_str] = l1;
 
+	id_str = std::to_string(next_laser_id);
+	next_laser_id++;
+	transform = mat4::translation(vec3(90, 0, 50));
+	LaserTower* l2 = new LaserTower(id_str, blue_team, this);
+	l2->setMatrix(transform);
+	idMap[id_str] = l2;
+
 	id_str = std::to_string(next_minion_id);
 	next_minion_id++;
-	transform = mat4::translation(vec3(9, 0, -5));
+	transform = mat4::translation(vec3(107, 0, 52));
 	Minion* m2 = new Minion(id_str, blue_team, this);
 	m2->setMatrix(transform);
 	idMap[id_str] = m2;
 
-	l1->setAttackTarget(m2);
-	m2->setAttackTarget(l1);*/
+	//l1->setAttackTarget(m2);
+	//m2->setAttackTarget(l1);
 }
 
 /***** legacy code *****/

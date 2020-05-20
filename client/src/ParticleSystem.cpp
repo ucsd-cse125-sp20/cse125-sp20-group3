@@ -24,7 +24,7 @@ ParticleSystem::ParticleSystem(Renderer* renderer, ParticleSystemParams params) 
 	addResource(&textureDesc, NULL, LOAD_PRIORITY_NORMAL);
 
 	for (int i = 0; i < params.numParticles; i++) {
-		particleAuxData[i].life = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / params.life);
+		particleAuxData[i].life = -(static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (params.life * 2.f)));
 		particleData[i].color = float4(0);
 	}
 
@@ -68,7 +68,7 @@ void ParticleSystem::update(float deltaTime)
 {
 	//printf("updating====================================================\n");
 	for (int i = 0; i < params.numParticles; i++) {
-		if (particleAuxData[i].life > params.life) {
+		if (particleAuxData[i].life >= params.life) {
 			params.initializer(&particleData[i], &particleAuxData[i]);
 			particleAuxData[i].life = 0.0f;
 		}

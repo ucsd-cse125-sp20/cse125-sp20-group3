@@ -86,6 +86,65 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	transforms["blarf4"] = t;
 	animators["blarf4"] = a;
 
+	// TODO These are hard coded particle examples. Remove them later
+	ParticleSystem::ParticleSystemParams params = {};
+	params.spriteFile = "LaserParticle.png";
+	params.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
+		float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.1f);
+		float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2 * PI));
+		float z = 0;
+
+		pd->position = float3(r * cos(a), z, r * sin(a));
+		pd->color = float4(0.8f, 0.8f, 1.0f, 1.0f);
+		pd->scale = float2(0.2f, 0.2f);
+		pad->velocity = float3(0, 5, 0);
+	};
+	params.numParticles = 1000;
+	params.life = 1.0f;
+	particleGeodes["blarf5"] = conf_new(ParticleSystemGeode, renderer, params);
+	t = conf_new(Transform, mat4::translation(vec3(-2, 0, 4)));
+	t->addChild(particleGeodes["blarf5"]);
+	this->addChild(t);
+	transforms["blarf5"] = t;
+
+	params.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
+		float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.1f);
+		float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2 * PI));
+		float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 5);
+
+		pd->position = float3(r * cos(a), z, r * sin(a));
+		pd->color = float4(0.8f, 0.8f, 1.0f, 1.0f);
+		pd->scale = float2(0.2f, 0.2f);
+		pad->velocity = float3(cos(a), 0.0f, sin(a));
+	};
+	params.updater = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad, float deltaTime) {
+		pd->scale *= 0.95f;
+	};
+	particleGeodes["blarf6"] = conf_new(ParticleSystemGeode, renderer, params);
+	t = conf_new(Transform, mat4::translation(vec3(0, 0, 4)));
+	t->addChild(particleGeodes["blarf6"]);
+	this->addChild(t);
+	transforms["blarf6"] = t;
+
+	params.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
+		float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.1f);
+		float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2 * PI));
+		float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 5);
+
+		pd->position = float3(r * cos(a), z, r * sin(a));
+		pd->color = float4(0.8f, 0.8f, 1.0f, 1.0f);
+		pd->scale = float2(0.2f, 0.2f);
+		pad->velocity = float3(cos(a), 0.0f, sin(a));
+	};
+	params.updater = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad, float deltaTime) {
+		pad->velocity += float3(-pd->position.x, 0.0f, -pd->position.z);
+	};
+	particleGeodes["blarf7"] = conf_new(ParticleSystemGeode, renderer, params);
+	t = conf_new(Transform, mat4::translation(vec3(2, 0, 4)));
+	t->addChild(particleGeodes["blarf7"]);
+	this->addChild(t);
+	transforms["blarf7"] = t;
+
 	///////////////////////////////////////////////////////////////////////////////
 
 	trackedPlayer_ID = "";
@@ -102,6 +161,7 @@ SceneManager_Client::~SceneManager_Client()
 	for (std::pair<std::string, Animator*> t : animators) conf_delete(t.second);
 	for (std::pair<std::string, GLTFGeode*> g : gltfGeodes) conf_delete(g.second);
 	for (std::pair<std::string, OzzGeode*> g : ozzGeodes) conf_delete(g.second);
+	for (std::pair<std::string, ParticleSystemGeode*> g : particleGeodes) conf_delete(g.second);
 
 	for (Transform* a : otherTransforms) conf_delete(a);
 }
@@ -117,6 +177,11 @@ void SceneManager_Client::createMaterialResources(SceneManager_Client::GeodeType
 	case SceneManager_Client::GeodeType::ANIMATED_MESH:
 		for (auto ge : ozzGeodes) {
 			ge.second->createMaterialResources(pRootSignature, pBindlessTexturesSamplersSet, defaultSampler);
+		}
+		break;
+	case SceneManager_Client::GeodeType::PARTICLES:
+		for (auto ge : particleGeodes) {
+			ge.second->createSpriteResources(pRootSignature);
 		}
 		break;
 	}
@@ -221,6 +286,9 @@ void SceneManager_Client::setBuffer(SceneManager_Client::SceneBuffer type, Buffe
 	case SceneManager_Client::SceneBuffer::BONE:
 		boneBuffer = buffer;
 		break;
+	case SceneManager_Client::SceneBuffer::PARTICLES:
+		particleBuffer = buffer;
+		break;
 	}
 }
 
@@ -234,6 +302,11 @@ void SceneManager_Client::setProgram(SceneManager_Client::GeodeType type, Geode:
 		break;
 	case SceneManager_Client::GeodeType::ANIMATED_MESH:
 		for (auto ge : ozzGeodes) {
+			ge.second->setProgram(program);
+		}
+		break;
+	case SceneManager_Client::GeodeType::PARTICLES:
+		for (auto ge : particleGeodes) {
 			ge.second->setProgram(program);
 		}
 		break;
@@ -271,6 +344,11 @@ void SceneManager_Client::draw(Cmd* cmd)
 	shaderCbv = { boneBuffer[Application::gFrameIndex] };
 	beginUpdateResource(&shaderCbv);
 	updateBoneBuffer(shaderCbv, NULL);
+	endUpdateResource(&shaderCbv, NULL);
+
+	shaderCbv = { particleBuffer[Application::gFrameIndex] };
+	beginUpdateResource(&shaderCbv);
+	updateParticleBuffer(shaderCbv);
 	endUpdateResource(&shaderCbv, NULL);
 
 	// Do culling check

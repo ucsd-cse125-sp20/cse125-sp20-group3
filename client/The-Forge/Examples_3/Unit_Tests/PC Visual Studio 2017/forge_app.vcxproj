@@ -45,6 +45,7 @@
     <ClCompile Include="..\..\..\..\src\GLTFObject.cpp" />
     <ClCompile Include="..\..\..\..\src\Input.cpp" />
     <ClCompile Include="..\..\..\..\src\ParticleSystem.cpp" />
+    <ClCompile Include="..\..\..\..\src\ParticleSystemGeode.cpp" />
     <ClCompile Include="..\..\..\..\src\SceneManager_Client.cpp" />
     <ClCompile Include="..\..\..\..\src\Transform.cpp" />
     <ClCompile Include="..\..\..\..\src\UIManager.cpp" />
@@ -87,6 +88,7 @@
     <ClInclude Include="..\..\..\..\..\common\entity.h" />
     <ClInclude Include="..\..\..\..\..\common\GameObject.h" />
     <ClInclude Include="..\..\..\..\..\common\macros.h" />
+    <ClInclude Include="..\..\..\..\..\common\MathUtils.h" />
     <ClInclude Include="..\..\..\..\..\common\minion.h" />
     <ClInclude Include="..\..\..\..\..\common\player.h" />
     <ClInclude Include="..\..\..\..\..\common\resource.h" />
@@ -104,6 +106,7 @@
     <ClInclude Include="..\..\..\..\src\Node.h" />
     <ClInclude Include="..\..\..\..\src\Object.h" />
     <ClInclude Include="..\..\..\..\src\ParticleSystem.h" />
+    <ClInclude Include="..\..\..\..\src\ParticleSystemGeode.h" />
     <ClInclude Include="..\..\..\..\src\SceneManager_Client.h" />
     <ClInclude Include="..\..\..\..\src\Transform.h" />
     <ClInclude Include="..\..\..\..\src\UIManager.h" />

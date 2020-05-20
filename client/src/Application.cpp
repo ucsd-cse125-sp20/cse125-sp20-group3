@@ -188,8 +188,6 @@ float rot = 0.f;
 Client* client;
 SceneManager_Client* scene;
 
-ParticleSystem* particles;
-
 bool connected = false;
 const int serverNameSize = 32;
 char serverName[serverNameSize] = "localhost";
@@ -220,31 +218,11 @@ bool Application::InitSceneResources()
 
 	scene->createMaterialResources(SceneManager_Client::GeodeType::MESH, pRootSignatureShaded, NULL, pDefaultSampler);
 	scene->createMaterialResources(SceneManager_Client::GeodeType::ANIMATED_MESH, pRootSignatureSkinning, NULL, pDefaultSampler);
+	scene->createMaterialResources(SceneManager_Client::GeodeType::PARTICLES, pRootSignatureParticles, NULL, pDefaultSampler);
 
 	scene->setBuffer(SceneManager_Client::SceneBuffer::INSTANCE, pInstanceBuffer);
 	scene->setBuffer(SceneManager_Client::SceneBuffer::BONE, pUniformBufferBones);
-
-
-	ParticleSystem::ParticleSystemParams params = {};
-	params.spriteFile = "circle_05.png";
-	params.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
-		float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-		float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2 * PI));
-		float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 2);
-
-		pd->position = float3(r * cos(a), z, r * sin(a));
-		pd->color = float4(1, 1, 0, 1);
-		pd->scale = 0.2f;
-		pad->velocity = pd->position;
-	};
-	params.updater = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad, float deltaTime) {
-		pad->velocity += float3(0.0f, -deltaTime, 0.0f);
-	};
-	params.numParticles = 1000;
-	params.life = 2.5f;
-	particles = conf_new(ParticleSystem, pRenderer, params);
-	particles->createSpriteResources(pRootSignatureParticles);
-
+	scene->setBuffer(SceneManager_Client::SceneBuffer::PARTICLES, pParticleBuffer);
 
 	return true;
 }
@@ -252,8 +230,6 @@ bool Application::InitSceneResources()
 void Application::RemoveSceneResources()
 {
 	conf_delete(scene);
-
-	conf_delete(particles);
 }
 
 // ======================================================================================================
@@ -869,16 +845,14 @@ void Application::LoadPipelines()
 	depthStateDesc.mDepthWrite = true;
 	depthStateDesc.mDepthFunc = CMP_GEQUAL;
 
-	BlendStateDesc blendStateAlphaDesc = {};
-	blendStateAlphaDesc.mSrcFactors[0] = BC_SRC_ALPHA;
-	blendStateAlphaDesc.mDstFactors[0] = BC_ONE_MINUS_SRC_ALPHA;
-	blendStateAlphaDesc.mBlendModes[0] = BM_ADD;
-	blendStateAlphaDesc.mSrcAlphaFactors[0] = BC_ONE;
-	blendStateAlphaDesc.mDstAlphaFactors[0] = BC_ZERO;
-	blendStateAlphaDesc.mBlendAlphaModes[0] = BM_ADD;
-	blendStateAlphaDesc.mMasks[0] = ALL;
-	blendStateAlphaDesc.mRenderTargetMask = BLEND_STATE_TARGET_0;
-	blendStateAlphaDesc.mIndependentBlend = false;
+	BlendStateDesc blendStateDesc = {};
+	blendStateDesc.mSrcAlphaFactors[0] = BC_SRC_ALPHA;
+	blendStateDesc.mDstAlphaFactors[0] = BC_ONE_MINUS_SRC_ALPHA;
+	blendStateDesc.mSrcFactors[0] = BC_SRC_ALPHA;
+	blendStateDesc.mDstFactors[0] = BC_ONE_MINUS_SRC_ALPHA;
+	blendStateDesc.mMasks[0] = ALL;
+	blendStateDesc.mRenderTargetMask = BLEND_STATE_TARGET_0;
+	blendStateDesc.mIndependentBlend = false;
 
 	{
 		PipelineDesc desc = {};
@@ -905,7 +879,7 @@ void Application::LoadPipelines()
 		pipelineSettings.mRenderTargetCount = 1;
 		pipelineSettings.pDepthState = &depthStateDesc;
 		pipelineSettings.mDepthStencilFormat = pDepthBuffer->mFormat;
-		pipelineSettings.pBlendState = &blendStateAlphaDesc;
+		pipelineSettings.pBlendState = &blendStateDesc;
 		pipelineSettings.pColorFormats = &pForwardRT->mFormat;
 		pipelineSettings.mSampleCount = pForwardRT->mSampleCount;
 		pipelineSettings.mSampleQuality = pForwardRT->mSampleQuality;
@@ -937,7 +911,7 @@ void Application::LoadPipelines()
 		pipelineSettings.mPrimitiveTopo = PRIMITIVE_TOPO_TRI_LIST;
 		pipelineSettings.mRenderTargetCount = 1;
 		pipelineSettings.pDepthState = NULL;
-		pipelineSettings.pBlendState = &blendStateAlphaDesc;
+		pipelineSettings.pBlendState = &blendStateDesc;
 		pipelineSettings.pColorFormats = &pPostProcessRT->mFormat;
 		pipelineSettings.mSampleCount = pPostProcessRT->mSampleCount;
 		pipelineSettings.mSampleQuality = pPostProcessRT->mSampleQuality;
@@ -975,7 +949,7 @@ void Application::LoadPipelines()
 		pipelineSettings.mRenderTargetCount = 1;
 		pipelineSettings.pDepthState = &depthStateDesc;
 		pipelineSettings.mDepthStencilFormat = pDepthBuffer->mFormat;
-		pipelineSettings.pBlendState = &blendStateAlphaDesc;
+		pipelineSettings.pBlendState = &blendStateDesc;
 		pipelineSettings.pColorFormats = &pForwardRT->mFormat;
 		pipelineSettings.mSampleCount = pForwardRT->mSampleCount;
 		pipelineSettings.mSampleQuality = pForwardRT->mSampleQuality;
@@ -1001,7 +975,7 @@ void Application::LoadPipelines()
 		pipelineSettings.pRootSignature = pRootSignatureParticles;
 		pipelineSettings.pShaderProgram = pShaderParticles;
 		pipelineSettings.pRasterizerState = &rasterizerStateDesc;
-		pipelineSettings.pBlendState = &blendStateAlphaDesc;
+		pipelineSettings.pBlendState = &blendStateDesc;
 		addPipeline(pRenderer, &desc, &pPipelineParticles);
 	}
 }
@@ -1107,8 +1081,6 @@ void Application::Update(float deltaTime)
 		scene->updateFromInputBuf(deltaTime);
 	}
 	scene->update(deltaTime);
-
-	particles->update(deltaTime);
 
 	/************************************************************************/
 	// Uniform Data Updates
@@ -1256,6 +1228,13 @@ void Application::Draw()
 		for (int i = 0; i < DESCRIPTOR_UPDATE_FREQ_COUNT; i++) {
 			skinShaderDesc.descriptorSets[i] = pDescriptorSetSkinning[i];
 		}
+
+		Geode::GeodeShaderDesc particleShaderDesc;
+		particleShaderDesc.rootSignature = pRootSignatureParticles;
+		particleShaderDesc.pipeline = pPipelineParticles;
+		for (int i = 0; i < DESCRIPTOR_UPDATE_FREQ_COUNT; i++) {
+			particleShaderDesc.descriptorSets[i] = pDescriptorSetParticles[i];
+		}
 		
 		// Set render target
 		cmdBindRenderTargets(cmd, 1, &pRenderTarget, pDepthBuffer, NULL, NULL, NULL, -1, -1);
@@ -1270,28 +1249,10 @@ void Application::Draw()
 
 		scene->setProgram(SceneManager_Client::GeodeType::MESH, meshShaderDesc);
 		scene->setProgram(SceneManager_Client::GeodeType::ANIMATED_MESH, skinShaderDesc);
+		scene->setProgram(SceneManager_Client::GeodeType::PARTICLES, particleShaderDesc);
 		GLTFGeode::useMaterials = true;
 		SceneManager_Client::enableCulling = bToggleCull;
 		scene->draw(cmd);
-
-
-
-
-		BufferUpdateDesc vboUpdateDesc = { pParticleBuffer[Application::gFrameIndex] };
-		beginUpdateResource(&vboUpdateDesc);
-		ParticleSystem::ParticleData* data = (ParticleSystem::ParticleData*)vboUpdateDesc.pMappedData;
-		particles->fillParticleData(data);
-		endUpdateResource(&vboUpdateDesc, NULL);
-		int index = 0;
-		cmdBindPipeline(cmd, pPipelineParticles);
-		//cmdBindPushConstants(cmd, pRootSignatureParticles, "cbRootConstants", &index);
-		for (int i = 0; i < DESCRIPTOR_UPDATE_FREQ_COUNT; i++) {
-			if (pDescriptorSetParticles[i])
-				cmdBindDescriptorSet(cmd, i == 0 ? 0 : Application::gFrameIndex, pDescriptorSetParticles[i]);
-		}
-		particles->draw(cmd);
-
-
 
 
 

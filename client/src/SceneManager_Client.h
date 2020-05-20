@@ -8,6 +8,7 @@
 #include "Transform.h"
 #include "GLTFGeode.h"
 #include "OzzGeode.h"
+#include "ParticleSystemGeode.h"
 #include "Animator.h"
 
 #include "Input.h"
@@ -42,20 +43,22 @@ private:
 	std::map<std::string, Animator*> animators;
 	std::map<std::string, GLTFGeode*> gltfGeodes;
 	std::map<std::string, OzzGeode*> ozzGeodes;
+	std::map<std::string, ParticleSystemGeode*> particleGeodes;
 	std::string trackedPlayer_ID;
 
 	std::vector<Transform*> otherTransforms;
     
     Buffer** instanceBuffer = NULL;
 	Buffer** boneBuffer = NULL;
+	Buffer** particleBuffer = NULL;
 
 public:
 	enum class GeodeType {
-		MESH, ANIMATED_MESH
+		MESH, ANIMATED_MESH, PARTICLES
 	};
 
 	enum class SceneBuffer {
-		INSTANCE, BONE
+		INSTANCE, BONE, PARTICLES
 	};
 
 	static bool enableCulling;

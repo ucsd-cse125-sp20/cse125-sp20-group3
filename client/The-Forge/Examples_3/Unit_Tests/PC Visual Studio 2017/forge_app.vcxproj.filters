@@ -102,8 +102,11 @@
     <ClCompile Include="..\..\..\..\..\common\resource.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\src\ParticleSystemGeode.cpp">
+      <Filter>Source Files\Scene Graph</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\..\src\ParticleSystem.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Render Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -279,6 +282,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\ParticleSystem.h">
       <Filter>Header Files\Render Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\MathUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\ParticleSystemGeode.h">
+      <Filter>Header Files\Scene Graph</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

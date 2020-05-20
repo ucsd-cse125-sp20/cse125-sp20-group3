@@ -14,7 +14,7 @@ class ParticleSystem : public Object {
 public:
 	struct ParticleData {
 		float3 position;
-		float scale;
+		float2 scale;
 		float4 color;
 	};
 

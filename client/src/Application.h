@@ -18,8 +18,6 @@
 #include "Transform.h"
 #include "OzzGeode.h"
 
-#include "ParticleSystem.h"
-
 #include "../../common/client2server.h"
 
 

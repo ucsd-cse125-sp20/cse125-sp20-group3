@@ -22,6 +22,8 @@
  * under the License.
 */
 
+#define MAX_PARTICLES 1000
+
 cbuffer cbPerPass : register(b0, UPDATE_FREQ_PER_FRAME)
 {
 	float4x4	projView;
@@ -35,11 +37,12 @@ cbuffer cbPerPass : register(b0, UPDATE_FREQ_PER_FRAME)
 
 cbuffer cbRootConstants : register(b2) {
     uint instanceIndex;
+    uint particleIndex;
 };
 
 struct ParticleData {
     float3 position;
-    float scale;
+    float2 scale;
     float4 color;
 };
 
@@ -64,21 +67,21 @@ VSOutput main(in uint vertexId : SV_VertexID, in uint instanceId : SV_InstanceID
                                 0,1,0,0,
                                 0,0,1,0,
                                 0,0,0,1);
-    toScene[0][3] = particleInstanceBuffer[instanceId].position.x;
-    toScene[1][3] = particleInstanceBuffer[instanceId].position.y;
-    toScene[2][3] = particleInstanceBuffer[instanceId].position.z;
-    float4x4 toWorld = mul(instanceBuffer[0], toScene);
+    toScene[0][3] = particleInstanceBuffer[particleIndex * MAX_PARTICLES + instanceId].position.x;
+    toScene[1][3] = particleInstanceBuffer[particleIndex * MAX_PARTICLES + instanceId].position.y;
+    toScene[2][3] = particleInstanceBuffer[particleIndex * MAX_PARTICLES + instanceId].position.z;
+    float4x4 toWorld = mul(instanceBuffer[instanceIndex], toScene);
     float4x4 modelView = mul(view, toWorld);
 
     float4 vertPos;
-    vertPos.x = (x - 0.5f) * particleInstanceBuffer[instanceId].scale + modelView[0][3];
-    vertPos.y = (y - 0.5f) * particleInstanceBuffer[instanceId].scale + modelView[1][3];
+    vertPos.x = (x - 0.5f) * particleInstanceBuffer[particleIndex * MAX_PARTICLES + instanceId].scale.x + modelView[0][3];
+    vertPos.y = (y - 0.5f) * particleInstanceBuffer[particleIndex * MAX_PARTICLES + instanceId].scale.y + modelView[1][3];
     vertPos.z = modelView[2][3];
     vertPos.w = 1.0f;
 
     result.pos = mul(proj, vertPos);
 
     result.uv = float2(x,1-y);
-    result.color = particleInstanceBuffer[instanceId].color;
+    result.color = particleInstanceBuffer[particleIndex * MAX_PARTICLES + instanceId].color;
     return result;
 };

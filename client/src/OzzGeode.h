@@ -19,13 +19,10 @@ public:
 		uint32_t animatedInstanceIndex;
 	};
 
+	int selfAnimatedInstanceCount = 0;
+
 	OzzGeode(Renderer* renderer, std::string directory);
 	~OzzGeode();
-
-	static bool countingAnimatedInstances;
-	static uint32_t animatedInstanceCount;
-	int selfAnimatedInstanceCount = 0;
-	std::deque<int> animatedInstanceIDs;
 
 	void unload();
 

@@ -449,7 +449,7 @@ void SceneManager_Server::testAttacking() {
 	idMap[id_str] = m1;
 	std::cout << "created minion at id " << id_str << "\n";
 
-	id_str = std::to_string(next_super_minion_id);
+	/*id_str = std::to_string(next_super_minion_id);
 	next_super_minion_id++;
 	transform = mat4::translation(vec3(14, 0, 5));
 	SuperMinion* sm1 = new SuperMinion(id_str, blue_team, this);
@@ -458,7 +458,7 @@ void SceneManager_Server::testAttacking() {
 	std::cout << "created super minion at id " << id_str << "\n";
 
 	m1->setAttackTarget(sm1);
-	sm1->setAttackTarget(m1);
+	sm1->setAttackTarget(m1);*/
 
 	/*id_str = std::to_string(next_super_minion_id);
 	next_super_minion_id++;

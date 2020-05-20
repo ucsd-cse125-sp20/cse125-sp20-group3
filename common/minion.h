@@ -20,6 +20,7 @@ protected:
 	int attackRange;
 	float attackInterval;
 	float velocity;
+	bool doneMoving;
 
 	Minion(std::string id, int health, int attack, int range, float interval, float vel, Team* t, SceneManager_Server* sm); //accept values for other types of minions
 public:

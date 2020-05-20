@@ -16,6 +16,7 @@
 #include "../../common/macros.h"
 #include "../../common/GameObject.h"
 #include "../../common/entity.h"
+#include "../../common/team.h"
 #include "../../common/player.h"
 #include "../../common/base.h"
 #include "../../common/minion.h"
@@ -51,6 +52,8 @@ private:
     Buffer** instanceBuffer = NULL;
 	Buffer** boneBuffer = NULL;
 
+	Team *red_team, *blue_team;
+
 public:
 	enum class GeodeType {
 		MESH, ANIMATED_MESH
@@ -73,7 +76,7 @@ public:
 
 	void createMaterialResources(SceneManager_Client::GeodeType type, RootSignature* pRootSignature, DescriptorSet* pBindlessTexturesSamplersSet, Sampler* defaultSampler);
 
-	void updateFromClientBuf(std::vector<Client::UpdateData> updateBuf);
+	void updateScene(std::vector<Client::UpdateData> updateBuf);
 	void updateFromInputBuf(float deltaTime);
 
 	void setBuffer(SceneManager_Client::SceneBuffer type, Buffer** buffers); // TODO Could probably mange instance buffers within class, rather than app

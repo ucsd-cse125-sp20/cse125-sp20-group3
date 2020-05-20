@@ -5,7 +5,7 @@
 
 class SuperMinion : public Minion {
 public:
-	SuperMinion(std::string id, SceneManager_Server* sm_server);
+	SuperMinion(std::string id, Team* t, SceneManager_Server* sm_server);
 };
 
 #endif

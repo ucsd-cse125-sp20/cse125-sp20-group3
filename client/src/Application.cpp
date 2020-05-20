@@ -992,7 +992,7 @@ void Application::Update(float deltaTime)
 	/************************************************************************/
 
 	if (connected) {
-		scene->updateFromClientBuf(updateBuf);
+		scene->updateScene(updateBuf);
 	}
 	else {
 		scene->updateFromInputBuf(deltaTime);

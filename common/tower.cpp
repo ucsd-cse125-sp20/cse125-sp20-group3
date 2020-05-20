@@ -1,11 +1,17 @@
 #include "tower.h"
 #include "../server/SceneManager_Server.h"
 
-Tower::Tower(std::string id, int health, int attack, SceneManager_Server* sm) : Entity(id, health, attack, sm) {
-	ObjectDetection::addObject(this, DETECTION_FLAG_TOWER | DETECTION_FLAG_ENTITY);
+Tower::Tower(std::string id, int health, int attack, Team* t, SceneManager_Server* sm) : Entity(id, health, attack, t, sm) {
+	if (sm != nullptr) { //only execute on server
+		int flags = DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE | DETECTION_FLAG_TOWER;
+		if (t->teamColor == RED_TEAM) flags = flags | DETECTION_FLAG_RED_TEAM;
+		else flags = flags | DETECTION_FLAG_BLUE_TEAM;
+		ObjectDetection::addObject(this, flags);
+	}
 }
 
-void Tower::setHealth(int new_health) {
-	Entity::setHealth(new_health);
-	if (health <= 0) team->decTower();
+void Tower::takeDamage(int damage) {
+	Entity::takeDamage(damage);
+	std::cout << "tower: " << this << " took " << damage << " damage | remaining health: " << health << "\n";
+	if (health <= 0) { team->decTower(); std::cout << "i die\n"; }
 }

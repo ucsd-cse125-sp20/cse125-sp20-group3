@@ -441,7 +441,7 @@ void SceneManager_Server::testAttacking() {
 	std::string id_str;
 	mat4 transform;
 
-	/*id_str = std::to_string(next_minion_id);
+	id_str = std::to_string(next_minion_id);
 	next_minion_id++;
 	transform = mat4::translation(vec3(10, 0, 5));
 	Minion* m1 = new Minion(id_str, red_team, this);
@@ -458,7 +458,7 @@ void SceneManager_Server::testAttacking() {
 	std::cout << "created super minion at id " << id_str << "\n";
 
 	m1->setAttackTarget(sm1);
-	sm1->setAttackTarget(m1);*/
+	sm1->setAttackTarget(m1);
 
 	/*id_str = std::to_string(next_super_minion_id);
 	next_super_minion_id++;
@@ -476,7 +476,7 @@ void SceneManager_Server::testAttacking() {
 
 	sm2->setAttackTarget(c1);*/
 
-	id_str = std::to_string(next_laser_id);
+	/*id_str = std::to_string(next_laser_id);
 	next_laser_id++;
 	transform = mat4::translation(vec3(5, 0, -5));
 	LaserTower* l1 = new LaserTower(id_str, red_team, this);
@@ -491,7 +491,7 @@ void SceneManager_Server::testAttacking() {
 	idMap[id_str] = m2;
 
 	l1->setAttackTarget(m2);
-	m2->setAttackTarget(l1);
+	m2->setAttackTarget(l1);*/
 }
 
 /***** legacy code *****/

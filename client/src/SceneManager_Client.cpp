@@ -94,7 +94,7 @@ void SceneManager_Client::createMaterialResources(SceneManager_Client::GeodeType
 	}
 }
 
-void SceneManager_Client::updateFromClientBuf(std::vector<Client::UpdateData> updateBuf)
+void SceneManager_Client::updateScene(std::vector<Client::UpdateData> updateBuf)
 {
 	//std::cout << "updating from client buf of size " << updateBuf.size() << "\n";
 	for (Client::UpdateData data : updateBuf) {
@@ -158,6 +158,9 @@ void SceneManager_Client::updateFromClientBuf(std::vector<Client::UpdateData> up
 		
 		if (data.ent_data.health <= 0) { //updated health marks entity as dead
 			//play death animation
+
+			this->removeChild(transforms[data.id_str]);
+
 			conf_delete(idMap[data.id_str]);
 			idMap.erase(data.id_str);
 			conf_delete(transforms[data.id_str]);

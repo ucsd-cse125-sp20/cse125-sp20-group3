@@ -59,6 +59,16 @@ void UIUtils::createText(std::string label, std::string text, float x, float y, 
 	texts[label].desc.mFontColor = color;
 }
 
+void UIUtils::editText(std::string label, std::string text)
+{
+	texts[label].text = text;
+}
+
+void UIUtils::removeText(std::string label)
+{
+	texts.erase(label);
+}
+
 void UIUtils::loadTexture(std::string filename)
 {
 	Texture* tex;

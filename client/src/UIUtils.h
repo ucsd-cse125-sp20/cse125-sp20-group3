@@ -60,15 +60,22 @@ public:
 	// Create screen space text
 	static void createText(std::string label, std::string text, float x, float y, std::string font, float size = 30, uint32_t color=0xffffffff);
 
+	// Change text content
+	static void editText(std::string label, std::string text);
 
-	// Create an empty widget container
-	static void createGuiComponent(std::string label, GuiDesc desc, UIApp app);
+	// Remove a text element
+	static void removeText(std::string label);
+
 
 	// Load a texture for the UI
 	static void loadTexture(std::string filename);
 
 	// Load a font file
 	static void loadFont(std::string label, std::string filename, UIApp app);
+
+
+	// Create an empty widget container
+	static void createGuiComponent(std::string label, GuiDesc desc, UIApp app);
 
 	// Deallocate resources
 	static void unload();

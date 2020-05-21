@@ -445,10 +445,10 @@ void Application::InitDebugGui()
 	UIUtils::addCallbackToImage("test", []() { UIUtils::changeImage("test", "why.png", 0.5f); });
 
 	UIUtils::createImage("aremover", "WeirdBox_halo.png", 600, 100, gAppUI, 0.05f);
-	UIUtils::addCallbackToImage("aremover", []() { UIUtils::removeImage("test"); });
+	UIUtils::addCallbackToImage("aremover", []() { UIUtils::removeImage("test"); UIUtils::editText("testText", "boop"); });
 
 	UIUtils::loadFont("default font", "ComicRelief/ComicRelief.ttf", gAppUI);
-	UIUtils::createText("testText", "HELLO WORLD!!!", 500, 800, "default font", 128, 0xff9955ff);
+	UIUtils::createText("testText", "HELLO WORLD!!!", 500, 800, "default font", 128, 0xff6655ff);
 }
 
 void Application::ToggleClient()

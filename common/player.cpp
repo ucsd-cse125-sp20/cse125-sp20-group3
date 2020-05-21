@@ -1,22 +1,15 @@
 #include "player.h"
 #include "../server/SceneManager_Server.h"
 
-Player::Player(SceneManager_Server* sm) : Entity(PLAYER_HEALTH, PLAYER_ATTACK, sm) {
+Player::Player(std::string id, Team* t, SceneManager_Server* sm) : Entity(id, PLAYER_HEALTH, PLAYER_ATTACK, t, sm) {
 	velocity_x = 0.f;
 	velocity_z = 0.f;
 	rotation_y = 0.f;
 	acceleration_x = 0.f;
 	acceleration_z = 0.f;
 	buildMode = NEUTRAL;
-}
 
-Player::Player(SceneManager_Server* sm, mat4 model_mat) : Entity(PLAYER_HEALTH, PLAYER_ATTACK, sm, model_mat) {
-	velocity_x = 0.f;
-	velocity_z = 0.f;
-	rotation_y = 0.f;
-	acceleration_x = 0.f;
-	acceleration_z = 0.f;
-	buildMode = NEUTRAL;
+	ObjectDetection::addObject(this, DETECTION_FLAG_PLAYER | DETECTION_FLAG_ENTITY);
 }
 
 void Player::update(float deltaTime) {
@@ -60,13 +53,13 @@ void Player::processInput(PlayerInput in) {
 
 			switch (buildMode) { //build something based on buildMode
 			case LASER: //TODO: check plastic and metal cost against amount in team inventory
-				//manager->spawnEntity(LASER_TYPE, x, z, y);
+				if (team->checkResources(LASER_TYPE))//manager->spawnEntity(LASER_TYPE, x, z, y);
 				break;
 			case CLAW:
-				//manager->spawnEntity(CLAW_TYPE, x, z, y);
+				if (team->checkResources(CLAW_TYPE))//manager->spawnEntity(CLAW_TYPE, x, z, y);
 				break;
 			case SUPER_MINION:
-				//manager->spawnEntity(SUPER_MINION_TYPE, x, z, y);
+				if (team->checkResources(SUPER_MINION_TYPE))//manager->spawnEntity(SUPER_MINION_TYPE, x, z, y);
 				break;
 			default:
 				std::cout << "invalid buildMode\n";

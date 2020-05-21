@@ -24,6 +24,9 @@ int __cdecl main(void)
 	SceneManager_Server* manager = new SceneManager_Server();
 	Server* server = new Server(manager);
 
+	// populate map
+	manager->populateMap();
+
     // Game State data
 	std::chrono::steady_clock::time_point lastTime = std::chrono::steady_clock::now();
 	float deltaTime;

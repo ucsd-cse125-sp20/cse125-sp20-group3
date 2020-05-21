@@ -3,17 +3,16 @@
 
 #include "entity.h"
 #include "team.h"
+#include "ObjectDetection.h"
 #include <iostream>
 #include <chrono>
 #include <ctime>
 
 class Tower : public Entity {
-private:
-	Entity* attackTarget;
+protected:
+	Tower(std::string id, int health, int attack, Team* t, SceneManager_Server* sm);
 public:
-	Tower(int health, int attack, SceneManager_Server* sm);
-	Tower(int health, int attack, SceneManager_Server* sm, mat4 model_mat);
-	void update(float deltaTime) override;
+	void takeDamage(int damage) override;
 };
 
 #endif

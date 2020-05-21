@@ -2,7 +2,6 @@
 
 GameObject::GameObject() {
 	model = mat4::identity();
-	//lastTime = std::chrono::steady_clock::now();
 }
 
 void GameObject::setGOData(GameObjectData data){
@@ -20,6 +19,10 @@ void GameObject::setMatrix(mat4 m){
 }
 mat4 GameObject::getMatrix(){
 	return model;
+}
+
+vec3 GameObject::getPosition() {
+	return getMatrix()[3].getXYZ();
 }
 
 int GameObject::writeData(char buf[], int index) {

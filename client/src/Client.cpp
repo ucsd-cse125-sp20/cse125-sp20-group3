@@ -74,7 +74,7 @@ int Client::sendData(char sendbuf[], int buflen, int flags) {
 	int iResult = send(ConnectSocket, sendbuf, buflen, flags);
 	//std::cout << "sent\n";
 	if (iResult == SOCKET_ERROR) {
-		std::cout << "send failed with error: " << WSAGetLastError() << std::endl;
+		//std::cout << "send failed with error: " << WSAGetLastError() << std::endl;
 		closesocket(ConnectSocket);
 		WSACleanup();
 		return -1;
@@ -109,7 +109,7 @@ std::vector<Client::UpdateData> Client::recvAndFormatData() {
 	while (1) { //receive until recv queue is empty
 		iResult = ioctlsocket(ConnectSocket, FIONBIO, &nonblocking);
 		if (iResult == SOCKET_ERROR) {
-			std::cout << "ioctlsocket before receiving packet size failed with error: " << WSAGetLastError() << "\n";
+			//std::cout << "ioctlsocket before receiving packet size failed with error: " << WSAGetLastError() << "\n";
 		}
 		//std::cout << "receiving data packet size\n";
 		iResult = recv(ConnectSocket, size_int_buf, sizeof(int), 0); //first receive size of data as an int
@@ -120,7 +120,7 @@ std::vector<Client::UpdateData> Client::recvAndFormatData() {
 				break;
 			}
 			else {
-				std::cout << "recv of size failed with error: " << code << std::endl;
+				//std::cout << "recv of size failed with error: " << code << std::endl;
 				closesocket(ConnectSocket);
 				WSACleanup();
 				std::vector<UpdateData> empty;

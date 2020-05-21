@@ -93,9 +93,6 @@
     <ClCompile Include="..\..\..\..\src\Animator.cpp">
       <Filter>Source Files\Scene Graph</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\src\UIManager.cpp">
-      <Filter>Source Files\Render Objects</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\..\common\clawtower.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
@@ -107,6 +104,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\ParticleSystem.cpp">
       <Filter>Source Files\Render Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\src\UIUtils.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -271,9 +271,6 @@
     <ClInclude Include="..\..\..\..\src\Animator.h">
       <Filter>Header Files\Scene Graph</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\src\UIManager.h">
-      <Filter>Header Files\Render Objects</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\..\common\clawtower.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
@@ -288,6 +285,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\ParticleSystemGeode.h">
       <Filter>Header Files\Scene Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\UIUtils.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

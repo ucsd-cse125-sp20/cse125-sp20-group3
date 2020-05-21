@@ -48,7 +48,7 @@
     <ClCompile Include="..\..\..\..\src\ParticleSystemGeode.cpp" />
     <ClCompile Include="..\..\..\..\src\SceneManager_Client.cpp" />
     <ClCompile Include="..\..\..\..\src\Transform.cpp" />
-    <ClCompile Include="..\..\..\..\src\UIManager.cpp" />
+    <ClCompile Include="..\..\..\..\src\UIUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\src\Shaders\D3D12\basic.frag" />
@@ -109,7 +109,7 @@
     <ClInclude Include="..\..\..\..\src\ParticleSystemGeode.h" />
     <ClInclude Include="..\..\..\..\src\SceneManager_Client.h" />
     <ClInclude Include="..\..\..\..\src\Transform.h" />
-    <ClInclude Include="..\..\..\..\src\UIManager.h" />
+    <ClInclude Include="..\..\..\..\src\UIUtils.h" />
     <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\cgltf\cgltf.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

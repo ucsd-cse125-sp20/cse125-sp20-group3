@@ -12,11 +12,8 @@
 
 #include "SceneManager_Client.h"
 
-#include "UIManager.h"
-
-#include "GLTFGeode.h"
-#include "Transform.h"
-#include "OzzGeode.h"
+#include "UIUtils.h"
+#include "../The-Forge/Common_3/ThirdParty/OpenSource/imgui/imgui.h"
 
 #include "../../common/client2server.h"
 

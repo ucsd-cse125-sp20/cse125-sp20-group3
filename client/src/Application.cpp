@@ -149,7 +149,7 @@ std::vector<mat4> instanceData;
 std::vector<mat4> shadowInstanceData;
 
 //--------------------------------------------------------------------------------------------
-// THE FORGE OBJECTS
+// OTHEr
 //--------------------------------------------------------------------------------------------
 
 ICameraController* pCameraController = NULL;
@@ -158,9 +158,10 @@ ICameraController* pLightView = NULL;
 GuiComponent* pDebugGui;
 GuiComponent* pTestGui;
 
-Texture* testImage;
-
 UIApp gAppUI;
+
+float3 uiBgColor = float3(0.2f, 0.25f, 0.3f);
+float bgAlpha = 0.0f;
 
 Input inputHandler;
 
@@ -382,6 +383,11 @@ void Application::RemoveShaderResources()
 
 void Application::InitDebugGui()
 {
+	UIUtils::setStyleColor(ImGuiCol_Border, float4(0, 0, 0, 0));
+	UIUtils::setStyleColor(ImGuiCol_Button, float4(0, 0, 0, 0));
+	UIUtils::setStyleColor(ImGuiCol_ButtonHovered, float4(0, 0, 0, 0));
+	UIUtils::setStyleColor(ImGuiCol_ButtonActive, float4(0, 0, 0, 0));
+
 	GuiDesc guiDesc = {};
 	guiDesc.mStartSize = vec2(400.0f, 20.0f);
 	guiDesc.mStartPosition = vec2(100, 0);
@@ -430,32 +436,19 @@ void Application::InitDebugGui()
 
 	pDebugGui->AddWidget(LightWidgets);
 
+	CollapsingHeaderWidget GuiWidgets("GUI Settings");
+	GuiWidgets.AddSubWidget(SliderFloatWidget("BG Alpha", &bgAlpha, 0.01f, 1.0f, 0.001f));
+	pDebugGui->AddWidget(GuiWidgets);
 
+	// Example usage
+	UIUtils::createImage("test", "bot.png", 500, 0, gAppUI);
+	UIUtils::addCallbackToImage("test", []() { UIUtils::changeImage("test", "why.png", 0.5f); });
 
-	/*
-	GuiDesc testGuiDesc = {};
-	testGuiDesc.mStartSize = vec2(100, 100);
-	testGuiDesc.mStartPosition = vec2((float)mSettings.mWidth - 1000, (float)mSettings.mHeight - 1000);
-	pTestGui = gAppUI.AddGuiComponent("asdf", &testGuiDesc);
-	pTestGui->mFlags |= GUI_COMPONENT_FLAGS_NO_TITLE_BAR;
-	pTestGui->mFlags |= GUI_COMPONENT_FLAGS_ALWAYS_USE_WINDOW_PADDING;
-	pTestGui->mFlags |= GUI_COMPONENT_FLAGS_NO_RESIZE;
-	pTestGui->mFlags |= GUI_COMPONENT_FLAGS_NO_COLLAPSE;
-	pTestGui->mFlags |= GUI_COMPONENT_FLAGS_NO_SCROLLBAR;
-	pTestGui->mAlpha = 0.9f;
+	UIUtils::createImage("aremover", "WeirdBox_halo.png", 600, 100, gAppUI, 0.05f);
+	UIUtils::addCallbackToImage("aremover", []() { UIUtils::removeImage("test"); });
 
-	PathHandle testImagePath = fsCopyPathInResourceDirectory(RD_TEXTURES, "bot.png");
-	TextureLoadDesc texDesc = {};
-	texDesc.pFilePath = testImagePath;
-	texDesc.ppTexture = &testImage;
-	addResource(&texDesc, NULL, LOAD_PRIORITY_LOW);
-	waitForAllResourceLoads();
-	
-	TextureButtonWidget texWidget("");
-	texWidget.SetTexture(testImage, float2(200, 200));
-	texWidget.pOnDeactivatedAfterEdit = []() { printf("Boop\n"); };
-	pTestGui->AddWidget(texWidget);
-	*/
+	UIUtils::loadFont("default font", "ComicRelief/ComicRelief.ttf", gAppUI);
+	UIUtils::createText("testText", "HELLO WORLD!!!", 500, 800, "default font", 128, 0xff9955ff);
 }
 
 void Application::ToggleClient()
@@ -691,6 +684,8 @@ void Application::Exit()
 
 	RemoveSceneResources();
 
+	UIUtils::unload();
+
 	destroyCameraController(pCameraController);
 	destroyCameraController(pLightView);
 
@@ -699,7 +694,6 @@ void Application::Exit()
 #endif
 
 	gAppUI.Exit();
-	//removeResource(testImage);
 
 	for (uint32_t i = 0; i < Application::gImageCount; ++i)
 	{
@@ -1151,7 +1145,10 @@ void Application::Update(float deltaTime)
 	gUniformData.mShadowLightViewProj = gShadowUniformData.ViewProj;
 
 	/************************************************************************/
+	// UI updates
 	/************************************************************************/
+
+	UIUtils::setStyleColor(ImGuiCol_WindowBg, float4(uiBgColor, bgAlpha));
 
 	gAppUI.Update(deltaTime);
 }
@@ -1357,10 +1354,9 @@ void Application::Draw()
 
 		//cmdDrawProfilerUI();
 
-		//ImGui::SetNextWindowBgAlpha(0);
 		gAppUI.Gui(pDebugGui);
-		//gAppUI.Gui(pTestGui);
-
+		UIUtils::drawImages(cmd, gAppUI);
+		UIUtils::drawText(cmd, gAppUI);
 		gAppUI.Draw(cmd);
 
 		cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);

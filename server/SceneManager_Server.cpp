@@ -490,7 +490,7 @@ void SceneManager_Server::testAttacking() {
 	transform = mat4::translation(vec3(20, 0, 24));
 	Minion* m2 = new Minion(id_str, blue_team, this);
 	m2->setMatrix(transform);
-	idMap[id_str] = m2;*
+	idMap[id_str] = m2;
 }
 
 /***** legacy code *****/

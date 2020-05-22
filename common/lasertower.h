@@ -3,6 +3,10 @@
 
 #include "tower.h"
 
+#define LASER_ACTION_IDLE 0
+#define LASER_ACTION_ATTACK 1
+#define LASER_ACTION_FIRE 2
+
 class LaserTower : public Tower {
 private:
 	float timeElapsed;
@@ -15,6 +19,8 @@ public:
 
 	void update(float deltaTime) override;
 	void attack();
+
+	void setEntData(EntityData data) override;
 
 	/* TESTING SPECIFIC FUNCTIONALITY - DO NOT USE */
 	void setAttackTarget(Entity* e);

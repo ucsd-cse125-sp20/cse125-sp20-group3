@@ -11,6 +11,11 @@
 #include <ctime>
 #include <map>
 
+#define MINION_ACTION_IDLE 0
+#define MINION_ACTION_MOVE 1
+#define MINION_ACTION_ATTACK 2
+#define MINION_ACTION_FIRE 3
+
 class Minion : public Entity {
 protected:
 	mapNode* destNode;
@@ -30,6 +35,8 @@ public:
 	void takeDamage(int damage) override;
 	void move(float deltaTime);
 	void attack();
+
+	void setEntData(EntityData data) override;
 
 	//TESTING SPECIFIC FUNCTIONALITY - DO NOT USE
 	void setAttackTarget(Entity* e);

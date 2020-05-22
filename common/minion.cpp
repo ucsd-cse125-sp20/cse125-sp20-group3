@@ -2,6 +2,8 @@
 #include "../server/SceneManager_Server.h"
 
 Minion::Minion(std::string id, Team* t, SceneManager_Server* sm) : Entity(id, MINION_HEALTH, MINION_ATTACK, t, sm) {
+	actionState = MINION_ACTION_IDLE;
+
 	timeElapsed = 0;
 	attackTarget = nullptr;
 	attackRange = MINION_ATK_RANGE;
@@ -68,6 +70,7 @@ void Minion::update(float deltaTime) { //should they be able to switch attack ta
 
 	if (attackTarget != nullptr) { //if this minion should be attacking something, don't move
 		timeElapsed += deltaTime; //increase timeElapsed
+		actionState = MINION_ACTION_ATTACK;
 
 		//first face the attack target, regardless of timeElapsed
 		vec3 forward = normalize(attackTarget->getPosition() - this->getPosition()); //TODO check vectors?
@@ -84,6 +87,8 @@ void Minion::update(float deltaTime) { //should they be able to switch attack ta
 	else { //no attack target after all checks, move
 		this->move(deltaTime);
 	}
+
+	ObjectDetection::updateObject(this);
 }
 
 void Minion::takeDamage(int damage) {
@@ -94,11 +99,14 @@ void Minion::takeDamage(int damage) {
 
 void Minion::attack() {
 	attackTarget->takeDamage(this->attackDamage);
+	actionState = MINION_ACTION_FIRE;
 	//TODO manipulate necessary data to spawn particle systems
 }
 
 void Minion::move(float deltaTime) {
 	if (doneMoving) return; //small optimization
+
+	actionState = MINION_ACTION_MOVE;
 
 	float remaining_move_dist = velocity * deltaTime; //full movement distance this minion travels this tick
 
@@ -129,12 +137,16 @@ void Minion::move(float deltaTime) {
 			else {
 				std::cout << "minion reached the end of the path!\n";
 				doneMoving = true;
+				actionState = MINION_ACTION_IDLE;
 				break;
 			}
 		}
 	}
+}
 
-	ObjectDetection::updateObject(this);
+void Minion::setEntData(EntityData data) {
+	Entity::setEntData(data);
+	//std::cout << "minion actionState: " << (int)actionState << "\n";
 }
 
 /* TESTING SPECIFIC FUNCTIONALITY - DO NOT USE */

@@ -13,6 +13,7 @@ class SceneManager_Server;
 class Entity : public GameObject {
 protected:
 	std::string id_str;
+	char actionState;
 	int health;
 	int attackDamage;
 	Team* team;
@@ -23,6 +24,7 @@ protected:
 public:
 	struct EntityData {
 		GameObjectData GO_data;
+		char actionState;
 		char teamColor;
 		int health;
 	};
@@ -40,6 +42,7 @@ public:
 	virtual void setEntData(EntityData data) {
 		lastPosition = this->getPosition(); //save old position for velocity inference purposes
 		this->GameObject::setGOData(data.GO_data);
+		this->actionState = data.actionState;
 		//teamColor is never updated, only used for initial instantiation of objects
 		this->health = data.health;
 	}
@@ -47,6 +50,7 @@ public:
 	int writeData(char buf[], int index) override {
 		EntityData entData;
 		entData.GO_data = this->GameObject::getData();
+		entData.actionState = this->actionState;
 		entData.teamColor = team != nullptr ? team->teamColor : NO_TEAM;
 		entData.health = this->health;
 		((EntityData*)(buf + index))[0] = entData;

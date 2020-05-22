@@ -2,7 +2,8 @@
 #include "../server/SceneManager_Server.h"
 
 LaserTower::LaserTower(std::string id, Team* t, SceneManager_Server* sm_server) : Tower(id, LASER_TOWER_HEALTH, LASER_TOWER_ATTACK, t, sm_server) {
-	//init stuff
+	actionState = LASER_ACTION_IDLE;
+	
 	timeElapsed = 0;
 	attackTarget = NULL;
 	attackRange = LASER_FIRE_RANGE;
@@ -38,6 +39,7 @@ void LaserTower::update(float deltaTime) { //should they be able to switch attac
 
 	if (attackTarget != nullptr) {
 		timeElapsed += deltaTime; //increase timeElapsed
+		actionState = LASER_ACTION_ATTACK;
 
 		if (timeElapsed >= attackInterval) { //only attack on an interval
 			std::cout << "laser " << id_str << " attacking " << attackTargetID << "\n";
@@ -45,13 +47,20 @@ void LaserTower::update(float deltaTime) { //should they be able to switch attac
 			timeElapsed = 0;
 		}
 	}
+	else actionState = LASER_ACTION_IDLE;
 
 	ObjectDetection::updateObject(this);
 }
 
 void LaserTower::attack() {
 	attackTarget->takeDamage(this->attackDamage);
+	actionState = LASER_ACTION_FIRE;
 	//TODO manipulate necessary data to spawn particle systems
+}
+
+void LaserTower::setEntData(EntityData data) {
+	Entity::setEntData(data);
+	//std::cout << "laser " << id_str << " actionState: " << (int)actionState << "\n";
 }
 
 /* TESTING SPECIFIC FUNCTIONALITY - DO NOT USE */

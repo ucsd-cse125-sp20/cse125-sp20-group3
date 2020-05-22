@@ -19,6 +19,7 @@
 
 #include "../common/ObjectDetection.h"
 #include "../common/mapNode.h"
+#include "../common/spawnNode.h"
 
 class SceneManager_Server {
 private:
@@ -29,6 +30,7 @@ private:
 public:
 	std::map<std::string, Entity*> idMap;
 	std::vector<mapNode*> *map;
+	std::vector<spawnNode*> *spawnNodeMap;
 
 	SceneManager_Server();
 	void processInput(std::string player, PlayerInput in);
@@ -39,6 +41,7 @@ public:
 	int encodeState(char buf[], int start_index);
 	int encodeScene(char buf[], int start_index);
 
+	void populateSpawnLocation();
 	void populateScene();
 	void testAttacking();
 

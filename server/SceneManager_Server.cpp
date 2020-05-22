@@ -243,8 +243,89 @@ int SceneManager_Server::encodeScene(char buf[], int start_index) {
 	return i;
 }
 
+void SceneManager_Server::populateSpawnLocation(){
+	std::vector<spawnNode*> spawnNodeMap;
+	this->spawnNodeMap = &spawnNodeMap;
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 7.5, 27.5)); //1
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 12.5, 27.5)); //2
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 17.5, 27.5)); //3
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 22.5, 17.5)); //4
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 27.5, 17.5)); //5
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 32.5, 17.5)); //6
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 42.5, 27.5)); //7
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 32.5, 42.5)); //8
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 17.5, 52.5)); //9
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 22.5, 52.5)); //10
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 32.5, 52.5)); //11
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 32.5, 57.5)); //12
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 32.5, 67.5)); //13
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 32.5, 72.5)); //14
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 12.5, 87.5)); //15
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 12.5, 92.5)); //16
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 22.5, 82.5)); //17
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 27.5, 82.5)); //18
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 32.5, 82.5)); //19
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 27.5, 87.5)); //20
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 27.5, 92.5)); //21
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 42.5, 67.5)); //22
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 47.5, 67.5)); //23
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 52.5, 32.5)); //24
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 57.5, 42.5)); //25
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 57.5, 47.5)); //26
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 67.5, 17.5)); //27
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 67.5, 32.5)); //28
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 72.5, 62.5)); //29
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 77.5, 12.5)); //30
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 82.5, 12.5)); //31
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 77.5, 17.5)); //32
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 97.5, 27.5)); //33
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 92.5, 82.5)); //34
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 117.5, 42.5)); //35
+
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 122.5, 72.5)); //36
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 117.5, 72.5)); //37
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 117.5, 67.5)); //38
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 117.5, 52.5)); //39
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 117.5, 47.5)); //40
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 127.5, 37.5)); //41
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 122.5, 22.5)); //42
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 122.5, 17.5)); //43
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 107.5, 92.5)); //44
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 102.5, 92.5)); //45
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 97.5, 92.5)); //46
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 92.5, 92.5)); //47
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 102.5, 82.5)); //48
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 102.5, 77.5)); //49
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 107.5, 22.5)); //50
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 102.5, 17.5)); //51
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 102.5, 12.5)); //52
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 102.5, 7.5)); //53
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 107.5, 7.5)); //54
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 92.5, 17.5)); //55
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 92.5, 62.5)); //56
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 92.5, 67.5)); //57
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 82.5, 77.5)); //58
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 82.5, 62.5)); //59
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 77.5, 52.5)); //60
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 82.5, 42.5)); //61
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 67.5, 92.5)); //62
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 67.5, 87.5)); //63
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 62.5, 52.5)); //64
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 57.5, 72.5)); //65
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 47.5, 52.5)); //66
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 37.5, 92.5)); //67
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 32.5, 92.5)); //68
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 32.5, 27.5)); //69
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 12.5, 67.5)); //70
+	
+
+
+	
+}
+
 void SceneManager_Server::populateMap() {
 	std::vector<mapNode*> nodeMap;
+	this->map = &nodeMap;
 	nodeMap.push_back(new mapNode(7.5, 17.5)); //0
 	nodeMap.push_back(new mapNode(22.5, 17.5)); //1
 	nodeMap[0]->setNextRed(nodeMap[1]);

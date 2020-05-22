@@ -13,8 +13,8 @@ private:
     int minionCount;
     int towerCount;
 public:
-    int teamColor;
-    Team(int color);
+    char teamColor;
+    Team(char color);
 	void incMinion();
 	void decMinion();
     void incTower();

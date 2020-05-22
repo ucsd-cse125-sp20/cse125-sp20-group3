@@ -107,6 +107,6 @@ void Player::setMoveAndDir(int move_x, int move_z, float view_y_rot) {
 void Player::setEntData(EntityData data) {
 	Entity::setEntData(data);
 	vec3 move_dir = this->getPosition() - lastPosition;
-	std::cout << "player move_dir x: " << move_dir.getX() << " z: " << move_dir.getZ() << "\n";
+	//std::cout << "player move_dir x: " << move_dir.getX() << " z: " << move_dir.getZ() << "\n";
 	//TODO set run animation in move_dir taking into account forward vector
 }

@@ -460,7 +460,7 @@ void SceneManager_Server::testAttacking() {
 	m1->setAttackTarget(sm1);
 	sm1->setAttackTarget(m1);*/
 
-	/*id_str = std::to_string(next_super_minion_id);
+	id_str = std::to_string(next_super_minion_id);
 	next_super_minion_id++;
 	transform = mat4::translation(vec3(-5, 0, 0));
 	SuperMinion* sm2 = new SuperMinion(id_str, blue_team, this);
@@ -469,33 +469,33 @@ void SceneManager_Server::testAttacking() {
 
 	id_str = std::to_string(next_claw_id);
 	next_claw_id++;
-	transform = mat4::translation(vec3(5, 0, 0));
+	transform = mat4::translation(vec3(15, 0, 0));
 	ClawTower* c1 = new ClawTower(id_str, red_team, this);
 	c1->setMatrix(transform);
 	idMap[id_str] = c1;
 
-	sm2->setAttackTarget(c1);*/
+	//sm2->setAttackTarget(c1);
 
-	id_str = std::to_string(next_laser_id);
+	/*id_str = std::to_string(next_laser_id);
 	next_laser_id++;
-	transform = mat4::translation(vec3(85, 0, 50));
+	transform = mat4::translation(vec3(30, 0, 42));
 	LaserTower* l1 = new LaserTower(id_str, red_team, this);
 	l1->setMatrix(transform);
 	idMap[id_str] = l1;
 
 	id_str = std::to_string(next_laser_id);
 	next_laser_id++;
-	transform = mat4::translation(vec3(90, 0, 50));
+	transform = mat4::translation(vec3(40, 0, 46));
 	LaserTower* l2 = new LaserTower(id_str, blue_team, this);
 	l2->setMatrix(transform);
 	idMap[id_str] = l2;
 
 	id_str = std::to_string(next_minion_id);
 	next_minion_id++;
-	transform = mat4::translation(vec3(107, 0, 52));
+	transform = mat4::translation(vec3(20, 0, 24));
 	Minion* m2 = new Minion(id_str, blue_team, this);
 	m2->setMatrix(transform);
-	idMap[id_str] = m2;
+	idMap[id_str] = m2;*/
 
 	//l1->setAttackTarget(m2);
 	//m2->setAttackTarget(l1);

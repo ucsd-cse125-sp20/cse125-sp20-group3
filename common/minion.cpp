@@ -56,6 +56,7 @@ void Minion::update(float deltaTime) { //should they be able to switch attack ta
 
 		if (attackTarget != nullptr && length(attackTarget->getPosition() - this->getPosition()) > this->attackRange) {
 			attackTarget = nullptr; //if target isn't actually in range, ignore it
+			//std::cout << "minion " << id_str << " ignoring target out of range\n";
 		} //object detection doesn't strictly follow distance, based on hashed block sections
 
 		if (attackTarget != nullptr) {

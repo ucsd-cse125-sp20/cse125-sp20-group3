@@ -11,7 +11,10 @@ ClawTower::ClawTower(std::string id, Team* t, SceneManager_Server* sm_server) : 
 void ClawTower::update(float deltaTime) {
 	timeElapsed += deltaTime;
 	if (timeElapsed >= spawnInterval) {
+		std::cout << "claw " << id_str << " spawning at x: " << spawnPoint.getX() << " z: " << spawnPoint.getZ() << "\n";
 		manager->spawnEntity(MINION_TYPE, spawnPoint[0], spawnPoint[2], 0, this->team);
 		timeElapsed = 0;
 	}
+
+	ObjectDetection::updateObject(this);
 }

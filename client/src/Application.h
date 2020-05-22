@@ -49,6 +49,8 @@ public:
 		uint padding00;
 	};
 
+	static UIApp gAppUI;
+
     static uint32_t gImageCount, gFrameIndex;
     static mat4 projMat, viewMat;
 

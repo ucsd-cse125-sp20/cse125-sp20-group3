@@ -7,6 +7,7 @@
 #include <map>
 #include "../The-Forge/Common_3/Renderer/IResourceLoader.h"
 #include <string>
+#include <algorithm>
 
 class TextureButtonWidget : public IWidget
 {
@@ -33,6 +34,11 @@ private:
 class UIUtils : public Object {
 public:
 
+	struct WindowDrawData {
+		GuiComponent* gui;
+		int priority;
+	};
+
 	struct TextDrawData {
 		std::string text;
 		float2 position;
@@ -41,18 +47,18 @@ public:
 
 	static std::map<std::string, Texture*> textures;
 	static std::map<std::string, int> fonts;
-	static std::map<std::string, GuiComponent*> guis;
+	static std::map<std::string, WindowDrawData> windows;
 	static std::map<std::string, TextureButtonWidget*> images;
 	static std::map<std::string, TextDrawData> texts;
 	
 	// Create an image at a specified position
-	static void createImage(std::string label, std::string filename, float x, float y, UIApp app, float scale=1.0f);
+	static void createImage(std::string label, std::string filename, float x, float y, float2 scale=float2(1,1), int priority=0);
 
 	// Adds a callback for when the image is clicked
 	static void addCallbackToImage(std::string label, WidgetCallback cb);
 
 	// Change the image in an existing component
-	static void changeImage(std::string label, std::string filename, float scale=1.0f);
+	static void changeImage(std::string label, std::string filename, float2 scale = float2(1, 1));
 
 	// Remove an image container so it isn't drawn
 	static void removeImage(std::string label);
@@ -66,16 +72,17 @@ public:
 	// Remove a text element
 	static void removeText(std::string label);
 
+	static void createBar(std::string label, float value=1.0f);
 
 	// Load a texture for the UI
 	static void loadTexture(std::string filename);
 
 	// Load a font file
-	static void loadFont(std::string label, std::string filename, UIApp app);
+	static void loadFont(std::string label, std::string filename);
 
 
 	// Create an empty widget container
-	static void createGuiComponent(std::string label, GuiDesc desc, UIApp app);
+	static void createGuiComponent(std::string label, GuiDesc desc, int priority=0);
 
 	// Deallocate resources
 	static void unload();
@@ -84,6 +91,6 @@ public:
 	static void setStyleColor(ImGuiCol_ component, float4 color);
 
 	// Set components to be drawn
-	static void drawImages(Cmd* cmd, UIApp app);
-	static void drawText(Cmd* cmd, UIApp app);
+	static void drawImages(Cmd* cmd);
+	static void drawText(Cmd* cmd);
 };

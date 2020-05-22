@@ -158,7 +158,7 @@ ICameraController* pLightView = NULL;
 GuiComponent* pDebugGui;
 GuiComponent* pTestGui;
 
-UIApp gAppUI;
+UIApp Application::gAppUI;
 
 float3 uiBgColor = float3(0.2f, 0.25f, 0.3f);
 float bgAlpha = 0.0f;
@@ -441,13 +441,13 @@ void Application::InitDebugGui()
 	pDebugGui->AddWidget(GuiWidgets);
 
 	// Example usage
-	UIUtils::createImage("test", "bot.png", 500, 0, gAppUI);
+	UIUtils::createImage("test", "bot.png", 500, 0, float2(1,1), 1);
 	UIUtils::addCallbackToImage("test", []() { UIUtils::changeImage("test", "why.png", 0.5f); });
 
-	UIUtils::createImage("aremover", "WeirdBox_halo.png", 600, 100, gAppUI, 0.05f);
-	UIUtils::addCallbackToImage("aremover", []() { UIUtils::removeImage("test"); UIUtils::editText("testText", "boop"); });
+	UIUtils::createImage("remover", "WeirdBox_halo.png", 600, 100, float2(0.05f,0.05f), 2);
+	UIUtils::addCallbackToImage("remover", []() { UIUtils::removeImage("test"); UIUtils::editText("testText", "boop"); });
 
-	UIUtils::loadFont("default font", "ComicRelief/ComicRelief.ttf", gAppUI);
+	UIUtils::loadFont("default font", "ComicRelief/ComicRelief.ttf");
 	UIUtils::createText("testText", "HELLO WORLD!!!", 500, 800, "default font", 128, 0xff6655ff);
 }
 
@@ -1355,8 +1355,8 @@ void Application::Draw()
 		//cmdDrawProfilerUI();
 
 		gAppUI.Gui(pDebugGui);
-		UIUtils::drawImages(cmd, gAppUI);
-		UIUtils::drawText(cmd, gAppUI);
+		UIUtils::drawImages(cmd);
+		UIUtils::drawText(cmd);
 		gAppUI.Draw(cmd);
 
 		cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);

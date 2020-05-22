@@ -1,33 +1,37 @@
 #include "UIUtils.h"
+#include "../The-Forge/Common_3/ThirdParty/OpenSource/imgui/imgui_internal.h"
+#include "Application.h"
 
 std::map<std::string, Texture*> UIUtils::textures = std::map<std::string, Texture*>();
 std::map<std::string, int> UIUtils::fonts = std::map<std::string, int>();
-std::map<std::string, GuiComponent*> UIUtils::guis = std::map<std::string, GuiComponent*>();
+std::map<std::string, UIUtils::WindowDrawData> UIUtils::windows = std::map<std::string, UIUtils::WindowDrawData>();
 std::map<std::string, TextureButtonWidget*> UIUtils::images = std::map<std::string, TextureButtonWidget*>();
 std::map<std::string, UIUtils::TextDrawData> UIUtils::texts = std::map<std::string, UIUtils::TextDrawData>();
 
-void UIUtils::createGuiComponent(std::string label, GuiDesc desc, UIApp app)
+void UIUtils::createGuiComponent(std::string label, GuiDesc desc, int priority)
 {
-	guis[label] = app.AddGuiComponent(label.c_str(), &desc);
-	guis[label]->mFlags |= GUI_COMPONENT_FLAGS_NO_TITLE_BAR;
-	guis[label]->mFlags |= GUI_COMPONENT_FLAGS_ALWAYS_USE_WINDOW_PADDING;
-	guis[label]->mFlags |= GUI_COMPONENT_FLAGS_NO_RESIZE;
-	guis[label]->mFlags |= GUI_COMPONENT_FLAGS_NO_COLLAPSE;
-	guis[label]->mFlags |= GUI_COMPONENT_FLAGS_NO_SCROLLBAR;
-	guis[label]->mFlags |= GUI_COMPONENT_FLAGS_NO_MOVE;
-	guis[label]->mFlags |= GUI_COMPONENT_FLAGS_NO_BRING_TO_FRONT_ON_FOCUS;
-	guis[label]->mFlags |= GUI_COMPONENT_FLAGS_NO_NAV_FOCUS;
+	windows[label] = {};
+	windows[label].gui = Application::gAppUI.AddGuiComponent(label.c_str(), &desc);
+	windows[label].gui->mFlags |= GUI_COMPONENT_FLAGS_NO_TITLE_BAR;
+	windows[label].gui->mFlags |= GUI_COMPONENT_FLAGS_ALWAYS_USE_WINDOW_PADDING;
+	windows[label].gui->mFlags |= GUI_COMPONENT_FLAGS_NO_RESIZE;
+	windows[label].gui->mFlags |= GUI_COMPONENT_FLAGS_NO_COLLAPSE;
+	windows[label].gui->mFlags |= GUI_COMPONENT_FLAGS_NO_SCROLLBAR;
+	windows[label].gui->mFlags |= GUI_COMPONENT_FLAGS_NO_MOVE;
+	windows[label].gui->mFlags |= GUI_COMPONENT_FLAGS_NO_BRING_TO_FRONT_ON_FOCUS;
+	windows[label].gui->mFlags |= GUI_COMPONENT_FLAGS_NO_NAV_FOCUS;
+	windows[label].priority = priority;
 }
 
-void UIUtils::createImage(std::string label, std::string filename, float x, float y, UIApp app, float scale)
+void UIUtils::createImage(std::string label, std::string filename, float x, float y, float2 scale, int priority)
 {
 	GuiDesc desc = {};
 	desc.mStartPosition = vec2(x, y);
-	UIUtils::createGuiComponent(label, desc, app);
+	UIUtils::createGuiComponent(label, desc, priority);
 	images[label] = conf_new(TextureButtonWidget, label.c_str());
 
 	changeImage(label, filename, scale);
-	UIUtils::guis[label]->AddWidget(images[label]);
+	UIUtils::windows[label].gui->AddWidget(images[label]);
 }
 
 void UIUtils::addCallbackToImage(std::string label, WidgetCallback cb)
@@ -35,18 +39,18 @@ void UIUtils::addCallbackToImage(std::string label, WidgetCallback cb)
 	images[label]->pOnActive = cb;
 }
 
-void UIUtils::changeImage(std::string label, std::string filename, float scale)
+void UIUtils::changeImage(std::string label, std::string filename, float2 scale)
 {
 	if (textures.find(filename) == textures.end()) UIUtils::loadTexture(filename);
-	float width = UIUtils::textures[filename]->mWidth * scale;
-	float height = UIUtils::textures[filename]->mHeight * scale;
+	float width = UIUtils::textures[filename]->mWidth * scale.x;
+	float height = UIUtils::textures[filename]->mHeight * scale.y;
 	images[label]->SetTexture(UIUtils::textures[filename], float2(width, height));
 }
 
 void UIUtils::removeImage(std::string label)
 {
 	// There is probably a better way to do this. Might change
-	guis.erase(label);
+	windows.erase(label);
 }
 
 void UIUtils::createText(std::string label, std::string text, float x, float y, std::string font, float size, uint32_t color)
@@ -81,9 +85,9 @@ void UIUtils::loadTexture(std::string filename)
 	textures[filename] = tex;
 }
 
-void UIUtils::loadFont(std::string label, std::string filename, UIApp app)
+void UIUtils::loadFont(std::string label, std::string filename)
 {
-	if (fonts.find(filename) == fonts.end()) fonts[label] = app.LoadFont(filename.c_str(), ResourceDirectory::RD_BUILTIN_FONTS);
+	if (fonts.find(filename) == fonts.end()) fonts[label] = Application::gAppUI.LoadFont(filename.c_str(), ResourceDirectory::RD_BUILTIN_FONTS);
 }
 
 void UIUtils::unload()
@@ -104,17 +108,33 @@ void UIUtils::setStyleColor(ImGuiCol_ component, float4 color)
 	style.Colors[component] = color;
 }
 
-void UIUtils::drawImages(Cmd* cmd, UIApp app)
+void UIUtils::drawImages(Cmd* cmd)
 {
-	for (auto gui : guis) {
-		app.Gui(gui.second);
+	auto ctx = ImGui::GetCurrentContext();
+	std::stable_sort(ctx->Windows.begin(), ctx->Windows.end(),
+		[](const ImGuiWindow* a, const ImGuiWindow* b) {
+			//printf("comparing %s and %s\n", a->Name, b->Name);
+			if (UIUtils::windows.find(a->Name) == UIUtils::windows.end() || UIUtils::windows.find(b->Name) == UIUtils::windows.end()) return false;
+			//printf("priorities %d and %d\n", UIUtils::windows[a->Name].priority, UIUtils::windows[b->Name].priority);
+			return UIUtils::windows[a->Name].priority < UIUtils::windows[b->Name].priority;
+		}
+	);
+
+	for (auto w : ctx->Windows) {
+		//printf("%s ", w->Name);
 	}
+
+	for (auto w : windows) {
+		//printf("->%s ", w.first.c_str());
+		Application::gAppUI.Gui(w.second.gui);
+	}
+	//printf("\n");
 }
 
-void UIUtils::drawText(Cmd* cmd, UIApp app)
+void UIUtils::drawText(Cmd* cmd)
 {
 	for (auto text : texts) {
-		app.DrawText(cmd, text.second.position, text.second.text.c_str(), &text.second.desc);
+		Application::gAppUI.DrawText(cmd, text.second.position, text.second.text.c_str(), &text.second.desc);
 	}
 }
 

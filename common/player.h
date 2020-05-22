@@ -29,11 +29,10 @@ public:
 	
     void update(float deltaTime) override; //server-side state management
 	void processInput(PlayerInput in);
-	void setVelocity(float vel_x, float vel_z);
-	std::pair<float, float> getVelocities();
+	//void setVelocity(float vel_x, float vel_z);
+	//std::pair<float, float> getVelocities();
 	void setMoveAndDir(int move_x, int move_z, float view_y_rot);
 
-    void buildTower();
-    void spawnUnit();
+	void setEntData(EntityData data) override;
 };
 #endif

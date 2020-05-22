@@ -40,7 +40,6 @@ Minion::Minion(std::string id, int health, int attack, int range, float interval
 }
 
 void Minion::update(float deltaTime) { //should they be able to switch attack targets instantaneously?
-	timeElapsed += deltaTime; //increase elapsedTime
 
 	if (attackTarget != nullptr &&																//first, if targeting something
 			(!manager->checkEntityAlive(attackTargetID) ||										//but either target is dead
@@ -61,11 +60,14 @@ void Minion::update(float deltaTime) { //should they be able to switch attack ta
 
 		if (attackTarget != nullptr) {
 			attackTargetID = attackTarget->getIDstr();
+			timeElapsed = 0; //reset attack timer on acquiring new target
 			std::cout << "minion " << id_str << " found target " << attackTarget->getIDstr() << "\n";
 		}
 	}
 
 	if (attackTarget != nullptr) { //if this minion should be attacking something, don't move
+		timeElapsed += deltaTime; //increase timeElapsed
+
 		//first face the attack target, regardless of timeElapsed
 		vec3 forward = normalize(attackTarget->getPosition() - this->getPosition()); //TODO check vectors?
 		vec3 right = cross(forward, vec3(0, 1, 0));
@@ -119,7 +121,7 @@ void Minion::move(float deltaTime) {
 
 		if (this->getPosition() == destNode->getPosition()) { //reached destNode with this iteration
 			mapNode* nextNode; //continue moving to the next node
-			if (this->team->teamColor == RED_TEAM) nextNode = this->destNode->next_red; //TODO do team stuff
+			if (this->team->teamColor == RED_TEAM) nextNode = this->destNode->next_red;
 			else nextNode = this->destNode->next_blue;
 
 			if (nextNode != nullptr) this->destNode = nextNode; 

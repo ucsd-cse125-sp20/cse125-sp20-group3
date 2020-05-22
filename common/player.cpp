@@ -81,14 +81,14 @@ void Player::processInput(PlayerInput in) {
 	}
 }
 
-void Player::setVelocity(float vel_x, float vel_z) {
+/*void Player::setVelocity(float vel_x, float vel_z) {
 	velocity_x = vel_x;
 	velocity_z = vel_z;
 }
 
 std::pair<float, float> Player::getVelocities() {
 	return std::make_pair(this->velocity_x, this->velocity_z);
-}
+}*/
 
 //read the move_x, move_z, and view_y_rot from PlayerInput
 //ignore the other values
@@ -102,4 +102,11 @@ void Player::setMoveAndDir(int move_x, int move_z, float view_y_rot) {
 	else acceleration_z = 0;
 
 	rotation_y = view_y_rot;
+}
+
+void Player::setEntData(EntityData data) {
+	Entity::setEntData(data);
+	vec3 move_dir = this->getPosition() - lastPosition;
+	std::cout << "player move_dir x: " << move_dir.getX() << " z: " << move_dir.getZ() << "\n";
+	//TODO set run animation in move_dir taking into account forward vector
 }

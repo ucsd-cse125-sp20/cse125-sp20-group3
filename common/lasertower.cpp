@@ -10,7 +10,6 @@ LaserTower::LaserTower(std::string id, Team* t, SceneManager_Server* sm_server) 
 }
 
 void LaserTower::update(float deltaTime) { //should they be able to switch attack targets instantaneously?
-	timeElapsed += deltaTime; //increase elapsedTime
 
 	if (attackTarget != nullptr &&																//first, if targeting something
 			(!manager->checkEntityAlive(attackTargetID) ||										//but either target is dead
@@ -31,14 +30,19 @@ void LaserTower::update(float deltaTime) { //should they be able to switch attac
 
 		if (attackTarget != nullptr) {
 			attackTargetID = attackTarget->getIDstr();
+			timeElapsed = 0; //reset attack timer on acquiring new target
 			std::cout << "laser " << id_str << " found target " << attackTarget->getIDstr() << "\n";
 		}
 	}
 
-	if (attackTarget != nullptr && timeElapsed >= attackInterval) { //only attack on an interval
-		std::cout << "laser " << id_str << " attacking " << attackTargetID << "\n";
-		this->attack();
-		timeElapsed = 0;
+	if (attackTarget != nullptr) {
+		timeElapsed += deltaTime; //increase timeElapsed
+
+		if (timeElapsed >= attackInterval) { //only attack on an interval
+			std::cout << "laser " << id_str << " attacking " << attackTargetID << "\n";
+			this->attack();
+			timeElapsed = 0;
+		}
 	}
 }
 

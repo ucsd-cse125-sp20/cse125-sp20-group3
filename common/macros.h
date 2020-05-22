@@ -10,6 +10,7 @@
 
 #define RED_TEAM 'R'
 #define BLUE_TEAM 'B'
+#define NO_TEAM 'N'
 
 #define ID_PLAYER_MIN 0
 #define ID_PLAYER_MAX 999

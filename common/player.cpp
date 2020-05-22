@@ -9,7 +9,12 @@ Player::Player(std::string id, Team* t, SceneManager_Server* sm) : Entity(id, PL
 	acceleration_z = 0.f;
 	buildMode = NEUTRAL;
 
-	ObjectDetection::addObject(this, DETECTION_FLAG_PLAYER | DETECTION_FLAG_ENTITY);
+	if (sm != nullptr) {
+		int flags = DETECTION_FLAG_PLAYER | DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE;
+		if (t->teamColor == RED_TEAM) flags = flags | DETECTION_FLAG_RED_TEAM;
+		else flags = flags | DETECTION_FLAG_BLUE_TEAM;
+		ObjectDetection::addObject(this, DETECTION_FLAG_PLAYER | DETECTION_FLAG_ENTITY);
+	}
 }
 
 void Player::update(float deltaTime) {

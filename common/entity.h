@@ -23,6 +23,7 @@ protected:
 public:
 	struct EntityData {
 		GameObjectData GO_data;
+		char teamColor;
 		int health;
 	};
 
@@ -39,12 +40,14 @@ public:
 	virtual void setEntData(EntityData data) {
 		lastPosition = this->getPosition(); //save old position for velocity inference purposes
 		this->GameObject::setGOData(data.GO_data);
+		//teamColor is never updated, only used for initial instantiation of objects
 		this->health = data.health;
 	}
 
 	int writeData(char buf[], int index) override {
 		EntityData entData;
 		entData.GO_data = this->GameObject::getData();
+		entData.teamColor = team != nullptr ? team->teamColor : NO_TEAM;
 		entData.health = this->health;
 		((EntityData*)(buf + index))[0] = entData;
 		return sizeof(EntityData);

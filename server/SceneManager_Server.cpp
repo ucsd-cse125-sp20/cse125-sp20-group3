@@ -28,7 +28,7 @@ void SceneManager_Server::processInput(std::string player, PlayerInput in) {
 
 bool SceneManager_Server::addPlayer(std::string player_id) {
 	if (idMap.find(player_id) == idMap.end()) { //player_id not in map, create a new player
-		idMap[player_id] = new Player(player_id, nullptr, this);
+		idMap[player_id] = new Player(player_id, red_team, this); //TODO assign players teams based on lobby choices
 		std::cout << "created new player id: " << player_id << " at " << idMap[player_id] << "\n";
 
 		return true; //return true that a player was added
@@ -455,12 +455,9 @@ void SceneManager_Server::testAttacking() {
 	SuperMinion* sm1 = new SuperMinion(id_str, blue_team, this);
 	sm1->setMatrix(transform);
 	idMap[id_str] = sm1;
-	std::cout << "created super minion at id " << id_str << "\n";
+	std::cout << "created super minion at id " << id_str << "\n";*/
 
-	m1->setAttackTarget(sm1);
-	sm1->setAttackTarget(m1);*/
-
-	id_str = std::to_string(next_super_minion_id);
+	/*id_str = std::to_string(next_super_minion_id);
 	next_super_minion_id++;
 	transform = mat4::translation(vec3(-5, 0, 0));
 	SuperMinion* sm2 = new SuperMinion(id_str, blue_team, this);
@@ -472,11 +469,9 @@ void SceneManager_Server::testAttacking() {
 	transform = mat4::translation(vec3(15, 0, 0));
 	ClawTower* c1 = new ClawTower(id_str, red_team, this);
 	c1->setMatrix(transform);
-	idMap[id_str] = c1;
+	idMap[id_str] = c1;*/
 
-	//sm2->setAttackTarget(c1);
-
-	/*id_str = std::to_string(next_laser_id);
+	id_str = std::to_string(next_laser_id);
 	next_laser_id++;
 	transform = mat4::translation(vec3(30, 0, 42));
 	LaserTower* l1 = new LaserTower(id_str, red_team, this);
@@ -495,10 +490,7 @@ void SceneManager_Server::testAttacking() {
 	transform = mat4::translation(vec3(20, 0, 24));
 	Minion* m2 = new Minion(id_str, blue_team, this);
 	m2->setMatrix(transform);
-	idMap[id_str] = m2;*/
-
-	//l1->setAttackTarget(m2);
-	//m2->setAttackTarget(l1);
+	idMap[id_str] = m2;*
 }
 
 /***** legacy code *****/

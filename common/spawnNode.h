@@ -1,5 +1,5 @@
-#ifndef _MAPNODE_H_
-#define _MAPNODE_H_
+#ifndef _SPAWNNODE_H_
+#define _SPAWNNODE_H_
 #include "GameObject.h"
 #include "ObjectDetection.h"
 

@@ -27,6 +27,7 @@ int __cdecl main(void)
 	// populate map
 	manager->populateMap();
 	manager->populateSpawnLocation();
+	manager->populateWallLocation();
 
     // Game State data
 	std::chrono::steady_clock::time_point lastTime = std::chrono::steady_clock::now();

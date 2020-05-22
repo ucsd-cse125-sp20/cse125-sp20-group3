@@ -26,6 +26,7 @@
 #define DETECTION_FLAG_MINION_TARGET 1 << 10
 #define DETECTION_FLAG_LASER_TARGET 1 << 11
 #define DETECTION_FLAG_SPAWN_NODE 1 << 12
+#define DETECTION_FLAG_WALL_NODE 1 << 13
 
 class ObjectDetection {
 private:

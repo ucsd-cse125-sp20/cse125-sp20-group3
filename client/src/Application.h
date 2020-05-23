@@ -12,11 +12,8 @@
 
 #include "SceneManager_Client.h"
 
-#include "UIManager.h"
-
-#include "GLTFGeode.h"
-#include "Transform.h"
-#include "OzzGeode.h"
+#include "UIUtils.h"
+#include "../The-Forge/Common_3/ThirdParty/OpenSource/imgui/imgui.h"
 
 #include "../../common/client2server.h"
 
@@ -31,7 +28,8 @@ public:
 	struct UniformBlock
 	{
 		mat4 mProjectView;
-		mat4 mModel;
+		mat4 mProj;
+		mat4 mView;
 		mat4 mShadowLightViewProj;
 		vec4 mCameraPosition;
 		vec4 mLightColor[LIGHT_COUNT + 1];
@@ -50,6 +48,8 @@ public:
 		uint Use;
 		uint padding00;
 	};
+
+	static UIApp gAppUI;
 
     static uint32_t gImageCount, gFrameIndex;
     static mat4 projMat, viewMat;

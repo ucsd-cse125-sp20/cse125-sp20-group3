@@ -43,6 +43,7 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	///////////////////////////////////////////////////////////////////////////////
 
     // TODO This is a hard coded animation example. Remove this later (SMALL MINION)
+	int key = 9999999;
     ozzGeodes["blarf"] = conf_new(OzzGeode, renderer, smallMinionDir);
 	((OzzObject*)ozzGeodes["blarf"]->obj)->SetClip(smallMinionActions[0]);
     Transform* t = conf_new(Transform, mat4::translation(vec3(-1, 0, 2)));
@@ -50,10 +51,11 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
     a->SetClip(smallMinionActions[0]);
     t->addChild(a);
     this->addChild(t);
-    transforms["blarf"] = t;
-    animators["blarf"] = a;
+    transforms[key] = t;
+    animators[key] = a;
 
 	// TODO This is a hard coded animation example. Remove this later (SUPER MINION)
+	key = 8888888;
 	ozzGeodes["blarf2"] = conf_new(OzzGeode, renderer, superMinionDir);
 	((OzzObject*)ozzGeodes["blarf2"]->obj)->SetClip(superMinionActions[0]);
 	t = conf_new(Transform, mat4::translation(vec3(1, 0, 2)));
@@ -61,10 +63,11 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	a->SetClip(superMinionActions[0]);
 	t->addChild(a);
 	this->addChild(t);
-	transforms["blarf2"] = t;
-	animators["blarf2"] = a;
+	transforms[key] = t;
+	animators[key] = a;
 
 	// TODO This is a hard coded animation example. Remove this later (MALE CHAR)
+	key = 4672347;
 	ozzGeodes["blarf3"] = conf_new(OzzGeode, renderer, playerMaleDir);
 	((OzzObject*)ozzGeodes["blarf3"]->obj)->SetClip(playerMaleActions[1]);
 	t = conf_new(Transform, mat4::translation(vec3(3, 0, 2)));
@@ -72,10 +75,11 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	a->SetClip(playerMaleActions[1]);
 	t->addChild(a);
 	this->addChild(t);
-	transforms["blarf3"] = t;
-	animators["blarf3"] = a;
+	transforms[key] = t;
+	animators[key] = a;
 
 	// TODO This is a hard coded animation example. Remove this later (FEMALE CHAR)
+	key = 1734813;
 	ozzGeodes["blarf4"] = conf_new(OzzGeode, renderer, playerFemaleDir);
 	((OzzObject*)ozzGeodes["blarf4"]->obj)->SetClip(playerFemaleActions[1]);
 	t = conf_new(Transform, mat4::translation(vec3(4, 0, 2)));
@@ -83,16 +87,78 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	a->SetClip(playerFemaleActions[1]);
 	t->addChild(a);
 	this->addChild(t);
-	transforms["blarf4"] = t;
-	animators["blarf4"] = a;
+	transforms[key] = t;
+	animators[key] = a;
+
+	// TODO These are hard coded particle examples. Remove them later
+	key = 7234813;
+	ParticleSystem::ParticleSystemParams params = {};
+	params.spriteFile = "LaserParticle.png";
+	params.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
+		float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.1f);
+		float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2 * PI));
+		float z = 0;
+
+		pd->position = float3(r * cos(a), z, r * sin(a));
+		pd->color = float4(0.8f, 0.8f, 1.0f, 1.0f);
+		pd->scale = float2(0.2f, 0.2f);
+		pad->velocity = float3(0, 5, 0);
+	};
+	params.numParticles = 1000;
+	params.life = 1.0f;
+	particleGeodes["blarf5"] = conf_new(ParticleSystemGeode, renderer, params);
+	t = conf_new(Transform, mat4::translation(vec3(-2, 0, 4)));
+	t->addChild(particleGeodes["blarf5"]);
+	this->addChild(t);
+	transforms[key] = t;
+
+	key = 4201387;
+	params.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
+		float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.1f);
+		float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2 * PI));
+		float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 5);
+
+		pd->position = float3(r * cos(a), z, r * sin(a));
+		pd->color = float4(0.8f, 0.8f, 1.0f, 1.0f);
+		pd->scale = float2(0.2f, 0.2f);
+		pad->velocity = float3(cos(a), 0.0f, sin(a));
+	};
+	params.updater = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad, float deltaTime) {
+		pd->scale *= 0.95f;
+	};
+	particleGeodes["blarf6"] = conf_new(ParticleSystemGeode, renderer, params);
+	t = conf_new(Transform, mat4::translation(vec3(0, 0, 4)));
+	t->addChild(particleGeodes["blarf6"]);
+	this->addChild(t);
+	transforms[key] = t;
+
+	key = 6672073;
+	params.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
+		float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.1f);
+		float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2 * PI));
+		float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 5);
+
+		pd->position = float3(r * cos(a), z, r * sin(a));
+		pd->color = float4(0.8f, 0.8f, 1.0f, 1.0f);
+		pd->scale = float2(0.2f, 0.2f);
+		pad->velocity = float3(cos(a), 0.0f, sin(a));
+	};
+	params.updater = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad, float deltaTime) {
+		pad->velocity += float3(-pd->position.x, 0.0f, -pd->position.z);
+	};
+	particleGeodes["blarf7"] = conf_new(ParticleSystemGeode, renderer, params);
+	t = conf_new(Transform, mat4::translation(vec3(2, 0, 4)));
+	t->addChild(particleGeodes["blarf7"]);
+	this->addChild(t);
+	transforms[key] = t;
 
 	///////////////////////////////////////////////////////////////////////////////
 
-	trackedPlayer_ID = "";
+	trackedPlayer_ID = NO_TRACKED_PLAYER;
 
-	transforms["ground"] = conf_new(Transform, mat4::identity());
-	transforms["ground"]->addChild(gltfGeodes[ENV_GEODE]);
-	this->addChild(transforms["ground"]);
+	transforms[GROUND_KEY] = conf_new(Transform, mat4::identity());
+	transforms[GROUND_KEY]->addChild(gltfGeodes[ENV_GEODE]);
+	this->addChild(transforms[GROUND_KEY]);
 
 	red_team = new Team(RED_TEAM);
 	blue_team = new Team(BLUE_TEAM);
@@ -100,11 +166,12 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 
 SceneManager_Client::~SceneManager_Client()
 {
-	for (std::pair<std::string, Entity*> e : idMap) conf_delete(e.second);
-	for (std::pair<std::string, Transform*> t : transforms) conf_delete(t.second);
-	for (std::pair<std::string, Animator*> t : animators) conf_delete(t.second);
+	for (std::pair<int, Entity*> e : idMap) conf_delete(e.second);
+	for (std::pair<int, Transform*> t : transforms) conf_delete(t.second);
+	for (std::pair<int, Animator*> t : animators) conf_delete(t.second);
 	for (std::pair<std::string, GLTFGeode*> g : gltfGeodes) conf_delete(g.second);
 	for (std::pair<std::string, OzzGeode*> g : ozzGeodes) conf_delete(g.second);
+	for (std::pair<std::string, ParticleSystemGeode*> g : particleGeodes) conf_delete(g.second);
 
 	for (Transform* a : otherTransforms) conf_delete(a);
 }
@@ -122,6 +189,11 @@ void SceneManager_Client::createMaterialResources(SceneManager_Client::GeodeType
 			ge.second->createMaterialResources(pRootSignature, pBindlessTexturesSamplersSet, defaultSampler);
 		}
 		break;
+	case SceneManager_Client::GeodeType::PARTICLES:
+		for (auto ge : particleGeodes) {
+			ge.second->createSpriteResources(pRootSignature);
+		}
+		break;
 	}
 }
 
@@ -129,77 +201,80 @@ void SceneManager_Client::updateScene(std::vector<Client::UpdateData> updateBuf)
 {
 	//std::cout << "updating from client buf of size " << updateBuf.size() << "\n";
 	for (Client::UpdateData data : updateBuf) {
-		if (idMap.find(data.id_str) == idMap.end()) { //new id encountered, spawn new object
-			int id_int = stoi(data.id_str);
-			//std::cout << "id_int: " << id_int << "\n";
-			if (ID_PLAYER_MIN <= id_int && id_int <= ID_PLAYER_MAX) {
-				std::cout << "creating new player, id: " << data.id_str << "\n";
+		if (idMap.find(data.id) == idMap.end()) { //new id encountered, spawn new object
+			Team* team;
+			if (data.ent_data.teamColor == RED_TEAM) team = red_team;
+			else if (data.ent_data.teamColor == BLUE_TEAM) team = blue_team;
+			else team = nullptr;
 
-				idMap[data.id_str] = conf_new(Player, data.id_str, nullptr, nullptr);
-				transforms[data.id_str] = conf_new(Transform, mat4::identity());
+			if (ID_PLAYER_MIN <= data.id && data.id <= ID_PLAYER_MAX) {
+				std::cout << "creating new player, id: " << data.id << "\n";
+
+				idMap[data.id] = conf_new(Player, data.id, team, nullptr);
+				transforms[data.id] = conf_new(Transform, mat4::identity());
 				Transform* adjustment = conf_new(Transform, mat4::rotationY(-PI / 2));
 
 				adjustment->addChild(gltfGeodes[PLAYER_GEODE]);
-				transforms[data.id_str]->addChild(adjustment);
+				transforms[data.id]->addChild(adjustment);
 
 				otherTransforms.push_back(adjustment); //save to be deleted upon closing
 			}
-			else if (ID_BASE_MIN <= id_int && id_int <= ID_BASE_MAX) {
+			else if (ID_BASE_MIN <= data.id && data.id <= ID_BASE_MAX) {
 				//idMap[id_str] = new Base();
 			}
-			else if (ID_MINION_MIN <= id_int && id_int <= ID_MINION_MAX) {
-				std::cout << "creating new minion, id: " << data.id_str << "\n";
-				idMap[data.id_str] = conf_new(Minion, data.id_str, nullptr, nullptr);
-				transforms[data.id_str] = conf_new(Transform, mat4::identity());
-				transforms[data.id_str]->addChild(gltfGeodes[MINION_GEODE]);
+			else if (ID_MINION_MIN <= data.id && data.id <= ID_MINION_MAX) {
+				std::cout << "creating new minion, id: " << data.id << "\n";
+				idMap[data.id] = conf_new(Minion, data.id, team, nullptr);
+				transforms[data.id] = conf_new(Transform, mat4::identity());
+				transforms[data.id]->addChild(gltfGeodes[MINION_GEODE]);
 			}
-			else if (ID_SUPER_MINION_MIN <= id_int && id_int <= ID_SUPER_MINION_MAX) {
-				std::cout << "creating new super minion, id: " << data.id_str << "\n";
-				idMap[data.id_str] = conf_new(SuperMinion, data.id_str, nullptr, nullptr);
-				transforms[data.id_str] = conf_new(Transform, mat4::identity());
-				transforms[data.id_str]->addChild(gltfGeodes[SUPER_MINION_GEODE]);
+			else if (ID_SUPER_MINION_MIN <= data.id && data.id <= ID_SUPER_MINION_MAX) {
+				std::cout << "creating new super minion, id: " << data.id << "\n";
+				idMap[data.id] = conf_new(SuperMinion, data.id, team, nullptr);
+				transforms[data.id] = conf_new(Transform, mat4::identity());
+				transforms[data.id]->addChild(gltfGeodes[SUPER_MINION_GEODE]);
 			}
-			else if (ID_LASER_MIN <= id_int && id_int <= ID_LASER_MAX) {
-				std::cout << "creating new laser tower, id: " << data.id_str << "\n";
-				idMap[data.id_str] = conf_new(LaserTower, data.id_str, nullptr, nullptr);
-				transforms[data.id_str] = conf_new(Transform, mat4::identity());
-				transforms[data.id_str]->addChild(gltfGeodes[LASER_TOWER_GEODE]);
+			else if (ID_LASER_MIN <= data.id && data.id <= ID_LASER_MAX) {
+				std::cout << "creating new laser tower, id: " << data.id << "\n";
+				idMap[data.id] = conf_new(LaserTower, data.id, team, nullptr);
+				transforms[data.id] = conf_new(Transform, mat4::identity());
+				transforms[data.id]->addChild(gltfGeodes[LASER_TOWER_GEODE]);
 			}
-			else if (ID_CLAW_MIN <= id_int && id_int <= ID_CLAW_MAX) {
-				std::cout << "creating new claw tower, id: " << data.id_str << "\n";
-				idMap[data.id_str] = conf_new(ClawTower, data.id_str, nullptr, nullptr);
-				transforms[data.id_str] = conf_new(Transform, mat4::identity());
-				transforms[data.id_str]->addChild(gltfGeodes[CLAW_TOWER_GEODE]);
+			else if (ID_CLAW_MIN <= data.id && data.id <= ID_CLAW_MAX) {
+				std::cout << "creating new claw tower, id: " << data.id << "\n";
+				idMap[data.id] = conf_new(ClawTower, data.id, team, nullptr);
+				transforms[data.id] = conf_new(Transform, mat4::identity());
+				transforms[data.id]->addChild(gltfGeodes[CLAW_TOWER_GEODE]);
 			}
-			else if (ID_DUMPSTER_MIN <= id_int && id_int <= ID_DUMPSTER_MAX) {
-				std::cout << "creating new dumpster, id: " << data.id_str << "\n";
-				idMap[data.id_str] = conf_new(Resource, DUMPSTER_TYPE, data.id_str, nullptr);
-				transforms[data.id_str] = conf_new(Transform, mat4::identity());
-				transforms[data.id_str]->addChild(gltfGeodes[DUMPSTER_GEODE]);
+			else if (ID_DUMPSTER_MIN <= data.id && data.id <= ID_DUMPSTER_MAX) {
+				std::cout << "creating new dumpster, id: " << data.id << "\n";
+				idMap[data.id] = conf_new(Resource, DUMPSTER_TYPE, data.id, nullptr);
+				transforms[data.id] = conf_new(Transform, mat4::identity());
+				transforms[data.id]->addChild(gltfGeodes[DUMPSTER_GEODE]);
 			}
-			else if (ID_RECYCLING_BIN_MIN <= id_int && id_int <= ID_RECYCLING_BIN_MAX) {
-				std::cout << "creating new recycling bin id: " << data.id_str << "\n";
-				idMap[data.id_str] = conf_new(Resource, RECYCLING_BIN_TYPE, data.id_str, nullptr);
-				transforms[data.id_str] = conf_new(Transform, mat4::identity());
-				transforms[data.id_str]->addChild(gltfGeodes[RECYCLING_BIN_GEODE]);
+			else if (ID_RECYCLING_BIN_MIN <= data.id && data.id <= ID_RECYCLING_BIN_MAX) {
+				std::cout << "creating new recycling bin id: " << data.id << "\n";
+				idMap[data.id] = conf_new(Resource, RECYCLING_BIN_TYPE, data.id, nullptr);
+				transforms[data.id] = conf_new(Transform, mat4::identity());
+				transforms[data.id]->addChild(gltfGeodes[RECYCLING_BIN_GEODE]);
 			}
 
-			this->addChild(transforms[data.id_str]);
+			this->addChild(transforms[data.id]);
 		}
 		
 		if (data.ent_data.health <= 0) { //updated health marks entity as dead
-			//play death animation
+			//TODO play death animation
 
-			this->removeChild(transforms[data.id_str]);
+			this->removeChild(transforms[data.id]);
 
-			conf_delete(idMap[data.id_str]);
-			idMap.erase(data.id_str);
-			conf_delete(transforms[data.id_str]);
-			transforms.erase(data.id_str);
+			conf_delete(idMap[data.id]);
+			idMap.erase(data.id);
+			conf_delete(transforms[data.id]);
+			transforms.erase(data.id);
 		}
 		else { //otherwise, update the entity's data and transform
-			idMap[data.id_str]->setEntData(data.ent_data);
-			transforms[data.id_str]->setMatrix(idMap[data.id_str]->getMatrix());
+			idMap[data.id]->setEntData(data.ent_data);
+			transforms[data.id]->setMatrix(idMap[data.id]->getMatrix());
 		}
 	}
 }
@@ -224,6 +299,9 @@ void SceneManager_Client::setBuffer(SceneManager_Client::SceneBuffer type, Buffe
 	case SceneManager_Client::SceneBuffer::BONE:
 		boneBuffer = buffer;
 		break;
+	case SceneManager_Client::SceneBuffer::PARTICLES:
+		particleBuffer = buffer;
+		break;
 	}
 }
 
@@ -240,17 +318,22 @@ void SceneManager_Client::setProgram(SceneManager_Client::GeodeType type, Geode:
 			ge.second->setProgram(program);
 		}
 		break;
+	case SceneManager_Client::GeodeType::PARTICLES:
+		for (auto ge : particleGeodes) {
+			ge.second->setProgram(program);
+		}
+		break;
 	}
 }
 
-void SceneManager_Client::trackPlayer(std::string player_id) {
-	std::cout << "tracking player " + player_id + "\n";
+void SceneManager_Client::trackPlayer(int player_id) {
+	std::cout << "tracking player " << player_id << "\n";
 	trackedPlayer_ID = player_id;
 }
 
 mat4 SceneManager_Client::getPlayerTransformMat() {
 	
-	if (trackedPlayer_ID != "" && transforms.find(trackedPlayer_ID) != transforms.end()) {
+	if (trackedPlayer_ID != NO_TRACKED_PLAYER && transforms.find(trackedPlayer_ID) != transforms.end()) {
 		return transforms[trackedPlayer_ID]->getMatrix();
 	}
 	else return mat4::identity();
@@ -258,8 +341,8 @@ mat4 SceneManager_Client::getPlayerTransformMat() {
 
 void SceneManager_Client::update(float deltaTime)
 {
-	if (counter % 100 == 0) animators["blarf"]->SetClip(smallMinionActions[animCounter]);
-	if (counter++ % 100 == 0) animators["blarf2"]->SetClip(superMinionActions[animCounter = (animCounter + 1) % 2]);
+	if (counter % 100 == 0) animators[9999999]->SetClip(smallMinionActions[animCounter]);
+	if (counter++ % 100 == 0) animators[8888888]->SetClip(superMinionActions[animCounter = (animCounter + 1) % 2]);
 	Transform::update(deltaTime);
 }
 
@@ -274,6 +357,11 @@ void SceneManager_Client::draw(Cmd* cmd)
 	shaderCbv = { boneBuffer[Application::gFrameIndex] };
 	beginUpdateResource(&shaderCbv);
 	updateBoneBuffer(shaderCbv, NULL);
+	endUpdateResource(&shaderCbv, NULL);
+
+	shaderCbv = { particleBuffer[Application::gFrameIndex] };
+	beginUpdateResource(&shaderCbv);
+	updateParticleBuffer(shaderCbv);
 	endUpdateResource(&shaderCbv, NULL);
 
 	// Do culling check

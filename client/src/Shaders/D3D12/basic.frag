@@ -89,7 +89,8 @@ static const float shadowSamples[NUM_SHADOW_SAMPLES * 2] =
 cbuffer cbPerPass : register(b0, UPDATE_FREQ_PER_FRAME)
 {
 	float4x4	projView;
-	float4x4	sceneToWorld;
+	float4x4	proj;
+	float4x4	view;
 	float4x4	shadowLightViewProj;
 	float4      camPos;
 	float4      lightColor[4];

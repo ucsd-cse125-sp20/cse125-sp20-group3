@@ -39,6 +39,8 @@
 #include "../../Common_3/Renderer/IRenderer.h"
 #include "../../Common_3/Renderer/IResourceLoader.h"
 
+#include "../../../src/UIUtils.h"
+
 #include "../../Common_3/OS/Interfaces/IMemory.h"    //NOTE: this should be the last include in a .cpp
 
 #define LABELID(prop) eastl::string().sprintf("##%llu", (uint64_t)(prop.pData)).c_str()
@@ -846,48 +848,56 @@ bool ImguiGUIDriver::addFont(void* pFontBuffer, uint32_t fontBufferSize, void* p
 {
 	// Build and load the texture atlas into a texture
 	int            width, height;
+	width = height = 0;
 	unsigned char* pixels = NULL;
 	ImGuiIO& io = ImGui::GetIO();
 
 	ImFontConfig   config = {};
 	config.FontDataOwnedByAtlas = false;
-	ImFont* font = io.Fonts->AddFontFromMemoryTTF(pFontBuffer, fontBufferSize,
-		fontSize * min(dpiScale.x, dpiScale.y), &config,
-		(const ImWchar*)pFontGlyphRanges);
-	if (font != NULL)
-	{
-		io.FontDefault = font;
-		*pFont = (uintptr_t)font;
+	if (!io.Fonts->Locked) {
+		ImFont* font = io.Fonts->AddFontFromMemoryTTF(pFontBuffer, fontBufferSize,
+			fontSize * min(dpiScale.x, dpiScale.y), &config,
+			(const ImWchar*)pFontGlyphRanges);
+		if (font != NULL)
+		{
+			io.FontDefault = font;
+			*pFont = (uintptr_t)font;
+		}
+		else
+		{
+			*pFont = (uintptr_t)io.Fonts->AddFontDefault();
+		}
+
+
+		io.Fonts->Build();
+		io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
+
+		// At this point you've got the texture data and you need to upload that your your graphic system:
+		// After we have created the texture, store its pointer/identifier (_in whichever format your engine uses_) in 'io.Fonts->TexID'.
+		// This will be passed back to your via the renderer. Basically ImTextureID == void*. Read FAQ below for details about ImTextureID.
+		Texture* pTexture = NULL;
+		RawImageData    rawData = { pixels, TinyImageFormat_R8G8B8A8_UNORM, (uint32_t)width, (uint32_t)height, 1, 1, 1 };
+		SyncToken token = {};
+		TextureLoadDesc loadDesc = {};
+		loadDesc.pRawImageData = &rawData;
+		loadDesc.ppTexture = &pTexture;
+		loadDesc.mCreationFlag = TEXTURE_CREATION_FLAG_OWN_MEMORY_BIT;
+		addResource(&loadDesc, &token, LOAD_PRIORITY_HIGH);
+
+		waitForToken(&token);
+		mFontTextures.emplace_back(pTexture);
+		io.Fonts->TexID = (void*)(mFontTextures.size() - 1);
+
+		DescriptorData params[1] = {};
+		params[0].pName = "uTex";
+		params[0].ppTextures = &pTexture;
+		updateDescriptorSet(pRenderer, (uint32_t)mFontTextures.size() - 1, pDescriptorSetTexture, 1, params);
+
 	}
 	else
 	{
-		*pFont = (uintptr_t)io.Fonts->AddFontDefault();
+		*pFont = (uintptr_t)UIUtils::fonts["default"];
 	}
-
-	io.Fonts->Build();
-	io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
-
-	// At this point you've got the texture data and you need to upload that your your graphic system:
-	// After we have created the texture, store its pointer/identifier (_in whichever format your engine uses_) in 'io.Fonts->TexID'.
-	// This will be passed back to your via the renderer. Basically ImTextureID == void*. Read FAQ below for details about ImTextureID.
-	Texture* pTexture = NULL;
-	RawImageData    rawData = { pixels, TinyImageFormat_R8G8B8A8_UNORM, (uint32_t)width, (uint32_t)height, 1, 1, 1 };
-	SyncToken token = {};
-	TextureLoadDesc loadDesc = {};
-	loadDesc.pRawImageData = &rawData;
-	loadDesc.ppTexture = &pTexture;
-	loadDesc.mCreationFlag = TEXTURE_CREATION_FLAG_OWN_MEMORY_BIT;
-	addResource(&loadDesc, &token, LOAD_PRIORITY_HIGH);
-
-	waitForToken(&token);
-	mFontTextures.emplace_back(pTexture);
-	io.Fonts->TexID = (void*)(mFontTextures.size() - 1);
-
-	DescriptorData params[1] = {};
-	params[0].pName = "uTex";
-	params[0].ppTextures = &pTexture;
-	updateDescriptorSet(pRenderer, (uint32_t)mFontTextures.size() - 1, pDescriptorSetTexture, 1, params);
-
 	return true;
 }
 

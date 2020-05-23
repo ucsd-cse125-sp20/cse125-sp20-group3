@@ -1,7 +1,9 @@
 #include "player.h"
 #include "../server/SceneManager_Server.h"
 
-Player::Player(std::string id, Team* t, SceneManager_Server* sm) : Entity(id, PLAYER_HEALTH, PLAYER_ATTACK, t, sm) {
+Player::Player(int id, Team* t, SceneManager_Server* sm) : Entity(id, PLAYER_HEALTH, PLAYER_ATTACK, t, sm) {
+	actionState = PLAYER_ACTION_NONE; //player animations are based on movement direction, so actionState is irrelevant
+
 	velocity_x = 0.f;
 	velocity_z = 0.f;
 	rotation_y = 0.f;
@@ -9,7 +11,12 @@ Player::Player(std::string id, Team* t, SceneManager_Server* sm) : Entity(id, PL
 	acceleration_z = 0.f;
 	buildMode = NEUTRAL;
 
-	ObjectDetection::addObject(this, DETECTION_FLAG_PLAYER | DETECTION_FLAG_ENTITY);
+	if (sm != nullptr) {
+		int flags = DETECTION_FLAG_PLAYER | DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE;
+		if (t->teamColor == RED_TEAM) flags = flags | DETECTION_FLAG_RED_TEAM;
+		else flags = flags | DETECTION_FLAG_BLUE_TEAM;
+		ObjectDetection::addObject(this, DETECTION_FLAG_PLAYER | DETECTION_FLAG_ENTITY);
+	}
 }
 
 void Player::update(float deltaTime) {
@@ -81,15 +88,6 @@ void Player::processInput(PlayerInput in) {
 	}
 }
 
-void Player::setVelocity(float vel_x, float vel_z) {
-	velocity_x = vel_x;
-	velocity_z = vel_z;
-}
-
-std::pair<float, float> Player::getVelocities() {
-	return std::make_pair(this->velocity_x, this->velocity_z);
-}
-
 //read the move_x, move_z, and view_y_rot from PlayerInput
 //ignore the other values
 void Player::setMoveAndDir(int move_x, int move_z, float view_y_rot) {
@@ -102,4 +100,12 @@ void Player::setMoveAndDir(int move_x, int move_z, float view_y_rot) {
 	else acceleration_z = 0;
 
 	rotation_y = view_y_rot;
+}
+
+void Player::setEntData(EntityData data) {
+	Entity::setEntData(data);
+	vec3 move_dir = this->getPosition() - lastPosition;
+	//std::cout << "player actionState: " << (int)actionState << "\n";
+	//std::cout << "player move_dir x: " << move_dir.getX() << " z: " << move_dir.getZ() << "\n";
+	//TODO set run animation in move_dir taking into account forward vector
 }

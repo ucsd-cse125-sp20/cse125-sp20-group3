@@ -1,6 +1,6 @@
 #include "team.h"
 
-Team::Team(int color) {
+Team::Team(char color) {
 	teamColor = color;
 	winStatus = WIN_STATUS_NEUTRAL;
 	metalCount = 0;

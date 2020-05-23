@@ -11,25 +11,29 @@
 #include <ctime>
 #include <map>
 
+#define MINION_ACTION_IDLE 0
+#define MINION_ACTION_MOVE 1
+#define MINION_ACTION_ATTACK 2
+#define MINION_ACTION_FIRE 3
+
 class Minion : public Entity {
 protected:
 	mapNode* destNode;
-	float timeElapsed;
-	Entity* attackTarget;
-	std::string attackTargetID;
 	int attackRange;
 	float attackInterval;
 	float velocity;
 	bool doneMoving;
 
-	Minion(std::string id, int health, int attack, int range, float interval, float vel, Team* t, SceneManager_Server* sm); //accept values for other types of minions
+	Minion(int id, int health, int attack, int range, float interval, float vel, Team* t, SceneManager_Server* sm); //accept values for other types of minions
 public:
-	Minion(std::string id, Team* t, SceneManager_Server* sm); //basic minion spawned by claw tower
+	Minion(int id, Team* t, SceneManager_Server* sm); //basic minion spawned by claw tower
 	
 	void update(float deltaTime) override;
 	void takeDamage(int damage) override;
 	void move(float deltaTime);
 	void attack();
+
+	void setEntData(EntityData data) override;
 
 	//TESTING SPECIFIC FUNCTIONALITY - DO NOT USE
 	void setAttackTarget(Entity* e);

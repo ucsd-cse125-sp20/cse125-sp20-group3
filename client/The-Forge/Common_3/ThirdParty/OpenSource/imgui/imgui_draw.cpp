@@ -1590,7 +1590,9 @@ ImFont* ImFontAtlas::AddFontFromFileTTF(const char* filename, float size_pixels,
         IM_ASSERT(0); // Could not load file.
         return NULL;
     }
-    fsReadFromStream(fh, data, fsGetStreamFileSize(fh));
+    data_size = fsGetStreamFileSize(fh); // Modifications in these three lines
+    fsReadFromStream(fh, data, data_size);
+    fsCloseStream(fh);
 
     ImFontConfig font_cfg = font_cfg_template ? *font_cfg_template : ImFontConfig();
     if (font_cfg.Name[0] == '\0')

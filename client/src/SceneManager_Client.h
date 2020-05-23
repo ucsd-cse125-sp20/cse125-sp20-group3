@@ -8,6 +8,7 @@
 #include "Transform.h"
 #include "GLTFGeode.h"
 #include "OzzGeode.h"
+#include "ParticleSystemGeode.h"
 #include "Animator.h"
 
 #include "Input.h"
@@ -27,6 +28,9 @@
 #include "../../common/resource.h"
 #include "../../common/client2server.h"
 
+#define GROUND_KEY 111111
+#define NO_TRACKED_PLAYER -1
+
 #define ENV_GEODE "env_geometry"
 #define PLAYER_GEODE "player_geometry"
 #define BASE_GEODE "base_geometry"
@@ -40,36 +44,32 @@
 class SceneManager_Client : public Transform
 {
 private:
-	std::map<std::string, Entity*> idMap;
-	std::map<std::string, Transform*> transforms;
-	std::map<std::string, Animator*> animators;
+	std::map<int, Entity*> idMap;
+	std::map<int, Transform*> transforms;
+	std::map<int, Animator*> animators;
 	std::map<std::string, GLTFGeode*> gltfGeodes;
 	std::map<std::string, OzzGeode*> ozzGeodes;
-	std::string trackedPlayer_ID;
+	std::map<std::string, ParticleSystemGeode*> particleGeodes;
+	int trackedPlayer_ID;
 
 	std::vector<Transform*> otherTransforms;
     
     Buffer** instanceBuffer = NULL;
 	Buffer** boneBuffer = NULL;
+	Buffer** particleBuffer = NULL;
 
 	Team *red_team, *blue_team;
 
 public:
 	enum class GeodeType {
-		MESH, ANIMATED_MESH
+		MESH, ANIMATED_MESH, PARTICLES
 	};
 
 	enum class SceneBuffer {
-		INSTANCE, BONE
+		INSTANCE, BONE, PARTICLES
 	};
 
 	static bool enableCulling;
-
-	// This vector should eventually be split between tracked objects and client only objects
-	//std::vector<Transform*> transforms;
-
-	// Will likely try to convert to a dictionary
-	//std::vector<GLTFGeode*> gltfGeodes;
 
 	SceneManager_Client(Renderer* renderer);
 	~SceneManager_Client();
@@ -82,7 +82,7 @@ public:
 	void setBuffer(SceneManager_Client::SceneBuffer type, Buffer** buffers); // TODO Could probably mange instance buffers within class, rather than app
 	void setProgram(SceneManager_Client::GeodeType type, Geode::GeodeShaderDesc program);
 
-	void trackPlayer(std::string player_id);
+	void trackPlayer(int player_id);
 	mat4 getPlayerTransformMat();
 
     void randomStaticInstantiation(Geode* g, int num, float range, float minSize, float maxSize);

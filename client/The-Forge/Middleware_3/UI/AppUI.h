@@ -767,6 +767,7 @@ class GuiComponent
 {
 	public:
 	IWidget* AddWidget(const IWidget& widget, bool clone = true);
+	IWidget* AddWidget(IWidget* widget);
 	void     RemoveWidget(IWidget* pWidget);
 	void     RemoveAllWidgets();
 

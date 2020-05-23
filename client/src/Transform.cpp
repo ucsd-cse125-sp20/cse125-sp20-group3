@@ -45,6 +45,13 @@ void Transform::updateBoneBuffer(BufferUpdateDesc& desc, OzzObject::UniformDataB
 	}
 }
 
+void Transform::updateParticleBuffer(BufferUpdateDesc& desc)
+{
+	for (auto child : children) {
+		child->updateParticleBuffer(desc);
+	}
+}
+
 void Transform::cull(const vec4 planes[6], bool doCull)
 {
 	for (auto child : children) {

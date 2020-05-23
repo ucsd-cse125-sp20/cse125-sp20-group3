@@ -245,49 +245,49 @@ int SceneManager_Server::encodeScene(char buf[], int start_index) {
 
 void SceneManager_Server::populateMap() {
 	std::vector<mapNode*> nodeMap;
-	nodeMap.push_back(new mapNode(7.5, 17.5)); //0
-	nodeMap.push_back(new mapNode(22.5, 17.5)); //1
+	nodeMap.push_back(new mapNode(1*5+2.5, 4*5+2.5)); //0
+	nodeMap.push_back(new mapNode(5*5+2.5, 4*5+2.5)); //1
 	nodeMap[0]->setNextRed(nodeMap[1]);
-	nodeMap.push_back(new mapNode(22.5, 42.5)); //2
+	nodeMap.push_back(new mapNode(5*5+2.5, 9*5+2.5)); //2
 	nodeMap[1]->setNextRed(nodeMap[2]);
-	nodeMap.push_back(new mapNode(22.5, 57.5)); //3
+	nodeMap.push_back(new mapNode(5*5+2.5, 12*5+2.5)); //3
 	nodeMap[2]->setNextRed(nodeMap[3]);
-	nodeMap.push_back(new mapNode(22.5, 72.5)); //4
+	nodeMap.push_back(new mapNode(5*5+2.5, 15*5+2.5)); //4
 	nodeMap[3]->setNextRed(nodeMap[4]);
-	nodeMap.push_back(new mapNode(57.5, 72.5)); //5
+	nodeMap.push_back(new mapNode(12*5+2.5, 15*5+2.5)); //5
 	nodeMap[4]->setNextRed(nodeMap[5]);
-	nodeMap.push_back(new mapNode(57.5, 52.5)); //6
+	nodeMap.push_back(new mapNode(12*5+2.5, 11*5+2.5)); //6
 	nodeMap[5]->setNextRed(nodeMap[6]);
-	nodeMap.push_back(new mapNode(67.5, 52.5)); //7
+	nodeMap.push_back(new mapNode(14*5+2.5, 11*5+2.5)); //7
 	nodeMap[6]->setNextRed(nodeMap[7]);
-	nodeMap.push_back(new mapNode(82.5, 52.5)); //8
+	nodeMap.push_back(new mapNode(17*5+2.5, 11*5+2.5)); //8
 	nodeMap[7]->setNextRed(nodeMap[8]);
-	nodeMap.push_back(new mapNode(107.5, 52.5)); //9
+	nodeMap.push_back(new mapNode(22*5+2.5, 11*5+2.5)); //9
 	nodeMap[8]->setNextRed(nodeMap[9]);
-	nodeMap.push_back(new mapNode(107.5, 72.5)); //10
+	nodeMap.push_back(new mapNode(22*5+2.5, 15*5+2.5)); //10
 	nodeMap[9]->setNextRed(nodeMap[10]);
-	nodeMap.push_back(new mapNode(117.5, 72.5)); //11
+	nodeMap.push_back(new mapNode(24*5+2.5, 15*5+2.5)); //11
 	nodeMap[10]->setNextRed(nodeMap[11]);
-	nodeMap.push_back(new mapNode(32.5, 17.5)); //12
+	nodeMap.push_back(new mapNode(7*5+2.5, 4*5+2.5)); //12
 	nodeMap[12]->setNextRed(nodeMap[1]);
-	nodeMap.push_back(new mapNode(47.5, 32.5)); //13
-	nodeMap.push_back(new mapNode(67.5, 32.5)); //14
+	nodeMap.push_back(new mapNode(10*5+2.5, 7*5+2.5)); //13
+	nodeMap.push_back(new mapNode(14*5+2.5, 7*5+2.5)); //14
 	nodeMap[13]->setNextRed(nodeMap[14]);
 	nodeMap[14]->setNextRed(nodeMap[7]);
-	nodeMap.push_back(new mapNode(67.5, 17.5)); //15
+	nodeMap.push_back(new mapNode(14*5+2.5, 4*5+2.5)); //15
 	nodeMap[15]->setNextRed(nodeMap[14]);
-	nodeMap.push_back(new mapNode(107.5, 17.5)); //16
+	nodeMap.push_back(new mapNode(22*5+2.5, 4*5+2.5)); //16
 	nodeMap[16]->setNextRed(nodeMap[9]);
-	nodeMap.push_back(new mapNode(67.5, 7.5)); //17
+	nodeMap.push_back(new mapNode(14*5+2.5, 1*5+2.5)); //17
 	nodeMap[17]->setNextRed(nodeMap[15]);
-	nodeMap.push_back(new mapNode(17.5, 72.5)); //18
+	nodeMap.push_back(new mapNode(3*5+2.5, 15*5+2.5)); //18
 	nodeMap[18]->setNextRed(nodeMap[4]);
-	nodeMap.push_back(new mapNode(82.5, 82.5)); //19
-	nodeMap.push_back(new mapNode(102.5, 82.5)); //20
+	nodeMap.push_back(new mapNode(17*5+2.5, 17*5+2.5)); //19
+	nodeMap.push_back(new mapNode(21*5+2.5, 17*5+2.5)); //20
 	nodeMap[19]->setNextRed(nodeMap[20]);
-	nodeMap.push_back(new mapNode(102.5, 72.5)); //21
+	nodeMap.push_back(new mapNode(21*5+2.5, 15*5+2.5)); //21
 	nodeMap[20]->setNextRed(nodeMap[21]);
-	nodeMap.push_back(new mapNode(47.5, 57.5)); //22
+	nodeMap.push_back(new mapNode(10*5+2.5, 12*5+2.5)); //22
 	nodeMap[22]->setNextRed(nodeMap[13]);
 	nodeMap[11]->setNextBlue(nodeMap[10]);
 	nodeMap[10]->setNextBlue(nodeMap[9]);
@@ -301,26 +301,143 @@ void SceneManager_Server::populateMap() {
 	nodeMap[2]->setNextBlue(nodeMap[1]);
 	nodeMap[1]->setNextBlue(nodeMap[0]);
 	nodeMap[12]->setNextBlue(nodeMap[1]);
-	nodeMap.push_back(new mapNode(12.5, 92.5)); //23
+	nodeMap.push_back(new mapNode(3*5+2.5, 19*5+2.5)); //23
 	nodeMap[23]->setNextBlue(nodeMap[18]);
 	nodeMap[18]->setNextBlue(nodeMap[4]);
-	nodeMap.push_back(new mapNode(82.5, 67.5)); //24
+	nodeMap.push_back(new mapNode(17*5+2.5, 14*5+2.5)); //24
 	nodeMap[24]->setNextBlue(nodeMap[8]);
 	nodeMap[19]->setNextBlue(nodeMap[24]);
 	nodeMap[20]->setNextBlue(nodeMap[19]);
 	nodeMap[16]->setNextBlue(nodeMap[9]);
-	nodeMap.push_back(new mapNode(92.5, 2.5)); //25
-	nodeMap.push_back(new mapNode(92.5, 17.5)); //26
+	nodeMap.push_back(new mapNode(19*5+2.5, 0*5+2.5)); //25
+	nodeMap.push_back(new mapNode(19*5+2.5, 4*5+2.5)); //26
 	nodeMap[25]->setNextBlue(nodeMap[26]);
 	nodeMap[26]->setNextBlue(nodeMap[16]);
-	nodeMap.push_back(new mapNode(122.5, 27.5)); //27
-	nodeMap.push_back(new mapNode(107.5, 27.5)); //28
+	nodeMap.push_back(new mapNode(25*5+2.5, 6*5+2.5)); //27
+	nodeMap.push_back(new mapNode(22*5+2.5, 6*5+2.5)); //28
 	nodeMap[27]->setNextBlue(nodeMap[28]);
 	nodeMap[28]->setNextBlue(nodeMap[9]);
-	nodeMap.push_back(new mapNode(82.5, 32.5)); //29
+	nodeMap.push_back(new mapNode(17*5+2.5, 7*5+2.5)); //29
 	nodeMap[29]->setNextBlue(nodeMap[8]);
-	nodeMap.push_back(new mapNode(32.5, 42.5)); //30
+	nodeMap.push_back(new mapNode(7*5+2.5, 9*5+2.5)); //30
 	nodeMap[30]->setNextBlue(nodeMap[2]);
+
+
+	// Add map nodes next to the towers for smooth animation
+	nodeMap.push_back(new mapNode(12.5, 22.5)); // 31
+	nodeMap.push_back(new mapNode(17.5, 22.5)); // 32
+	nodeMap.push_back(new mapNode(4*5+2.5, 4*4+2.5)); // 33
+	nodeMap.push_back(new mapNode(6*5+2.5, 4*5+2.5)); // 34
+	nodeMap.push_back(new mapNode(5*5+2.5, 5*5+2.5)); // 35
+	nodeMap.push_back(new mapNode(7*5+2.5, 5*5+2.5)); // 36
+	nodeMap.push_back(new mapNode(5*5+2.5, 8*5+2.5)); // 37
+	nodeMap.push_back(new mapNode(3*5+2.5, 9*5+2.5)); // 38
+	nodeMap.push_back(new mapNode(4*5+2.5, 9*5+2.5)); // 39
+	nodeMap.push_back(new mapNode(5*5+2.5, 10*5+2.5)); // 40
+	nodeMap.push_back(new mapNode(5*5+2.5, 11*5+2.5)); // 41
+	nodeMap.push_back(new mapNode(5*5+2.5, 13*5+2.5)); // 42
+	nodeMap.push_back(new mapNode(5*5+2.5, 14*5+2.5)); // 43
+	nodeMap.push_back(new mapNode(3*5+2.5, 13*5+2.5)); // 44
+	nodeMap.push_back(new mapNode(3*5+2.5, 16*5+2.5)); // 45
+	nodeMap.push_back(new mapNode(3*5+2.5, 17*5+2.5)); // 46
+	nodeMap.push_back(new mapNode(3*5+2.5, 18*5+2.5)); // 47
+	nodeMap.push_back(new mapNode(6*5+2.5, 15*5+2.5)); // 48
+	nodeMap.push_back(new mapNode(8*5+2.5, 12*5+2.5)); // 49
+	nodeMap.push_back(new mapNode(9*5+2.5, 12*5+2.5)); // 50
+	nodeMap.push_back(new mapNode(6*5+2.5, 19*5+2.5)); // 51
+	nodeMap.push_back(new mapNode(7*5+2.5, 19*5+2.5)); // 52
+	nodeMap.push_back(new mapNode(9*5+2.5, 9*5+2.5)); // 53
+	nodeMap.push_back(new mapNode(10*5+2.5, 8*5+2.5)); // 54
+	nodeMap.push_back(new mapNode(10*5+2.5, 9*5+2.5)); // 55
+	nodeMap.push_back(new mapNode(11*5+2.5, 15*5+2.5)); // 56
+	nodeMap.push_back(new mapNode(12*5+2.5, 17*5+2.5)); // 57
+	nodeMap.push_back(new mapNode(12*5+2.5, 18*5+2.5)); // 58
+	nodeMap.push_back(new mapNode(14*5+2.5, 2*5+2.5)); // 59
+	nodeMap.push_back(new mapNode(14*5+2.5, 3*5+2.5)); // 60
+	nodeMap.push_back(new mapNode(14*5+2.5, 6*5+2.5)); // 61
+	nodeMap.push_back(new mapNode(14*5+2.5, 10*5+2.5)); // 62
+	nodeMap.push_back(new mapNode(16*5+2.5, 1*5+2.5)); // 63
+	nodeMap.push_back(new mapNode(17*5+2.5, 8*5+2.5)); // 64
+	nodeMap.push_back(new mapNode(17*5+2.5, 12*5+2.5)); // 65
+	nodeMap.push_back(new mapNode(17*5+2.5, 13*5+2.5)); // 66
+	nodeMap.push_back(new mapNode(17*5+2.5, 15*5+2.5)); // 67
+	nodeMap.push_back(new mapNode(17*5+2.5, 16*5+2.5)); // 68
+	nodeMap.push_back(new mapNode(18*5+2.5, 17*5+2.5)); // 69
+	nodeMap.push_back(new mapNode(19*5+2.5, 1*5+2.5)); // 70
+	nodeMap.push_back(new mapNode(19*5+2.5, 2*5+2.5)); // 71
+	nodeMap.push_back(new mapNode(19*5+2.5, 3*5+2.5)); // 72
+	nodeMap.push_back(new mapNode(19*5+2.5, 17*5+2.5)); // 73
+	nodeMap.push_back(new mapNode(20*5+2.5, 17*5+2.5)); // 74
+	nodeMap.push_back(new mapNode(21*5+2.5, 0*5+2.5)); // 75
+	nodeMap.push_back(new mapNode(21*5+2.5, 16*5+2.5)); // 76
+	nodeMap.push_back(new mapNode(22*5+2.5, 5*5+2.5)); // 77
+	nodeMap.push_back(new mapNode(22*5+2.5, 8*5+2.5)); // 78
+	nodeMap.push_back(new mapNode(22*5+2.5, 9*5+2.5)); // 79
+	nodeMap.push_back(new mapNode(22*5+2.5, 10*5+2.5)); // 80
+	nodeMap.push_back(new mapNode(22*5+2.5, 13*5+2.5)); // 81
+	nodeMap.push_back(new mapNode(22*5+2.5, 14*5+2.5)); // 82
+	nodeMap.push_back(new mapNode(25*5+2.5, 3*5+2.5)); // 83
+	nodeMap.push_back(new mapNode(25*5+2.5, 4*5+2.5)); // 84
+
+	// Connect red the nodes
+	nodeMap[31]->setNextRed(nodeMap[32]);
+	nodeMap[32]->setNextRed(nodeMap[33]);
+	nodeMap[33]->setNextRed(nodeMap[1]);
+	nodeMap[34]->setNextRed(nodeMap[1]);
+	nodeMap[36]->setNextRed(nodeMap[12]);
+	nodeMap[37]->setNextRed(nodeMap[2]);
+	nodeMap[38]->setNextRed(nodeMap[39]);
+	nodeMap[39]->setNextRed(nodeMap[2]);
+	nodeMap[40]->setNextRed(nodeMap[41]);
+	nodeMap[41]->setNextRed(nodeMap[3]);
+	nodeMap[42]->setNextRed(nodeMap[2]);
+	nodeMap[43]->setNextRed(nodeMap[44]);
+	nodeMap[44]->setNextRed(nodeMap[4]);
+	nodeMap[45]->setNextRed(nodeMap[18]);
+	nodeMap[46]->setNextRed(nodeMap[45]);
+	nodeMap[47]->setNextRed(nodeMap[46]);
+	nodeMap[48]->setNextRed(nodeMap[4]);
+	nodeMap[49]->setNextRed(nodeMap[50]);
+	nodeMap[50]->setNextRed(nodeMap[22]);
+	nodeMap[54]->setNextRed(nodeMap[13]);
+	nodeMap[55]->setNextRed(nodeMap[54]);
+	nodeMap[59]->setNextRed(nodeMap[60]);
+	nodeMap[60]->setNextRed(nodeMap[15]);
+	nodeMap[61]->setNextRed(nodeMap[14]);
+	nodeMap[63]->setNextRed(nodeMap[17]);
+	nodeMap[68]->setNextRed(nodeMap[19]);
+	nodeMap[26]->setNextRed(nodeMap[16]);
+	nodeMap[78]->setNextRed(nodeMap[9]);
+	
+	// Connect blue nodes
+	nodeMap[35]->setNextBlue(nodeMap[1]);
+	nodeMap[44]->setNextBlue(nodeMap[18]);
+	nodeMap[52]->setNextBlue(nodeMap[51]);
+	nodeMap[51]->setNextBlue(nodeMap[23]);
+	nodeMap[53]->setNextBlue(nodeMap[30]);
+	nodeMap[56]->setNextBlue(nodeMap[4]);
+	nodeMap[58]->setNextBlue(nodeMap[57]);
+	nodeMap[57]->setNextBlue(nodeMap[5]);
+	nodeMap[62]->setNextBlue(nodeMap[7]);
+	nodeMap[64]->setNextBlue(nodeMap[8]);
+	nodeMap[65]->setNextBlue(nodeMap[8]);
+	nodeMap[66]->setNextBlue(nodeMap[65]);
+	nodeMap[67]->setNextBlue(nodeMap[24]);
+	nodeMap[70]->setNextBlue(nodeMap[71]);
+	nodeMap[71]->setNextBlue(nodeMap[72]);
+	nodeMap[72]->setNextBlue(nodeMap[26]);
+	nodeMap[73]->setNextBlue(nodeMap[69]);
+	nodeMap[69]->setNextBlue(nodeMap[19]);
+	nodeMap[74]->setNextBlue(nodeMap[73]);
+	nodeMap[75]->setNextBlue(nodeMap[25]);
+	nodeMap[76]->setNextBlue(nodeMap[20]);
+	nodeMap[77]->setNextBlue(nodeMap[28]);
+	nodeMap[79]->setNextBlue(nodeMap[80]);
+	nodeMap[81]->setNextBlue(nodeMap[82]);
+	nodeMap[82]->setNextBlue(nodeMap[10]);
+	nodeMap[83]->setNextBlue(nodeMap[84]);
+	nodeMap[84]->setNextBlue(nodeMap[27]);
+	
 }
 
 void SceneManager_Server::populateScene() { //testing only

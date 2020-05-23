@@ -17,12 +17,12 @@ int __cdecl main(void)
     int iResult;
 	int iSendResult;
     char sendbuf[SERVER_SENDBUFLEN] = "I'm server";
-	//recvbuf structure: [(player number + received bytes + delimiter) for each player]
-	//const int RECV_BUFLEN = NUM_PLAYERS + (DEFAULT_BUFLEN * NUM_PLAYERS) + NUM_PLAYERS; //worst case, player num + default buflen + delim
-    //char recvbuf[RECV_BUFLEN];
 
 	SceneManager_Server* manager = new SceneManager_Server();
 	Server* server = new Server(manager);
+
+	// populate map
+	manager->populateMap();
 
     // Game State data
 	std::chrono::steady_clock::time_point lastTime = std::chrono::steady_clock::now();
@@ -44,19 +44,15 @@ int __cdecl main(void)
 
 		/* Process player input */
 		for (int p = 0; p < inputs.size(); p++) {
-			std::string player_str = std::to_string(p);
 			//std::cout << "processing player " << p << "\n";
 
-			//manager->addPlayer(player_str) now handled by Server on accept
-
-			manager->processInput(player_str, inputs[p]);
+			manager->processInput(p, inputs[p]);
 			//TODO check for ending game?
 		}
 
 		/* Update Game State */
 		auto currTime = std::chrono::steady_clock::now();
 		std::chrono::duration<float> deltaDuration = currTime - lastTime;
-		//std::chrono::seconds sec = std::chrono::duration_cast<std::chrono::seconds>(deltaDuration);
 		deltaTime = deltaDuration.count();
 		//std::cout << "deltaTime: " << deltaTime << "\n";
 		manager->update(deltaTime);
@@ -65,7 +61,7 @@ int __cdecl main(void)
 		/* Send updated data back to clients */
 		int statebufSize = manager->encodeState(sendbuf, 0);
 		int sendbufSize = manager->encodeScene(sendbuf, statebufSize) + statebufSize;
-		//std::cout << "sendbufSize: " << sendbufSize << std::endl;
+		std::cout << "sendbufSize: " << sendbufSize << std::endl;
 		char sizebuf[4];
 		((int*)sizebuf)[0] = sendbufSize; //push size of data packet to players
 		server->pushDataAll(sizebuf, sizeof(int), 0); //and then push data packet

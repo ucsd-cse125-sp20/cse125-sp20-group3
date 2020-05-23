@@ -11,6 +11,8 @@
 
 #define MOVE_SPEED 1
 
+#define PLAYER_ACTION_NONE 0 //player animations are handled based on movement direction, so actionState isn't relevant
+
 class Player : public Entity {
 private:
 	enum BUILD_MODE { NEUTRAL, LASER, CLAW, SUPER_MINION };
@@ -25,16 +27,14 @@ public:
 		float velocity_z;
 	};*/
 
-    Player(SceneManager_Server* sm);
-    Player(SceneManager_Server* sm, mat4 model_mat);
+    Player(int id, Team* t, SceneManager_Server* sm);
 	
     void update(float deltaTime) override; //server-side state management
 	void processInput(PlayerInput in);
-	void setVelocity(float vel_x, float vel_z);
-	std::pair<float, float> getVelocities();
+	//void setVelocity(float vel_x, float vel_z);
+	//std::pair<float, float> getVelocities();
 	void setMoveAndDir(int move_x, int move_z, float view_y_rot);
 
-    void buildTower();
-    void spawnUnit();
+	void setEntData(EntityData data) override;
 };
 #endif

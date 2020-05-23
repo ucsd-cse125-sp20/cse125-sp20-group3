@@ -22,17 +22,12 @@ public:
 
 	ObjDectData objDectData = {};
 
-	//std::chrono::steady_clock::time_point lastTime;
-	//float deltaTime = 0.f;
 	mat4 model;
 
 	GameObject();
-	GameObject(mat4 m) : model(m) {}
+	//GameObject(mat4 m) : model(m) {}
 	
 //	~GameObject();
-
-	//virtual void update();
-	//void resetClock();
 
 	void setGOData(GameObjectData data);
 	void setMatrix(mat4 m);

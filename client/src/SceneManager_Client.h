@@ -17,13 +17,19 @@
 #include "../../common/macros.h"
 #include "../../common/GameObject.h"
 #include "../../common/entity.h"
+#include "../../common/team.h"
 #include "../../common/player.h"
 #include "../../common/base.h"
 #include "../../common/minion.h"
+#include "../../common/SuperMinion.h"
 #include "../../common/tower.h"
+#include "../../common/lasertower.h"
 #include "../../common/clawtower.h"
 #include "../../common/resource.h"
 #include "../../common/client2server.h"
+
+#define GROUND_KEY 111111
+#define NO_TRACKED_PLAYER -1
 
 #define ENV_GEODE "env_geometry"
 #define PLAYER_GEODE "player_geometry"
@@ -38,19 +44,21 @@
 class SceneManager_Client : public Transform
 {
 private:
-	std::map<std::string, Entity*> idMap;
-	std::map<std::string, Transform*> transforms;
-	std::map<std::string, Animator*> animators;
+	std::map<int, Entity*> idMap;
+	std::map<int, Transform*> transforms;
+	std::map<int, Animator*> animators;
 	std::map<std::string, GLTFGeode*> gltfGeodes;
 	std::map<std::string, OzzGeode*> ozzGeodes;
 	std::map<std::string, ParticleSystemGeode*> particleGeodes;
-	std::string trackedPlayer_ID;
+	int trackedPlayer_ID;
 
 	std::vector<Transform*> otherTransforms;
     
     Buffer** instanceBuffer = NULL;
 	Buffer** boneBuffer = NULL;
 	Buffer** particleBuffer = NULL;
+
+	Team *red_team, *blue_team;
 
 public:
 	enum class GeodeType {
@@ -63,24 +71,18 @@ public:
 
 	static bool enableCulling;
 
-	// This vector should eventually be split between tracked objects and client only objects
-	//std::vector<Transform*> transforms;
-
-	// Will likely try to convert to a dictionary
-	//std::vector<GLTFGeode*> gltfGeodes;
-
 	SceneManager_Client(Renderer* renderer);
 	~SceneManager_Client();
 
 	void createMaterialResources(SceneManager_Client::GeodeType type, RootSignature* pRootSignature, DescriptorSet* pBindlessTexturesSamplersSet, Sampler* defaultSampler);
 
-	void updateFromClientBuf(std::vector<Client::UpdateData> updateBuf);
+	void updateScene(std::vector<Client::UpdateData> updateBuf);
 	void updateFromInputBuf(float deltaTime);
 
 	void setBuffer(SceneManager_Client::SceneBuffer type, Buffer** buffers); // TODO Could probably mange instance buffers within class, rather than app
 	void setProgram(SceneManager_Client::GeodeType type, Geode::GeodeShaderDesc program);
 
-	void trackPlayer(std::string player_id);
+	void trackPlayer(int player_id);
 	mat4 getPlayerTransformMat();
 
     void randomStaticInstantiation(Geode* g, int num, float range, float minSize, float maxSize);

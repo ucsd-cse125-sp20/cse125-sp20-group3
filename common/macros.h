@@ -8,6 +8,12 @@
 #define NUM_PLAYERS 1 //change to 4 eventually //upper bound, no more than 15 (1 byte) because of Server recv
 #define DELIMITER ','
 
+#define NO_TARGET_ID -1
+
+#define RED_TEAM 'R'
+#define BLUE_TEAM 'B'
+#define NO_TEAM 'N'
+
 #define ID_PLAYER_MIN 0
 #define ID_PLAYER_MAX 999
 #define ID_BASE_MIN 1000
@@ -33,10 +39,13 @@
 #define MINION_TYPE 'm'
 #define SUPER_MINION_TYPE 's'
 #define TOWER_TYPE 't'
-#define LASER_TYPE 'L'
+#define LASER_TYPE 'l'
 #define CLAW_TYPE 'c'
 #define DUMPSTER_TYPE 'd'
 #define RECYCLING_BIN_TYPE 'r'
+
+#define METAL_RES_TYPE 'M'
+#define PLASTIC_RES_TYPE 'P'
 
 #define PLAYER_HEALTH 200
 #define BASE_HEALTH 2000
@@ -54,21 +63,35 @@
 #define CLAW_TOWER_ATTACK 0
 #define RESOURCE_ATTACK 0
 
+#define MINION_ATK_RANGE 15
+//#define MINION_MV_RANGE 20
+#define SUPER_MINION_ATK_RANGE 10
+#define LASER_FIRE_RANGE 20
+
+#define MINION_ATK_INTERVAL 1.0
+#define SUPER_MINION_ATK_INTERVAL 3.0
+#define LASER_FIRE_INTERVAL 2.0
+#define CLAW_SPAWN_INTERVAL 5.0
+
+#define MINION_VELOCITY 3.0
+#define SUPER_MINION_VELOCITY 2.0
+
 #define WIN_STATUS_NEUTRAL 0
 #define WIN_STATUS_WON 10
 #define	WIN_STATUS_LOST -10
+
+#define DUMPSTER_PLASTIC 3
+#define RECYCLING_BIN_METAL 2
 
 #define MINION_METAL_REQ 2
 #define MINION_PLASTIC_REQ 8
 #define SUPER_MINION_METAL_REQ 4
 #define SUPER_MINION_PLASTIC_REQ 12
-#define TOWER_METAL_REQ 5
-#define TOWER_PLASTIC_REQ 20
+//#define TOWER_METAL_REQ 5
+//#define TOWER_PLASTIC_REQ 20
 #define LASER_METAL_REQ 2
 #define LASER_PLASTIC_REQ 4
 #define CLAW_METAL_REQ 8
 #define CLAW_PLASTIC_REQ 16
-
-#define CLAW_SPAWN_INTERVAL 5.0
 
 #endif

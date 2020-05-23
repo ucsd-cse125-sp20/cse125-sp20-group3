@@ -10,8 +10,7 @@ class Resource : public Entity {
 protected:
 	char type;
 public:
-	Resource(char resourceType, SceneManager_Server* sm_server);
-	Resource(char resourceType, SceneManager_Server* sm_server, mat4 model_mat);
+	Resource(char resourceType, int id, SceneManager_Server* sm_server);
 	std::pair<char, int> harvest();
 };
 

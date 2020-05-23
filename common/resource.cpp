@@ -1,16 +1,25 @@
 #include "resource.h"
 #include "../server/SceneManager_Server.h"
 
-Resource::Resource(char resourceType, SceneManager_Server* sm_server) : Entity(RESOURCE_HEALTH, RESOURCE_ATTACK, sm_server) {
+Resource::Resource(char resourceType, int id, SceneManager_Server* sm_server) : Entity(id, RESOURCE_HEALTH, RESOURCE_ATTACK, nullptr, sm_server) {
 	type = resourceType;
-}
 
-Resource::Resource(char resourceType, SceneManager_Server* sm_server, mat4 model_mat) : Entity(RESOURCE_HEALTH, RESOURCE_ATTACK, sm_server, model_mat) {
-	type = resourceType;
+	if (sm_server != nullptr) { //only execute on server
+		int flags = DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE | DETECTION_FLAG_RESOURCE;
+		ObjectDetection::addObject(this, flags);
+	}
 }
 
 std::pair<char, int> Resource::harvest() {
-	//TODO figure out how much to return, kill this once harvested
-	std::pair<char, int> res = std::make_pair(type, 1);
+	std::pair<char, int> res;
+	if (type == DUMPSTER_TYPE) {
+		res = std::make_pair(PLASTIC_RES_TYPE, DUMPSTER_PLASTIC);
+	}
+	else if (type == RECYCLING_BIN_TYPE) {
+		res = std::make_pair(METAL_RES_TYPE, RECYCLING_BIN_METAL);
+	}
+
+	this->takeDamage(RESOURCE_HEALTH); //mark as "dead" to indicate used
+
 	return res;
 }

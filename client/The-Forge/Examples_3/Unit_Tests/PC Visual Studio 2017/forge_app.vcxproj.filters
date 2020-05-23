@@ -40,6 +40,12 @@
     <Filter Include="Source Files\Render Objects">
       <UniqueIdentifier>{76e39935-a8f5-4a49-a079-94efaaae9bf0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Server Files">
+      <UniqueIdentifier>{6a9dd15e-4f99-4ed4-b959-8f1323573794}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Server Files">
+      <UniqueIdentifier>{97065513-a192-42ab-90c4-6b751f2824f7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\src\Application.cpp">
@@ -107,6 +113,21 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\src\UIUtils.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\lasertower.cpp">
+      <Filter>Source Files\Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\superminion.cpp">
+      <Filter>Source Files\Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\server\SceneManager_Server.cpp">
+      <Filter>Source Files\Server Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\ObjectDetection.cpp">
+      <Filter>Source Files\Server Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\mapNode.cpp">
+      <Filter>Source Files\Server Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -288,6 +309,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\src\UIUtils.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\lasertower.h">
+      <Filter>Header Files\Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\superminion.h">
+      <Filter>Header Files\Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\ObjectDetection.h">
+      <Filter>Header Files\Server Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\server\SceneManager_Server.h">
+      <Filter>Header Files\Server Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\mapNode.h">
+      <Filter>Header Files\Server Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

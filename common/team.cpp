@@ -1,26 +1,19 @@
 #include "team.h"
 
-Team::Team(std::string objFilename) {
-    Team::Team();
-}
-
-Team::Team() {
+Team::Team(char color) {
+	teamColor = color;
 	winStatus = WIN_STATUS_NEUTRAL;
 	metalCount = 0;
 	plasticCount = 0;
-    baseHealth = 100;
-    unitCount = 0;
-    towerCount = 0;
+	baseHealth = 100;
+	minionCount = 0;
+	towerCount = 0;
 }
 
-void Team::update() {
-    //send the base health, unitCount and towerCount
-}
-
+void Team::incMinion() { minionCount++; }
+void Team::decMinion() { minionCount--; }
 void Team::incTower() { towerCount++; }
 void Team::decTower() { towerCount--; }
-void Team::incUnit() { unitCount++; }
-void Team::decUnit() { unitCount--; }
 
 bool Team::checkResources(char entityType) {
 	switch (entityType) {

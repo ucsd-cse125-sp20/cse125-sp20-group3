@@ -441,14 +441,19 @@ void Application::InitDebugGui()
 	pDebugGui->AddWidget(GuiWidgets);
 
 	// Example usage
-	UIUtils::createImage("test", "bot.png", 500, 0, float2(1,1), 1);
-	UIUtils::addCallbackToImage("test", []() { UIUtils::changeImage("test", "why.png", 0.5f); });
+	UIUtils::createImage("overlay", "why.png", 0, 0, float2((float)mSettings.mWidth / 1333, (float)mSettings.mHeight / 949), 0);
 
-	UIUtils::createImage("remover", "WeirdBox_halo.png", 600, 100, float2(0.05f,0.05f), 2);
-	UIUtils::addCallbackToImage("remover", []() { UIUtils::removeImage("test"); UIUtils::editText("testText", "boop"); });
+	UIUtils::loadTexture("WeirdBox_halo.png"); // Preload textures
+	UIUtils::createImage("start_button", "start.png", 1500, 400, float2(1,1), 1);
+	UIUtils::addCallbackToImage("start_button", []() { 
+		UIUtils::removeImage("overlay"); 
+		UIUtils::removeText("testText"); 
+		UIUtils::removeImage("start_button"); 
+		UIUtils::createImage("hud", "WeirdBox_halo.png", 400, -10, float2(1.f, 0.05f), 1);
+	});
 
-	UIUtils::loadFont("default font", "ComicRelief/ComicRelief.ttf");
-	UIUtils::createText("testText", "HELLO WORLD!!!", 500, 800, "default font", 128, 0xff6655ff);
+	UIUtils::loadFont("default font", "TitilliumText/TitilliumText-Bold.otf", 128); // All fonts must be loaded beforehand
+	UIUtils::createText("testText", "YEET", 500, 800, "default font", 0xff6655ff, 3);
 }
 
 void Application::ToggleClient()
@@ -523,6 +528,7 @@ bool Application::Init()
 		return false;
 
 	gAppUI.LoadFont("TitilliumText/TitilliumText-Bold.otf", RD_BUILTIN_FONTS);
+	UIUtils::loadFont("default", "TitilliumText/TitilliumText-Bold.otf", 12);
 
 	initProfiler();
 
@@ -1356,7 +1362,6 @@ void Application::Draw()
 
 		gAppUI.Gui(pDebugGui);
 		UIUtils::drawImages(cmd);
-		UIUtils::drawText(cmd);
 		gAppUI.Draw(cmd);
 
 		cmdEndGpuTimestampQuery(cmd, gGpuProfileToken);

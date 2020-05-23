@@ -3,10 +3,10 @@
 #include "Application.h"
 
 std::map<std::string, Texture*> UIUtils::textures = std::map<std::string, Texture*>();
-std::map<std::string, int> UIUtils::fonts = std::map<std::string, int>();
+std::map<std::string, ImFont*> UIUtils::fonts = std::map<std::string, ImFont*>();
 std::map<std::string, UIUtils::WindowDrawData> UIUtils::windows = std::map<std::string, UIUtils::WindowDrawData>();
 std::map<std::string, TextureButtonWidget*> UIUtils::images = std::map<std::string, TextureButtonWidget*>();
-std::map<std::string, UIUtils::TextDrawData> UIUtils::texts = std::map<std::string, UIUtils::TextDrawData>();
+std::map<std::string, TextWidget*> UIUtils::texts = std::map<std::string, TextWidget*>();
 
 void UIUtils::createGuiComponent(std::string label, GuiDesc desc, int priority)
 {
@@ -53,24 +53,27 @@ void UIUtils::removeImage(std::string label)
 	windows.erase(label);
 }
 
-void UIUtils::createText(std::string label, std::string text, float x, float y, std::string font, float size, uint32_t color)
+void UIUtils::createText(std::string label, std::string text, float x, float y, std::string font, uint32_t color, int priority)
 {
-	texts[label] = {};
-	texts[label].text = text;
-	texts[label].position = float2(x, y);
-	texts[label].desc.mFontID = fonts[font];
-	texts[label].desc.mFontSize = size;
-	texts[label].desc.mFontColor = color;
+	GuiDesc desc = {};
+	desc.mStartPosition = vec2(x, y);
+	UIUtils::createGuiComponent(label, desc, priority);
+	texts[label] = conf_new(TextWidget, label.c_str());
+
+	editText(label, text, font, color);
+	UIUtils::windows[label].gui->AddWidget(texts[label]);
 }
 
-void UIUtils::editText(std::string label, std::string text)
+void UIUtils::editText(std::string label, std::string text, std::string font, uint32_t color)
 {
-	texts[label].text = text;
+	texts[label]->text = text;
+	texts[label]->font = font == "" ? texts[label]->font : fonts[font];
+	texts[label]->color = color == 0xabcdef00 ? texts[label]->color : color;
 }
 
 void UIUtils::removeText(std::string label)
 {
-	texts.erase(label);
+	windows.erase(label);
 }
 
 void UIUtils::loadTexture(std::string filename)
@@ -85,9 +88,15 @@ void UIUtils::loadTexture(std::string filename)
 	textures[filename] = tex;
 }
 
-void UIUtils::loadFont(std::string label, std::string filename)
+void UIUtils::loadFont(std::string label, std::string filename, float size)
 {
-	if (fonts.find(filename) == fonts.end()) fonts[label] = Application::gAppUI.LoadFont(filename.c_str(), ResourceDirectory::RD_BUILTIN_FONTS);
+	ImGuiIO& io = ImGui::GetIO();
+	auto path = fsCopyPathInResourceDirectory(ResourceDirectory::RD_BUILTIN_FONTS, filename.c_str());
+	std::string pathstr = fsGetPathAsNativeString(path);
+	printf("%s\n", pathstr.c_str());
+	fsFreePath(path);
+	//if (fonts.find(filename) == fonts.end()) fonts[label] = Application::gAppUI.LoadFont(filename.c_str(), ResourceDirectory::RD_BUILTIN_FONTS);
+	if (fonts.find(label) == fonts.end()) fonts[label] = io.Fonts->AddFontFromFileTTF(pathstr.c_str(), size);
 }
 
 void UIUtils::unload()
@@ -98,6 +107,10 @@ void UIUtils::unload()
 
 	for (auto img : images) {
 		conf_delete(img.second);
+	}
+
+	for (auto t : texts) {
+		conf_delete(t.second);
 	}
 }
 
@@ -113,7 +126,7 @@ void UIUtils::drawImages(Cmd* cmd)
 	auto ctx = ImGui::GetCurrentContext();
 	std::stable_sort(ctx->Windows.begin(), ctx->Windows.end(),
 		[](const ImGuiWindow* a, const ImGuiWindow* b) {
-			//printf("comparing %s and %s\n", a->Name, b->Name);
+			printf("comparing %s and %s\n", a->Name, b->Name);
 			if (UIUtils::windows.find(a->Name) == UIUtils::windows.end() || UIUtils::windows.find(b->Name) == UIUtils::windows.end()) return false;
 			//printf("priorities %d and %d\n", UIUtils::windows[a->Name].priority, UIUtils::windows[b->Name].priority);
 			return UIUtils::windows[a->Name].priority < UIUtils::windows[b->Name].priority;
@@ -129,13 +142,6 @@ void UIUtils::drawImages(Cmd* cmd)
 		Application::gAppUI.Gui(w.second.gui);
 	}
 	//printf("\n");
-}
-
-void UIUtils::drawText(Cmd* cmd)
-{
-	for (auto text : texts) {
-		Application::gAppUI.DrawText(cmd, text.second.position, text.second.text.c_str(), &text.second.desc);
-	}
 }
 
 static void CloneCallbacks(IWidget* pSrc, IWidget* pDst)
@@ -168,4 +174,26 @@ void TextureButtonWidget::Draw()
 	ImGui::SameLine();
 
 	//ProcessCallbacks();
+}
+
+IWidget* TextWidget::Clone() const
+{
+	TextWidget* pWidget = conf_placement_new<TextWidget>(conf_calloc(1, sizeof(*pWidget)), this->mLabel);
+	pWidget->SetText(this->text, this->font, this->color);
+
+	// Clone the callbacks
+	CloneCallbacks((IWidget*)this, pWidget);
+
+	return pWidget;
+}
+
+void TextWidget::Draw()
+{
+	ImGui::PushFont(this->font);
+	ImGui::PushStyleColor(ImGuiCol_Text, this->color);
+	ImGui::Text(this->text.c_str());
+	ImGui::PopStyleColor();
+	ImGui::PopFont();
+	
+	ImGui::SameLine();
 }

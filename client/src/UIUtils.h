@@ -9,6 +9,29 @@
 #include <string>
 #include <algorithm>
 
+class TextWidget : public IWidget
+{
+public:
+	ImFont* font;
+	uint32_t color;
+	std::string text;
+
+	TextWidget(const eastl::string& _label) :
+		IWidget(_label),
+		font(NULL),
+		color(0),
+		text("") {}
+
+	IWidget* Clone() const;
+	void     Draw();
+
+	void SetText(std::string const& text, ImFont* const font, uint32_t const& color) {
+		this->font = font;
+		this->text = text;
+		this->color = color;
+	}
+};
+
 class TextureButtonWidget : public IWidget
 {
 public:
@@ -39,17 +62,11 @@ public:
 		int priority;
 	};
 
-	struct TextDrawData {
-		std::string text;
-		float2 position;
-		TextDrawDesc desc;
-	};
-
 	static std::map<std::string, Texture*> textures;
-	static std::map<std::string, int> fonts;
+	static std::map<std::string, ImFont*> fonts;
 	static std::map<std::string, WindowDrawData> windows;
 	static std::map<std::string, TextureButtonWidget*> images;
-	static std::map<std::string, TextDrawData> texts;
+	static std::map<std::string, TextWidget*> texts;
 	
 	// Create an image at a specified position
 	static void createImage(std::string label, std::string filename, float x, float y, float2 scale=float2(1,1), int priority=0);
@@ -64,21 +81,19 @@ public:
 	static void removeImage(std::string label);
 
 	// Create screen space text
-	static void createText(std::string label, std::string text, float x, float y, std::string font, float size = 30, uint32_t color=0xffffffff);
+	static void createText(std::string label, std::string text, float x, float y, std::string font, uint32_t color=0xffffffff, int priority=0);
 
 	// Change text content
-	static void editText(std::string label, std::string text);
+	static void editText(std::string label, std::string text, std::string font="", uint32_t color=0xabcdef00);
 
 	// Remove a text element
 	static void removeText(std::string label);
-
-	static void createBar(std::string label, float value=1.0f);
 
 	// Load a texture for the UI
 	static void loadTexture(std::string filename);
 
 	// Load a font file
-	static void loadFont(std::string label, std::string filename);
+	static void loadFont(std::string label, std::string filename, float size);
 
 
 	// Create an empty widget container
@@ -92,5 +107,4 @@ public:
 
 	// Set components to be drawn
 	static void drawImages(Cmd* cmd);
-	static void drawText(Cmd* cmd);
 };

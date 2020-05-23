@@ -1,7 +1,7 @@
 #include "resource.h"
 #include "../server/SceneManager_Server.h"
 
-Resource::Resource(char resourceType, std::string id, SceneManager_Server* sm_server) : Entity(id, RESOURCE_HEALTH, RESOURCE_ATTACK, nullptr, sm_server) {
+Resource::Resource(char resourceType, int id, SceneManager_Server* sm_server) : Entity(id, RESOURCE_HEALTH, RESOURCE_ATTACK, nullptr, sm_server) {
 	type = resourceType;
 
 	if (sm_server != nullptr) { //only execute on server

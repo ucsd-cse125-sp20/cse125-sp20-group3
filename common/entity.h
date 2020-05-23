@@ -12,7 +12,8 @@ class SceneManager_Server;
 
 class Entity : public GameObject {
 protected:
-	std::string id_str;
+	//std::string id_str;
+	int id;
 	char actionState;
 	int health;
 	int attackDamage;
@@ -29,12 +30,12 @@ public:
 		int health;
 	};
 
-	Entity(std::string id, int h, int a, Team* t, SceneManager_Server* sm) : GameObject() { 
-		id_str = id; health = h; attackDamage = a; team = t; manager = sm; 
+	Entity(int i, int h, int a, Team* t, SceneManager_Server* sm) : GameObject() { 
+		id = i; health = h; attackDamage = a; team = t; manager = sm; 
 	};
 	virtual void update(float deltaTime) {} //server only function
 	bool isEnemyTeam(Team* checkTeam) { return this->team != checkTeam; }
-	std::string getIDstr() { return id_str; }
+	int getID() { return id; }
 	int getHealth() { return health; }
 	void setHealth(int new_health) { health = new_health; }
 	virtual void takeDamage(int damage) { health = std::max(health - damage, 0);	}

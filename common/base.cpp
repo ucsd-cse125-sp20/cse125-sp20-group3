@@ -1,7 +1,7 @@
 #include "base.h"
 #include "../server/SceneManager_Server.h"
 
-Base::Base(std::string id, Team* t, SceneManager_Server* sm) : Entity(id, BASE_HEALTH, BASE_ATTACK, t, sm) {
+Base::Base(int id, Team* t, SceneManager_Server* sm) : Entity(id, BASE_HEALTH, BASE_ATTACK, t, sm) {
     //init stuff
 }
 

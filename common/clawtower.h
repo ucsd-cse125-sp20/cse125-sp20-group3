@@ -13,7 +13,7 @@ private:
 	float spawnInterval;
     
 public:
-	ClawTower(std::string id, Team* t, SceneManager_Server* sm_server);
+	ClawTower(int id, Team* t, SceneManager_Server* sm_server);
 
 	void update(float deltaTime) override;
 

@@ -435,10 +435,9 @@ void Application::ToggleClient()
 	}
 	else {
 		client = conf_new(Client, serverName);
-		char myPlayerID = client->recvPlayerID();
-		std::cout << "char of myPlayerID " << myPlayerID << "\n";
-		std::cout << "myPlayerID: " << (std::string(1, myPlayerID)) << "\n";
-		scene->trackPlayer(std::string(1, myPlayerID));
+		int myPlayerID = client->recvPlayerID();
+		std::cout << "myPlayerID: " << myPlayerID << "\n";
+		scene->trackPlayer(myPlayerID);
 	}
 }
 

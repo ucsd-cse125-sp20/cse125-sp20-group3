@@ -1,7 +1,7 @@
 #include "player.h"
 #include "../server/SceneManager_Server.h"
 
-Player::Player(std::string id, Team* t, SceneManager_Server* sm) : Entity(id, PLAYER_HEALTH, PLAYER_ATTACK, t, sm) {
+Player::Player(int id, Team* t, SceneManager_Server* sm) : Entity(id, PLAYER_HEALTH, PLAYER_ATTACK, t, sm) {
 	actionState = PLAYER_ACTION_NONE; //player animations are based on movement direction, so actionState is irrelevant
 
 	velocity_x = 0.f;
@@ -87,15 +87,6 @@ void Player::processInput(PlayerInput in) {
 		std::cout << "harvesting\n";
 	}
 }
-
-/*void Player::setVelocity(float vel_x, float vel_z) {
-	velocity_x = vel_x;
-	velocity_z = vel_z;
-}
-
-std::pair<float, float> Player::getVelocities() {
-	return std::make_pair(this->velocity_x, this->velocity_z);
-}*/
 
 //read the move_x, move_z, and view_y_rot from PlayerInput
 //ignore the other values

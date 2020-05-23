@@ -1,7 +1,7 @@
 #include "clawtower.h"
 #include "../server/SceneManager_Server.h"
 
-ClawTower::ClawTower(std::string id, Team* t, SceneManager_Server* sm_server) : Tower(id, CLAW_TOWER_HEALTH, CLAW_TOWER_ATTACK, t, sm_server) {
+ClawTower::ClawTower(int id, Team* t, SceneManager_Server* sm_server) : Tower(id, CLAW_TOWER_HEALTH, CLAW_TOWER_ATTACK, t, sm_server) {
 	actionState = CLAW_ACTION_IDLE;
 
 	timeElapsed = 0;
@@ -14,7 +14,7 @@ void ClawTower::update(float deltaTime) {
 	actionState = CLAW_ACTION_SPAWN;
 
 	if (timeElapsed >= spawnInterval) {
-		std::cout << "claw " << id_str << " spawning at x: " << spawnPoint.getX() << " z: " << spawnPoint.getZ() << "\n";
+		std::cout << "claw " << id << " spawning at x: " << spawnPoint.getX() << " z: " << spawnPoint.getZ() << "\n";
 		manager->spawnEntity(MINION_TYPE, spawnPoint[0], spawnPoint[2], 0, this->team);
 		timeElapsed = 0;
 	}

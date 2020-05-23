@@ -82,11 +82,11 @@ int Client::sendData(char sendbuf[], int buflen, int flags) {
 	return iResult;
 }
 
-char Client::recvPlayerID() {
-	char idbuf[1];
+int Client::recvPlayerID() {
+	char idbuf[4];
 	int iResult = 0;
 	while (iResult == 0) {
-		iResult = recv(ConnectSocket, idbuf, 1, 0); //receive 1 byte
+		iResult = recv(ConnectSocket, idbuf, 4, 0); //receive id int
 		if (iResult == SOCKET_ERROR) {
 			std::cout << "recv ID failed with error: " << WSAGetLastError() << std::endl;
 			closesocket(ConnectSocket);
@@ -94,7 +94,8 @@ char Client::recvPlayerID() {
 			return '0';
 		}
 	}
-	return idbuf[0];
+	int id = ((int*)idbuf)[0];
+	return id;
 }
 
 std::vector<Client::UpdateData> Client::recvAndFormatData() {
@@ -102,7 +103,7 @@ std::vector<Client::UpdateData> Client::recvAndFormatData() {
 	char size_int_buf[sizeof(int)];
 	int bytes_to_receive;
 	std::vector<char> recvbuf;
-	std::map<std::string, Entity::EntityData> dataMap;
+	std::map<int, Entity::EntityData> dataMap;
 	int iResult;
 	u_long blocking = 0, nonblocking = 1;
 	
@@ -195,17 +196,26 @@ std::vector<Client::UpdateData> Client::recvAndFormatData() {
 		}*/
 
 		int state = 0;
-		std::string id_str = "";
+		int id;
 		Entity::EntityData data;
+		char* recvData = &recvbuf[0];
 		//std::cout << "processing\n";
 		for (; i < recvbuf.size(); i++) {
-			if (state == 0) { //append bytes to id_str until delimiter encountered
-				if (recvbuf[i] == DELIMITER) {
-					state++; //end of id bytes found, advance to reading data
-					//std::cout << "id_str: " + id_str + "\n";
+			if (state == 0) { //read bytes as id int
+				if (recvbuf[i] == DELIMITER) { //delimiter found at beginning of state 0 must be closing delimiter, break out
+					break;
 				}
-				else { //read id bytes one by one, appending to id_str
-					id_str += recvbuf[i];
+				else {
+					id = ((int*)(recvData + i))[0];
+					i += sizeof(int); //advance i to where delimiter should be
+
+					if (recvbuf[i] == DELIMITER) {
+						//std::cout << "read id: " << id << " | state 0 delimiter at i: " << i << "\n";
+						state++; //end of id bytes found, advance to reading data
+					}
+					else {
+						std::cout << "state 0 delimiter expected but not found, i: " << i << "\n";
+					}
 				}
 			}
 			else if (state == 1) { //read bytes as an EntityData
@@ -215,12 +225,11 @@ std::vector<Client::UpdateData> Client::recvAndFormatData() {
 
 				if (recvbuf[i] == DELIMITER) {
 					//std::cout << "state 1 delimiter at i: " << i << "\n";
-					dataMap[id_str] = data; //overwrite old data in the case of multiple updates on same object in one tick
+					dataMap[id] = data; //overwrite old data in the case of multiple updates on same object in one tick
 					state = 0; //end of data confirmed, reset to reading id bytes
-					id_str = "";
 				}
 				else {
-					//std::cout << "state 1 delimiter expected but not found, i: " << i << "\n";
+					std::cout << "state 1 delimiter expected but not found, i: " << i << "\n";
 				}
 			}
 		}
@@ -230,7 +239,7 @@ std::vector<Client::UpdateData> Client::recvAndFormatData() {
 	}
 
 	std::vector<UpdateData> updateDataVec; //format data into a vector to be returned
-	for (std::pair<std::string, Entity::EntityData> idDataPair : dataMap) {
+	for (std::pair<int, Entity::EntityData> idDataPair : dataMap) {
 		UpdateData upData = { idDataPair.first, idDataPair.second }; //{id_str, data}
 		updateDataVec.push_back(upData); //associate data to id strings
 	}

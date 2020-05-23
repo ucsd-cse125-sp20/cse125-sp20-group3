@@ -1,7 +1,7 @@
 #include "minion.h"
 #include "../server/SceneManager_Server.h"
 
-Minion::Minion(std::string id, Team* t, SceneManager_Server* sm) : Entity(id, MINION_HEALTH, MINION_ATTACK, t, sm) {
+Minion::Minion(int id, Team* t, SceneManager_Server* sm) : Entity(id, MINION_HEALTH, MINION_ATTACK, t, sm) {
 	actionState = MINION_ACTION_IDLE;
 
 	timeElapsed = 0;
@@ -22,7 +22,7 @@ Minion::Minion(std::string id, Team* t, SceneManager_Server* sm) : Entity(id, MI
 	}
 }
 
-Minion::Minion(std::string id, int health, int attack, int range, float interval, float vel, Team* t, SceneManager_Server* sm) : Entity(id, health, attack, t, sm) {
+Minion::Minion(int id, int health, int attack, int range, float interval, float vel, Team* t, SceneManager_Server* sm) : Entity(id, health, attack, t, sm) {
 	timeElapsed = 0;
 	attackTarget = nullptr;
 	attackRange = range;
@@ -46,7 +46,7 @@ void Minion::update(float deltaTime) { //should they be able to switch attack ta
 	if (attackTarget != nullptr &&																//first, if targeting something
 			(!manager->checkEntityAlive(attackTargetID) ||										//but either target is dead
 			length(attackTarget->getPosition() - this->getPosition()) > this->attackRange)) {	//or target is out of range, null out ptr
-		std::cout << "minion " << id_str << " nulling out attackTarget\n";
+		std::cout << "minion " << id << " nulling out attackTarget\n";
 		attackTarget = nullptr; //do this check here instead of after attacking in the case of multiple entities targeting one entity
 	}
 
@@ -62,9 +62,9 @@ void Minion::update(float deltaTime) { //should they be able to switch attack ta
 		} //object detection doesn't strictly follow distance, based on hashed block sections
 
 		if (attackTarget != nullptr) {
-			attackTargetID = attackTarget->getIDstr();
+			attackTargetID = attackTarget->getID();
 			timeElapsed = 0; //reset attack timer on acquiring new target
-			std::cout << "minion " << id_str << " found target " << attackTarget->getIDstr() << "\n";
+			std::cout << "minion " << id<< " found target " << attackTarget->getID() << "\n";
 		}
 	}
 
@@ -79,7 +79,7 @@ void Minion::update(float deltaTime) { //should they be able to switch attack ta
 		model[2] = vec4(-forward, 0);
 
 		if (timeElapsed >= attackInterval) { //only attack on an interval
-			std::cout << "minion: " << id_str << " attacking that " << attackTargetID << "\n";
+			std::cout << "minion: " << id << " attacking that " << attackTargetID << "\n";
 			this->attack();
 			timeElapsed = 0;
 		}
@@ -93,7 +93,7 @@ void Minion::update(float deltaTime) { //should they be able to switch attack ta
 
 void Minion::takeDamage(int damage) {
 	Entity::takeDamage(damage);
-	std::cout << "minion: " << id_str << " took " << damage << " damage | remaining health: " << health << "\n";
+	std::cout << "minion: " << id << " took " << damage << " damage | remaining health: " << health << "\n";
 	if (health <= 0) { team->decMinion(); std::cout << "i die\n"; }
 }
 
@@ -150,4 +150,4 @@ void Minion::setEntData(EntityData data) {
 }
 
 /* TESTING SPECIFIC FUNCTIONALITY - DO NOT USE */
-void Minion::setAttackTarget(Entity* e) { attackTarget = e; attackTargetID = e->getIDstr(); }
+void Minion::setAttackTarget(Entity* e) { attackTarget = e; attackTargetID = e->getID(); }

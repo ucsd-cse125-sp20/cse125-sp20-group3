@@ -102,10 +102,10 @@ Server::Server(SceneManager_Server* manager) {
 		else
 		{ // client connected successfully
 			// start a thread that will communicate with client
-			// startThread (client[number_of_clients]);
-			char id_buf[1] = { (std::to_string(number_of_clients))[0] };
-			iResult = send(ClientSockets[number_of_clients], id_buf, 1, 0); //tell client what their player id is
-			if (!manager->addPlayer(std::to_string(number_of_clients))) { //spawn a player object for the player
+			char id_buf[4];
+			((int*)id_buf)[0] = number_of_clients;
+			iResult = send(ClientSockets[number_of_clients], id_buf, 4, 0); //tell client what their player id is
+			if (!manager->addPlayer(number_of_clients)) { //spawn a player object for the player
 				//if somehow the player object already exists
 				std::cout << "error spawning player object, player " << number_of_clients << " already exists\n";
 			}
@@ -155,7 +155,9 @@ void Server::pushDataAll(char sendbuf[], int buflen, int flags) {
 std::vector<PlayerInput> Server::pullData() {
 	std::vector<PlayerInput> inputs;
 	for (int p = 0; p < NUM_PLAYERS; p++) {
+		//player_states_mtx[p].lock();
 		inputs.push_back(Player_States[p].in);
+		//player_states_mtx[p].unlock();
 	}
 	return inputs;
 }

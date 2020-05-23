@@ -8,7 +8,6 @@
 
 class ClawTower : public Tower {
 private:
-	float timeElapsed;
 	vec3 spawnPoint;
 	float spawnInterval;
     

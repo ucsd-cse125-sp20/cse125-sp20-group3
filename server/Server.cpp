@@ -155,9 +155,9 @@ void Server::pushDataAll(char sendbuf[], int buflen, int flags) {
 std::vector<PlayerInput> Server::pullData() {
 	std::vector<PlayerInput> inputs;
 	for (int p = 0; p < NUM_PLAYERS; p++) {
-		//player_states_mtx[p].lock();
+		player_states_mtx[p].lock();
 		inputs.push_back(Player_States[p].in);
-		//player_states_mtx[p].unlock();
+		player_states_mtx[p].unlock();
 	}
 	return inputs;
 }

@@ -4,8 +4,6 @@
 Minion::Minion(int id, Team* t, SceneManager_Server* sm) : Entity(id, MINION_HEALTH, MINION_ATTACK, t, sm) {
 	actionState = MINION_ACTION_IDLE;
 
-	timeElapsed = 0;
-	attackTarget = nullptr;
 	attackRange = MINION_ATK_RANGE;
 	attackInterval = MINION_ATK_INTERVAL;
 	velocity = MINION_VELOCITY;
@@ -23,8 +21,8 @@ Minion::Minion(int id, Team* t, SceneManager_Server* sm) : Entity(id, MINION_HEA
 }
 
 Minion::Minion(int id, int health, int attack, int range, float interval, float vel, Team* t, SceneManager_Server* sm) : Entity(id, health, attack, t, sm) {
-	timeElapsed = 0;
-	attackTarget = nullptr;
+	actionState = MINION_ACTION_IDLE;
+	
 	attackRange = range;
 	attackInterval = interval;
 	velocity = vel;
@@ -146,7 +144,7 @@ void Minion::move(float deltaTime) {
 
 void Minion::setEntData(EntityData data) {
 	Entity::setEntData(data);
-	//std::cout << "minion actionState: " << (int)actionState << "\n";
+	std::cout << "minion " << id << " targetID: " << attackTargetID << "\n";
 }
 
 /* TESTING SPECIFIC FUNCTIONALITY - DO NOT USE */

@@ -9,11 +9,9 @@
 
 class LaserTower : public Tower {
 private:
-	float timeElapsed;
-	Entity* attackTarget;
-	int attackTargetID;
 	int attackRange;
 	float attackInterval;
+
 public:
 	LaserTower(int id, Team* t, SceneManager_Server* sm_server);
 

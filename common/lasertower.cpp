@@ -4,8 +4,6 @@
 LaserTower::LaserTower(int id, Team* t, SceneManager_Server* sm_server) : Tower(id, LASER_TOWER_HEALTH, LASER_TOWER_ATTACK, t, sm_server) {
 	actionState = LASER_ACTION_IDLE;
 	
-	timeElapsed = 0;
-	attackTarget = NULL;
 	attackRange = LASER_FIRE_RANGE;
 	attackInterval = LASER_FIRE_INTERVAL; //interval between firing at attack target
 }
@@ -60,7 +58,7 @@ void LaserTower::attack() {
 
 void LaserTower::setEntData(EntityData data) {
 	Entity::setEntData(data);
-	//std::cout << "laser " << id_str << " actionState: " << (int)actionState << "\n";
+	std::cout << "laser " << id << " targetID: " << attackTargetID << "\n";
 }
 
 /* TESTING SPECIFIC FUNCTIONALITY - DO NOT USE */

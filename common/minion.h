@@ -19,9 +19,6 @@
 class Minion : public Entity {
 protected:
 	mapNode* destNode;
-	float timeElapsed;
-	Entity* attackTarget;
-	int attackTargetID;
 	int attackRange;
 	float attackInterval;
 	float velocity;

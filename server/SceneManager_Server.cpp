@@ -243,8 +243,248 @@ int SceneManager_Server::encodeScene(char buf[], int start_index) {
 	return i;
 }
 
+void SceneManager_Server::populateWallLocation(){
+	std::vector<wallNode*> wallNodeMap;
+	this->wallNodeMap = &wallNodeMap;
+	wallNodeMap.push_back(new wallNode(0,3)); 
+	wallNodeMap.push_back(new wallNode(0,4)); 
+	wallNodeMap.push_back(new wallNode(0,5));
+	wallNodeMap.push_back(new wallNode(2,3)); 
+	wallNodeMap.push_back(new wallNode(3,3));
+	wallNodeMap.push_back(new wallNode(4,5));
+	wallNodeMap.push_back(new wallNode(6,2));
+	wallNodeMap.push_back(new wallNode(7,1));
+	wallNodeMap.push_back(new wallNode(8,1));
+	wallNodeMap.push_back(new wallNode(9,1));
+	wallNodeMap.push_back(new wallNode(10,1));
+	wallNodeMap.push_back(new wallNode(11,1));
+	wallNodeMap.push_back(new wallNode(12,1));
+	wallNodeMap.push_back(new wallNode(13,1));
+	wallNodeMap.push_back(new wallNode(14,0));
+	wallNodeMap.push_back(new wallNode(15,0));
+	wallNodeMap.push_back(new wallNode(16,0));
+	wallNodeMap.push_back(new wallNode(17,0));
+	wallNodeMap.push_back(new wallNode(18,0));
+	wallNodeMap.push_back(new wallNode(9,3));
+	wallNodeMap.push_back(new wallNode(10,3));
+	wallNodeMap.push_back(new wallNode(11,3));
+	wallNodeMap.push_back(new wallNode(12,3));
+	wallNodeMap.push_back(new wallNode(17,2));
+	wallNodeMap.push_back(new wallNode(18,2));
+	wallNodeMap.push_back(new wallNode(22,1));
+	wallNodeMap.push_back(new wallNode(23,1));
+	wallNodeMap.push_back(new wallNode(24,1));
+	wallNodeMap.push_back(new wallNode(23,5));
+	wallNodeMap.push_back(new wallNode(24,5));
+	wallNodeMap.push_back(new wallNode(21,3));
+	wallNodeMap.push_back(new wallNode(22,3));
+	wallNodeMap.push_back(new wallNode(23,4));
+	wallNodeMap.push_back(new wallNode(24,2));
+	wallNodeMap.push_back(new wallNode(16,3));
+	wallNodeMap.push_back(new wallNode(17,3));
+	wallNodeMap.push_back(new wallNode(4,6));
+	wallNodeMap.push_back(new wallNode(4,7));
+	wallNodeMap.push_back(new wallNode(4,8));
+	wallNodeMap.push_back(new wallNode(3,8));
+	wallNodeMap.push_back(new wallNode(2,8));
+	wallNodeMap.push_back(new wallNode(1,9));
+	wallNodeMap.push_back(new wallNode(6,6));
+	wallNodeMap.push_back(new wallNode(6,7));
+	wallNodeMap.push_back(new wallNode(8,4));
+	wallNodeMap.push_back(new wallNode(8,6));
+	wallNodeMap.push_back(new wallNode(8,7));
+	wallNodeMap.push_back(new wallNode(8,8));
+	wallNodeMap.push_back(new wallNode(9,7));
+	wallNodeMap.push_back(new wallNode(9,8));
+	wallNodeMap.push_back(new wallNode(11,6));
+	wallNodeMap.push_back(new wallNode(12,6));
+	wallNodeMap.push_back(new wallNode(13,4));
+	wallNodeMap.push_back(new wallNode(13,5));
+	wallNodeMap.push_back(new wallNode(15,5));
+	wallNodeMap.push_back(new wallNode(16,5));
+	wallNodeMap.push_back(new wallNode(17,5));
+	wallNodeMap.push_back(new wallNode(18,5));
+	wallNodeMap.push_back(new wallNode(20,5));
+	wallNodeMap.push_back(new wallNode(15,6));
+	wallNodeMap.push_back(new wallNode(16,6));
+	wallNodeMap.push_back(new wallNode(17,6));
+	wallNodeMap.push_back(new wallNode(18,8));
+	wallNodeMap.push_back(new wallNode(18,9));
+	wallNodeMap.push_back(new wallNode(18,10));
+	wallNodeMap.push_back(new wallNode(19,10));
+	wallNodeMap.push_back(new wallNode(21,10));
+	wallNodeMap.push_back(new wallNode(18,7));
+	wallNodeMap.push_back(new wallNode(21,6));
+	wallNodeMap.push_back(new wallNode(21,7));
+	wallNodeMap.push_back(new wallNode(21,8));
+	wallNodeMap.push_back(new wallNode(21,9));
+	wallNodeMap.push_back(new wallNode(23,7));
+	wallNodeMap.push_back(new wallNode(24,7));
+	wallNodeMap.push_back(new wallNode(23,11));
+	wallNodeMap.push_back(new wallNode(23,12));
+	wallNodeMap.push_back(new wallNode(25,15));
+	wallNodeMap.push_back(new wallNode(25,16));
+	wallNodeMap.push_back(new wallNode(1,11));
+	wallNodeMap.push_back(new wallNode(1,12));
+	wallNodeMap.push_back(new wallNode(2,14));
+	wallNodeMap.push_back(new wallNode(2,15));
+	wallNodeMap.push_back(new wallNode(2,16));
+	wallNodeMap.push_back(new wallNode(2,19));
+	wallNodeMap.push_back(new wallNode(3,11));
+	wallNodeMap.push_back(new wallNode(4,11));
+	wallNodeMap.push_back(new wallNode(4,12));
+	wallNodeMap.push_back(new wallNode(4,13));
+	wallNodeMap.push_back(new wallNode(4,14));
+	wallNodeMap.push_back(new wallNode(5,18));
+	wallNodeMap.push_back(new wallNode(7,10));
+	wallNodeMap.push_back(new wallNode(7,11));
+	wallNodeMap.push_back(new wallNode(7,13));
+	wallNodeMap.push_back(new wallNode(7,14));
+	wallNodeMap.push_back(new wallNode(7,16));
+	wallNodeMap.push_back(new wallNode(8,10));
+	wallNodeMap.push_back(new wallNode(8,11));
+	wallNodeMap.push_back(new wallNode(8,14));
+	wallNodeMap.push_back(new wallNode(8,16));
+	wallNodeMap.push_back(new wallNode(8,18));
+	wallNodeMap.push_back(new wallNode(9,11));
+	wallNodeMap.push_back(new wallNode(9,14));
+	wallNodeMap.push_back(new wallNode(9,16));
+	wallNodeMap.push_back(new wallNode(9,18));
+	wallNodeMap.push_back(new wallNode(10,13));
+	wallNodeMap.push_back(new wallNode(10,14));
+	wallNodeMap.push_back(new wallNode(10,16));
+	wallNodeMap.push_back(new wallNode(10,18));
+	wallNodeMap.push_back(new wallNode(11,10));
+	wallNodeMap.push_back(new wallNode(11,11));
+	wallNodeMap.push_back(new wallNode(11,12));
+	wallNodeMap.push_back(new wallNode(11,13));
+	wallNodeMap.push_back(new wallNode(11,16));
+	wallNodeMap.push_back(new wallNode(11,17));
+	wallNodeMap.push_back(new wallNode(11,18));
+	wallNodeMap.push_back(new wallNode(12,8));
+	wallNodeMap.push_back(new wallNode(13,8));
+	wallNodeMap.push_back(new wallNode(13,9));
+	wallNodeMap.push_back(new wallNode(13,10));
+	wallNodeMap.push_back(new wallNode(13,12));
+	wallNodeMap.push_back(new wallNode(13,13));
+	wallNodeMap.push_back(new wallNode(13,14));
+	wallNodeMap.push_back(new wallNode(13,15));
+	wallNodeMap.push_back(new wallNode(13,16));
+	wallNodeMap.push_back(new wallNode(14,14));
+	wallNodeMap.push_back(new wallNode(14,15));
+	wallNodeMap.push_back(new wallNode(14,16));
+	wallNodeMap.push_back(new wallNode(14,17));
+	wallNodeMap.push_back(new wallNode(14,18));
+	wallNodeMap.push_back(new wallNode(15,8));
+	wallNodeMap.push_back(new wallNode(15,9));
+	wallNodeMap.push_back(new wallNode(15,12));
+	wallNodeMap.push_back(new wallNode(15,13));
+	wallNodeMap.push_back(new wallNode(16,9));
+	wallNodeMap.push_back(new wallNode(16,10));
+	wallNodeMap.push_back(new wallNode(16,13));
+	wallNodeMap.push_back(new wallNode(16,16));
+	wallNodeMap.push_back(new wallNode(16,18));
+	wallNodeMap.push_back(new wallNode(16,19));
+	wallNodeMap.push_back(new wallNode(17,18));
+	wallNodeMap.push_back(new wallNode(18,14));
+	wallNodeMap.push_back(new wallNode(18,15));
+	wallNodeMap.push_back(new wallNode(19,14));
+	wallNodeMap.push_back(new wallNode(19,12));
+	wallNodeMap.push_back(new wallNode(20,12));
+	wallNodeMap.push_back(new wallNode(21,12));
+	wallNodeMap.push_back(new wallNode(21,13));
+	wallNodeMap.push_back(new wallNode(21,14));
+	wallNodeMap.push_back(new wallNode(22,16));
+	wallNodeMap.push_back(new wallNode(22,17));
+	wallNodeMap.push_back(new wallNode(23,16));
+
+
+
+
+
+}
+
+
+void SceneManager_Server::populateSpawnLocation(){
+	std::vector<spawnNode*> spawnNodeMap;
+	this->spawnNodeMap = &spawnNodeMap;
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 7.5, 27.5)); //1
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 12.5, 27.5)); //2
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 17.5, 27.5)); //3
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 22.5, 17.5)); //4
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 27.5, 17.5)); //5
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 32.5, 17.5)); //6
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 42.5, 27.5)); //7
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 32.5, 42.5)); //8
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 17.5, 52.5)); //9
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 22.5, 52.5)); //10
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 32.5, 52.5)); //11
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 32.5, 57.5)); //12
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 32.5, 67.5)); //13
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 32.5, 72.5)); //14
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 12.5, 87.5)); //15
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 12.5, 92.5)); //16
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 22.5, 82.5)); //17
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 27.5, 82.5)); //18
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 32.5, 82.5)); //19
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 27.5, 87.5)); //20
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 27.5, 92.5)); //21
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 42.5, 67.5)); //22
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 47.5, 67.5)); //23
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 52.5, 32.5)); //24
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 57.5, 42.5)); //25
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 57.5, 47.5)); //26
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 67.5, 17.5)); //27
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 67.5, 32.5)); //28
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 72.5, 62.5)); //29
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 77.5, 12.5)); //30
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 82.5, 12.5)); //31
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 77.5, 17.5)); //32
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 97.5, 27.5)); //33
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 92.5, 82.5)); //34
+	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 117.5, 42.5)); //35
+
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 122.5, 72.5)); //36
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 117.5, 72.5)); //37
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 117.5, 67.5)); //38
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 117.5, 52.5)); //39
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 117.5, 47.5)); //40
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 127.5, 37.5)); //41
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 122.5, 22.5)); //42
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 122.5, 17.5)); //43
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 107.5, 92.5)); //44
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 102.5, 92.5)); //45
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 97.5, 92.5)); //46
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 92.5, 92.5)); //47
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 102.5, 82.5)); //48
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 102.5, 77.5)); //49
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 107.5, 22.5)); //50
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 102.5, 17.5)); //51
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 102.5, 12.5)); //52
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 102.5, 7.5)); //53
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 107.5, 7.5)); //54
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 92.5, 17.5)); //55
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 92.5, 62.5)); //56
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 92.5, 67.5)); //57
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 82.5, 77.5)); //58
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 82.5, 62.5)); //59
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 77.5, 52.5)); //60
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 82.5, 42.5)); //61
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 67.5, 92.5)); //62
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 67.5, 87.5)); //63
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 62.5, 52.5)); //64
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 57.5, 72.5)); //65
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 47.5, 52.5)); //66
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 37.5, 92.5)); //67
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 32.5, 92.5)); //68
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 32.5, 27.5)); //69
+	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 12.5, 67.5)); //70
+	
+}
+
 void SceneManager_Server::populateMap() {
 	std::vector<mapNode*> nodeMap;
+	this->map = &nodeMap;
 	nodeMap.push_back(new mapNode(1*5+2.5, 4*5+2.5)); //0
 	nodeMap.push_back(new mapNode(5*5+2.5, 4*5+2.5)); //1
 	nodeMap[0]->setNextRed(nodeMap[1]);

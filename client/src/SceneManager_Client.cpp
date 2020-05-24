@@ -96,10 +96,20 @@ void SceneManager_Client::createMaterialResources(SceneManager_Client::GeodeType
 	}
 }
 
-void SceneManager_Client::updateScene(std::vector<Client::UpdateData> updateBuf)
+void SceneManager_Client::updateStateAndScene(Client::UpData data) {
+	this->updateState(data.stateUpdate);
+	this->updateScene(data.sceneUpdate);
+}
+
+void SceneManager_Client::updateState(Client::StateUpdateData updateData) {
+	red_team->setData(updateData.redTeamData);
+	blue_team->setData(updateData.blueTeamData);
+}
+
+void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 {
 	//std::cout << "updating from client buf of size " << updateBuf.size() << "\n";
-	for (Client::UpdateData data : updateBuf) {
+	for (Client::IDEntData data : updateData.entUpdates) {
 		if (idMap.find(data.id) == idMap.end()) { //new id encountered, spawn new object
 			GameObject::GameObjectData GO_data = data.ent_data.GO_data;
 			Team* team;

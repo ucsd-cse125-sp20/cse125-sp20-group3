@@ -177,35 +177,15 @@ void SceneManager_Server::update(float deltaTime) {
 int SceneManager_Server::encodeState(char buf[], int start_index) {
 	int i = start_index;
 
-	/*((int*)(buf + i))[0] = team1.getPlasticCount();
-	((int*)(buf + i))[1] = team1.getMetalCount();
-	((int*)(buf + i))[2] = team2.getPlasticCount();
-	((int*)(buf + i))[3] = team2.getMetalCount();
-	i += 4 * sizeof(int);
-
+	i += red_team->writeData(buf, i);
 	buf[i] = DELIMITER;
-	i++;*/
-
-	/*for (int p = ID_PLAYER_MIN; p < ID_PLAYER_MIN + NUM_PLAYERS; p++) {
-		int id_str = std::to_string(p);
-
-		strncpy(buf + i, id_str.c_str(), id_str.length()); //copy player id into buf
-		i += id_str.length();
-
-		buf[i] = DELIMITER;
-		i++;
-
-		std::pair<float, float> p_velocities = ((Player*)idMap[std::to_string(p)])->getVelocities();
-		((float*)(buf + i))[0] = p_velocities.first; //write velocity_x
-		((float*)(buf + i))[1] = p_velocities.second; //write velocity_z
-		i += 2 * sizeof(float);
-
-		buf[i] = DELIMITER;
-		i++;
-	}
-
+	i++;
+	i += blue_team->writeData(buf, i);
 	buf[i] = DELIMITER;
-	i++;*/
+	i++;
+
+	buf[i] = DELIMITER; //closing delimiter
+	i++;
 
 	return i;
 }

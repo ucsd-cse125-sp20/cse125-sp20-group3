@@ -188,7 +188,7 @@ const int serverNameSize = 32;
 char serverName[serverNameSize] = "localhost";
 char sendbuf[DEFAULT_BUFLEN];
 //char recvbuf[SERVER_SENDBUFLEN];
-std::vector<Client::UpdateData> updateBuf;
+Client::UpData updateData;
 
 // ======================================================================================================
 // ==============================================[ CODE STARTS HERE ]====================================
@@ -983,7 +983,7 @@ void Application::Update(float deltaTime)
 	if (connected) {
 		int size = Input::EncodeToBuf(sendbuf);
 		client->sendData(sendbuf, size, 0);
-		updateBuf = client->recvAndFormatData();
+		updateData = client->recvAndFormatData();
 	}
 
 	/************************************************************************/
@@ -991,7 +991,7 @@ void Application::Update(float deltaTime)
 	/************************************************************************/
 
 	if (connected) {
-		scene->updateScene(updateBuf);
+		scene->updateStateAndScene(updateData);
 	}
 	else {
 		scene->updateFromInputBuf(deltaTime);

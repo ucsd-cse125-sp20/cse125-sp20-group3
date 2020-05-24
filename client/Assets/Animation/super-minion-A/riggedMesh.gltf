@@ -1,0 +1,247 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 8499,
+      "min": [-14.6419, -4.52918, -14.4745],
+      "max": [14.5814, 21.0628, 11.8109]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 8499
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "type": "VEC2",
+      "count": 8499
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5123,
+      "type": "VEC4",
+      "count": 8499
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5126,
+      "type": "VEC4",
+      "count": 8499
+    },
+    {
+      "bufferView": 5,
+      "componentType": 5123,
+      "type": "SCALAR",
+      "count": 24636
+    },
+    {
+      "bufferView": 6,
+      "componentType": 5126,
+      "type": "MAT4",
+      "count": 13
+    }
+  ],
+  "asset": {
+    "generator": "Khronos glTF Blender I/O v1.1.46",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 101988
+    },
+    {
+      "buffer": 0,
+      "byteLength": 101988,
+      "byteOffset": 101988
+    },
+    {
+      "buffer": 0,
+      "byteLength": 67992,
+      "byteOffset": 203976
+    },
+    {
+      "buffer": 0,
+      "byteLength": 67992,
+      "byteOffset": 271968
+    },
+    {
+      "buffer": 0,
+      "byteLength": 135984,
+      "byteOffset": 339960
+    },
+    {
+      "buffer": 0,
+      "byteLength": 49272,
+      "byteOffset": 475944
+    },
+    {
+      "buffer": 0,
+      "byteLength": 832,
+      "byteOffset": 525216
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "riggedMesh.bin",
+      "byteLength": 526048
+    }
+  ],
+  "images": [
+    {
+      "name": "super_minion_tex_A",
+      "uri": "super_minion_tex_A.png",
+      "mimeType": "image/png"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Super_Minion_Body_Cube.002",
+      "primitives": [
+        {
+          "indices": 5,
+          "material": 0,
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2,
+            "JOINTS_0": 3,
+            "WEIGHTS_0": 4
+          }
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "Material",
+      "doubleSided": true,
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        },
+        "metallicFactor": 0,
+        "roughnessFactor": 0.5
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "name": "arm.L",
+      "translation": [0.780613, 1.25774, 0.352145],
+      "rotation": [0.434555, -0.644408, 0.243026, 0.580378],
+      "scale": [1, 1, 1]
+    },
+    {
+      "name": "arm.R",
+      "translation": [-0.776533, 0.666181, 0.11103],
+      "rotation": [0.250368, -0.652798, -0.27155, 0.661386],
+      "scale": [1, 1, 1]
+    },
+    {
+      "name": "leg.L",
+      "translation": [0.671705, -0.13342, 0.0195834],
+      "rotation": [0.703046, 0.229032, -0.668237, 0.0820364],
+      "scale": [1, 1, 1]
+    },
+    {
+      "name": "leg.R",
+      "translation": [-0.747507, 0.144096, 0.0594776],
+      "rotation": [-0.679352, 0.0746994, 0.723984, 0.0935312],
+      "scale": [1, 1, 1]
+    },
+    {
+      "name": "ear3.L",
+      "translation": [-1.44355e-08, 0.367246, -3.72529e-08],
+      "rotation": [0.0601876, 0.187215, -0.200276, 0.959801],
+      "scale": [1, 1, 1]
+    },
+    {
+      "children": [ 4 ],
+      "name": "ear2.L",
+      "translation": [4.09782e-08, 0.396604, -1.49012e-08],
+      "rotation": [-0.0268323, 0.555135, 0.00208003, 0.831325],
+      "scale": [1, 1, 1]
+    },
+    {
+      "children": [ 5 ],
+      "name": "ear.L",
+      "translation": [0.317684, 1.11555, 0.0674729],
+      "rotation": [-0.0463877, -0.350022, -0.83517, 0.421691],
+      "scale": [1, 1, 1]
+    },
+    {
+      "name": "ear3.R",
+      "translation": [4.47035e-08, 0.363399, -1.49012e-08],
+      "rotation": [0.169695, 0.320692, -0.111175, 0.925203],
+      "scale": [1, 1, 1]
+    },
+    {
+      "children": [ 7 ],
+      "name": "ear2.R",
+      "translation": [8.9407e-08, 0.392581, -5.58794e-09],
+      "rotation": [0.0308297, 0.558271, -0.0239632, 0.828739],
+      "scale": [1, 1, 1]
+    },
+    {
+      "children": [ 8 ],
+      "name": "ear.R",
+      "translation": [-0.297442, 1.11555, 0.0506047],
+      "rotation": [-0.643721, 0.560686, 0.498459, 0.150978],
+      "scale": [1, 1, 1]
+    },
+    {
+      "name": "eye.L",
+      "translation": [0.516166, 0.877453, 0.404836],
+      "rotation": [0.260138, 0.14191, 0.48152, 0.82482],
+      "scale": [-0.947016, -0.947016, -0.947016]
+    },
+    {
+      "name": "eye.R",
+      "translation": [-0.516166, 0.906001, 0.386996],
+      "rotation": [0.520143, 0.483139, -0.180497, 0.680771],
+      "scale": [-0.919048, -0.919048, -0.919048]
+    },
+    {
+      "children": [ 0, 1, 2, 3, 6, 9, 10, 11 ],
+      "name": "body",
+      "translation": [1.12209e-18, 0.0260306, -0.00351953],
+      "rotation": [0.615046, 4.56379e-17, -2.42345e-17, 0.788491],
+      "scale": [0.0654782, 0.0654782, 0.0654782]
+    },
+    {
+      "mesh": 0,
+      "name": "Super_Minion_Body_Cube.002",
+      "skin": 0
+    },
+    {
+      "children": [ 13, 12 ],
+      "name": "Armature",
+      "scale": [15.4801, 15.4801, 15.4801]
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [ 14 ]
+    }
+  ],
+  "textures": [
+    {
+      "source": 0
+    }
+  ],
+  "skins": [
+    {
+      "inverseBindMatrices": 6,
+      "joints": [ 12, 0, 1, 2, 3, 6, 5, 4, 9, 8, 7, 10, 11 ],
+      "name": "Armature",
+      "extras": [ 1, 9, 8, 7, 6, 5, 12, 13, 4, 10, 11, 3, 2, ],
+    }
+  ]
+}

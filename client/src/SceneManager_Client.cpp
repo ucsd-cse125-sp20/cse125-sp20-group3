@@ -2,6 +2,8 @@
 #include "Application.h"
 
 namespace {
+	// Models
+	const char* mapFile = "map.gltf";
 	const char* playerFile = "char-1-female.gltf";
 	const char* groundFile = "Ground.gltf";
 	const char* minionFile = "minion-retry.gltf";
@@ -12,10 +14,10 @@ namespace {
 	const char* recyclingBinFile = "resource-2-recycling-bin.gltf";
 
 	// Animations
-	const char* smallMinionDir = "small-minion";
-	const char* smallMinionActions[2] = { "Walking", "Fighting" };
-	const char* superMinionDir = "super-minion";
-	const char* superMinionActions[2] = { "Walking", "Fighting" };
+	const char* smallMinionDir = "small-minion-B";
+	const char* smallMinionActions[3] = { "Walking", "Fighting", "Death" };
+	const char* superMinionDir = "super-minion-A";
+	const char* superMinionActions[3] = { "Walking", "Fighting", "Death" };
 	const char* playerMaleDir = "male-char";
 	const char* playerMaleActions[2] = { "Idle", "Walking" };
 	const char* playerFemaleDir = "female-char";
@@ -30,7 +32,7 @@ bool SceneManager_Client::enableCulling = true;
 SceneManager_Client::SceneManager_Client(Renderer* renderer)
 {
 	// It'd be nice if I could put this in a loop later
-	gltfGeodes[ENV_GEODE] = conf_new(GLTFGeode, renderer, groundFile);
+	gltfGeodes[ENV_GEODE] = conf_new(GLTFGeode, renderer, mapFile);
 	gltfGeodes[PLAYER_GEODE] = conf_new(GLTFGeode, renderer, playerFile);
 	//gltfGeodes[BASE_GEODE] = conf_new(GLTFGeode, renderer, baseFile);
 	gltfGeodes[MINION_GEODE] = conf_new(GLTFGeode, renderer, minionFile);
@@ -45,14 +47,15 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
     // TODO This is a hard coded animation example. Remove this later (SMALL MINION)
 	int key = 9999999;
     ozzGeodes["blarf"] = conf_new(OzzGeode, renderer, smallMinionDir);
-	((OzzObject*)ozzGeodes["blarf"]->obj)->SetClip(smallMinionActions[0]);
+	((OzzObject*)ozzGeodes["blarf"]->obj)->SetClip(smallMinionActions[2]);
     Transform* t = conf_new(Transform, mat4::translation(vec3(-1, 0, 2)));
     Animator* a = conf_new(Animator, ozzGeodes["blarf"]);
-    a->SetClip(smallMinionActions[0]);
+    a->SetClip(smallMinionActions[2]);
     t->addChild(a);
     this->addChild(t);
     transforms[key] = t;
     animators[key] = a;
+
 
 	// TODO This is a hard coded animation example. Remove this later (SUPER MINION)
 	key = 8888888;
@@ -66,91 +69,91 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	transforms[key] = t;
 	animators[key] = a;
 
-	// TODO This is a hard coded animation example. Remove this later (MALE CHAR)
-	key = 4672347;
-	ozzGeodes["blarf3"] = conf_new(OzzGeode, renderer, playerMaleDir);
-	((OzzObject*)ozzGeodes["blarf3"]->obj)->SetClip(playerMaleActions[1]);
-	t = conf_new(Transform, mat4::translation(vec3(3, 0, 2)));
-	a = conf_new(Animator, ozzGeodes["blarf3"]);
-	a->SetClip(playerMaleActions[1]);
-	t->addChild(a);
-	this->addChild(t);
-	transforms[key] = t;
-	animators[key] = a;
+	//// TODO This is a hard coded animation example. Remove this later (MALE CHAR)
+	//key = 4672347;
+	//ozzGeodes["blarf3"] = conf_new(OzzGeode, renderer, playerMaleDir);
+	//((OzzObject*)ozzGeodes["blarf3"]->obj)->SetClip(playerMaleActions[1]);
+	//t = conf_new(Transform, mat4::translation(vec3(3, 0, 2)));
+	//a = conf_new(Animator, ozzGeodes["blarf3"]);
+	//a->SetClip(playerMaleActions[1]);
+	//t->addChild(a);
+	//this->addChild(t);
+	//transforms[key] = t;
+	//animators[key] = a;
 
-	// TODO This is a hard coded animation example. Remove this later (FEMALE CHAR)
-	key = 1734813;
-	ozzGeodes["blarf4"] = conf_new(OzzGeode, renderer, playerFemaleDir);
-	((OzzObject*)ozzGeodes["blarf4"]->obj)->SetClip(playerFemaleActions[1]);
-	t = conf_new(Transform, mat4::translation(vec3(4, 0, 2)));
-	a = conf_new(Animator, ozzGeodes["blarf4"]);
-	a->SetClip(playerFemaleActions[1]);
-	t->addChild(a);
-	this->addChild(t);
-	transforms[key] = t;
-	animators[key] = a;
+	//// TODO This is a hard coded animation example. Remove this later (FEMALE CHAR)
+	//key = 1734813;
+	//ozzGeodes["blarf4"] = conf_new(OzzGeode, renderer, playerFemaleDir);
+	//((OzzObject*)ozzGeodes["blarf4"]->obj)->SetClip(playerFemaleActions[1]);
+	//t = conf_new(Transform, mat4::translation(vec3(4, 0, 2)));
+	//a = conf_new(Animator, ozzGeodes["blarf4"]);
+	//a->SetClip(playerFemaleActions[1]);
+	//t->addChild(a);
+	//this->addChild(t);
+	//transforms[key] = t;
+	//animators[key] = a;
 
-	// TODO These are hard coded particle examples. Remove them later
-	key = 7234813;
-	ParticleSystem::ParticleSystemParams params = {};
-	params.spriteFile = "LaserParticle.png";
-	params.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
-		float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.1f);
-		float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2 * PI));
-		float z = 0;
+	//// TODO These are hard coded particle examples. Remove them later
+	//key = 7234813;
+	//ParticleSystem::ParticleSystemParams params = {};
+	//params.spriteFile = "LaserParticle.png";
+	//params.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
+	//	float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.1f);
+	//	float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2 * PI));
+	//	float z = 0;
 
-		pd->position = float3(r * cos(a), z, r * sin(a));
-		pd->color = float4(0.8f, 0.8f, 1.0f, 1.0f);
-		pd->scale = float2(0.2f, 0.2f);
-		pad->velocity = float3(0, 5, 0);
-	};
-	params.numParticles = 1000;
-	params.life = 1.0f;
-	particleGeodes["blarf5"] = conf_new(ParticleSystemGeode, renderer, params);
-	t = conf_new(Transform, mat4::translation(vec3(-2, 0, 4)));
-	t->addChild(particleGeodes["blarf5"]);
-	this->addChild(t);
-	transforms[key] = t;
+	//	pd->position = float3(r * cos(a), z, r * sin(a));
+	//	pd->color = float4(0.8f, 0.8f, 1.0f, 1.0f);
+	//	pd->scale = float2(0.2f, 0.2f);
+	//	pad->velocity = float3(0, 5, 0);
+	//};
+	//params.numParticles = 1000;
+	//params.life = 1.0f;
+	//particleGeodes["blarf5"] = conf_new(ParticleSystemGeode, renderer, params);
+	//t = conf_new(Transform, mat4::translation(vec3(-2, 0, 4)));
+	//t->addChild(particleGeodes["blarf5"]);
+	//this->addChild(t);
+	//transforms[key] = t;
 
-	key = 4201387;
-	params.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
-		float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.1f);
-		float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2 * PI));
-		float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 5);
+	//key = 4201387;
+	//params.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
+	//	float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.1f);
+	//	float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2 * PI));
+	//	float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 5);
 
-		pd->position = float3(r * cos(a), z, r * sin(a));
-		pd->color = float4(0.8f, 0.8f, 1.0f, 1.0f);
-		pd->scale = float2(0.2f, 0.2f);
-		pad->velocity = float3(cos(a), 0.0f, sin(a));
-	};
-	params.updater = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad, float deltaTime) {
-		pd->scale *= 0.95f;
-	};
-	particleGeodes["blarf6"] = conf_new(ParticleSystemGeode, renderer, params);
-	t = conf_new(Transform, mat4::translation(vec3(0, 0, 4)));
-	t->addChild(particleGeodes["blarf6"]);
-	this->addChild(t);
-	transforms[key] = t;
+	//	pd->position = float3(r * cos(a), z, r * sin(a));
+	//	pd->color = float4(0.8f, 0.8f, 1.0f, 1.0f);
+	//	pd->scale = float2(0.2f, 0.2f);
+	//	pad->velocity = float3(cos(a), 0.0f, sin(a));
+	//};
+	//params.updater = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad, float deltaTime) {
+	//	pd->scale *= 0.95f;
+	//};
+	//particleGeodes["blarf6"] = conf_new(ParticleSystemGeode, renderer, params);
+	//t = conf_new(Transform, mat4::translation(vec3(0, 0, 4)));
+	//t->addChild(particleGeodes["blarf6"]);
+	//this->addChild(t);
+	//transforms[key] = t;
 
-	key = 6672073;
-	params.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
-		float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.1f);
-		float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2 * PI));
-		float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 5);
+	//key = 6672073;
+	//params.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
+	//	float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.1f);
+	//	float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2 * PI));
+	//	float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 5);
 
-		pd->position = float3(r * cos(a), z, r * sin(a));
-		pd->color = float4(0.8f, 0.8f, 1.0f, 1.0f);
-		pd->scale = float2(0.2f, 0.2f);
-		pad->velocity = float3(cos(a), 0.0f, sin(a));
-	};
-	params.updater = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad, float deltaTime) {
-		pad->velocity += float3(-pd->position.x, 0.0f, -pd->position.z);
-	};
-	particleGeodes["blarf7"] = conf_new(ParticleSystemGeode, renderer, params);
-	t = conf_new(Transform, mat4::translation(vec3(2, 0, 4)));
-	t->addChild(particleGeodes["blarf7"]);
-	this->addChild(t);
-	transforms[key] = t;
+	//	pd->position = float3(r * cos(a), z, r * sin(a));
+	//	pd->color = float4(0.8f, 0.8f, 1.0f, 1.0f);
+	//	pd->scale = float2(0.2f, 0.2f);
+	//	pad->velocity = float3(cos(a), 0.0f, sin(a));
+	//};
+	//params.updater = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad, float deltaTime) {
+	//	pad->velocity += float3(-pd->position.x, 0.0f, -pd->position.z);
+	//};
+	//particleGeodes["blarf7"] = conf_new(ParticleSystemGeode, renderer, params);
+	//t = conf_new(Transform, mat4::translation(vec3(2, 0, 4)));
+	//t->addChild(particleGeodes["blarf7"]);
+	//this->addChild(t);
+	//transforms[key] = t;
 
 	///////////////////////////////////////////////////////////////////////////////
 
@@ -342,7 +345,7 @@ mat4 SceneManager_Client::getPlayerTransformMat() {
 void SceneManager_Client::update(float deltaTime)
 {
 	if (counter % 100 == 0) animators[9999999]->SetClip(smallMinionActions[animCounter]);
-	if (counter++ % 100 == 0) animators[8888888]->SetClip(superMinionActions[animCounter = (animCounter + 1) % 2]);
+	if (counter++ % 100 == 0) animators[8888888]->SetClip(superMinionActions[animCounter = (animCounter + 1) % 3]);
 	Transform::update(deltaTime);
 }
 

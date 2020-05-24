@@ -25,6 +25,7 @@ public:
 	mat4 model;
 
 	GameObject();
+	GameObject(GameObjectData data);
 
 	void setGOData(GameObjectData data);
 	void setMatrix(mat4 m);

@@ -36,8 +36,10 @@ void SceneManager_Server::processInput(int player_id, PlayerInput in) {
 }
 
 bool SceneManager_Server::addPlayer(int player_id) {
+	//TODO figure out player spawn locations
+	GameObject::GameObjectData data = { 0.0f, 0.0f, 0.0f };
 	if (idMap.find(player_id) == idMap.end()) { //player_id not in map, create a new player
-		idMap[player_id] = new Player(player_id, red_team, this); //TODO assign players teams based on lobby choices
+		idMap[player_id] = new Player(data, player_id, red_team, this); //TODO assign players teams based on lobby choices
 		std::cout << "created new player id: " << player_id << " at " << idMap[player_id] << "\n";
 
 		return true; //return true that a player was added
@@ -51,10 +53,12 @@ void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, 
 	Entity* ent;
 	int id;
 
+	GameObject::GameObjectData data = { pos_x, pos_z, rot_y };
+
 	switch (spawnType) {
 	case BASE_TYPE:
 		id = next_base_id;
-		ent = new Base(id, t, this);
+		ent = new Base(data, id, t, this);
 
 		do {
 			next_base_id = next_base_id + 1 > ID_BASE_MAX ? ID_BASE_MIN : next_base_id + 1;
@@ -66,7 +70,7 @@ void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, 
 		break;
 	case MINION_TYPE:
 		id = next_minion_id;
-		ent = new Minion(id, t, this);
+		ent = new Minion(data, id, t, this);
 
 		do {
 			next_minion_id = next_minion_id + 1 > ID_MINION_MAX ? ID_MINION_MIN : next_minion_id + 1;
@@ -78,7 +82,7 @@ void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, 
 		break;
 	case SUPER_MINION_TYPE:
 		id = next_super_minion_id;
-		ent = new SuperMinion(id, t, this);
+		ent = new SuperMinion(data, id, t, this);
 
 		do {
 			next_super_minion_id = next_super_minion_id + 1 > ID_SUPER_MINION_MAX ? ID_SUPER_MINION_MIN : next_super_minion_id + 1;
@@ -90,7 +94,7 @@ void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, 
 		break;
 	case LASER_TYPE:
 		id = next_laser_id;
-		ent = new LaserTower(id, t, this);
+		ent = new LaserTower(data, id, t, this);
 
 		do {
 			next_laser_id = next_laser_id + 1 > ID_LASER_MAX ? ID_LASER_MIN : next_laser_id + 1;
@@ -102,7 +106,7 @@ void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, 
 		break;
 	case CLAW_TYPE:
 		id = next_claw_id;
-		ent = new ClawTower(id, t, this);
+		ent = new ClawTower(data, id, t, this);
 
 		do {
 			next_claw_id = next_claw_id + 1 > ID_CLAW_MAX ? ID_CLAW_MIN : next_claw_id + 1;
@@ -114,7 +118,7 @@ void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, 
 		break;
 	case DUMPSTER_TYPE:
 		id = next_dumpster_id;
-		ent = new Resource(DUMPSTER_TYPE, id, this);
+		ent = new Resource(DUMPSTER_TYPE, data, id, this);
 
 		do {
 			next_dumpster_id = next_dumpster_id + 1 > ID_DUMPSTER_MAX ? ID_DUMPSTER_MIN : next_dumpster_id + 1;
@@ -126,7 +130,7 @@ void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, 
 		break;
 	case RECYCLING_BIN_TYPE:
 		id = next_recycling_bin_id;
-		ent = new Resource(RECYCLING_BIN_TYPE, id, this);
+		ent = new Resource(RECYCLING_BIN_TYPE, data, id, this);
 
 		do {
 			next_recycling_bin_id = next_recycling_bin_id + 1 > ID_RECYCLING_BIN_MAX ? ID_RECYCLING_BIN_MIN : next_recycling_bin_id + 1;
@@ -138,12 +142,10 @@ void SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, 
 		break;
 	default:
 		id = -1;
-		ent = new Minion(id, t, this);
+		ent = new Minion(data, id, t, this);
 		std::cout << "spawnEntity encountered unknown entity type " << spawnType << "\n";
 	}
-
-	GameObject::GameObjectData data = { pos_x, pos_z, rot_y };
-	ent->setGOData(data);
+	
 	idMap[id] = ent;
 }
 
@@ -676,12 +678,10 @@ void SceneManager_Server::populateScene() { //testing only
 		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
 		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
 		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
-		float s = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
 
 		int id = next_minion_id;
-		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		Minion* m = new Minion(id, red_team, this);
-		m->setMatrix(transform);
+		GameObject::GameObjectData data = { x, z, rot };
+		Minion* m = new Minion(data, id, red_team, this);
 		idMap[id] = m;
 
 		std::cout << "created new minion: " << id << " at " << idMap[id] << "\n";
@@ -694,12 +694,10 @@ void SceneManager_Server::populateScene() { //testing only
 		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
 		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
 		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
-		float s = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
 
 		int id = next_super_minion_id;
-		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		SuperMinion* sm = new SuperMinion(id, red_team, this);
-		sm->setMatrix(transform);
+		GameObject::GameObjectData data = { x, z, rot };
+		SuperMinion* sm = new SuperMinion(data, id, red_team, this);
 		idMap[id] = sm;
 
 		std::cout << "created new super minion: " << id << " at " << idMap[id] << "\n";
@@ -712,12 +710,10 @@ void SceneManager_Server::populateScene() { //testing only
 		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
 		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
 		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
-		float s = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
 
 		int id = next_laser_id;
-		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		LaserTower* l = new LaserTower(id, blue_team, this);
-		l->setMatrix(transform);
+		GameObject::GameObjectData data = { x, z, rot };
+		LaserTower* l = new LaserTower(data, id, blue_team, this);
 		idMap[id] = l;
 
 		std::cout << "created new laser tower: " << id << " at " << idMap[id] << "\n";
@@ -730,12 +726,10 @@ void SceneManager_Server::populateScene() { //testing only
 		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
 		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
 		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
-		float s = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
 
 		int id = next_claw_id;
-		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		ClawTower* c = new ClawTower(id, blue_team, this);
-		c->setMatrix(transform);
+		GameObject::GameObjectData data = { x, z, rot };
+		ClawTower* c = new ClawTower(data, id, blue_team, this);
 		idMap[id] = c;
 
 		std::cout << "created new claw tower: " << id << " at " << idMap[id] << "\n";
@@ -748,12 +742,10 @@ void SceneManager_Server::populateScene() { //testing only
 		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
 		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
 		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
-		float s = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
 
 		int id = next_dumpster_id;
-		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		Resource* d = new Resource(DUMPSTER_TYPE, id, this);
-		d->setMatrix(transform);
+		GameObject::GameObjectData data = { x, z, rot };
+		Resource* d = new Resource(DUMPSTER_TYPE, data, id, this);
 		idMap[id] = d;
 
 		std::cout << "created new dumpster: " << id << " at " << idMap[id] << "\n";
@@ -766,12 +758,10 @@ void SceneManager_Server::populateScene() { //testing only
 		float x = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
 		float z = -100 + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200)));
 		float rot = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / PI));
-		float s = static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / 1.0f));
 
 		int id = next_recycling_bin_id;
-		mat4 transform = mat4::translation(vec3(x, 0, z)) * mat4::rotationY(rot) * mat4::scale(vec3(s));
-		Resource* r = new Resource(RECYCLING_BIN_TYPE, id, this);
-		r->setMatrix(transform);
+		GameObject::GameObjectData data = { x, z, rot };
+		Resource* r = new Resource(RECYCLING_BIN_TYPE, data, id, this);
 		idMap[id] = r;
 
 		std::cout << "created new recycling bin: " << id << " at " << idMap[id] << "\n";
@@ -783,58 +773,51 @@ void SceneManager_Server::populateScene() { //testing only
 
 void SceneManager_Server::testAttacking() {
 	int id;
-	mat4 transform;
+	GameObject::GameObjectData data;
 
 	/*id = next_minion_id;
 	next_minion_id++;
-	transform = mat4::translation(vec3(10, 0, 5));
-	Minion* m1 = new Minion(id, red_team, this);
-	m1->setMatrix(transform);
+	data = { 10, 5, 0 };
+	Minion* m1 = new Minion(data, id, red_team, this);
 	idMap[id] = m1;
 	std::cout << "created minion at id " << id << "\n";
 
 	id = next_super_minion_id;
 	next_super_minion_id++;
-	transform = mat4::translation(vec3(14, 0, 5));
-	SuperMinion* sm1 = new SuperMinion(id, blue_team, this);
-	sm1->setMatrix(transform);
+	data = { 14, 5, 0 };
+	SuperMinion* sm1 = new SuperMinion(data, id, blue_team, this);
 	idMap[id] = sm1;
 	std::cout << "created super minion at id " << id << "\n";*/
 
 	/*id = next_super_minion_id;
 	next_super_minion_id++;
-	transform = mat4::translation(vec3(-5, 0, 0));
-	SuperMinion* sm2 = new SuperMinion(id, blue_team, this);
-	sm2->setMatrix(transform);
-	idMap[id] = sm2;
+	data = { -5, 0, 0 };
+	SuperMinion* sm2 = new SuperMinion(data, id, blue_team, this);
+	idMap[id] = sm2;*/
 
 	id = next_claw_id;
 	next_claw_id++;
-	transform = mat4::translation(vec3(15, 0, 0));
-	ClawTower* c1 = new ClawTower(id, red_team, this);
-	c1->setMatrix(transform);
-	idMap[id] = c1;*/
+	data = { 32.5, 67.5, 0 };
+	ClawTower* c1 = new ClawTower(data, id, red_team, this);
+	idMap[id] = c1;
 
-	id = next_laser_id;
+	/*id = next_laser_id;
 	next_laser_id++;
-	transform = mat4::translation(vec3(30, 0, 42));
-	LaserTower* l1 = new LaserTower(id, red_team, this);
-	l1->setMatrix(transform);
+	data = { 30, 42, 0 };
+	LaserTower* l1 = new LaserTower(data, id, red_team, this);
 	idMap[id] = l1;
 
 	id = next_laser_id;
 	next_laser_id++;
-	transform = mat4::translation(vec3(40, 0, 46));
-	LaserTower* l2 = new LaserTower(id, blue_team, this);
-	l2->setMatrix(transform);
+	data = { 40, 46, 0 };
+	LaserTower* l2 = new LaserTower(data, id, blue_team, this);
 	idMap[id] = l2;
 
 	id = next_minion_id;
 	next_minion_id++;
-	transform = mat4::translation(vec3(20, 0, 24));
-	Minion* m2 = new Minion(id, blue_team, this);
-	m2->setMatrix(transform);
-	idMap[id] = m2;
+	data = { 20, 24, 0 };
+	Minion* m2 = new Minion(data, id, blue_team, this);
+	idMap[id] = m2;*/
 }
 
 /***** legacy code *****/

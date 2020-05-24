@@ -4,6 +4,11 @@ GameObject::GameObject() {
 	model = mat4::identity();
 }
 
+GameObject::GameObject(GameObjectData data) {
+	model = mat4::identity();
+	this->setGOData(data);
+}
+
 void GameObject::setGOData(GameObjectData data){
 	//std::cout << "setting data x: " << data.x << " z: " << data.z << " y: " << data.rot << "\n";
 	vec3 forward = normalize(vec3(cos(data.rot), 0, sin(data.rot)));

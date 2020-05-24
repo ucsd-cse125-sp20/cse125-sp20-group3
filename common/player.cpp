@@ -1,7 +1,7 @@
 #include "player.h"
 #include "../server/SceneManager_Server.h"
 
-Player::Player(int id, Team* t, SceneManager_Server* sm) : Entity(id, PLAYER_HEALTH, PLAYER_ATTACK, t, sm) {
+Player::Player(GameObjectData data, int id, Team* t, SceneManager_Server* sm) : Entity(data, id, PLAYER_HEALTH, PLAYER_ATTACK, t, sm) {
 	velocity_x = 0.f;
 	velocity_z = 0.f;
 	rotation_y = 0.f;
@@ -13,7 +13,7 @@ Player::Player(int id, Team* t, SceneManager_Server* sm) : Entity(id, PLAYER_HEA
 		int flags = DETECTION_FLAG_PLAYER | DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE;
 		if (t->teamColor == RED_TEAM) flags = flags | DETECTION_FLAG_RED_TEAM;
 		else flags = flags | DETECTION_FLAG_BLUE_TEAM;
-		ObjectDetection::addObject(this, DETECTION_FLAG_PLAYER | DETECTION_FLAG_ENTITY);
+		ObjectDetection::addObject(this, flags);
 	}
 }
 
@@ -40,6 +40,8 @@ void Player::update(float deltaTime) {
 	float zpos = model[3][2];
 	float yrot = atan2(-model[2][2], -model[2][0]);
 	//std::cout << "player x: " << xpos << " z: " << zpos << " y: " << yrot << "\n";
+
+	ObjectDetection::updateObject(this);
 }
 
 void Player::processInput(PlayerInput in) {

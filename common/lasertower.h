@@ -9,7 +9,7 @@ private:
 	float attackInterval;
 
 public:
-	LaserTower(int id, Team* t, SceneManager_Server* sm_server);
+	LaserTower(GameObjectData data, int id, Team* t, SceneManager_Server* sm_server);
 
 	void update(float deltaTime) override;
 	void attack();

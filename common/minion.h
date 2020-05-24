@@ -19,9 +19,9 @@ protected:
 	float velocity;
 	bool doneMoving;
 
-	Minion(int id, int health, int attack, int range, float interval, float vel, Team* t, SceneManager_Server* sm); //accept values for other types of minions
+	Minion(GameObjectData data, int id, int health, int attack, int range, float interval, float vel, Team* t, SceneManager_Server* sm); //accept values for other types of minions
 public:
-	Minion(int id, Team* t, SceneManager_Server* sm); //basic minion spawned by claw tower
+	Minion(GameObjectData data, int id, Team* t, SceneManager_Server* sm); //basic minion spawned by claw tower
 	
 	void update(float deltaTime) override;
 	void takeDamage(int damage) override;

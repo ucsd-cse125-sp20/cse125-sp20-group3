@@ -25,7 +25,7 @@ public:
 		float velocity_z;
 	};*/
 
-    Player(int id, Team* t, SceneManager_Server* sm);
+    Player(GameObjectData data, int id, Team* t, SceneManager_Server* sm);
 	
     void update(float deltaTime) override; //server-side state management
 	void processInput(PlayerInput in);

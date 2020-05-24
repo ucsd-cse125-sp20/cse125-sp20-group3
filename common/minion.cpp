@@ -1,7 +1,7 @@
 #include "minion.h"
 #include "../server/SceneManager_Server.h"
 
-Minion::Minion(int id, Team* t, SceneManager_Server* sm) : Entity(id, MINION_HEALTH, MINION_ATTACK, t, sm) {
+Minion::Minion(GameObjectData data, int id, Team* t, SceneManager_Server* sm) : Entity(data, id, MINION_HEALTH, MINION_ATTACK, t, sm) {
 	attackRange = MINION_ATK_RANGE;
 	attackInterval = MINION_ATK_INTERVAL;
 	velocity = MINION_VELOCITY;
@@ -18,7 +18,7 @@ Minion::Minion(int id, Team* t, SceneManager_Server* sm) : Entity(id, MINION_HEA
 	}
 }
 
-Minion::Minion(int id, int health, int attack, int range, float interval, float vel, Team* t, SceneManager_Server* sm) : Entity(id, health, attack, t, sm) {
+Minion::Minion(GameObjectData data, int id, int health, int attack, int range, float interval, float vel, Team* t, SceneManager_Server* sm) : Entity(data, id, health, attack, t, sm) {
 	attackRange = range;
 	attackInterval = interval;
 	velocity = vel;
@@ -140,7 +140,7 @@ void Minion::move(float deltaTime) {
 
 void Minion::setEntData(EntityData data) {
 	Entity::setEntData(data);
-	if(actionState != ACTION_STATE_IDLE) std::cout << "minion " << id << " actionState: " << (int)actionState << "\n";
+	//if(actionState != ACTION_STATE_IDLE) std::cout << "minion " << id << " actionState: " << (int)actionState << "\n";
 }
 
 /* TESTING SPECIFIC FUNCTIONALITY - DO NOT USE */

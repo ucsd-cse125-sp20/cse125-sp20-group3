@@ -1,7 +1,7 @@
 #include "lasertower.h"
 #include "../server/SceneManager_Server.h"
 
-LaserTower::LaserTower(int id, Team* t, SceneManager_Server* sm_server) : Tower(id, LASER_TOWER_HEALTH, LASER_TOWER_ATTACK, t, sm_server) {
+LaserTower::LaserTower(GameObjectData data, int id, Team* t, SceneManager_Server* sm_server) : Tower(data, id, LASER_TOWER_HEALTH, LASER_TOWER_ATTACK, t, sm_server) {
 	actionState = ACTION_STATE_IDLE;
 	
 	attackRange = LASER_FIRE_RANGE;
@@ -47,7 +47,7 @@ void LaserTower::update(float deltaTime) { //should they be able to switch attac
 	}
 	else actionState = ACTION_STATE_IDLE;
 
-	ObjectDetection::updateObject(this);
+	//ObjectDetection::updateObject(this);
 }
 
 void LaserTower::attack() {
@@ -58,7 +58,7 @@ void LaserTower::attack() {
 
 void LaserTower::setEntData(EntityData data) {
 	Entity::setEntData(data);
-	if(actionState != ACTION_STATE_IDLE) std::cout << "laser " << id << " actionState: " << (int)actionState << "\n";
+	//if(actionState != ACTION_STATE_IDLE) std::cout << "laser " << id << " actionState: " << (int)actionState << "\n";
 }
 
 /* TESTING SPECIFIC FUNCTIONALITY - DO NOT USE */

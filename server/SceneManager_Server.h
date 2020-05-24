@@ -30,16 +30,16 @@ private:
 		Team *red_team, *blue_team;
 
 public:
-	std::map<std::string, Entity*> idMap;
+	std::map<int, Entity*> idMap;
 	std::vector<mapNode*> *map;
 	std::vector<spawnNode*> *spawnNodeMap;
 	std::vector<wallNode*> *wallNodeMap;
 
 	SceneManager_Server();
-	void processInput(std::string player, PlayerInput in);
-	bool addPlayer(std::string player_id);
+	void processInput(int player_id, PlayerInput in);
+	bool addPlayer(int player_id);
 	void spawnEntity(char spawnType, float pos_x, float pos_z, float rot_y, Team* t);
-	bool checkEntityAlive(std::string id);
+	bool checkEntityAlive(int id);
 	void update(float deltaTime);
 	int encodeState(char buf[], int start_index);
 	int encodeScene(char buf[], int start_index);

@@ -8,6 +8,8 @@
 #define NUM_PLAYERS 1 //change to 4 eventually //upper bound, no more than 15 (1 byte) because of Server recv
 #define DELIMITER ','
 
+#define NO_TARGET_ID -1
+
 #define RED_TEAM 'R'
 #define BLUE_TEAM 'B'
 #define NO_TEAM 'N'

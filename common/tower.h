@@ -10,7 +10,7 @@
 
 class Tower : public Entity {
 protected:
-	Tower(std::string id, int health, int attack, Team* t, SceneManager_Server* sm);
+	Tower(int id, int health, int attack, Team* t, SceneManager_Server* sm);
 public:
 	void takeDamage(int damage) override;
 };

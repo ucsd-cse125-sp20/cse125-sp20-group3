@@ -12,10 +12,16 @@ class SceneManager_Server;
 
 class Entity : public GameObject {
 protected:
-	std::string id_str;
+	float timeElapsed;
+
+	int id;
 	char actionState;
 	int health;
 	int attackDamage;
+
+	Entity* attackTarget; //shouldn't do anything in classes that don't use it
+	int attackTargetID;
+
 	Team* team;
 	SceneManager_Server* manager;
 
@@ -27,14 +33,18 @@ public:
 		char actionState;
 		char teamColor;
 		int health;
+		int targetID;
 	};
 
-	Entity(std::string id, int h, int a, Team* t, SceneManager_Server* sm) : GameObject() { 
-		id_str = id; health = h; attackDamage = a; team = t; manager = sm; 
+	Entity(int i, int h, int a, Team* t, SceneManager_Server* sm) : GameObject() { 
+		id = i; health = h; attackDamage = a; team = t; manager = sm;
+		timeElapsed = 0;
+		attackTarget = nullptr;
+		attackTargetID = NO_TARGET_ID;
 	};
 	virtual void update(float deltaTime) {} //server only function
 	bool isEnemyTeam(Team* checkTeam) { return this->team != checkTeam; }
-	std::string getIDstr() { return id_str; }
+	int getID() { return id; }
 	int getHealth() { return health; }
 	void setHealth(int new_health) { health = new_health; }
 	virtual void takeDamage(int damage) { health = std::max(health - damage, 0);	}
@@ -45,6 +55,7 @@ public:
 		this->actionState = data.actionState;
 		//teamColor is never updated, only used for initial instantiation of objects
 		this->health = data.health;
+		this->attackTargetID = data.targetID;
 	}
 
 	int writeData(char buf[], int index) override {
@@ -53,6 +64,7 @@ public:
 		entData.actionState = this->actionState;
 		entData.teamColor = team != nullptr ? team->teamColor : NO_TEAM;
 		entData.health = this->health;
+		entData.targetID = attackTarget != nullptr ? attackTargetID : NO_TARGET_ID;
 		((EntityData*)(buf + index))[0] = entData;
 		return sizeof(EntityData);
 	}

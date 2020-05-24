@@ -1,11 +1,9 @@
 #include "lasertower.h"
 #include "../server/SceneManager_Server.h"
 
-LaserTower::LaserTower(std::string id, Team* t, SceneManager_Server* sm_server) : Tower(id, LASER_TOWER_HEALTH, LASER_TOWER_ATTACK, t, sm_server) {
+LaserTower::LaserTower(int id, Team* t, SceneManager_Server* sm_server) : Tower(id, LASER_TOWER_HEALTH, LASER_TOWER_ATTACK, t, sm_server) {
 	actionState = LASER_ACTION_IDLE;
 	
-	timeElapsed = 0;
-	attackTarget = NULL;
 	attackRange = LASER_FIRE_RANGE;
 	attackInterval = LASER_FIRE_INTERVAL; //interval between firing at attack target
 }
@@ -15,7 +13,7 @@ void LaserTower::update(float deltaTime) { //should they be able to switch attac
 	if (attackTarget != nullptr &&																//first, if targeting something
 			(!manager->checkEntityAlive(attackTargetID) ||										//but either target is dead
 			length(attackTarget->getPosition() - this->getPosition()) > this->attackRange)) {	//or target is out of range, null out ptr
-		std::cout << "laser " << id_str << " nulling out attackTarget\n";
+		std::cout << "laser " << id << " nulling out attackTarget\n";
 		attackTarget = nullptr; //do this check here instead of after attacking in the case of multiple entities targeting one entity
 	}
 
@@ -31,9 +29,9 @@ void LaserTower::update(float deltaTime) { //should they be able to switch attac
 		} //object detection doesn't strictly follow distance, based on hashed block sections
 
 		if (attackTarget != nullptr) {
-			attackTargetID = attackTarget->getIDstr();
+			attackTargetID = attackTarget->getID();
 			timeElapsed = 0; //reset attack timer on acquiring new target
-			std::cout << "laser " << id_str << " found target " << attackTarget->getIDstr() << "\n";
+			std::cout << "laser " << id << " found target " << attackTarget->getID() << "\n";
 		}
 	}
 
@@ -42,7 +40,7 @@ void LaserTower::update(float deltaTime) { //should they be able to switch attac
 		actionState = LASER_ACTION_ATTACK;
 
 		if (timeElapsed >= attackInterval) { //only attack on an interval
-			std::cout << "laser " << id_str << " attacking " << attackTargetID << "\n";
+			std::cout << "laser " << id << " attacking " << attackTargetID << "\n";
 			this->attack();
 			timeElapsed = 0;
 		}
@@ -60,8 +58,8 @@ void LaserTower::attack() {
 
 void LaserTower::setEntData(EntityData data) {
 	Entity::setEntData(data);
-	//std::cout << "laser " << id_str << " actionState: " << (int)actionState << "\n";
+	std::cout << "laser " << id << " targetID: " << attackTargetID << "\n";
 }
 
 /* TESTING SPECIFIC FUNCTIONALITY - DO NOT USE */
-void LaserTower::setAttackTarget(Entity* e) { attackTarget = e; attackTargetID = e->getIDstr(); }
+void LaserTower::setAttackTarget(Entity* e) { attackTarget = e; attackTargetID = e->getID(); }

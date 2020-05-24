@@ -16,10 +16,19 @@ SceneManager_Server::SceneManager_Server() :
 	red_team = new Team(RED_TEAM);
 	blue_team = new Team(BLUE_TEAM);
 
-	this->populateMap();
+	this->populatePaths();
+	this->populateWalls();
+	this->populateBuilds();
 
 	//this->populateScene();
 	this->testAttacking();
+}
+
+SceneManager_Server::~SceneManager_Server() {
+	for (auto idEntPair : idMap) delete(idEntPair.second);
+	for (auto path : pathNodes) delete(path);
+	for (auto build : buildNodes) delete(build);
+	for (auto wall : wallNodes) delete(wall);
 }
 
 void SceneManager_Server::processInput(int player_id, PlayerInput in) {
@@ -234,440 +243,427 @@ int SceneManager_Server::encodeScene(char buf[], int start_index) {
 	return i;
 }
 
-void SceneManager_Server::populateWallLocation(){
-	std::vector<wallNode*> wallNodeMap;
-	this->wallNodeMap = &wallNodeMap;
-	wallNodeMap.push_back(new wallNode(0,3)); 
-	wallNodeMap.push_back(new wallNode(0,4)); 
-	wallNodeMap.push_back(new wallNode(0,5));
-	wallNodeMap.push_back(new wallNode(2,3)); 
-	wallNodeMap.push_back(new wallNode(3,3));
-	wallNodeMap.push_back(new wallNode(4,5));
-	wallNodeMap.push_back(new wallNode(6,2));
-	wallNodeMap.push_back(new wallNode(7,1));
-	wallNodeMap.push_back(new wallNode(8,1));
-	wallNodeMap.push_back(new wallNode(9,1));
-	wallNodeMap.push_back(new wallNode(10,1));
-	wallNodeMap.push_back(new wallNode(11,1));
-	wallNodeMap.push_back(new wallNode(12,1));
-	wallNodeMap.push_back(new wallNode(13,1));
-	wallNodeMap.push_back(new wallNode(14,0));
-	wallNodeMap.push_back(new wallNode(15,0));
-	wallNodeMap.push_back(new wallNode(16,0));
-	wallNodeMap.push_back(new wallNode(17,0));
-	wallNodeMap.push_back(new wallNode(18,0));
-	wallNodeMap.push_back(new wallNode(9,3));
-	wallNodeMap.push_back(new wallNode(10,3));
-	wallNodeMap.push_back(new wallNode(11,3));
-	wallNodeMap.push_back(new wallNode(12,3));
-	wallNodeMap.push_back(new wallNode(17,2));
-	wallNodeMap.push_back(new wallNode(18,2));
-	wallNodeMap.push_back(new wallNode(22,1));
-	wallNodeMap.push_back(new wallNode(23,1));
-	wallNodeMap.push_back(new wallNode(24,1));
-	wallNodeMap.push_back(new wallNode(23,5));
-	wallNodeMap.push_back(new wallNode(24,5));
-	wallNodeMap.push_back(new wallNode(21,3));
-	wallNodeMap.push_back(new wallNode(22,3));
-	wallNodeMap.push_back(new wallNode(23,4));
-	wallNodeMap.push_back(new wallNode(24,2));
-	wallNodeMap.push_back(new wallNode(16,3));
-	wallNodeMap.push_back(new wallNode(17,3));
-	wallNodeMap.push_back(new wallNode(4,6));
-	wallNodeMap.push_back(new wallNode(4,7));
-	wallNodeMap.push_back(new wallNode(4,8));
-	wallNodeMap.push_back(new wallNode(3,8));
-	wallNodeMap.push_back(new wallNode(2,8));
-	wallNodeMap.push_back(new wallNode(1,9));
-	wallNodeMap.push_back(new wallNode(6,6));
-	wallNodeMap.push_back(new wallNode(6,7));
-	wallNodeMap.push_back(new wallNode(8,4));
-	wallNodeMap.push_back(new wallNode(8,6));
-	wallNodeMap.push_back(new wallNode(8,7));
-	wallNodeMap.push_back(new wallNode(8,8));
-	wallNodeMap.push_back(new wallNode(9,7));
-	wallNodeMap.push_back(new wallNode(9,8));
-	wallNodeMap.push_back(new wallNode(11,6));
-	wallNodeMap.push_back(new wallNode(12,6));
-	wallNodeMap.push_back(new wallNode(13,4));
-	wallNodeMap.push_back(new wallNode(13,5));
-	wallNodeMap.push_back(new wallNode(15,5));
-	wallNodeMap.push_back(new wallNode(16,5));
-	wallNodeMap.push_back(new wallNode(17,5));
-	wallNodeMap.push_back(new wallNode(18,5));
-	wallNodeMap.push_back(new wallNode(20,5));
-	wallNodeMap.push_back(new wallNode(15,6));
-	wallNodeMap.push_back(new wallNode(16,6));
-	wallNodeMap.push_back(new wallNode(17,6));
-	wallNodeMap.push_back(new wallNode(18,8));
-	wallNodeMap.push_back(new wallNode(18,9));
-	wallNodeMap.push_back(new wallNode(18,10));
-	wallNodeMap.push_back(new wallNode(19,10));
-	wallNodeMap.push_back(new wallNode(21,10));
-	wallNodeMap.push_back(new wallNode(18,7));
-	wallNodeMap.push_back(new wallNode(21,6));
-	wallNodeMap.push_back(new wallNode(21,7));
-	wallNodeMap.push_back(new wallNode(21,8));
-	wallNodeMap.push_back(new wallNode(21,9));
-	wallNodeMap.push_back(new wallNode(23,7));
-	wallNodeMap.push_back(new wallNode(24,7));
-	wallNodeMap.push_back(new wallNode(23,11));
-	wallNodeMap.push_back(new wallNode(23,12));
-	wallNodeMap.push_back(new wallNode(25,15));
-	wallNodeMap.push_back(new wallNode(25,16));
-	wallNodeMap.push_back(new wallNode(1,11));
-	wallNodeMap.push_back(new wallNode(1,12));
-	wallNodeMap.push_back(new wallNode(2,14));
-	wallNodeMap.push_back(new wallNode(2,15));
-	wallNodeMap.push_back(new wallNode(2,16));
-	wallNodeMap.push_back(new wallNode(2,19));
-	wallNodeMap.push_back(new wallNode(3,11));
-	wallNodeMap.push_back(new wallNode(4,11));
-	wallNodeMap.push_back(new wallNode(4,12));
-	wallNodeMap.push_back(new wallNode(4,13));
-	wallNodeMap.push_back(new wallNode(4,14));
-	wallNodeMap.push_back(new wallNode(5,18));
-	wallNodeMap.push_back(new wallNode(7,10));
-	wallNodeMap.push_back(new wallNode(7,11));
-	wallNodeMap.push_back(new wallNode(7,13));
-	wallNodeMap.push_back(new wallNode(7,14));
-	wallNodeMap.push_back(new wallNode(7,16));
-	wallNodeMap.push_back(new wallNode(8,10));
-	wallNodeMap.push_back(new wallNode(8,11));
-	wallNodeMap.push_back(new wallNode(8,14));
-	wallNodeMap.push_back(new wallNode(8,16));
-	wallNodeMap.push_back(new wallNode(8,18));
-	wallNodeMap.push_back(new wallNode(9,11));
-	wallNodeMap.push_back(new wallNode(9,14));
-	wallNodeMap.push_back(new wallNode(9,16));
-	wallNodeMap.push_back(new wallNode(9,18));
-	wallNodeMap.push_back(new wallNode(10,13));
-	wallNodeMap.push_back(new wallNode(10,14));
-	wallNodeMap.push_back(new wallNode(10,16));
-	wallNodeMap.push_back(new wallNode(10,18));
-	wallNodeMap.push_back(new wallNode(11,10));
-	wallNodeMap.push_back(new wallNode(11,11));
-	wallNodeMap.push_back(new wallNode(11,12));
-	wallNodeMap.push_back(new wallNode(11,13));
-	wallNodeMap.push_back(new wallNode(11,16));
-	wallNodeMap.push_back(new wallNode(11,17));
-	wallNodeMap.push_back(new wallNode(11,18));
-	wallNodeMap.push_back(new wallNode(12,8));
-	wallNodeMap.push_back(new wallNode(13,8));
-	wallNodeMap.push_back(new wallNode(13,9));
-	wallNodeMap.push_back(new wallNode(13,10));
-	wallNodeMap.push_back(new wallNode(13,12));
-	wallNodeMap.push_back(new wallNode(13,13));
-	wallNodeMap.push_back(new wallNode(13,14));
-	wallNodeMap.push_back(new wallNode(13,15));
-	wallNodeMap.push_back(new wallNode(13,16));
-	wallNodeMap.push_back(new wallNode(14,14));
-	wallNodeMap.push_back(new wallNode(14,15));
-	wallNodeMap.push_back(new wallNode(14,16));
-	wallNodeMap.push_back(new wallNode(14,17));
-	wallNodeMap.push_back(new wallNode(14,18));
-	wallNodeMap.push_back(new wallNode(15,8));
-	wallNodeMap.push_back(new wallNode(15,9));
-	wallNodeMap.push_back(new wallNode(15,12));
-	wallNodeMap.push_back(new wallNode(15,13));
-	wallNodeMap.push_back(new wallNode(16,9));
-	wallNodeMap.push_back(new wallNode(16,10));
-	wallNodeMap.push_back(new wallNode(16,13));
-	wallNodeMap.push_back(new wallNode(16,16));
-	wallNodeMap.push_back(new wallNode(16,18));
-	wallNodeMap.push_back(new wallNode(16,19));
-	wallNodeMap.push_back(new wallNode(17,18));
-	wallNodeMap.push_back(new wallNode(18,14));
-	wallNodeMap.push_back(new wallNode(18,15));
-	wallNodeMap.push_back(new wallNode(19,14));
-	wallNodeMap.push_back(new wallNode(19,12));
-	wallNodeMap.push_back(new wallNode(20,12));
-	wallNodeMap.push_back(new wallNode(21,12));
-	wallNodeMap.push_back(new wallNode(21,13));
-	wallNodeMap.push_back(new wallNode(21,14));
-	wallNodeMap.push_back(new wallNode(22,16));
-	wallNodeMap.push_back(new wallNode(22,17));
-	wallNodeMap.push_back(new wallNode(23,16));
-
-
-
-
-
-}
-
-
-void SceneManager_Server::populateSpawnLocation(){
-	std::vector<spawnNode*> spawnNodeMap;
-	this->spawnNodeMap = &spawnNodeMap;
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 7.5, 27.5)); //1
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 12.5, 27.5)); //2
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 17.5, 27.5)); //3
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 22.5, 17.5)); //4
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 27.5, 17.5)); //5
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 32.5, 17.5)); //6
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 42.5, 27.5)); //7
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 32.5, 42.5)); //8
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 17.5, 52.5)); //9
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 22.5, 52.5)); //10
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 32.5, 52.5)); //11
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 32.5, 57.5)); //12
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 32.5, 67.5)); //13
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 32.5, 72.5)); //14
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 12.5, 87.5)); //15
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 12.5, 92.5)); //16
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 22.5, 82.5)); //17
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 27.5, 82.5)); //18
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 32.5, 82.5)); //19
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 27.5, 87.5)); //20
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 27.5, 92.5)); //21
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 42.5, 67.5)); //22
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 47.5, 67.5)); //23
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 52.5, 32.5)); //24
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 57.5, 42.5)); //25
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 57.5, 47.5)); //26
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 67.5, 17.5)); //27
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 67.5, 32.5)); //28
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 72.5, 62.5)); //29
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 77.5, 12.5)); //30
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 82.5, 12.5)); //31
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 77.5, 17.5)); //32
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 97.5, 27.5)); //33
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 92.5, 82.5)); //34
-	spawnNodeMap.push_back(new spawnNode(RED_TEAM, 117.5, 42.5)); //35
-
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 122.5, 72.5)); //36
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 117.5, 72.5)); //37
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 117.5, 67.5)); //38
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 117.5, 52.5)); //39
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 117.5, 47.5)); //40
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 127.5, 37.5)); //41
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 122.5, 22.5)); //42
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 122.5, 17.5)); //43
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 107.5, 92.5)); //44
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 102.5, 92.5)); //45
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 97.5, 92.5)); //46
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 92.5, 92.5)); //47
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 102.5, 82.5)); //48
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 102.5, 77.5)); //49
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 107.5, 22.5)); //50
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 102.5, 17.5)); //51
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 102.5, 12.5)); //52
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 102.5, 7.5)); //53
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 107.5, 7.5)); //54
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 92.5, 17.5)); //55
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 92.5, 62.5)); //56
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 92.5, 67.5)); //57
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 82.5, 77.5)); //58
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 82.5, 62.5)); //59
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 77.5, 52.5)); //60
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 82.5, 42.5)); //61
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 67.5, 92.5)); //62
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 67.5, 87.5)); //63
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 62.5, 52.5)); //64
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 57.5, 72.5)); //65
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 47.5, 52.5)); //66
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 37.5, 92.5)); //67
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 32.5, 92.5)); //68
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 32.5, 27.5)); //69
-	spawnNodeMap.push_back(new spawnNode(BLUE_TEAM, 12.5, 67.5)); //70
-	
-}
-
-void SceneManager_Server::populateMap() {
-	std::vector<mapNode*> nodeMap;
-	this->map = &nodeMap;
-	nodeMap.push_back(new mapNode(1*5+2.5, 4*5+2.5)); //0
-	nodeMap.push_back(new mapNode(5*5+2.5, 4*5+2.5)); //1
-	nodeMap[0]->setNextRed(nodeMap[1]);
-	nodeMap.push_back(new mapNode(5*5+2.5, 9*5+2.5)); //2
-	nodeMap[1]->setNextRed(nodeMap[2]);
-	nodeMap.push_back(new mapNode(5*5+2.5, 12*5+2.5)); //3
-	nodeMap[2]->setNextRed(nodeMap[3]);
-	nodeMap.push_back(new mapNode(5*5+2.5, 15*5+2.5)); //4
-	nodeMap[3]->setNextRed(nodeMap[4]);
-	nodeMap.push_back(new mapNode(12*5+2.5, 15*5+2.5)); //5
-	nodeMap[4]->setNextRed(nodeMap[5]);
-	nodeMap.push_back(new mapNode(12*5+2.5, 11*5+2.5)); //6
-	nodeMap[5]->setNextRed(nodeMap[6]);
-	nodeMap.push_back(new mapNode(14*5+2.5, 11*5+2.5)); //7
-	nodeMap[6]->setNextRed(nodeMap[7]);
-	nodeMap.push_back(new mapNode(17*5+2.5, 11*5+2.5)); //8
-	nodeMap[7]->setNextRed(nodeMap[8]);
-	nodeMap.push_back(new mapNode(22*5+2.5, 11*5+2.5)); //9
-	nodeMap[8]->setNextRed(nodeMap[9]);
-	nodeMap.push_back(new mapNode(22*5+2.5, 15*5+2.5)); //10
-	nodeMap[9]->setNextRed(nodeMap[10]);
-	nodeMap.push_back(new mapNode(24*5+2.5, 15*5+2.5)); //11
-	nodeMap[10]->setNextRed(nodeMap[11]);
-	nodeMap.push_back(new mapNode(7*5+2.5, 4*5+2.5)); //12
-	nodeMap[12]->setNextRed(nodeMap[1]);
-	nodeMap.push_back(new mapNode(10*5+2.5, 7*5+2.5)); //13
-	nodeMap.push_back(new mapNode(14*5+2.5, 7*5+2.5)); //14
-	nodeMap[13]->setNextRed(nodeMap[14]);
-	nodeMap[14]->setNextRed(nodeMap[7]);
-	nodeMap.push_back(new mapNode(14*5+2.5, 4*5+2.5)); //15
-	nodeMap[15]->setNextRed(nodeMap[14]);
-	nodeMap.push_back(new mapNode(22*5+2.5, 4*5+2.5)); //16
-	nodeMap[16]->setNextRed(nodeMap[9]);
-	nodeMap.push_back(new mapNode(14*5+2.5, 1*5+2.5)); //17
-	nodeMap[17]->setNextRed(nodeMap[15]);
-	nodeMap.push_back(new mapNode(3*5+2.5, 15*5+2.5)); //18
-	nodeMap[18]->setNextRed(nodeMap[4]);
-	nodeMap.push_back(new mapNode(17*5+2.5, 17*5+2.5)); //19
-	nodeMap.push_back(new mapNode(21*5+2.5, 17*5+2.5)); //20
-	nodeMap[19]->setNextRed(nodeMap[20]);
-	nodeMap.push_back(new mapNode(21*5+2.5, 15*5+2.5)); //21
-	nodeMap[20]->setNextRed(nodeMap[21]);
-	nodeMap.push_back(new mapNode(10*5+2.5, 12*5+2.5)); //22
-	nodeMap[22]->setNextRed(nodeMap[13]);
-	nodeMap[11]->setNextBlue(nodeMap[10]);
-	nodeMap[10]->setNextBlue(nodeMap[9]);
-	nodeMap[9]->setNextBlue(nodeMap[8]);
-	nodeMap[8]->setNextBlue(nodeMap[7]);
-	nodeMap[7]->setNextBlue(nodeMap[6]);
-	nodeMap[6]->setNextBlue(nodeMap[5]);
-	nodeMap[5]->setNextBlue(nodeMap[4]);
-	nodeMap[4]->setNextBlue(nodeMap[3]);
-	nodeMap[3]->setNextBlue(nodeMap[2]);
-	nodeMap[2]->setNextBlue(nodeMap[1]);
-	nodeMap[1]->setNextBlue(nodeMap[0]);
-	nodeMap[12]->setNextBlue(nodeMap[1]);
-	nodeMap.push_back(new mapNode(3*5+2.5, 19*5+2.5)); //23
-	nodeMap[23]->setNextBlue(nodeMap[18]);
-	nodeMap[18]->setNextBlue(nodeMap[4]);
-	nodeMap.push_back(new mapNode(17*5+2.5, 14*5+2.5)); //24
-	nodeMap[24]->setNextBlue(nodeMap[8]);
-	nodeMap[19]->setNextBlue(nodeMap[24]);
-	nodeMap[20]->setNextBlue(nodeMap[19]);
-	nodeMap[16]->setNextBlue(nodeMap[9]);
-	nodeMap.push_back(new mapNode(19*5+2.5, 0*5+2.5)); //25
-	nodeMap.push_back(new mapNode(19*5+2.5, 4*5+2.5)); //26
-	nodeMap[25]->setNextBlue(nodeMap[26]);
-	nodeMap[26]->setNextBlue(nodeMap[16]);
-	nodeMap.push_back(new mapNode(25*5+2.5, 6*5+2.5)); //27
-	nodeMap.push_back(new mapNode(22*5+2.5, 6*5+2.5)); //28
-	nodeMap[27]->setNextBlue(nodeMap[28]);
-	nodeMap[28]->setNextBlue(nodeMap[9]);
-	nodeMap.push_back(new mapNode(17*5+2.5, 7*5+2.5)); //29
-	nodeMap[29]->setNextBlue(nodeMap[8]);
-	nodeMap.push_back(new mapNode(7*5+2.5, 9*5+2.5)); //30
-	nodeMap[30]->setNextBlue(nodeMap[2]);
-
+void SceneManager_Server::populatePaths() {
+	pathNodes.push_back(new pathNode(1, 4)); //0
+	pathNodes.push_back(new pathNode(5, 4)); //1
+	pathNodes[0]->setNextRed(pathNodes[1]);
+	pathNodes.push_back(new pathNode(5, 9)); //2
+	pathNodes[1]->setNextRed(pathNodes[2]);
+	pathNodes.push_back(new pathNode(5, 12)); //3
+	pathNodes[2]->setNextRed(pathNodes[3]);
+	pathNodes.push_back(new pathNode(5, 15)); //4
+	pathNodes[3]->setNextRed(pathNodes[4]);
+	pathNodes.push_back(new pathNode(12, 15)); //5
+	pathNodes[4]->setNextRed(pathNodes[5]);
+	pathNodes.push_back(new pathNode(12, 11)); //6
+	pathNodes[5]->setNextRed(pathNodes[6]);
+	pathNodes.push_back(new pathNode(14, 11)); //7
+	pathNodes[6]->setNextRed(pathNodes[7]);
+	pathNodes.push_back(new pathNode(17, 11)); //8
+	pathNodes[7]->setNextRed(pathNodes[8]);
+	pathNodes.push_back(new pathNode(22, 11)); //9
+	pathNodes[8]->setNextRed(pathNodes[9]);
+	pathNodes.push_back(new pathNode(22, 15)); //10
+	pathNodes[9]->setNextRed(pathNodes[10]);
+	pathNodes.push_back(new pathNode(24, 15)); //11
+	pathNodes[10]->setNextRed(pathNodes[11]);
+	pathNodes.push_back(new pathNode(7, 4)); //12
+	pathNodes[12]->setNextRed(pathNodes[1]);
+	pathNodes.push_back(new pathNode(10, 7)); //13
+	pathNodes.push_back(new pathNode(14, 7)); //14
+	pathNodes[13]->setNextRed(pathNodes[14]);
+	pathNodes[14]->setNextRed(pathNodes[7]);
+	pathNodes.push_back(new pathNode(14, 4)); //15
+	pathNodes[15]->setNextRed(pathNodes[14]);
+	pathNodes.push_back(new pathNode(22, 4)); //16
+	pathNodes[16]->setNextRed(pathNodes[9]);
+	pathNodes.push_back(new pathNode(14, 1)); //17
+	pathNodes[17]->setNextRed(pathNodes[15]);
+	pathNodes.push_back(new pathNode(3, 15)); //18
+	pathNodes[18]->setNextRed(pathNodes[4]);
+	pathNodes.push_back(new pathNode(17, 17)); //19
+	pathNodes.push_back(new pathNode(21, 17)); //20
+	pathNodes[19]->setNextRed(pathNodes[20]);
+	pathNodes.push_back(new pathNode(21, 15)); //21
+	pathNodes[20]->setNextRed(pathNodes[21]);
+	pathNodes.push_back(new pathNode(10, 12)); //22
+	pathNodes[22]->setNextRed(pathNodes[13]);
+	pathNodes[11]->setNextBlue(pathNodes[10]);
+	pathNodes[10]->setNextBlue(pathNodes[9]);
+	pathNodes[9]->setNextBlue(pathNodes[8]);
+	pathNodes[8]->setNextBlue(pathNodes[7]);
+	pathNodes[7]->setNextBlue(pathNodes[6]);
+	pathNodes[6]->setNextBlue(pathNodes[5]);
+	pathNodes[5]->setNextBlue(pathNodes[4]);
+	pathNodes[4]->setNextBlue(pathNodes[3]);
+	pathNodes[3]->setNextBlue(pathNodes[2]);
+	pathNodes[2]->setNextBlue(pathNodes[1]);
+	pathNodes[1]->setNextBlue(pathNodes[0]);
+	pathNodes[12]->setNextBlue(pathNodes[1]);
+	pathNodes.push_back(new pathNode(3, 19)); //23
+	pathNodes[23]->setNextBlue(pathNodes[18]);
+	pathNodes[18]->setNextBlue(pathNodes[4]);
+	pathNodes.push_back(new pathNode(17, 14)); //24
+	pathNodes[24]->setNextBlue(pathNodes[8]);
+	pathNodes[19]->setNextBlue(pathNodes[24]);
+	pathNodes[20]->setNextBlue(pathNodes[19]);
+	pathNodes[16]->setNextBlue(pathNodes[9]);
+	pathNodes.push_back(new pathNode(19, 0)); //25
+	pathNodes.push_back(new pathNode(19, 4)); //26
+	pathNodes[25]->setNextBlue(pathNodes[26]);
+	pathNodes[26]->setNextBlue(pathNodes[16]);
+	pathNodes.push_back(new pathNode(25, 6)); //27
+	pathNodes.push_back(new pathNode(22, 6)); //28
+	pathNodes[27]->setNextBlue(pathNodes[28]);
+	pathNodes[28]->setNextBlue(pathNodes[9]);
+	pathNodes.push_back(new pathNode(17, 7)); //29
+	pathNodes[29]->setNextBlue(pathNodes[8]);
+	pathNodes.push_back(new pathNode(7, 9)); //30
+	pathNodes[30]->setNextBlue(pathNodes[2]);
 
 	// Add map nodes next to the towers for smooth animation
-	nodeMap.push_back(new mapNode(12.5, 22.5)); // 31
-	nodeMap.push_back(new mapNode(17.5, 22.5)); // 32
-	nodeMap.push_back(new mapNode(4*5+2.5, 4*4+2.5)); // 33
-	nodeMap.push_back(new mapNode(6*5+2.5, 4*5+2.5)); // 34
-	nodeMap.push_back(new mapNode(5*5+2.5, 5*5+2.5)); // 35
-	nodeMap.push_back(new mapNode(7*5+2.5, 5*5+2.5)); // 36
-	nodeMap.push_back(new mapNode(5*5+2.5, 8*5+2.5)); // 37
-	nodeMap.push_back(new mapNode(3*5+2.5, 9*5+2.5)); // 38
-	nodeMap.push_back(new mapNode(4*5+2.5, 9*5+2.5)); // 39
-	nodeMap.push_back(new mapNode(5*5+2.5, 10*5+2.5)); // 40
-	nodeMap.push_back(new mapNode(5*5+2.5, 11*5+2.5)); // 41
-	nodeMap.push_back(new mapNode(5*5+2.5, 13*5+2.5)); // 42
-	nodeMap.push_back(new mapNode(5*5+2.5, 14*5+2.5)); // 43
-	nodeMap.push_back(new mapNode(3*5+2.5, 13*5+2.5)); // 44
-	nodeMap.push_back(new mapNode(3*5+2.5, 16*5+2.5)); // 45
-	nodeMap.push_back(new mapNode(3*5+2.5, 17*5+2.5)); // 46
-	nodeMap.push_back(new mapNode(3*5+2.5, 18*5+2.5)); // 47
-	nodeMap.push_back(new mapNode(6*5+2.5, 15*5+2.5)); // 48
-	nodeMap.push_back(new mapNode(8*5+2.5, 12*5+2.5)); // 49
-	nodeMap.push_back(new mapNode(9*5+2.5, 12*5+2.5)); // 50
-	nodeMap.push_back(new mapNode(6*5+2.5, 19*5+2.5)); // 51
-	nodeMap.push_back(new mapNode(7*5+2.5, 19*5+2.5)); // 52
-	nodeMap.push_back(new mapNode(9*5+2.5, 9*5+2.5)); // 53
-	nodeMap.push_back(new mapNode(10*5+2.5, 8*5+2.5)); // 54
-	nodeMap.push_back(new mapNode(10*5+2.5, 9*5+2.5)); // 55
-	nodeMap.push_back(new mapNode(11*5+2.5, 15*5+2.5)); // 56
-	nodeMap.push_back(new mapNode(12*5+2.5, 17*5+2.5)); // 57
-	nodeMap.push_back(new mapNode(12*5+2.5, 18*5+2.5)); // 58
-	nodeMap.push_back(new mapNode(14*5+2.5, 2*5+2.5)); // 59
-	nodeMap.push_back(new mapNode(14*5+2.5, 3*5+2.5)); // 60
-	nodeMap.push_back(new mapNode(14*5+2.5, 6*5+2.5)); // 61
-	nodeMap.push_back(new mapNode(14*5+2.5, 10*5+2.5)); // 62
-	nodeMap.push_back(new mapNode(16*5+2.5, 1*5+2.5)); // 63
-	nodeMap.push_back(new mapNode(17*5+2.5, 8*5+2.5)); // 64
-	nodeMap.push_back(new mapNode(17*5+2.5, 12*5+2.5)); // 65
-	nodeMap.push_back(new mapNode(17*5+2.5, 13*5+2.5)); // 66
-	nodeMap.push_back(new mapNode(17*5+2.5, 15*5+2.5)); // 67
-	nodeMap.push_back(new mapNode(17*5+2.5, 16*5+2.5)); // 68
-	nodeMap.push_back(new mapNode(18*5+2.5, 17*5+2.5)); // 69
-	nodeMap.push_back(new mapNode(19*5+2.5, 1*5+2.5)); // 70
-	nodeMap.push_back(new mapNode(19*5+2.5, 2*5+2.5)); // 71
-	nodeMap.push_back(new mapNode(19*5+2.5, 3*5+2.5)); // 72
-	nodeMap.push_back(new mapNode(19*5+2.5, 17*5+2.5)); // 73
-	nodeMap.push_back(new mapNode(20*5+2.5, 17*5+2.5)); // 74
-	nodeMap.push_back(new mapNode(21*5+2.5, 0*5+2.5)); // 75
-	nodeMap.push_back(new mapNode(21*5+2.5, 16*5+2.5)); // 76
-	nodeMap.push_back(new mapNode(22*5+2.5, 5*5+2.5)); // 77
-	nodeMap.push_back(new mapNode(22*5+2.5, 8*5+2.5)); // 78
-	nodeMap.push_back(new mapNode(22*5+2.5, 9*5+2.5)); // 79
-	nodeMap.push_back(new mapNode(22*5+2.5, 10*5+2.5)); // 80
-	nodeMap.push_back(new mapNode(22*5+2.5, 13*5+2.5)); // 81
-	nodeMap.push_back(new mapNode(22*5+2.5, 14*5+2.5)); // 82
-	nodeMap.push_back(new mapNode(25*5+2.5, 3*5+2.5)); // 83
-	nodeMap.push_back(new mapNode(25*5+2.5, 4*5+2.5)); // 84
+	pathNodes.push_back(new pathNode(2, 4)); // 31
+	pathNodes.push_back(new pathNode(3, 4)); // 32
+	pathNodes.push_back(new pathNode(4, 4)); // 33
+	pathNodes.push_back(new pathNode(6, 4)); // 34
+	pathNodes.push_back(new pathNode(5, 5)); // 35
+	pathNodes.push_back(new pathNode(7, 5)); // 36
+	pathNodes.push_back(new pathNode(5, 8)); // 37
+	pathNodes.push_back(new pathNode(3, 9)); // 38
+	pathNodes.push_back(new pathNode(4, 9)); // 39
+	pathNodes.push_back(new pathNode(5, 10)); // 40
+	pathNodes.push_back(new pathNode(5, 11)); // 41
+	pathNodes.push_back(new pathNode(5, 13)); // 42
+	pathNodes.push_back(new pathNode(5, 14)); // 43
+	pathNodes.push_back(new pathNode(3, 13)); // 44
+	pathNodes.push_back(new pathNode(3, 16)); // 45
+	pathNodes.push_back(new pathNode(3, 17)); // 46
+	pathNodes.push_back(new pathNode(3, 18)); // 47
+	pathNodes.push_back(new pathNode(6, 15)); // 48
+	pathNodes.push_back(new pathNode(8, 12)); // 49
+	pathNodes.push_back(new pathNode(9, 12)); // 50
+	pathNodes.push_back(new pathNode(6, 19)); // 51
+	pathNodes.push_back(new pathNode(7, 19)); // 52
+	pathNodes.push_back(new pathNode(9, 9)); // 53
+	pathNodes.push_back(new pathNode(10, 8)); // 54
+	pathNodes.push_back(new pathNode(10, 9)); // 55
+	pathNodes.push_back(new pathNode(11, 15)); // 56
+	pathNodes.push_back(new pathNode(12, 17)); // 57
+	pathNodes.push_back(new pathNode(12, 18)); // 58
+	pathNodes.push_back(new pathNode(14, 2)); // 59
+	pathNodes.push_back(new pathNode(14, 3)); // 60
+	pathNodes.push_back(new pathNode(14, 6)); // 61
+	pathNodes.push_back(new pathNode(14, 10)); // 62
+	pathNodes.push_back(new pathNode(16, 1)); // 63
+	pathNodes.push_back(new pathNode(17, 8)); // 64
+	pathNodes.push_back(new pathNode(17, 12)); // 65
+	pathNodes.push_back(new pathNode(17, 13)); // 66
+	pathNodes.push_back(new pathNode(17, 15)); // 67
+	pathNodes.push_back(new pathNode(17, 16)); // 68
+	pathNodes.push_back(new pathNode(18, 17)); // 69
+	pathNodes.push_back(new pathNode(19, 1)); // 70
+	pathNodes.push_back(new pathNode(19, 2)); // 71
+	pathNodes.push_back(new pathNode(19, 3)); // 72
+	pathNodes.push_back(new pathNode(19, 17)); // 73
+	pathNodes.push_back(new pathNode(20, 17)); // 74
+	pathNodes.push_back(new pathNode(21, 0)); // 75
+	pathNodes.push_back(new pathNode(21, 16)); // 76
+	pathNodes.push_back(new pathNode(22, 5)); // 77
+	pathNodes.push_back(new pathNode(22, 8)); // 78
+	pathNodes.push_back(new pathNode(22, 9)); // 79
+	pathNodes.push_back(new pathNode(22, 10)); // 80
+	pathNodes.push_back(new pathNode(22, 13)); // 81
+	pathNodes.push_back(new pathNode(22, 14)); // 82
+	pathNodes.push_back(new pathNode(25, 3)); // 83
+	pathNodes.push_back(new pathNode(25, 4)); // 84
 
 	// Connect red the nodes
-	nodeMap[31]->setNextRed(nodeMap[32]);
-	nodeMap[32]->setNextRed(nodeMap[33]);
-	nodeMap[33]->setNextRed(nodeMap[1]);
-	nodeMap[34]->setNextRed(nodeMap[1]);
-	nodeMap[36]->setNextRed(nodeMap[12]);
-	nodeMap[37]->setNextRed(nodeMap[2]);
-	nodeMap[38]->setNextRed(nodeMap[39]);
-	nodeMap[39]->setNextRed(nodeMap[2]);
-	nodeMap[40]->setNextRed(nodeMap[41]);
-	nodeMap[41]->setNextRed(nodeMap[3]);
-	nodeMap[42]->setNextRed(nodeMap[2]);
-	nodeMap[43]->setNextRed(nodeMap[44]);
-	nodeMap[44]->setNextRed(nodeMap[4]);
-	nodeMap[45]->setNextRed(nodeMap[18]);
-	nodeMap[46]->setNextRed(nodeMap[45]);
-	nodeMap[47]->setNextRed(nodeMap[46]);
-	nodeMap[48]->setNextRed(nodeMap[4]);
-	nodeMap[49]->setNextRed(nodeMap[50]);
-	nodeMap[50]->setNextRed(nodeMap[22]);
-	nodeMap[54]->setNextRed(nodeMap[13]);
-	nodeMap[55]->setNextRed(nodeMap[54]);
-	nodeMap[59]->setNextRed(nodeMap[60]);
-	nodeMap[60]->setNextRed(nodeMap[15]);
-	nodeMap[61]->setNextRed(nodeMap[14]);
-	nodeMap[63]->setNextRed(nodeMap[17]);
-	nodeMap[68]->setNextRed(nodeMap[19]);
-	nodeMap[26]->setNextRed(nodeMap[16]);
-	nodeMap[78]->setNextRed(nodeMap[9]);
-	
+	pathNodes[31]->setNextRed(pathNodes[32]);
+	pathNodes[32]->setNextRed(pathNodes[33]);
+	pathNodes[33]->setNextRed(pathNodes[1]);
+	pathNodes[34]->setNextRed(pathNodes[1]);
+	pathNodes[36]->setNextRed(pathNodes[12]);
+	pathNodes[37]->setNextRed(pathNodes[2]);
+	pathNodes[38]->setNextRed(pathNodes[39]);
+	pathNodes[39]->setNextRed(pathNodes[2]);
+	pathNodes[40]->setNextRed(pathNodes[41]);
+	pathNodes[41]->setNextRed(pathNodes[3]);
+	pathNodes[42]->setNextRed(pathNodes[2]);
+	pathNodes[43]->setNextRed(pathNodes[44]);
+	pathNodes[44]->setNextRed(pathNodes[4]);
+	pathNodes[45]->setNextRed(pathNodes[18]);
+	pathNodes[46]->setNextRed(pathNodes[45]);
+	pathNodes[47]->setNextRed(pathNodes[46]);
+	pathNodes[48]->setNextRed(pathNodes[4]);
+	pathNodes[49]->setNextRed(pathNodes[50]);
+	pathNodes[50]->setNextRed(pathNodes[22]);
+	pathNodes[54]->setNextRed(pathNodes[13]);
+	pathNodes[55]->setNextRed(pathNodes[54]);
+	pathNodes[59]->setNextRed(pathNodes[60]);
+	pathNodes[60]->setNextRed(pathNodes[15]);
+	pathNodes[61]->setNextRed(pathNodes[14]);
+	pathNodes[63]->setNextRed(pathNodes[17]);
+	pathNodes[68]->setNextRed(pathNodes[19]);
+	pathNodes[26]->setNextRed(pathNodes[16]);
+	pathNodes[78]->setNextRed(pathNodes[9]);
+
 	// Connect blue nodes
-	nodeMap[35]->setNextBlue(nodeMap[1]);
-	nodeMap[44]->setNextBlue(nodeMap[18]);
-	nodeMap[52]->setNextBlue(nodeMap[51]);
-	nodeMap[51]->setNextBlue(nodeMap[23]);
-	nodeMap[53]->setNextBlue(nodeMap[30]);
-	nodeMap[56]->setNextBlue(nodeMap[4]);
-	nodeMap[58]->setNextBlue(nodeMap[57]);
-	nodeMap[57]->setNextBlue(nodeMap[5]);
-	nodeMap[62]->setNextBlue(nodeMap[7]);
-	nodeMap[64]->setNextBlue(nodeMap[8]);
-	nodeMap[65]->setNextBlue(nodeMap[8]);
-	nodeMap[66]->setNextBlue(nodeMap[65]);
-	nodeMap[67]->setNextBlue(nodeMap[24]);
-	nodeMap[70]->setNextBlue(nodeMap[71]);
-	nodeMap[71]->setNextBlue(nodeMap[72]);
-	nodeMap[72]->setNextBlue(nodeMap[26]);
-	nodeMap[73]->setNextBlue(nodeMap[69]);
-	nodeMap[69]->setNextBlue(nodeMap[19]);
-	nodeMap[74]->setNextBlue(nodeMap[73]);
-	nodeMap[75]->setNextBlue(nodeMap[25]);
-	nodeMap[76]->setNextBlue(nodeMap[20]);
-	nodeMap[77]->setNextBlue(nodeMap[28]);
-	nodeMap[79]->setNextBlue(nodeMap[80]);
-	nodeMap[81]->setNextBlue(nodeMap[82]);
-	nodeMap[82]->setNextBlue(nodeMap[10]);
-	nodeMap[83]->setNextBlue(nodeMap[84]);
-	nodeMap[84]->setNextBlue(nodeMap[27]);
+	pathNodes[35]->setNextBlue(pathNodes[1]);
+	pathNodes[44]->setNextBlue(pathNodes[18]);
+	pathNodes[52]->setNextBlue(pathNodes[51]);
+	pathNodes[51]->setNextBlue(pathNodes[23]);
+	pathNodes[53]->setNextBlue(pathNodes[30]);
+	pathNodes[56]->setNextBlue(pathNodes[4]);
+	pathNodes[58]->setNextBlue(pathNodes[57]);
+	pathNodes[57]->setNextBlue(pathNodes[5]);
+	pathNodes[62]->setNextBlue(pathNodes[7]);
+	pathNodes[64]->setNextBlue(pathNodes[8]);
+	pathNodes[65]->setNextBlue(pathNodes[8]);
+	pathNodes[66]->setNextBlue(pathNodes[65]);
+	pathNodes[67]->setNextBlue(pathNodes[24]);
+	pathNodes[70]->setNextBlue(pathNodes[71]);
+	pathNodes[71]->setNextBlue(pathNodes[72]);
+	pathNodes[72]->setNextBlue(pathNodes[26]);
+	pathNodes[73]->setNextBlue(pathNodes[69]);
+	pathNodes[69]->setNextBlue(pathNodes[19]);
+	pathNodes[74]->setNextBlue(pathNodes[73]);
+	pathNodes[75]->setNextBlue(pathNodes[25]);
+	pathNodes[76]->setNextBlue(pathNodes[20]);
+	pathNodes[77]->setNextBlue(pathNodes[28]);
+	pathNodes[79]->setNextBlue(pathNodes[80]);
+	pathNodes[81]->setNextBlue(pathNodes[82]);
+	pathNodes[82]->setNextBlue(pathNodes[10]);
+	pathNodes[83]->setNextBlue(pathNodes[84]);
+	pathNodes[84]->setNextBlue(pathNodes[27]);
+
+}
+
+void SceneManager_Server::populateWalls(){
+	wallNodes.push_back(new wallNode(0,3)); 
+	wallNodes.push_back(new wallNode(0,4)); 
+	wallNodes.push_back(new wallNode(0,5));
+	wallNodes.push_back(new wallNode(2,3)); 
+	wallNodes.push_back(new wallNode(3,3));
+	wallNodes.push_back(new wallNode(4,5));
+	wallNodes.push_back(new wallNode(6,2));
+	wallNodes.push_back(new wallNode(7,1));
+	wallNodes.push_back(new wallNode(8,1));
+	wallNodes.push_back(new wallNode(9,1));
+	wallNodes.push_back(new wallNode(10,1));
+	wallNodes.push_back(new wallNode(11,1));
+	wallNodes.push_back(new wallNode(12,1));
+	wallNodes.push_back(new wallNode(13,1));
+	wallNodes.push_back(new wallNode(14,0));
+	wallNodes.push_back(new wallNode(15,0));
+	wallNodes.push_back(new wallNode(16,0));
+	wallNodes.push_back(new wallNode(17,0));
+	wallNodes.push_back(new wallNode(18,0));
+	wallNodes.push_back(new wallNode(9,3));
+	wallNodes.push_back(new wallNode(10,3));
+	wallNodes.push_back(new wallNode(11,3));
+	wallNodes.push_back(new wallNode(12,3));
+	wallNodes.push_back(new wallNode(17,2));
+	wallNodes.push_back(new wallNode(18,2));
+	wallNodes.push_back(new wallNode(22,1));
+	wallNodes.push_back(new wallNode(23,1));
+	wallNodes.push_back(new wallNode(24,1));
+	wallNodes.push_back(new wallNode(23,5));
+	wallNodes.push_back(new wallNode(24,5));
+	wallNodes.push_back(new wallNode(21,3));
+	wallNodes.push_back(new wallNode(22,3));
+	wallNodes.push_back(new wallNode(23,4));
+	wallNodes.push_back(new wallNode(24,2));
+	wallNodes.push_back(new wallNode(16,3));
+	wallNodes.push_back(new wallNode(17,3));
+	wallNodes.push_back(new wallNode(4,6));
+	wallNodes.push_back(new wallNode(4,7));
+	wallNodes.push_back(new wallNode(4,8));
+	wallNodes.push_back(new wallNode(3,8));
+	wallNodes.push_back(new wallNode(2,8));
+	wallNodes.push_back(new wallNode(1,9));
+	wallNodes.push_back(new wallNode(6,6));
+	wallNodes.push_back(new wallNode(6,7));
+	wallNodes.push_back(new wallNode(8,4));
+	wallNodes.push_back(new wallNode(8,6));
+	wallNodes.push_back(new wallNode(8,7));
+	wallNodes.push_back(new wallNode(8,8));
+	wallNodes.push_back(new wallNode(9,7));
+	wallNodes.push_back(new wallNode(9,8));
+	wallNodes.push_back(new wallNode(11,6));
+	wallNodes.push_back(new wallNode(12,6));
+	wallNodes.push_back(new wallNode(13,4));
+	wallNodes.push_back(new wallNode(13,5));
+	wallNodes.push_back(new wallNode(15,5));
+	wallNodes.push_back(new wallNode(16,5));
+	wallNodes.push_back(new wallNode(17,5));
+	wallNodes.push_back(new wallNode(18,5));
+	wallNodes.push_back(new wallNode(20,5));
+	wallNodes.push_back(new wallNode(15,6));
+	wallNodes.push_back(new wallNode(16,6));
+	wallNodes.push_back(new wallNode(17,6));
+	wallNodes.push_back(new wallNode(18,8));
+	wallNodes.push_back(new wallNode(18,9));
+	wallNodes.push_back(new wallNode(18,10));
+	wallNodes.push_back(new wallNode(19,10));
+	wallNodes.push_back(new wallNode(21,10));
+	wallNodes.push_back(new wallNode(18,7));
+	wallNodes.push_back(new wallNode(21,6));
+	wallNodes.push_back(new wallNode(21,7));
+	wallNodes.push_back(new wallNode(21,8));
+	wallNodes.push_back(new wallNode(21,9));
+	wallNodes.push_back(new wallNode(23,7));
+	wallNodes.push_back(new wallNode(24,7));
+	wallNodes.push_back(new wallNode(23,11));
+	wallNodes.push_back(new wallNode(23,12));
+	wallNodes.push_back(new wallNode(25,15));
+	wallNodes.push_back(new wallNode(25,16));
+	wallNodes.push_back(new wallNode(1,11));
+	wallNodes.push_back(new wallNode(1,12));
+	wallNodes.push_back(new wallNode(2,14));
+	wallNodes.push_back(new wallNode(2,15));
+	wallNodes.push_back(new wallNode(2,16));
+	wallNodes.push_back(new wallNode(2,19));
+	wallNodes.push_back(new wallNode(3,11));
+	wallNodes.push_back(new wallNode(4,11));
+	wallNodes.push_back(new wallNode(4,12));
+	wallNodes.push_back(new wallNode(4,13));
+	wallNodes.push_back(new wallNode(4,14));
+	wallNodes.push_back(new wallNode(5,18));
+	wallNodes.push_back(new wallNode(7,10));
+	wallNodes.push_back(new wallNode(7,11));
+	wallNodes.push_back(new wallNode(7,13));
+	wallNodes.push_back(new wallNode(7,14));
+	wallNodes.push_back(new wallNode(7,16));
+	wallNodes.push_back(new wallNode(8,10));
+	wallNodes.push_back(new wallNode(8,11));
+	wallNodes.push_back(new wallNode(8,14));
+	wallNodes.push_back(new wallNode(8,16));
+	wallNodes.push_back(new wallNode(8,18));
+	wallNodes.push_back(new wallNode(9,11));
+	wallNodes.push_back(new wallNode(9,14));
+	wallNodes.push_back(new wallNode(9,16));
+	wallNodes.push_back(new wallNode(9,18));
+	wallNodes.push_back(new wallNode(10,13));
+	wallNodes.push_back(new wallNode(10,14));
+	wallNodes.push_back(new wallNode(10,16));
+	wallNodes.push_back(new wallNode(10,18));
+	wallNodes.push_back(new wallNode(11,10));
+	wallNodes.push_back(new wallNode(11,11));
+	wallNodes.push_back(new wallNode(11,12));
+	wallNodes.push_back(new wallNode(11,13));
+	wallNodes.push_back(new wallNode(11,16));
+	wallNodes.push_back(new wallNode(11,17));
+	wallNodes.push_back(new wallNode(11,18));
+	wallNodes.push_back(new wallNode(12,8));
+	wallNodes.push_back(new wallNode(13,8));
+	wallNodes.push_back(new wallNode(13,9));
+	wallNodes.push_back(new wallNode(13,10));
+	wallNodes.push_back(new wallNode(13,12));
+	wallNodes.push_back(new wallNode(13,13));
+	wallNodes.push_back(new wallNode(13,14));
+	wallNodes.push_back(new wallNode(13,15));
+	wallNodes.push_back(new wallNode(13,16));
+	wallNodes.push_back(new wallNode(14,14));
+	wallNodes.push_back(new wallNode(14,15));
+	wallNodes.push_back(new wallNode(14,16));
+	wallNodes.push_back(new wallNode(14,17));
+	wallNodes.push_back(new wallNode(14,18));
+	wallNodes.push_back(new wallNode(15,8));
+	wallNodes.push_back(new wallNode(15,9));
+	wallNodes.push_back(new wallNode(15,12));
+	wallNodes.push_back(new wallNode(15,13));
+	wallNodes.push_back(new wallNode(16,9));
+	wallNodes.push_back(new wallNode(16,10));
+	wallNodes.push_back(new wallNode(16,13));
+	wallNodes.push_back(new wallNode(16,16));
+	wallNodes.push_back(new wallNode(16,18));
+	wallNodes.push_back(new wallNode(16,19));
+	wallNodes.push_back(new wallNode(17,18));
+	wallNodes.push_back(new wallNode(18,14));
+	wallNodes.push_back(new wallNode(18,15));
+	wallNodes.push_back(new wallNode(19,14));
+	wallNodes.push_back(new wallNode(19,12));
+	wallNodes.push_back(new wallNode(20,12));
+	wallNodes.push_back(new wallNode(21,12));
+	wallNodes.push_back(new wallNode(21,13));
+	wallNodes.push_back(new wallNode(21,14));
+	wallNodes.push_back(new wallNode(22,16));
+	wallNodes.push_back(new wallNode(22,17));
+	wallNodes.push_back(new wallNode(23,16));
+}
+
+void SceneManager_Server::populateBuilds(){
+	buildNodes.push_back(new buildNode(RED_TEAM, 1, 5)); //1
+	buildNodes.push_back(new buildNode(RED_TEAM, 2, 5)); //2
+	buildNodes.push_back(new buildNode(RED_TEAM, 3, 5)); //3
+	buildNodes.push_back(new buildNode(RED_TEAM, 4, 3)); //4
+	buildNodes.push_back(new buildNode(RED_TEAM, 5, 3)); //5
+	buildNodes.push_back(new buildNode(RED_TEAM, 6, 3)); //6
+	buildNodes.push_back(new buildNode(RED_TEAM, 8, 5)); //7
+	buildNodes.push_back(new buildNode(RED_TEAM, 6, 8)); //8
+	buildNodes.push_back(new buildNode(RED_TEAM, 3, 10)); //9
+	buildNodes.push_back(new buildNode(RED_TEAM, 4, 10)); //10
+	buildNodes.push_back(new buildNode(RED_TEAM, 6, 10)); //11
+	buildNodes.push_back(new buildNode(RED_TEAM, 6, 11)); //12
+	buildNodes.push_back(new buildNode(RED_TEAM, 6, 13)); //13
+	buildNodes.push_back(new buildNode(RED_TEAM, 6, 14)); //14
+	buildNodes.push_back(new buildNode(RED_TEAM, 2, 17)); //15
+	buildNodes.push_back(new buildNode(RED_TEAM, 2, 18)); //16
+	buildNodes.push_back(new buildNode(RED_TEAM, 4, 16)); //17
+	buildNodes.push_back(new buildNode(RED_TEAM, 5, 16)); //18
+	buildNodes.push_back(new buildNode(RED_TEAM, 6, 16)); //19
+	buildNodes.push_back(new buildNode(RED_TEAM, 4, 17)); //20
+	buildNodes.push_back(new buildNode(RED_TEAM, 4, 18)); //21
+	buildNodes.push_back(new buildNode(RED_TEAM, 8, 13)); //22
+	buildNodes.push_back(new buildNode(RED_TEAM, 9, 13)); //23
+	buildNodes.push_back(new buildNode(RED_TEAM, 10, 6)); //24
+	buildNodes.push_back(new buildNode(RED_TEAM, 11, 8)); //25
+	buildNodes.push_back(new buildNode(RED_TEAM, 11, 9)); //26
+	buildNodes.push_back(new buildNode(RED_TEAM, 13, 3)); //27
+	buildNodes.push_back(new buildNode(RED_TEAM, 13, 6)); //28
+	buildNodes.push_back(new buildNode(RED_TEAM, 14, 12)); //29
+	buildNodes.push_back(new buildNode(RED_TEAM, 15, 2)); //30
+	buildNodes.push_back(new buildNode(RED_TEAM, 16, 2)); //31
+	buildNodes.push_back(new buildNode(RED_TEAM, 15, 3)); //32
+	buildNodes.push_back(new buildNode(RED_TEAM, 19, 5)); //33
+	buildNodes.push_back(new buildNode(RED_TEAM, 18, 16)); //34
+	buildNodes.push_back(new buildNode(RED_TEAM, 23, 8)); //35
+
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 24, 14)); //36
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 23, 14)); //37
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 23, 13)); //38
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 23, 10)); //39
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 23, 9)); //40
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 25, 7)); //41
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 24, 4)); //42
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 24, 3)); //43
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 21, 18)); //44
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 20, 18)); //45
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 19, 18)); //46
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 18, 18)); //47
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 20, 16)); //48
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 20, 15)); //49
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 21, 5)); //50
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 20, 3)); //51
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 20, 2)); //52
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 20, 1)); //53
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 21, 1)); //54
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 18, 3)); //55
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 18, 12)); //56
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 18, 13)); //57
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 16, 15)); //58
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 16, 12)); //59
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 15, 10)); //60
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 16, 8)); //61
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 13, 18)); //62
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 13, 17)); //63
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 12, 10)); //64
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 11, 14)); //65
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 9, 10)); //66
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 7, 18)); //67
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 6, 18)); //68
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 6, 5)); //69
+	buildNodes.push_back(new buildNode(BLUE_TEAM, 2, 13)); //70
 	
 }
 

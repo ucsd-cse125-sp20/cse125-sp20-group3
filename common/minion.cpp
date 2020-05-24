@@ -2,15 +2,13 @@
 #include "../server/SceneManager_Server.h"
 
 Minion::Minion(int id, Team* t, SceneManager_Server* sm) : Entity(id, MINION_HEALTH, MINION_ATTACK, t, sm) {
-	actionState = MINION_ACTION_IDLE;
-
 	attackRange = MINION_ATK_RANGE;
 	attackInterval = MINION_ATK_INTERVAL;
 	velocity = MINION_VELOCITY;
 	doneMoving = false;
 
 	if (sm != nullptr) { //only execute on server
-		destNode = (mapNode*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_MAP_NODE, 50); //TODO unbounded radius check
+		destNode = (pathNode*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_PATH_NODE, 50); //TODO unbounded radius check
 
 		int flags = DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE | DETECTION_FLAG_MINION | 
 					DETECTION_FLAG_MINION_TARGET | DETECTION_FLAG_LASER_TARGET;
@@ -21,15 +19,13 @@ Minion::Minion(int id, Team* t, SceneManager_Server* sm) : Entity(id, MINION_HEA
 }
 
 Minion::Minion(int id, int health, int attack, int range, float interval, float vel, Team* t, SceneManager_Server* sm) : Entity(id, health, attack, t, sm) {
-	actionState = MINION_ACTION_IDLE;
-	
 	attackRange = range;
 	attackInterval = interval;
 	velocity = vel;
 	doneMoving = false;
 
 	if (sm != nullptr) { //only execute on server
-		destNode = (mapNode*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_MAP_NODE, 50); //TODO unbounded radius check
+		destNode = (pathNode*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_PATH_NODE, 50); //TODO unbounded radius check
 
 		int flags = DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE | DETECTION_FLAG_MINION |
 					DETECTION_FLAG_MINION_TARGET | DETECTION_FLAG_LASER_TARGET;
@@ -68,7 +64,7 @@ void Minion::update(float deltaTime) { //should they be able to switch attack ta
 
 	if (attackTarget != nullptr) { //if this minion should be attacking something, don't move
 		timeElapsed += deltaTime; //increase timeElapsed
-		actionState = MINION_ACTION_ATTACK;
+		actionState = ACTION_STATE_ATTACK;
 
 		//first face the attack target, regardless of timeElapsed
 		vec3 forward = normalize(attackTarget->getPosition() - this->getPosition()); //TODO check vectors?
@@ -97,14 +93,14 @@ void Minion::takeDamage(int damage) {
 
 void Minion::attack() {
 	attackTarget->takeDamage(this->attackDamage);
-	actionState = MINION_ACTION_FIRE;
+	actionState = ACTION_STATE_FIRE;
 	//TODO manipulate necessary data to spawn particle systems
 }
 
 void Minion::move(float deltaTime) {
 	if (doneMoving) return; //small optimization
 
-	actionState = MINION_ACTION_MOVE;
+	actionState = ACTION_STATE_MOVE;
 
 	float remaining_move_dist = velocity * deltaTime; //full movement distance this minion travels this tick
 
@@ -127,7 +123,7 @@ void Minion::move(float deltaTime) {
 		model[2] = vec4(-forward, 0);
 
 		if (this->getPosition() == destNode->getPosition()) { //reached destNode with this iteration
-			mapNode* nextNode; //continue moving to the next node
+			pathNode* nextNode; //continue moving to the next node
 			if (this->team->teamColor == RED_TEAM) nextNode = this->destNode->next_red;
 			else nextNode = this->destNode->next_blue;
 
@@ -135,7 +131,7 @@ void Minion::move(float deltaTime) {
 			else {
 				std::cout << "minion reached the end of the path!\n";
 				doneMoving = true;
-				actionState = MINION_ACTION_IDLE;
+				actionState = ACTION_STATE_IDLE;
 				break;
 			}
 		}
@@ -144,7 +140,7 @@ void Minion::move(float deltaTime) {
 
 void Minion::setEntData(EntityData data) {
 	Entity::setEntData(data);
-	std::cout << "minion " << id << " targetID: " << attackTargetID << "\n";
+	if(actionState != ACTION_STATE_IDLE) std::cout << "minion " << id << " actionState: " << (int)actionState << "\n";
 }
 
 /* TESTING SPECIFIC FUNCTIONALITY - DO NOT USE */

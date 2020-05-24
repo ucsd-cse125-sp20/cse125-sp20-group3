@@ -39,6 +39,7 @@ public:
 	Entity(int i, int h, int a, Team* t, SceneManager_Server* sm) : GameObject() { 
 		id = i; health = h; attackDamage = a; team = t; manager = sm;
 		timeElapsed = 0;
+		actionState = ACTION_STATE_IDLE;
 		attackTarget = nullptr;
 		attackTargetID = NO_TARGET_ID;
 	};

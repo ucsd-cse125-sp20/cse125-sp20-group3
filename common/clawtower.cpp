@@ -2,15 +2,12 @@
 #include "../server/SceneManager_Server.h"
 
 ClawTower::ClawTower(int id, Team* t, SceneManager_Server* sm_server) : Tower(id, CLAW_TOWER_HEALTH, CLAW_TOWER_ATTACK, t, sm_server) {
-	actionState = CLAW_ACTION_IDLE;
-
-	spawnPoint = this->getPosition() + vec3(2.f, 0, 2.f); //TODO find nearest path location and use as spawn point
+	spawnPoint = ObjectDetection::getNearestObject(this, DETECTION_FLAG_PATH_NODE)->getPosition();
 	spawnInterval = CLAW_SPAWN_INTERVAL; //interval between minion spawns
 }
 
 void ClawTower::update(float deltaTime) {
 	timeElapsed += deltaTime;
-	actionState = CLAW_ACTION_SPAWN;
 
 	if (timeElapsed >= spawnInterval) {
 		std::cout << "claw " << id << " spawning at x: " << spawnPoint.getX() << " z: " << spawnPoint.getZ() << "\n";

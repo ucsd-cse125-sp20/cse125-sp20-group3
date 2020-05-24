@@ -1,5 +1,6 @@
-#ifndef _WALLNODE_H_
-#define _WALLNODE_H_
+#ifndef _WALL_NODE_H_
+#define _WALL_NODE_H_
+
 #include "GameObject.h"
 #include "ObjectDetection.h"
 

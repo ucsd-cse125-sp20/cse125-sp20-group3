@@ -5,20 +5,15 @@
 #include "entity.h"
 #include "team.h"
 #include "ObjectDetection.h"
-#include "mapNode.h"
+#include "pathNode.h"
 #include <iostream>
 #include <chrono>
 #include <ctime>
 #include <map>
 
-#define MINION_ACTION_IDLE 0
-#define MINION_ACTION_MOVE 1
-#define MINION_ACTION_ATTACK 2
-#define MINION_ACTION_FIRE 3
-
 class Minion : public Entity {
 protected:
-	mapNode* destNode;
+	pathNode* destNode;
 	int attackRange;
 	float attackInterval;
 	float velocity;

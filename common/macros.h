@@ -10,6 +10,11 @@
 
 #define NO_TARGET_ID -1
 
+#define ACTION_STATE_IDLE 0
+#define ACTION_STATE_MOVE 1
+#define ACTION_STATE_ATTACK 2
+#define ACTION_STATE_FIRE 3
+
 #define RED_TEAM 'R'
 #define BLUE_TEAM 'B'
 #define NO_TEAM 'N'

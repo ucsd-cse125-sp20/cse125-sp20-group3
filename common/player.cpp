@@ -2,8 +2,6 @@
 #include "../server/SceneManager_Server.h"
 
 Player::Player(int id, Team* t, SceneManager_Server* sm) : Entity(id, PLAYER_HEALTH, PLAYER_ATTACK, t, sm) {
-	actionState = PLAYER_ACTION_NONE; //player animations are based on movement direction, so actionState is irrelevant
-
 	velocity_x = 0.f;
 	velocity_z = 0.f;
 	rotation_y = 0.f;

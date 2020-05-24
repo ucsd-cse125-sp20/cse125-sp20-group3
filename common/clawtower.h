@@ -3,9 +3,6 @@
 
 #include "tower.h"
 
-#define CLAW_ACTION_IDLE 0
-#define CLAW_ACTION_SPAWN 1
-
 class ClawTower : public Tower {
 private:
 	vec3 spawnPoint;

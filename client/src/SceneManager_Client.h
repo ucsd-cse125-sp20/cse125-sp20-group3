@@ -23,7 +23,7 @@
 #include "../../common/minion.h"
 #include "../../common/SuperMinion.h"
 #include "../../common/tower.h"
-#include "../../common/lasertower.h"
+#include "../../common/lasertower_client.h"
 #include "../../common/clawtower.h"
 #include "../../common/resource.h"
 #include "../../common/client2server.h"
@@ -44,7 +44,15 @@
 class SceneManager_Client : public Transform
 {
 private:
-	std::map<int, Entity*> idMap;
+	enum EntityType {
+		LASER_TOWER, OTHER
+	};
+
+	uint32_t subid = 0;
+
+	std::map<int, std::pair<uint32_t, EntityType>> idMap;
+	std::map<uint32_t, Entity*> entityMap;
+	std::map<uint32_t, LaserTower_Client*> laserTowerMap;
 	std::map<int, Transform*> transforms;
 	std::map<int, Animator*> animators;
 	std::map<std::string, GLTFGeode*> gltfGeodes;
@@ -58,7 +66,11 @@ private:
 	Buffer** boneBuffer = NULL;
 	Buffer** particleBuffer = NULL;
 
+	RootSignature* particleRootSignature = NULL;
+
 	Team *red_team, *blue_team;
+
+	Renderer* renderer;
 
 public:
 	enum class GeodeType {
@@ -84,9 +96,6 @@ public:
 
 	void trackPlayer(int player_id);
 	mat4 getPlayerTransformMat();
-
-    void randomStaticInstantiation(Geode* g, int num, float range, float minSize, float maxSize);
-	void randomAnimatedInstantiation(OzzGeode* g, int num, float range, float minSize, float maxSize, const char* actions[], int numActions);
 
 	void update(float deltaTime) override;
 	void draw(Cmd* cmd) override;

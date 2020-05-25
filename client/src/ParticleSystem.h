@@ -48,7 +48,9 @@ public:
 
 	void createSpriteResources(RootSignature* pRootSignature);
 
-	void updateInitilizer(ParticleInitializer initializer);
+	void reset(float shift, float scale);
+	void setInitilizer(ParticleInitializer initializer);
+	void setLife(float life);
 
 	void fillParticleData(ParticleData* buf);
 

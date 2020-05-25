@@ -12,6 +12,8 @@ protected:
 	mat4 M;
 	std::vector<Node*> children;
 public:
+	bool active = true;
+
 	Transform();
 	Transform(mat4 transformation);
 	~Transform();

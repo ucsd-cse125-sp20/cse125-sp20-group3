@@ -129,6 +129,9 @@
     <ClCompile Include="..\..\..\..\..\common\mapNode.cpp">
       <Filter>Source Files\Server Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\lasertower_client.cpp" />
+    <ClCompile Include="..\..\..\..\src\TimedTransform.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\MathUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\src\Shaders\D3D12\basic.frag">
@@ -324,6 +327,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\common\mapNode.h">
       <Filter>Header Files\Server Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\lasertower_client.h">
+      <Filter>Source Files\Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\src\TimedTransform.h">
+      <Filter>Header Files\Scene Graph</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

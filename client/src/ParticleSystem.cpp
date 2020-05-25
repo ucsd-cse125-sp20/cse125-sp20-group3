@@ -23,16 +23,15 @@ ParticleSystem::ParticleSystem(Renderer* renderer, ParticleSystemParams params) 
 	textureDesc.pFilePath = spritesPath;
 	addResource(&textureDesc, NULL, LOAD_PRIORITY_NORMAL);
 
-	for (int i = 0; i < params.numParticles; i++) {
-		particleAuxData[i].life = -(static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (params.life * 2.f)));
-		particleData[i].color = float4(0);
-	}
+	reset(-2 * params.life, 2);
+	//printf("creating\n");
 
 	waitForAllResourceLoads();
 }
 
 ParticleSystem::~ParticleSystem()
 {
+	//printf("removing\n");
 	removeResource(pSpriteTexture);
 	removeResource(pSpriteIndexBuffer);
 
@@ -54,9 +53,25 @@ void ParticleSystem::createSpriteResources(RootSignature* pRootSignature)
 	updateDescriptorSet(pRenderer, 0, pDescriptorSetTexture, 1, params);
 }
 
-void ParticleSystem::updateInitilizer(ParticleInitializer initializer)
+void ParticleSystem::reset(float shift, float scale)
+{
+	for (int i = 0; i < params.numParticles; i++) {
+		params.initializer(&particleData[i], &particleAuxData[i]);
+		particleAuxData[i].life = shift + static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (params.life * scale));
+		if (particleAuxData[i].life > 0) {
+			particleData[i].position += particleAuxData[i].life * particleAuxData[i].velocity;
+		}
+	}
+}
+
+void ParticleSystem::setInitilizer(ParticleInitializer initializer)
 {
 	params.initializer = initializer;
+}
+
+void ParticleSystem::setLife(float life)
+{
+	params.life = life;
 }
 
 void ParticleSystem::fillParticleData(ParticleData* buf)

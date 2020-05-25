@@ -31,7 +31,9 @@
     <ClCompile Include="..\..\..\..\..\common\clawtower.cpp" />
     <ClCompile Include="..\..\..\..\..\common\GameObject.cpp" />
     <ClCompile Include="..\..\..\..\..\common\lasertower.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\lasertower_client.cpp" />
     <ClCompile Include="..\..\..\..\..\common\mapNode.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\MathUtils.cpp" />
     <ClCompile Include="..\..\..\..\..\common\minion.cpp" />
     <ClCompile Include="..\..\..\..\..\common\ObjectDetection.cpp" />
     <ClCompile Include="..\..\..\..\..\common\player.cpp" />
@@ -52,6 +54,7 @@
     <ClCompile Include="..\..\..\..\src\ParticleSystem.cpp" />
     <ClCompile Include="..\..\..\..\src\ParticleSystemGeode.cpp" />
     <ClCompile Include="..\..\..\..\src\SceneManager_Client.cpp" />
+    <ClCompile Include="..\..\..\..\src\TimedTransform.cpp" />
     <ClCompile Include="..\..\..\..\src\Transform.cpp" />
     <ClCompile Include="..\..\..\..\src\UIUtils.cpp" />
   </ItemGroup>
@@ -103,6 +106,7 @@
     <ClInclude Include="..\..\..\..\..\common\superminion.h" />
     <ClInclude Include="..\..\..\..\..\common\team.h" />
     <ClInclude Include="..\..\..\..\..\common\tower.h" />
+    <ClInclude Include="..\..\..\..\..\common\lasertower_client.h" />
     <ClInclude Include="..\..\..\..\..\server\SceneManager_Server.h" />
     <ClInclude Include="..\..\..\..\src\Animator.h" />
     <ClInclude Include="..\..\..\..\src\OzzGeode.h" />
@@ -118,6 +122,7 @@
     <ClInclude Include="..\..\..\..\src\ParticleSystem.h" />
     <ClInclude Include="..\..\..\..\src\ParticleSystemGeode.h" />
     <ClInclude Include="..\..\..\..\src\SceneManager_Client.h" />
+    <ClInclude Include="..\..\..\..\src\TimedTransform.h" />
     <ClInclude Include="..\..\..\..\src\Transform.h" />
     <ClInclude Include="..\..\..\..\src\UIUtils.h" />
     <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\cgltf\cgltf.h" />

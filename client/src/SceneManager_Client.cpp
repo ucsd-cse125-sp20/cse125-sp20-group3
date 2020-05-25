@@ -29,6 +29,7 @@ bool SceneManager_Client::enableCulling = true;
 
 SceneManager_Client::SceneManager_Client(Renderer* renderer)
 {
+	this->renderer = renderer;
 	// It'd be nice if I could put this in a loop later
 	gltfGeodes[ENV_GEODE] = conf_new(GLTFGeode, renderer, groundFile);
 	gltfGeodes[PLAYER_GEODE] = conf_new(GLTFGeode, renderer, playerFile);
@@ -90,75 +91,13 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	transforms[key] = t;
 	animators[key] = a;
 
-	// TODO These are hard coded particle examples. Remove them later
-	key = 7234813;
-	ParticleSystem::ParticleSystemParams params = {};
-	params.spriteFile = "LaserParticle.png";
-	params.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
-		float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.1f);
-		float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2 * PI));
-		float z = 0;
-
-		pd->position = float3(r * cos(a), z, r * sin(a));
-		pd->color = float4(0.8f, 0.8f, 1.0f, 1.0f);
-		pd->scale = float2(0.2f, 0.2f);
-		pad->velocity = float3(0, 5, 0);
-	};
-	params.numParticles = 1000;
-	params.life = 1.0f;
-	particleGeodes["blarf5"] = conf_new(ParticleSystemGeode, renderer, params);
-	t = conf_new(Transform, mat4::translation(vec3(-2, 0, 4)));
-	t->addChild(particleGeodes["blarf5"]);
-	this->addChild(t);
-	transforms[key] = t;
-
-	key = 4201387;
-	params.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
-		float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.1f);
-		float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2 * PI));
-		float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 5);
-
-		pd->position = float3(r * cos(a), z, r * sin(a));
-		pd->color = float4(0.8f, 0.8f, 1.0f, 1.0f);
-		pd->scale = float2(0.2f, 0.2f);
-		pad->velocity = float3(cos(a), 0.0f, sin(a));
-	};
-	params.updater = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad, float deltaTime) {
-		pd->scale *= 0.95f;
-	};
-	particleGeodes["blarf6"] = conf_new(ParticleSystemGeode, renderer, params);
-	t = conf_new(Transform, mat4::translation(vec3(0, 0, 4)));
-	t->addChild(particleGeodes["blarf6"]);
-	this->addChild(t);
-	transforms[key] = t;
-
-	key = 6672073;
-	params.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
-		float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.1f);
-		float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2 * PI));
-		float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 5);
-
-		pd->position = float3(r * cos(a), z, r * sin(a));
-		pd->color = float4(0.8f, 0.8f, 1.0f, 1.0f);
-		pd->scale = float2(0.2f, 0.2f);
-		pad->velocity = float3(cos(a), 0.0f, sin(a));
-	};
-	params.updater = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad, float deltaTime) {
-		pad->velocity += float3(-pd->position.x, 0.0f, -pd->position.z);
-	};
-	particleGeodes["blarf7"] = conf_new(ParticleSystemGeode, renderer, params);
-	t = conf_new(Transform, mat4::translation(vec3(2, 0, 4)));
-	t->addChild(particleGeodes["blarf7"]);
-	this->addChild(t);
-	transforms[key] = t;
-
 	///////////////////////////////////////////////////////////////////////////////
 
 	trackedPlayer_ID = NO_TRACKED_PLAYER;
 
-	transforms[GROUND_KEY] = conf_new(Transform, mat4::identity());
-	transforms[GROUND_KEY]->addChild(gltfGeodes[ENV_GEODE]);
-	this->addChild(transforms[GROUND_KEY]);
+	//transforms[GROUND_KEY] = conf_new(Transform, mat4::identity());
+	//transforms[GROUND_KEY]->addChild(gltfGeodes[ENV_GEODE]);
+	//this->addChild(transforms[GROUND_KEY]);
 
 	red_team = new Team(RED_TEAM);
 	blue_team = new Team(BLUE_TEAM);
@@ -166,7 +105,9 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 
 SceneManager_Client::~SceneManager_Client()
 {
-	for (std::pair<int, Entity*> e : idMap) conf_delete(e.second);
+	//printf("ASDFASDFASDF\n");
+	for (std::pair<int, Entity*> e : entityMap) conf_delete(e.second);
+	for (std::pair<int, LaserTower_Client*> t : laserTowerMap) conf_delete(t.second);
 	for (std::pair<int, Transform*> t : transforms) conf_delete(t.second);
 	for (std::pair<int, Animator*> t : animators) conf_delete(t.second);
 	for (std::pair<std::string, GLTFGeode*> g : gltfGeodes) conf_delete(g.second);
@@ -193,6 +134,7 @@ void SceneManager_Client::createMaterialResources(SceneManager_Client::GeodeType
 		for (auto ge : particleGeodes) {
 			ge.second->createSpriteResources(pRootSignature);
 		}
+		particleRootSignature = (pRootSignature);
 		break;
 	}
 }
@@ -210,7 +152,8 @@ void SceneManager_Client::updateScene(std::vector<Client::UpdateData> updateBuf)
 			if (ID_PLAYER_MIN <= data.id && data.id <= ID_PLAYER_MAX) {
 				std::cout << "creating new player, id: " << data.id << "\n";
 
-				idMap[data.id] = conf_new(Player, data.id, team, nullptr);
+				idMap[data.id] = std::make_pair(++subid, EntityType::OTHER);
+				entityMap[subid] = conf_new(Player, data.id, team, nullptr);
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				Transform* adjustment = conf_new(Transform, mat4::rotationY(-PI / 2));
 
@@ -224,37 +167,45 @@ void SceneManager_Client::updateScene(std::vector<Client::UpdateData> updateBuf)
 			}
 			else if (ID_MINION_MIN <= data.id && data.id <= ID_MINION_MAX) {
 				std::cout << "creating new minion, id: " << data.id << "\n";
-				idMap[data.id] = conf_new(Minion, data.id, team, nullptr);
+				idMap[data.id] = std::make_pair(++subid, EntityType::OTHER);
+				entityMap[subid] = conf_new(Minion, data.id, team, nullptr);
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				transforms[data.id]->addChild(gltfGeodes[MINION_GEODE]);
 			}
 			else if (ID_SUPER_MINION_MIN <= data.id && data.id <= ID_SUPER_MINION_MAX) {
 				std::cout << "creating new super minion, id: " << data.id << "\n";
-				idMap[data.id] = conf_new(SuperMinion, data.id, team, nullptr);
+				idMap[data.id] = std::make_pair(++subid, EntityType::OTHER);
+				entityMap[subid] = conf_new(SuperMinion, data.id, team, nullptr);
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				transforms[data.id]->addChild(gltfGeodes[SUPER_MINION_GEODE]);
 			}
 			else if (ID_LASER_MIN <= data.id && data.id <= ID_LASER_MAX) {
 				std::cout << "creating new laser tower, id: " << data.id << "\n";
-				idMap[data.id] = conf_new(LaserTower, data.id, team, nullptr);
+				idMap[data.id] = std::make_pair(++subid, EntityType::LASER_TOWER);
+				laserTowerMap[subid] = conf_new(LaserTower_Client, data.id, team, nullptr, renderer);
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				transforms[data.id]->addChild(gltfGeodes[LASER_TOWER_GEODE]);
+				transforms[data.id]->addChild(laserTowerMap[subid]->laserTransform);
+				laserTowerMap[subid]->laser->createSpriteResources(particleRootSignature);
 			}
 			else if (ID_CLAW_MIN <= data.id && data.id <= ID_CLAW_MAX) {
 				std::cout << "creating new claw tower, id: " << data.id << "\n";
-				idMap[data.id] = conf_new(ClawTower, data.id, team, nullptr);
+				idMap[data.id] = std::make_pair(++subid, EntityType::OTHER);
+				entityMap[subid] = conf_new(ClawTower, data.id, team, nullptr);
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				transforms[data.id]->addChild(gltfGeodes[CLAW_TOWER_GEODE]);
 			}
 			else if (ID_DUMPSTER_MIN <= data.id && data.id <= ID_DUMPSTER_MAX) {
 				std::cout << "creating new dumpster, id: " << data.id << "\n";
-				idMap[data.id] = conf_new(Resource, DUMPSTER_TYPE, data.id, nullptr);
+				idMap[data.id] = std::make_pair(++subid, EntityType::OTHER);
+				entityMap[subid] = conf_new(Resource, DUMPSTER_TYPE, data.id, nullptr);
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				transforms[data.id]->addChild(gltfGeodes[DUMPSTER_GEODE]);
 			}
 			else if (ID_RECYCLING_BIN_MIN <= data.id && data.id <= ID_RECYCLING_BIN_MAX) {
 				std::cout << "creating new recycling bin id: " << data.id << "\n";
-				idMap[data.id] = conf_new(Resource, RECYCLING_BIN_TYPE, data.id, nullptr);
+				idMap[data.id] = std::make_pair(++subid, EntityType::OTHER);
+				entityMap[subid] = conf_new(Resource, RECYCLING_BIN_TYPE, data.id, nullptr);
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				transforms[data.id]->addChild(gltfGeodes[RECYCLING_BIN_GEODE]);
 			}
@@ -267,14 +218,38 @@ void SceneManager_Client::updateScene(std::vector<Client::UpdateData> updateBuf)
 
 			this->removeChild(transforms[data.id]);
 
-			conf_delete(idMap[data.id]);
-			idMap.erase(data.id);
+			int id = idMap[data.id].first;
+			switch (idMap[data.id].second) {
+			case EntityType::LASER_TOWER:
+				conf_delete(laserTowerMap[id]);
+				laserTowerMap.erase(id);
+				break;
+			case EntityType::OTHER:
+				//conf_delete(entityMap[id]);
+				//entityMap.erase(id);
+				break;
+			}
+			//idMap.erase(data.id);
 			conf_delete(transforms[data.id]);
 			transforms.erase(data.id);
 		}
 		else { //otherwise, update the entity's data and transform
-			idMap[data.id]->setEntData(data.ent_data);
-			transforms[data.id]->setMatrix(idMap[data.id]->getMatrix());
+			int id = idMap[data.id].first;
+			switch (idMap[data.id].second) {
+			case EntityType::LASER_TOWER:
+				laserTowerMap[id]->setEntData(data.ent_data);
+				if (laserTowerMap[id]->getActionState() == LASER_ACTION_FIRE) {
+					print(entityMap[idMap[laserTowerMap[id]->getTargetID()].first]->getMatrix());
+					print(laserTowerMap[id]->getMatrix());
+					laserTowerMap[id]->activate(entityMap[idMap[laserTowerMap[id]->getTargetID()].first]->getPosition());
+				}
+				transforms[data.id]->setMatrix(laserTowerMap[id]->getMatrix());
+				break;
+			case EntityType::OTHER:
+				entityMap[id]->setEntData(data.ent_data);
+				transforms[data.id]->setMatrix(entityMap[id]->getMatrix());
+				break;
+			}
 		}
 	}
 }
@@ -321,6 +296,9 @@ void SceneManager_Client::setProgram(SceneManager_Client::GeodeType type, Geode:
 	case SceneManager_Client::GeodeType::PARTICLES:
 		for (auto ge : particleGeodes) {
 			ge.second->setProgram(program);
+		}
+		for (auto ltower : laserTowerMap) {
+			ltower.second->setProgram(program);
 		}
 		break;
 	}

@@ -5,7 +5,7 @@ namespace {
 	// Models
 	const char* mapFile = "map.gltf";
 	const char* playerFile = "char-1-female.gltf";
-	const char* groundFile = "Ground.gltf";
+	const char* groundFile = "map.gltf";
 	const char* minionFile = "minion-retry.gltf";
 	const char* superMinionFile = "minion-2-super.gltf";
 	const char* laserTowerFile = "tower-1-laser.gltf";
@@ -326,7 +326,7 @@ void SceneManager_Client::updateScene(std::vector<Client::UpdateData> updateBuf)
 					//print(laserTowerMap[id]->getMatrix());
 					laserTowerMap[id]->activate(minionMap[idMap[laserTowerMap[id]->getTargetID()].first]->getPosition());
 				}
-				transforms[data.id]->setMatrix(laserTowerMap[id]->getMatrix());
+				transforms[data.id]->setMatrix(mat4::translation(vec3(-20,0,0)) * laserTowerMap[id]->getMatrix()); // TODO remove translation
 				break;
 			case EntityType::MINION:
 				minionMap[id]->setEntData(data.ent_data);
@@ -334,7 +334,7 @@ void SceneManager_Client::updateScene(std::vector<Client::UpdateData> updateBuf)
 					minionMap[id]->setEntData(data.ent_data);
 					minionMap[id]->shoot();
 				}
-				transforms[data.id]->setMatrix(minionMap[id]->getMatrix());
+				transforms[data.id]->setMatrix(mat4::translation(vec3(-20, 0, 0))* minionMap[id]->getMatrix()); // TODO remove translation
 				break;
 			case EntityType::PLAYER:
 				playerMap[id]->setEntData(data.ent_data);

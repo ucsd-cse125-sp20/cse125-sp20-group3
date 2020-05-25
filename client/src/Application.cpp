@@ -441,8 +441,9 @@ void Application::InitDebugGui()
 	pDebugGui->AddWidget(GuiWidgets);
 
 	// Example usage
-	UIUtils::createImage("overlay", "why.png", 0, 0, float2((float)mSettings.mWidth / 1333, (float)mSettings.mHeight / 949), 0);
-
+	// UIUtils::createImage("overlay", "why.png", 0, 0, float2((float)mSettings.mWidth / 1333, (float)mSettings.mHeight / 949), 0);
+	UIUtils::createImage("overlay", "bottle.png", 250, 900, float2((float)mSettings.mWidth / 15000, (float)mSettings.mHeight / 12000), 0);
+	UIUtils::createImage("overlay1", "metal.png", 400, 900, float2((float)mSettings.mWidth / 15000, (float)mSettings.mHeight / 12000), 0);
 	UIUtils::loadTexture("WeirdBox_halo.png"); // Preload textures
 	UIUtils::createImage("start_button", "start.png", 1500, 400, float2(1,1), 1);
 	UIUtils::addCallbackToImage("start_button", []() { 
@@ -453,7 +454,7 @@ void Application::InitDebugGui()
 	});
 
 	UIUtils::loadFont("default font", "TitilliumText/TitilliumText-Bold.otf", 128); // All fonts must be loaded beforehand
-	UIUtils::createText("testText", "YEET", 500, 800, "default font", 0xff6655ff, 3);
+	//UIUtils::createText("testText", "YEET", 500, 800, "default font", 0xff6655ff, 3);
 }
 
 void Application::ToggleClient()

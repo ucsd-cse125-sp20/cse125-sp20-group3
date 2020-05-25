@@ -5,7 +5,7 @@ Team::Team(char color) {
 	winStatus = WIN_STATUS_NEUTRAL;
 	metalCount = 0;
 	plasticCount = 0;
-	baseHealth = 100;
+	baseHealth = 100; //TODO pointer to base and getHealth()? or have base set baseHealth?
 	minionCount = 0;
 	towerCount = 0;
 }
@@ -63,4 +63,8 @@ int Team::writeData(char buf[], int index) {
 	data.towerCount = this->towerCount;
 	((TeamData*)(buf + index))[0] = data;
 	return sizeof(TeamData);
+}
+
+void Team::print() {
+	std::cout << "team color: " << teamColor << " metal: " << metalCount << " plastic: " << plasticCount << " baseHealth: " << baseHealth << " minionCount: " << minionCount << " towerCount: " << towerCount << "\n";
 }

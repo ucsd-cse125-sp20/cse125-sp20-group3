@@ -33,6 +33,7 @@ public:
 
 	void setData(TeamData data);
 	int writeData(char buf[], int index);
+	void print();
 };
 
 #endif

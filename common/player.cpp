@@ -26,7 +26,6 @@ void Player::update(float deltaTime) {
 	velocity_z += (cos(rotation_y) * acceleration_z + sin(rotation_y) * acceleration_x) * deltaTime;
 	//printf("%f %f %f %f %f\n", velocity_x, velocity_z, acceleration_x, acceleration_z, deltaTime);
 
-	//TODO handle rotation stuff
 	if (sqrt(velocity_x * velocity_x + velocity_z * velocity_z) > 0.001) {
 		model[3] += vec4(velocity_x, 0, velocity_z, 0);
 	}
@@ -59,7 +58,7 @@ void Player::processInput(PlayerInput in) {
 			//TODO: do math to figure out where to build
 
 			switch (buildMode) { //build something based on buildMode
-			case LASER: //TODO: check plastic and metal cost against amount in team inventory
+			case LASER: //TODO: getNearestObject(position + forward, BUILD_NODE_FLAG)
 				if (team->checkResources(LASER_TYPE))//manager->spawnEntity(LASER_TYPE, x, z, y);
 				break;
 			case CLAW:
@@ -108,4 +107,6 @@ void Player::setEntData(EntityData data) {
 	//std::cout << "player actionState: " << (int)actionState << "\n";
 	//std::cout << "player move_dir x: " << move_dir.getX() << " z: " << move_dir.getZ() << "\n";
 	//TODO set run animation in move_dir taking into account forward vector
+
+	//this->team->print();
 }

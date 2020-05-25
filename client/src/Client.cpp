@@ -20,7 +20,6 @@ Client::Client(std::string servername) {
 	int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (iResult != 0) {
 		printf("WSAStartup failed with error: %d\n", iResult);
-		//TODO handle failure
 	}
 
 	ZeroMemory(&hints, sizeof(hints));
@@ -33,7 +32,6 @@ Client::Client(std::string servername) {
 	if (iResult != 0) {
 		printf("getaddrinfo failed with error: %d\n", iResult);
 		WSACleanup();
-		//TODO handle failure
 	}
 
 	// Attempt to connect to an address until one succeeds
@@ -45,7 +43,6 @@ Client::Client(std::string servername) {
 		if (ConnectSocket == INVALID_SOCKET) {
 			printf("socket failed with error: %ld\n", WSAGetLastError());
 			WSACleanup();
-			//TODO handle failure
 		}
 
 		// Connect to server.
@@ -65,7 +62,6 @@ Client::Client(std::string servername) {
 	if (ConnectSocket == INVALID_SOCKET) {
 		printf("Unable to connect to server!\n");
 		WSACleanup();
-		//TODO handle failure
 	}
 }
 
@@ -203,6 +199,8 @@ Client::UpData Client::recvAndFormatData() {
 		}
 		if (recvbuf[recvbuf.size() - 2] != DELIMITER || recvbuf[recvbuf.size() - 1] != DELIMITER) { //sanity check
 			std::cout << "double delimiter not found at end of recvbuf\n";
+			std::cout << "size: " << recvbuf.size() << "\n";
+			std::cout << "-2: " << recvbuf[recvbuf.size() - 2] << " 1: " << recvbuf[recvbuf.size() - 1] << "\n";
 		}
 	}
 

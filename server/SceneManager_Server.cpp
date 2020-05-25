@@ -200,8 +200,6 @@ int SceneManager_Server::encodeScene(char buf[], int start_index) {
 
 	int i = start_index;
 	for (std::pair<int, Entity*> idEntPair : idMap) { //iterate through all entities in scene
-		//std::cout << "id: " << idEntPair.first << "\n";
-
 		//std::cout << "writing id at i: " << i << "\n";
 		((int*)(buf + i))[0] = idEntPair.first;
 		i += sizeof(int);
@@ -775,29 +773,29 @@ void SceneManager_Server::testAttacking() {
 	SuperMinion* sm2 = new SuperMinion(data, id, blue_team, this);
 	idMap[id] = sm2;*/
 
-	id = next_claw_id;
+	/*id = next_claw_id;
 	next_claw_id++;
 	data = { 32.5, 67.5, 0 };
 	ClawTower* c1 = new ClawTower(data, id, red_team, this);
-	idMap[id] = c1;
+	idMap[id] = c1;*/
 
-	/*id = next_laser_id;
+	id = next_laser_id;
 	next_laser_id++;
 	data = { 30, 42, 0 };
-	LaserTower* l1 = new LaserTower(data, id, red_team, this);
+	LaserTower* l1 = new LaserTower(data, id, blue_team, this);
 	idMap[id] = l1;
 
 	id = next_laser_id;
 	next_laser_id++;
 	data = { 40, 46, 0 };
-	LaserTower* l2 = new LaserTower(data, id, blue_team, this);
+	LaserTower* l2 = new LaserTower(data, id, red_team, this);
 	idMap[id] = l2;
 
 	id = next_minion_id;
 	next_minion_id++;
 	data = { 20, 24, 0 };
-	Minion* m2 = new Minion(data, id, blue_team, this);
-	idMap[id] = m2;*/
+	Minion* m2 = new Minion(data, id, red_team, this);
+	idMap[id] = m2;
 }
 
 /***** legacy code *****/

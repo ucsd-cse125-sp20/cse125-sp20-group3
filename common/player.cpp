@@ -22,8 +22,8 @@ Player::Player(int id, Team* t, SceneManager_Server* sm) : Entity(id, PLAYER_HEA
 void Player::update(float deltaTime) {
 	//should only execute on the server
 	
-	velocity_x *= 0.9f;
-	velocity_z *= 0.9f;
+	velocity_x *= 0.8f;
+	velocity_z *= 0.8f;
 	velocity_x += (cos(rotation_y) * acceleration_x - sin(rotation_y) * acceleration_z) * deltaTime;
 	velocity_z += (cos(rotation_y) * acceleration_z + sin(rotation_y) * acceleration_x) * deltaTime;
 	//printf("%f %f %f %f %f\n", velocity_x, velocity_z, acceleration_x, acceleration_z, deltaTime);

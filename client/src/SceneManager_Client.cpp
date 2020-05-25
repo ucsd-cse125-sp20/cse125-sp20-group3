@@ -41,8 +41,13 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	gltfGeodes[DUMPSTER_GEODE] = conf_new(GLTFGeode, renderer, dumpsterFile);
 	gltfGeodes[RECYCLING_BIN_GEODE] = conf_new(GLTFGeode, renderer, recyclingBinFile);
 
-	///////////////////////////////////////////////////////////////////////////////
+	ozzGeodes[MINION_GEODE] = conf_new(OzzGeode, renderer, smallMinionDir);
+	((OzzObject*)ozzGeodes[MINION_GEODE]->obj)->SetClip(smallMinionActions[0]); // Set a default action
+	ozzGeodes[PLAYER_GEODE] = conf_new(OzzGeode, renderer, playerMaleDir);
+	((OzzObject*)ozzGeodes[PLAYER_GEODE]->obj)->SetClip(playerMaleActions[0]); // Set a default action
 
+	///////////////////////////////////////////////////////////////////////////////
+	
     // TODO This is a hard coded animation example. Remove this later (SMALL MINION)
 	int key = 9999999;
     ozzGeodes["blarf"] = conf_new(OzzGeode, renderer, smallMinionDir);
@@ -90,14 +95,14 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	this->addChild(t);
 	transforms[key] = t;
 	animators[key] = a;
-
+	
 	///////////////////////////////////////////////////////////////////////////////
 
 	trackedPlayer_ID = NO_TRACKED_PLAYER;
 
-	//transforms[GROUND_KEY] = conf_new(Transform, mat4::identity());
-	//transforms[GROUND_KEY]->addChild(gltfGeodes[ENV_GEODE]);
-	//this->addChild(transforms[GROUND_KEY]);
+	transforms[GROUND_KEY] = conf_new(Transform, mat4::identity());
+	transforms[GROUND_KEY]->addChild(gltfGeodes[ENV_GEODE]);
+	this->addChild(transforms[GROUND_KEY]);
 
 	red_team = new Team(RED_TEAM);
 	blue_team = new Team(BLUE_TEAM);
@@ -108,6 +113,8 @@ SceneManager_Client::~SceneManager_Client()
 	//printf("ASDFASDFASDF\n");
 	for (std::pair<int, Entity*> e : entityMap) conf_delete(e.second);
 	for (std::pair<int, LaserTower_Client*> t : laserTowerMap) conf_delete(t.second);
+	for (std::pair<int, Minion_Client*> m : minionMap) conf_delete(m.second);
+	for (std::pair<int, Player_Client*> p : playerMap) conf_delete(p.second);
 	for (std::pair<int, Transform*> t : transforms) conf_delete(t.second);
 	for (std::pair<int, Animator*> t : animators) conf_delete(t.second);
 	for (std::pair<std::string, GLTFGeode*> g : gltfGeodes) conf_delete(g.second);
@@ -152,25 +159,23 @@ void SceneManager_Client::updateScene(std::vector<Client::UpdateData> updateBuf)
 			if (ID_PLAYER_MIN <= data.id && data.id <= ID_PLAYER_MAX) {
 				std::cout << "creating new player, id: " << data.id << "\n";
 
-				idMap[data.id] = std::make_pair(++subid, EntityType::OTHER);
-				entityMap[subid] = conf_new(Player, data.id, team, nullptr);
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				Transform* adjustment = conf_new(Transform, mat4::rotationY(-PI / 2));
-
-				adjustment->addChild(gltfGeodes[PLAYER_GEODE]);
 				transforms[data.id]->addChild(adjustment);
 
 				otherTransforms.push_back(adjustment); //save to be deleted upon closing
+
+				idMap[data.id] = std::make_pair(++subid, EntityType::PLAYER);
+				playerMap[subid] = conf_new(Player_Client, data.id, team, nullptr, ozzGeodes[PLAYER_GEODE], adjustment);
 			}
 			else if (ID_BASE_MIN <= data.id && data.id <= ID_BASE_MAX) {
 				//idMap[id_str] = new Base();
 			}
 			else if (ID_MINION_MIN <= data.id && data.id <= ID_MINION_MAX) {
 				std::cout << "creating new minion, id: " << data.id << "\n";
-				idMap[data.id] = std::make_pair(++subid, EntityType::OTHER);
-				entityMap[subid] = conf_new(Minion, data.id, team, nullptr);
 				transforms[data.id] = conf_new(Transform, mat4::identity());
-				transforms[data.id]->addChild(gltfGeodes[MINION_GEODE]);
+				idMap[data.id] = std::make_pair(++subid, EntityType::MINION);
+				minionMap[subid] = conf_new(Minion_Client, data.id, team, nullptr, renderer, ozzGeodes[MINION_GEODE], transforms[data.id], particleRootSignature);
 			}
 			else if (ID_SUPER_MINION_MIN <= data.id && data.id <= ID_SUPER_MINION_MAX) {
 				std::cout << "creating new super minion, id: " << data.id << "\n";
@@ -216,22 +221,37 @@ void SceneManager_Client::updateScene(std::vector<Client::UpdateData> updateBuf)
 		if (data.ent_data.health <= 0) { //updated health marks entity as dead
 			//TODO play death animation
 
-			this->removeChild(transforms[data.id]);
-
 			int id = idMap[data.id].first;
 			switch (idMap[data.id].second) {
+			case EntityType::PLAYER:
+				this->removeChild(transforms[data.id]);
+				conf_delete(playerMap[id]);
+				playerMap.erase(id);
+				idMap.erase(data.id);
+				conf_delete(transforms[data.id]);
+				transforms.erase(data.id);
+				break;
 			case EntityType::LASER_TOWER:
+				this->removeChild(transforms[data.id]);
 				conf_delete(laserTowerMap[id]);
 				laserTowerMap.erase(id);
+				idMap.erase(data.id);
+				conf_delete(transforms[data.id]);
+				transforms.erase(data.id);
+				break;
+			case EntityType::MINION:
+				deathlist.push_back(data.id);
+				minionMap[id]->kill();
 				break;
 			case EntityType::OTHER:
-				//conf_delete(entityMap[id]);
-				//entityMap.erase(id);
+				this->removeChild(transforms[data.id]);
+				conf_delete(entityMap[id]);
+				entityMap.erase(id);
+				idMap.erase(data.id);
+				conf_delete(transforms[data.id]);
+				transforms.erase(data.id);
 				break;
 			}
-			//idMap.erase(data.id);
-			conf_delete(transforms[data.id]);
-			transforms.erase(data.id);
 		}
 		else { //otherwise, update the entity's data and transform
 			int id = idMap[data.id].first;
@@ -239,11 +259,23 @@ void SceneManager_Client::updateScene(std::vector<Client::UpdateData> updateBuf)
 			case EntityType::LASER_TOWER:
 				laserTowerMap[id]->setEntData(data.ent_data);
 				if (laserTowerMap[id]->getActionState() == LASER_ACTION_FIRE) {
-					print(entityMap[idMap[laserTowerMap[id]->getTargetID()].first]->getMatrix());
-					print(laserTowerMap[id]->getMatrix());
-					laserTowerMap[id]->activate(entityMap[idMap[laserTowerMap[id]->getTargetID()].first]->getPosition());
+					//print(entityMap[idMap[laserTowerMap[id]->getTargetID()].first]->getMatrix());
+					//print(laserTowerMap[id]->getMatrix());
+					laserTowerMap[id]->activate(minionMap[idMap[laserTowerMap[id]->getTargetID()].first]->getPosition());
 				}
 				transforms[data.id]->setMatrix(laserTowerMap[id]->getMatrix());
+				break;
+			case EntityType::MINION:
+				minionMap[id]->setEntData(data.ent_data);
+				if (minionMap[id]->getActionState() == MINION_ACTION_FIRE) {
+					minionMap[id]->setEntData(data.ent_data);
+					minionMap[id]->shoot();
+				}
+				transforms[data.id]->setMatrix(minionMap[id]->getMatrix());
+				break;
+			case EntityType::PLAYER:
+				playerMap[id]->setEntData(data.ent_data);
+				transforms[data.id]->setMatrix(playerMap[id]->getMatrix());
 				break;
 			case EntityType::OTHER:
 				entityMap[id]->setEntData(data.ent_data);
@@ -251,6 +283,34 @@ void SceneManager_Client::updateScene(std::vector<Client::UpdateData> updateBuf)
 				break;
 			}
 		}
+		
+		// Post death processing
+		std::vector<int> toRemove = std::vector<int>();
+		for (auto mapID : deathlist) {
+			int id = idMap[mapID].first;
+			switch (idMap[mapID].second) {
+			case EntityType::MINION:
+				// We can suspend removal here to play a death animation
+				if (!minionMap[id]->alive) {
+					this->removeChild(transforms[mapID]);
+					//conf_delete(minionMap[id]);							// TODO Memory issues here. Possibly fix by optimizing texture usage
+					//minionMap.erase(id);
+					idMap.erase(mapID);
+					conf_delete(transforms[mapID]);
+					transforms.erase(mapID);
+					toRemove.push_back(mapID);
+				}
+				else {
+					(minionMap[id]->deathCounter)--;
+					// This is a hack. There's an issue where the tower tries to shoot at the minion after it's been removed
+					if (minionMap[id]->deathCounter == 0) {
+						minionMap[id]->alive = false;
+					}
+				}
+				break;
+			}
+		}
+		for (auto id : toRemove) deathlist.erase(std::remove(deathlist.begin(), deathlist.end(), id), deathlist.end());
 	}
 }
 
@@ -300,6 +360,9 @@ void SceneManager_Client::setProgram(SceneManager_Client::GeodeType type, Geode:
 		for (auto ltower : laserTowerMap) {
 			ltower.second->setProgram(program);
 		}
+		for (auto minion : minionMap) {
+			minion.second->setProgram(program);
+		}
 		break;
 	}
 }
@@ -319,8 +382,8 @@ mat4 SceneManager_Client::getPlayerTransformMat() {
 
 void SceneManager_Client::update(float deltaTime)
 {
-	if (counter % 100 == 0) animators[9999999]->SetClip(smallMinionActions[animCounter]);
-	if (counter++ % 100 == 0) animators[8888888]->SetClip(superMinionActions[animCounter = (animCounter + 1) % 2]);
+	//if (counter % 100 == 0) animators[9999999]->SetClip(smallMinionActions[animCounter]);
+	//if (counter++ % 100 == 0) animators[8888888]->SetClip(superMinionActions[animCounter = (animCounter + 1) % 2]);
 	Transform::update(deltaTime);
 }
 

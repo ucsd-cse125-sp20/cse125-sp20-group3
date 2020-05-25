@@ -58,7 +58,7 @@ void LaserTower::attack() {
 
 void LaserTower::setEntData(EntityData data) {
 	Entity::setEntData(data);
-	std::cout << "laser " << id << " targetID: " << attackTargetID << "\n";
+	//std::cout << "laser " << id << " targetID: " << attackTargetID << "\n";
 }
 
 /* TESTING SPECIFIC FUNCTIONALITY - DO NOT USE */

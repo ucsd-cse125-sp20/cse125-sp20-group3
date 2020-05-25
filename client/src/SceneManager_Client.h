@@ -18,9 +18,9 @@
 #include "../../common/GameObject.h"
 #include "../../common/entity.h"
 #include "../../common/team.h"
-#include "../../common/player.h"
+#include "../../common/player_client.h"
 #include "../../common/base.h"
-#include "../../common/minion.h"
+#include "../../common/minion_client.h"
 #include "../../common/SuperMinion.h"
 #include "../../common/tower.h"
 #include "../../common/lasertower_client.h"
@@ -44,20 +44,23 @@
 class SceneManager_Client : public Transform
 {
 private:
-	enum EntityType {
-		LASER_TOWER, OTHER
+	enum class EntityType {
+		PLAYER, LASER_TOWER, MINION, OTHER
 	};
 
 	uint32_t subid = 0;
 
 	std::map<int, std::pair<uint32_t, EntityType>> idMap;
 	std::map<uint32_t, Entity*> entityMap;
+	std::map<uint32_t, Player_Client*> playerMap;
 	std::map<uint32_t, LaserTower_Client*> laserTowerMap;
+	std::map<uint32_t, Minion_Client*> minionMap;
 	std::map<int, Transform*> transforms;
 	std::map<int, Animator*> animators;
 	std::map<std::string, GLTFGeode*> gltfGeodes;
 	std::map<std::string, OzzGeode*> ozzGeodes;
 	std::map<std::string, ParticleSystemGeode*> particleGeodes;
+	std::vector<int> deathlist;
 	int trackedPlayer_ID;
 
 	std::vector<Transform*> otherTransforms;

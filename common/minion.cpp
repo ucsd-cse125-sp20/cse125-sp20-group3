@@ -144,7 +144,7 @@ void Minion::move(float deltaTime) {
 
 void Minion::setEntData(EntityData data) {
 	Entity::setEntData(data);
-	std::cout << "minion " << id << " targetID: " << attackTargetID << "\n";
+	//std::cout << "minion " << id << " targetID: " << attackTargetID << "\n";
 }
 
 /* TESTING SPECIFIC FUNCTIONALITY - DO NOT USE */

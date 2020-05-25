@@ -46,11 +46,11 @@ void LaserTower_Client::activate(vec3 target)
 	((ParticleSystem*)laser->obj)->setInitilizer(initializer);
 	((ParticleSystem*)laser->obj)->setLife(length(laserPosition - target) / LASER_TOWER_BEAM_SPEED);
 	((ParticleSystem*)laser->obj)->reset(0, 1);
-	printf("%f\n", (float)length(laserPosition - target));
+	//printf("%f\n", (float)length(laserPosition - target));
 	
 	laserTransform->setPositionDirection(LASER_TOWER_BEAM_OFFSET, target - laserPosition);
-	print(target - laserPosition);
-	print(laserTransform->getMatrix());
+	//print(target - laserPosition);
+	//print(laserTransform->getMatrix());
 
 	laserTransform->activate(LASER_TOWER_BEAM_TIMEOUT);
 }

@@ -19,6 +19,7 @@
 
 #include "../../common/entity.h"
 #include "../../common/player.h"
+#include "../../common/team.h"
 #include <vector>
 #include <map>
 
@@ -31,15 +32,29 @@ class Client {
 private:
 	SOCKET ConnectSocket = INVALID_SOCKET;
 public:
-	struct UpdateData {
+	struct IDEntData {
 		int id;
 		Entity::EntityData ent_data;
+	};
+
+	struct StateUpdateData {
+		Team::TeamData redTeamData;
+		Team::TeamData blueTeamData;
+	};
+
+	struct SceneUpdateData {
+		std::vector<IDEntData> entUpdates;
+	};
+
+	struct UpData {
+		StateUpdateData stateUpdate;
+		SceneUpdateData sceneUpdate;
 	};
 
 	Client(std::string servername); //establish connection with given server
 	int sendData(char sendbuf[], int buflen, int flags); //send data to client's connected server
 	//int recvData(char recvbuf[], int buflen, int flags); //recv data from client's connected server
 	int recvPlayerID();
-	std::vector<UpdateData> recvAndFormatData();
+	UpData recvAndFormatData();
 	int closeConnection(int how); //close client's connection with server
 };

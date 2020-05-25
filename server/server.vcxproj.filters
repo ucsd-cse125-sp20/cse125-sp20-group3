@@ -63,7 +63,13 @@
     <ClCompile Include="..\common\superminion.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\mapNode.cpp">
+    <ClCompile Include="..\common\wallNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\buildNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\pathNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -116,7 +122,13 @@
     <ClInclude Include="..\common\superminion.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\mapNode.h">
+    <ClInclude Include="..\common\wallNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\buildNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\pathNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

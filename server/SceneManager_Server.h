@@ -18,7 +18,10 @@
 #include "../common/resource.h"
 
 #include "../common/ObjectDetection.h"
-#include "../common/mapNode.h"
+#include "../common/pathNode.h"
+#include "../common/buildNode.h"
+#include "../common/wallNode.h"
+
 
 class SceneManager_Server {
 private:
@@ -28,9 +31,12 @@ private:
 
 public:
 	std::map<int, Entity*> idMap;
-	std::vector<mapNode*> *map;
+	std::vector<pathNode*> pathNodes;
+	std::vector<wallNode*> wallNodes;
+	std::vector<buildNode*> buildNodes;
 
 	SceneManager_Server();
+	~SceneManager_Server();
 	void processInput(int player_id, PlayerInput in);
 	bool addPlayer(int player_id);
 	void spawnEntity(char spawnType, float pos_x, float pos_z, float rot_y, Team* t);
@@ -39,10 +45,12 @@ public:
 	int encodeState(char buf[], int start_index);
 	int encodeScene(char buf[], int start_index);
 
+	void populatePaths();
+	void populateWalls();
+	void populateBuilds();
+
 	void populateScene();
 	void testAttacking();
-
-	void populateMap();
 };
 
 #endif

@@ -11,8 +11,6 @@
 
 #define MOVE_SPEED 1
 
-#define PLAYER_ACTION_NONE 0 //player animations are handled based on movement direction, so actionState isn't relevant
-
 class Player : public Entity {
 private:
 	enum BUILD_MODE { NEUTRAL, LASER, CLAW, SUPER_MINION };
@@ -27,7 +25,7 @@ public:
 		float velocity_z;
 	};*/
 
-    Player(int id, Team* t, SceneManager_Server* sm);
+    Player(GameObjectData data, int id, Team* t, SceneManager_Server* sm);
 	
     void update(float deltaTime) override; //server-side state management
 	void processInput(PlayerInput in);

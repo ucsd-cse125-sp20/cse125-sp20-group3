@@ -5,7 +5,7 @@
 
 class SuperMinion : public Minion {
 public:
-	SuperMinion(int id, Team* t, SceneManager_Server* sm_server);
+	SuperMinion(GameObjectData data, int id, Team* t, SceneManager_Server* sm_server);
 };
 
 #endif

@@ -21,9 +21,6 @@ int __cdecl main(void)
 	SceneManager_Server* manager = new SceneManager_Server();
 	Server* server = new Server(manager);
 
-	// populate map
-	manager->populateMap();
-
     // Game State data
 	std::chrono::steady_clock::time_point lastTime = std::chrono::steady_clock::now();
 	float deltaTime;
@@ -60,8 +57,8 @@ int __cdecl main(void)
 
 		/* Send updated data back to clients */
 		int statebufSize = manager->encodeState(sendbuf, 0);
-		int sendbufSize = manager->encodeScene(sendbuf, statebufSize) + statebufSize;
-		std::cout << "sendbufSize: " << sendbufSize << std::endl;
+		int sendbufSize = manager->encodeScene(sendbuf, statebufSize);
+		//std::cout << "sendbufSize: " << sendbufSize << std::endl;
 		char sizebuf[4];
 		((int*)sizebuf)[0] = sendbufSize; //push size of data packet to players
 		server->pushDataAll(sizebuf, sizeof(int), 0); //and then push data packet

@@ -1,16 +1,21 @@
 #include "clawtower.h"
 #include "../server/SceneManager_Server.h"
 
-ClawTower::ClawTower(int id, Team* t, SceneManager_Server* sm_server) : Tower(id, CLAW_TOWER_HEALTH, CLAW_TOWER_ATTACK, t, sm_server) {
-	actionState = CLAW_ACTION_IDLE;
-
-	spawnPoint = this->getPosition() + vec3(2.f, 0, 2.f); //TODO find nearest path location and use as spawn point
+ClawTower::ClawTower(GameObjectData data, int id, Team* t, SceneManager_Server* sm_server) : Tower(data, id, CLAW_TOWER_HEALTH, CLAW_TOWER_ATTACK, t, sm_server) {
 	spawnInterval = CLAW_SPAWN_INTERVAL; //interval between minion spawns
+
+	if (sm_server != nullptr) {
+		std::cout << "x: " << this->getPosition().getX() << " z: " << this->getPosition().getZ() << "\n";
+
+		GameObject* nearPathNode = ObjectDetection::getNearestObject(this, DETECTION_FLAG_PATH_NODE, 0);
+		if (nearPathNode == nullptr) std::cout << "claw tower " << id << " couldn't find a nearby path!\n";
+		else std::cout << "claw tower " << id << " using x: " << nearPathNode->getPosition().getX() << " z: " << nearPathNode->getPosition().getZ() << " as spawnPoint\n";
+		spawnPoint = nearPathNode->getPosition();
+	}
 }
 
 void ClawTower::update(float deltaTime) {
 	timeElapsed += deltaTime;
-	actionState = CLAW_ACTION_SPAWN;
 
 	if (timeElapsed >= spawnInterval) {
 		std::cout << "claw " << id << " spawning at x: " << spawnPoint.getX() << " z: " << spawnPoint.getZ() << "\n";
@@ -18,7 +23,7 @@ void ClawTower::update(float deltaTime) {
 		timeElapsed = 0;
 	}
 
-	ObjectDetection::updateObject(this);
+	//ObjectDetection::updateObject(this);
 }
 
 void ClawTower::setEntData(EntityData data) {

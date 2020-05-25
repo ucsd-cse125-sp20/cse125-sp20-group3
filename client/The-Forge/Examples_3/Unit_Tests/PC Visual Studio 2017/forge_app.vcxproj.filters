@@ -120,7 +120,13 @@
     <ClCompile Include="..\..\..\..\..\common\ObjectDetection.cpp">
       <Filter>Source Files\Server Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\common\mapNode.cpp">
+    <ClCompile Include="..\..\..\..\..\common\pathNode.cpp">
+      <Filter>Source Files\Server Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\buildNode.cpp">
+      <Filter>Source Files\Server Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\wallNode.cpp">
       <Filter>Source Files\Server Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -301,7 +307,13 @@
     <ClInclude Include="..\..\..\..\..\server\SceneManager_Server.h">
       <Filter>Header Files\Server Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\common\mapNode.h">
+    <ClInclude Include="..\..\..\..\..\common\pathNode.h">
+      <Filter>Header Files\Server Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\buildNode.h">
+      <Filter>Header Files\Server Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\wallNode.h">
       <Filter>Header Files\Server Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -96,11 +96,22 @@ void SceneManager_Client::createMaterialResources(SceneManager_Client::GeodeType
 	}
 }
 
-void SceneManager_Client::updateScene(std::vector<Client::UpdateData> updateBuf)
+void SceneManager_Client::updateStateAndScene(Client::UpData data) {
+	this->updateState(data.stateUpdate);
+	this->updateScene(data.sceneUpdate);
+}
+
+void SceneManager_Client::updateState(Client::StateUpdateData updateData) {
+	red_team->setData(updateData.redTeamData);
+	blue_team->setData(updateData.blueTeamData);
+}
+
+void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 {
 	//std::cout << "updating from client buf of size " << updateBuf.size() << "\n";
-	for (Client::UpdateData data : updateBuf) {
+	for (Client::IDEntData data : updateData.entUpdates) {
 		if (idMap.find(data.id) == idMap.end()) { //new id encountered, spawn new object
+			GameObject::GameObjectData GO_data = data.ent_data.GO_data;
 			Team* team;
 			if (data.ent_data.teamColor == RED_TEAM) team = red_team;
 			else if (data.ent_data.teamColor == BLUE_TEAM) team = blue_team;
@@ -109,7 +120,7 @@ void SceneManager_Client::updateScene(std::vector<Client::UpdateData> updateBuf)
 			if (ID_PLAYER_MIN <= data.id && data.id <= ID_PLAYER_MAX) {
 				std::cout << "creating new player, id: " << data.id << "\n";
 
-				idMap[data.id] = conf_new(Player, data.id, team, nullptr);
+				idMap[data.id] = conf_new(Player, GO_data, data.id, team, nullptr);
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				Transform* adjustment = conf_new(Transform, mat4::rotationY(-PI / 2));
 
@@ -123,37 +134,37 @@ void SceneManager_Client::updateScene(std::vector<Client::UpdateData> updateBuf)
 			}
 			else if (ID_MINION_MIN <= data.id && data.id <= ID_MINION_MAX) {
 				std::cout << "creating new minion, id: " << data.id << "\n";
-				idMap[data.id] = conf_new(Minion, data.id, team, nullptr);
+				idMap[data.id] = conf_new(Minion, GO_data, data.id, team, nullptr);
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				transforms[data.id]->addChild(gltfGeodes[MINION_GEODE]);
 			}
 			else if (ID_SUPER_MINION_MIN <= data.id && data.id <= ID_SUPER_MINION_MAX) {
 				std::cout << "creating new super minion, id: " << data.id << "\n";
-				idMap[data.id] = conf_new(SuperMinion, data.id, team, nullptr);
+				idMap[data.id] = conf_new(SuperMinion, GO_data, data.id, team, nullptr);
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				transforms[data.id]->addChild(gltfGeodes[SUPER_MINION_GEODE]);
 			}
 			else if (ID_LASER_MIN <= data.id && data.id <= ID_LASER_MAX) {
 				std::cout << "creating new laser tower, id: " << data.id << "\n";
-				idMap[data.id] = conf_new(LaserTower, data.id, team, nullptr);
+				idMap[data.id] = conf_new(LaserTower, GO_data, data.id, team, nullptr);
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				transforms[data.id]->addChild(gltfGeodes[LASER_TOWER_GEODE]);
 			}
 			else if (ID_CLAW_MIN <= data.id && data.id <= ID_CLAW_MAX) {
 				std::cout << "creating new claw tower, id: " << data.id << "\n";
-				idMap[data.id] = conf_new(ClawTower, data.id, team, nullptr);
+				idMap[data.id] = conf_new(ClawTower, GO_data, data.id, team, nullptr);
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				transforms[data.id]->addChild(gltfGeodes[CLAW_TOWER_GEODE]);
 			}
 			else if (ID_DUMPSTER_MIN <= data.id && data.id <= ID_DUMPSTER_MAX) {
 				std::cout << "creating new dumpster, id: " << data.id << "\n";
-				idMap[data.id] = conf_new(Resource, DUMPSTER_TYPE, data.id, nullptr);
+				idMap[data.id] = conf_new(Resource, DUMPSTER_TYPE, GO_data, data.id, nullptr);
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				transforms[data.id]->addChild(gltfGeodes[DUMPSTER_GEODE]);
 			}
 			else if (ID_RECYCLING_BIN_MIN <= data.id && data.id <= ID_RECYCLING_BIN_MAX) {
 				std::cout << "creating new recycling bin id: " << data.id << "\n";
-				idMap[data.id] = conf_new(Resource, RECYCLING_BIN_TYPE, data.id, nullptr);
+				idMap[data.id] = conf_new(Resource, RECYCLING_BIN_TYPE, GO_data, data.id, nullptr);
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				transforms[data.id]->addChild(gltfGeodes[RECYCLING_BIN_GEODE]);
 			}
@@ -161,7 +172,7 @@ void SceneManager_Client::updateScene(std::vector<Client::UpdateData> updateBuf)
 			this->addChild(transforms[data.id]);
 		}
 		
-		if (data.ent_data.health <= 0) { //updated health marks entity as dead
+		if (data.ent_data.health <= 0) { //if updated health marks entity as dead
 			//TODO play death animation
 
 			this->removeChild(transforms[data.id]);

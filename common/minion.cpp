@@ -8,7 +8,9 @@ Minion::Minion(GameObjectData data, int id, Team* t, SceneManager_Server* sm) : 
 	doneMoving = false;
 
 	if (sm != nullptr) { //only execute on server
-		destNode = (pathNode*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_PATH_NODE, 50); //TODO unbounded radius check
+		t->incMinion();
+
+		destNode = (pathNode*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_PATH_NODE, 10);
 
 		int flags = DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE | DETECTION_FLAG_MINION | 
 					DETECTION_FLAG_MINION_TARGET | DETECTION_FLAG_LASER_TARGET;
@@ -25,7 +27,9 @@ Minion::Minion(GameObjectData data, int id, int health, int attack, int range, f
 	doneMoving = false;
 
 	if (sm != nullptr) { //only execute on server
-		destNode = (pathNode*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_PATH_NODE, 50); //TODO unbounded radius check
+		t->incMinion();
+
+		destNode = (pathNode*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_PATH_NODE, 10);
 
 		int flags = DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE | DETECTION_FLAG_MINION |
 					DETECTION_FLAG_MINION_TARGET | DETECTION_FLAG_LASER_TARGET;
@@ -67,7 +71,7 @@ void Minion::update(float deltaTime) { //should they be able to switch attack ta
 		actionState = ACTION_STATE_ATTACK;
 
 		//first face the attack target, regardless of timeElapsed
-		vec3 forward = normalize(attackTarget->getPosition() - this->getPosition()); //TODO check vectors?
+		vec3 forward = normalize(attackTarget->getPosition() - this->getPosition());
 		vec3 right = cross(forward, vec3(0, 1, 0));
 		model[0] = vec4(right, 0);
 		model[2] = vec4(-forward, 0);
@@ -117,7 +121,7 @@ void Minion::move(float deltaTime) {
 		model[3][2] += move_vec[2];
 		//if (doneMoving) std::cout << "x: " << model[3][0] << " z: " << model[3][2] << "\n";
 		remaining_move_dist -= move_dist; //decrease remaining movement distance
-		vec3 forward = normalize(vec3(model[3][0] - lastXPos, 0, model[3][2] - lastZPos)); //TODO check vectors?
+		vec3 forward = normalize(vec3(model[3][0] - lastXPos, 0, model[3][2] - lastZPos));
 		vec3 right = cross(forward, vec3(0, 1, 0));
 		model[0] = vec4(right, 0);
 		model[2] = vec4(-forward, 0);

@@ -73,7 +73,9 @@ public:
 
 	void createMaterialResources(SceneManager_Client::GeodeType type, RootSignature* pRootSignature, DescriptorSet* pBindlessTexturesSamplersSet, Sampler* defaultSampler);
 
-	void updateScene(std::vector<Client::UpdateData> updateBuf);
+	void updateStateAndScene(Client::UpData data);
+	void updateState(Client::StateUpdateData updateData);
+	void updateScene(Client::SceneUpdateData updateData);
 	void updateFromInputBuf(float deltaTime);
 
 	void setBuffer(SceneManager_Client::SceneBuffer type, Buffer** buffers); // TODO Could probably mange instance buffers within class, rather than app

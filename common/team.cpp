@@ -5,7 +5,7 @@ Team::Team(char color) {
 	winStatus = WIN_STATUS_NEUTRAL;
 	metalCount = 0;
 	plasticCount = 0;
-	baseHealth = 100;
+	baseHealth = 100; //TODO pointer to base and getHealth()? or have base set baseHealth?
 	minionCount = 0;
 	towerCount = 0;
 }
@@ -42,4 +42,29 @@ bool Team::checkResources(char entityType) {
 		std::cout << "Invalid entityType of " << entityType << " passed to team->checkResources!\n";
 		return false;
 	}
+}
+
+void Team::setData(TeamData data) {
+	this->teamColor = data.teamColor;
+	this->metalCount = data.metalCount;
+	this->plasticCount = data.plasticCount;
+	this->baseHealth = data.baseHealth;
+	this->minionCount = data.minionCount;
+	this->towerCount = data.towerCount;
+}
+
+int Team::writeData(char buf[], int index) {
+	TeamData data;
+	data.teamColor = this->teamColor;
+	data.metalCount = this->metalCount;
+	data.plasticCount = this->plasticCount;
+	data.baseHealth = this->baseHealth;
+	data.minionCount = this->minionCount;
+	data.towerCount = this->towerCount;
+	((TeamData*)(buf + index))[0] = data;
+	return sizeof(TeamData);
+}
+
+void Team::print() {
+	std::cout << "team color: " << teamColor << " metal: " << metalCount << " plastic: " << plasticCount << " baseHealth: " << baseHealth << " minionCount: " << minionCount << " towerCount: " << towerCount << "\n";
 }

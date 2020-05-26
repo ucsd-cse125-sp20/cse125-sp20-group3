@@ -6,9 +6,12 @@ LaserTower::LaserTower(GameObjectData data, int id, Team* t, SceneManager_Server
 	
 	attackRange = LASER_FIRE_RANGE;
 	attackInterval = LASER_FIRE_INTERVAL; //interval between firing at attack target
+
+	std::cout << "laser tower " << id << " at " << getPosition().getX() << " " << getPosition().getZ() << "\n";
 }
 
 void LaserTower::update(float deltaTime) { //should they be able to switch attack targets instantaneously?
+	//std::cout << "laser " << id << " at " << getPosition().getX() << " " << getPosition().getZ() << "\n";
 
 	if (attackTarget != nullptr &&																//first, if targeting something
 			(!manager->checkEntityAlive(attackTargetID) ||										//but either target is dead

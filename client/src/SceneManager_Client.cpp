@@ -177,9 +177,13 @@ SceneManager_Client::~SceneManager_Client()
 {
 	//printf("ASDFASDFASDF\n");
 	for (std::pair<int, Entity*> e : entityMap) conf_delete(e.second);
-	for (std::pair<int, LaserTower_Client*> t : laserTowerMap) conf_delete(t.second);
-	for (std::pair<int, Minion_Client*> m : minionMap) conf_delete(m.second);
 	for (std::pair<int, Player_Client*> p : playerMap) conf_delete(p.second);
+	for (std::pair<int, Minion_Client*> m : minionMap) conf_delete(m.second);
+	//super_minion
+	for (std::pair<int, LaserTower_Client*> t : laserTowerMap) conf_delete(t.second);
+	//claw_tower
+	//dumpster
+	//recycling_bin
 	for (std::pair<int, Transform*> t : transforms) conf_delete(t.second);
 	for (std::pair<int, Animator*> t : animators) conf_delete(t.second);
 	for (std::pair<std::string, GLTFGeode*> g : gltfGeodes) conf_delete(g.second);
@@ -238,6 +242,9 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				Transform* adjustment = conf_new(Transform, mat4::rotationY(-PI / 2));
 				transforms[data.id]->addChild(adjustment);
+				//Transform* interact = conf_new(Transform, mat4::translation(vec3(0, 0, -5.0f)));
+				//interact->addChild(gltfGeodes[DUMPSTER_GEODE]);
+				//adjustment->addChild(interact);
 
 				otherTransforms.push_back(adjustment); //save to be deleted upon closing
 
@@ -338,7 +345,7 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 					AudioManager::playAudioSource(laserTowerMap[id]->getPosition(), "laser");
 					laserTowerMap[id]->activate(minionMap[idMap[laserTowerMap[id]->getTargetID()].first]->getPosition());
 				}
-				transforms[data.id]->setMatrix(mat4::translation(vec3(-20,0,0)) * laserTowerMap[id]->getMatrix()); // TODO remove translation
+				transforms[data.id]->setMatrix(laserTowerMap[id]->getMatrix());
 				break;
 			case EntityType::MINION:
 				minionMap[id]->setEntData(data.ent_data);
@@ -346,7 +353,7 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 					minionMap[id]->setEntData(data.ent_data);
 					minionMap[id]->shoot();
 				}
-				transforms[data.id]->setMatrix(mat4::translation(vec3(-20, 0, 0))* minionMap[id]->getMatrix()); // TODO remove translation
+				transforms[data.id]->setMatrix(minionMap[id]->getMatrix());
 				break;
 			case EntityType::PLAYER:
 				playerMap[id]->setEntData(data.ent_data);

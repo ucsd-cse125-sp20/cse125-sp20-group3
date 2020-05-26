@@ -44,6 +44,13 @@ bool Team::checkResources(char entityType) {
 	}
 }
 
+void Team::addResource(char type, int amount) {
+	std::cout << teamColor << " team added " << amount << " of " << type << "\n";
+	if (type == METAL_RES_TYPE) metalCount += amount;
+	else if (type == PLASTIC_RES_TYPE) plasticCount += amount;
+	else std::cout << teamColor << " team tried to add resource type " << type << "\n";
+}
+
 void Team::setData(TeamData data) {
 	this->teamColor = data.teamColor;
 	this->metalCount = data.metalCount;
@@ -51,6 +58,8 @@ void Team::setData(TeamData data) {
 	this->baseHealth = data.baseHealth;
 	this->minionCount = data.minionCount;
 	this->towerCount = data.towerCount;
+
+	//print();
 }
 
 int Team::writeData(char buf[], int index) {

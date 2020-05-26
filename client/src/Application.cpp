@@ -225,12 +225,20 @@ bool Application::InitSceneResources()
 	scene->setBuffer(SceneManager_Client::SceneBuffer::BONE, pUniformBufferBones);
 	scene->setBuffer(SceneManager_Client::SceneBuffer::PARTICLES, pParticleBuffer);
 
+	AudioManager::initialize(scene);
+	AudioManager::setGlobalVolume(0.5f);
+	AudioManager::loadWav("loop.wav", "bg");
+	AudioManager::loadWav("laser.wav", "laser");
+	AudioManager::setLoop("bg");
+
 	return true;
 }
 
 void Application::RemoveSceneResources()
 {
 	conf_delete(scene);
+
+	AudioManager::exit();
 }
 
 // ======================================================================================================
@@ -491,6 +499,7 @@ bool Application::Init()
 		fsSetRelativePathForResourceDirectory(RD_MESHES, "../Assets/Meshes");
 		fsSetRelativePathForResourceDirectory(RD_BUILTIN_FONTS, "../Assets/Fonts");
 		fsSetRelativePathForResourceDirectory(RD_ANIMATIONS, "../Assets/Animation");
+		fsSetRelativePathForResourceDirectory(RD_AUDIO, "../Assets/Audio");
 		fsSetRelativePathForResourceDirectory(RD_MIDDLEWARE_TEXT, "../The-Forge/Middleware_3/Text");
 		fsSetRelativePathForResourceDirectory(RD_MIDDLEWARE_UI, "../The-Forge/Middleware_3/UI");
 	}
@@ -1080,6 +1089,8 @@ void Application::Update(float deltaTime)
 		scene->updateFromInputBuf(deltaTime);
 	}
 	scene->update(deltaTime);
+
+	AudioManager::update();
 
 	/************************************************************************/
 	// Uniform Data Updates

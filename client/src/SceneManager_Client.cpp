@@ -23,7 +23,7 @@ namespace {
 	const char* playerFemaleDir = "female-char";
 	const char* playerFemaleActions[2] = { "Idle", "Walking" };
 
-	int counter = 0;
+	int counter = 1;
 	int animCounter = 1;
 }
 
@@ -333,8 +333,7 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 			case EntityType::LASER_TOWER:
 				laserTowerMap[id]->setEntData(data.ent_data);
 				if (laserTowerMap[id]->getActionState() == ACTION_STATE_FIRE) {
-					//print(entityMap[idMap[laserTowerMap[id]->getTargetID()].first]->getMatrix());
-					//print(laserTowerMap[id]->getMatrix());
+					AudioManager::playAudioSource(laserTowerMap[id]->getPosition(), "laser");
 					laserTowerMap[id]->activate(minionMap[idMap[laserTowerMap[id]->getTargetID()].first]->getPosition());
 				}
 				transforms[data.id]->setMatrix(mat4::translation(vec3(-20,0,0)) * laserTowerMap[id]->getMatrix()); // TODO remove translation
@@ -457,6 +456,7 @@ mat4 SceneManager_Client::getPlayerTransformMat() {
 void SceneManager_Client::update(float deltaTime)
 {
 	if (counter % 100 == 0) animators[9999999]->SetClip(smallMinionActions[animCounter]);
+	//if (counter % 100 == 0)	AudioManager::playAudioSource(vec3(0), "laser");
 	if (counter++ % 100 == 0) animators[8888888]->SetClip(superMinionActions[animCounter = (animCounter + 1) % 3]);
 	Transform::update(deltaTime);
 }

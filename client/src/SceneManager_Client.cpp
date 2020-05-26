@@ -240,6 +240,9 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				Transform* adjustment = conf_new(Transform, mat4::rotationY(-PI / 2));
 				transforms[data.id]->addChild(adjustment);
+				//Transform* interact = conf_new(Transform, mat4::translation(vec3(0, 0, -5.0f)));
+				//interact->addChild(gltfGeodes[DUMPSTER_GEODE]);
+				//adjustment->addChild(interact);
 
 				otherTransforms.push_back(adjustment); //save to be deleted upon closing
 
@@ -341,7 +344,7 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 					//print(laserTowerMap[id]->getMatrix());
 					laserTowerMap[id]->activate(minionMap[idMap[laserTowerMap[id]->getTargetID()].first]->getPosition());
 				}
-				transforms[data.id]->setMatrix(mat4::translation(vec3(-20,0,0)) * laserTowerMap[id]->getMatrix()); // TODO remove translation
+				transforms[data.id]->setMatrix(laserTowerMap[id]->getMatrix());
 				break;
 			case EntityType::MINION:
 				minionMap[id]->setEntData(data.ent_data);
@@ -349,7 +352,7 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 					minionMap[id]->setEntData(data.ent_data);
 					minionMap[id]->shoot();
 				}
-				transforms[data.id]->setMatrix(mat4::translation(vec3(-20, 0, 0))* minionMap[id]->getMatrix()); // TODO remove translation
+				transforms[data.id]->setMatrix(minionMap[id]->getMatrix());
 				break;
 			case EntityType::PLAYER:
 				playerMap[id]->setEntData(data.ent_data);

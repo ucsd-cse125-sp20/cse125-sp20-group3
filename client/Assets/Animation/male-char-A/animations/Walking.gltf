@@ -418,7 +418,13 @@
             "children" : [
                 19
             ],
-            "name" : "Armature"
+            "name" : "Armature",
+            "rotation" : [
+                0.5,
+                0.4999999701976776,
+                -0.5000000596046448,
+                0.4999999403953552
+            ]
         }
     ],
     "animations" : [
@@ -843,6 +849,27 @@
                         "node" : 18,
                         "path" : "scale"
                     }
+                },
+                {
+                    "sampler" : 60,
+                    "target" : {
+                        "node" : 20,
+                        "path" : "translation"
+                    }
+                },
+                {
+                    "sampler" : 61,
+                    "target" : {
+                        "node" : 20,
+                        "path" : "rotation"
+                    }
+                },
+                {
+                    "sampler" : 62,
+                    "target" : {
+                        "node" : 20,
+                        "path" : "scale"
+                    }
                 }
             ],
             "name" : "Walking",
@@ -1146,6 +1173,21 @@
                     "input" : 0,
                     "interpolation" : "LINEAR",
                     "output" : 60
+                },
+                {
+                    "input" : 61,
+                    "interpolation" : "STEP",
+                    "output" : 62
+                },
+                {
+                    "input" : 61,
+                    "interpolation" : "STEP",
+                    "output" : 63
+                },
+                {
+                    "input" : 61,
+                    "interpolation" : "STEP",
+                    "output" : 64
                 }
             ]
         }
@@ -1522,6 +1564,36 @@
             "componentType" : 5126,
             "count" : 22,
             "type" : "VEC3"
+        },
+        {
+            "bufferView" : 61,
+            "componentType" : 5126,
+            "count" : 1,
+            "max" : [
+                0.08333333333333333
+            ],
+            "min" : [
+                0.08333333333333333
+            ],
+            "type" : "SCALAR"
+        },
+        {
+            "bufferView" : 62,
+            "componentType" : 5126,
+            "count" : 1,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 63,
+            "componentType" : 5126,
+            "count" : 1,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 64,
+            "componentType" : 5126,
+            "count" : 1,
+            "type" : "VEC3"
         }
     ],
     "bufferViews" : [
@@ -1829,11 +1901,31 @@
             "buffer" : 0,
             "byteLength" : 264,
             "byteOffset" : 17424
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 4,
+            "byteOffset" : 17688
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 12,
+            "byteOffset" : 17692
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 16,
+            "byteOffset" : 17704
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 12,
+            "byteOffset" : 17720
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 17688,
+            "byteLength" : 17732,
             "uri" : "Walking.bin"
         }
     ]

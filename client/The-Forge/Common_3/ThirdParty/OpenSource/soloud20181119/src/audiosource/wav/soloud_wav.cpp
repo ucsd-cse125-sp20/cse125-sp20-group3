@@ -300,7 +300,7 @@ namespace SoLoud
 		int res = dr.open(aFilename);
 		if (res == SO_NO_ERROR)
 			return loadFile(&dr);
-		return FILE_LOAD_FAILED;
+		return FILE_NOT_FOUND;
 	}
 
 	result Wav::loadMem(unsigned char *aMem, unsigned int aLength, bool aCopy, bool aTakeOwnership)

@@ -26,7 +26,7 @@ public:
 	bool alive = true;
 	int deathCounter = 5;
 
-	Minion_Client(int id, Team* t, SceneManager_Server* sm, Renderer* renderer, OzzGeode* geode, Transform* parent, RootSignature* root);
+	Minion_Client(GameObjectData data, int id, Team* t, SceneManager_Server* sm, Renderer* renderer, OzzGeode* geode, Transform* parent, RootSignature* root);
 	~Minion_Client();
 
 	static void setProgram(Geode::GeodeShaderDesc shader);

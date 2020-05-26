@@ -18,7 +18,7 @@ public:
 	ParticleSystemGeode* laser;
 	TimedTransform* laserTransform;
 
-	LaserTower_Client(int id, Team* t, SceneManager_Server* sm_server, Renderer* renderer);
+	LaserTower_Client(GameObjectData data, int id, Team* t, SceneManager_Server* sm_server, Renderer* renderer);
 	~LaserTower_Client();
 
 	static void setProgram(Geode::GeodeShaderDesc shader);

@@ -4,7 +4,7 @@ namespace {
 	const char* playerActions[2] = { "Idle", "Walking" };
 }
 
-Player_Client::Player_Client(int id, Team* t, SceneManager_Server* sm, OzzGeode* geode, Transform* parent) : Player(id, t, sm)
+Player_Client::Player_Client(GameObjectData data, int id, Team* t, SceneManager_Server* sm, OzzGeode* geode, Transform* parent) : Player(data, id, t, sm)
 {
 	rotator = conf_new(Transform);
 

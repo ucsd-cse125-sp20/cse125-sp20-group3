@@ -29,7 +29,6 @@ Server::Server(SceneManager_Server* manager) {
 	int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (iResult != 0) {
 		printf("WSAStartup failed with error: %d\n", iResult);
-		//TODO handle failure
 	}
 
 	ZeroMemory(&hints, sizeof(hints));
@@ -45,7 +44,6 @@ Server::Server(SceneManager_Server* manager) {
 	if (iResult != 0) {
 		printf("getaddrinfo failed with error: %d\n", iResult);
 		WSACleanup();
-		//TODO handle failure
 	}
 
 	
@@ -56,11 +54,7 @@ Server::Server(SceneManager_Server* manager) {
 			printf("socket failed with error: %ld\n", WSAGetLastError());
 			freeaddrinfo(result);
 			WSACleanup();
-			//TODO handle failure
 		}
-
-		
-		//TODO should either of these loop like how client loops on a failed connect() ?
 
 		// Setup the TCP listening socket
 		iResult = bind(ListenSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
@@ -69,7 +63,6 @@ Server::Server(SceneManager_Server* manager) {
 			freeaddrinfo(result);
 			closesocket(ListenSocket);
 			WSACleanup();
-			//TODO handle failure
 		}
 	}
 
@@ -81,12 +74,9 @@ Server::Server(SceneManager_Server* manager) {
 		printf("listen failed with error: %d\n", WSAGetLastError());
 		closesocket(ListenSocket);
 		WSACleanup();
-		//TODO handle failure
 	}
 
-	// // Accept a client socket
-	// ClientSockets[0] = accept(ListenSocket, NULL, NULL);
-	// //TODO iterate through all the ClientSockets eventually
+	// Accept a client socket
 	int number_of_clients = 0;
 	while (number_of_clients < NUM_PLAYERS) // let MAX_CLIENTS connect
 	{
@@ -96,7 +86,6 @@ Server::Server(SceneManager_Server* manager) {
 			printf("accept failed with error: %d\n", WSAGetLastError());
 			closesocket(ListenSocket);
 			WSACleanup();
-		//TODO handle failure
 			return;
 		}
 		else

@@ -103,14 +103,16 @@
     <ClCompile Include="..\common\clawtower.cpp" />
     <ClCompile Include="..\common\GameObject.cpp" />
     <ClCompile Include="..\common\lasertower.cpp" />
-    <ClCompile Include="..\common\mapNode.cpp" />
+    <ClCompile Include="..\common\pathNode.cpp" />
     <ClCompile Include="..\common\minion.cpp" />
     <ClCompile Include="..\common\ObjectDetection.cpp" />
     <ClCompile Include="..\common\player.cpp" />
     <ClCompile Include="..\common\resource.cpp" />
+    <ClCompile Include="..\common\buildNode.cpp" />
     <ClCompile Include="..\common\superminion.cpp" />
     <ClCompile Include="..\common\team.cpp" />
     <ClCompile Include="..\common\tower.cpp" />
+    <ClCompile Include="..\common\wallNode.cpp" />
     <ClCompile Include="SceneManager_Server.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="server_main.cpp" />
@@ -123,14 +125,16 @@
     <ClInclude Include="..\common\GameObject.h" />
     <ClInclude Include="..\common\lasertower.h" />
     <ClInclude Include="..\common\macros.h" />
-    <ClInclude Include="..\common\mapNode.h" />
+    <ClInclude Include="..\common\pathNode.h" />
     <ClInclude Include="..\common\ObjectDetection.h" />
     <ClInclude Include="..\common\player.h" />
     <ClInclude Include="..\common\resource.h" />
+    <ClInclude Include="..\common\buildNode.h" />
     <ClInclude Include="..\common\superminion.h" />
     <ClInclude Include="..\common\team.h" />
     <ClInclude Include="..\common\tower.h" />
     <ClInclude Include="..\common\minion.h" />
+    <ClInclude Include="..\common\wallNode.h" />
     <ClInclude Include="SceneManager_Server.h" />
     <ClInclude Include="Server.h" />
   </ItemGroup>

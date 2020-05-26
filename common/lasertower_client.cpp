@@ -2,7 +2,7 @@
 
 std::vector<ParticleSystemGeode*> LaserTower_Client::geodes = std::vector<ParticleSystemGeode*>();
 
-LaserTower_Client::LaserTower_Client(int id, Team* t, SceneManager_Server* sm_server, Renderer* renderer) : LaserTower(id, t, sm_server)
+LaserTower_Client::LaserTower_Client(GameObjectData data, int id, Team* t, SceneManager_Server* sm_server, Renderer* renderer) : LaserTower(data, id, t, sm_server)
 {
 	ParticleSystem::ParticleSystemParams params = {};
 	params.spriteFile = LASER_TOWER_BEAM_SPRITE;
@@ -48,9 +48,13 @@ void LaserTower_Client::activate(vec3 target)
 	((ParticleSystem*)laser->obj)->reset(0, 1);
 	//printf("%f\n", (float)length(laserPosition - target));
 	
+	
 	laserTransform->setPositionDirection(LASER_TOWER_BEAM_OFFSET, target - laserPosition);
 	//print(target - laserPosition);
 	//print(laserTransform->getMatrix());
+	mat4 currMat = this->getMatrix();
+	mat4 inverseMat = inverse(currMat);
+	laserTransform->setMatrix(inverseMat * mat4::translation(this->getPosition()) * laserTransform->getMatrix());
 
 	laserTransform->activate(LASER_TOWER_BEAM_TIMEOUT);
 }

@@ -23,7 +23,7 @@ namespace {
 	const char* playerFemaleDir = "female-char";
 	const char* playerFemaleActions[2] = { "Idle", "Walking" };
 
-	int counter = 0;
+	int counter = 1;
 	int animCounter = 1;
 }
 
@@ -209,11 +209,22 @@ void SceneManager_Client::createMaterialResources(SceneManager_Client::GeodeType
 	}
 }
 
-void SceneManager_Client::updateScene(std::vector<Client::UpdateData> updateBuf)
+void SceneManager_Client::updateStateAndScene(Client::UpData data) {
+	this->updateState(data.stateUpdate);
+	this->updateScene(data.sceneUpdate);
+}
+
+void SceneManager_Client::updateState(Client::StateUpdateData updateData) {
+	red_team->setData(updateData.redTeamData);
+	blue_team->setData(updateData.blueTeamData);
+}
+
+void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 {
 	//std::cout << "updating from client buf of size " << updateBuf.size() << "\n";
-	for (Client::UpdateData data : updateBuf) {
+	for (Client::IDEntData data : updateData.entUpdates) {
 		if (idMap.find(data.id) == idMap.end()) { //new id encountered, spawn new object
+			GameObject::GameObjectData GO_data = data.ent_data.GO_data;
 			Team* team;
 			if (data.ent_data.teamColor == RED_TEAM) team = red_team;
 			else if (data.ent_data.teamColor == BLUE_TEAM) team = blue_team;
@@ -229,7 +240,7 @@ void SceneManager_Client::updateScene(std::vector<Client::UpdateData> updateBuf)
 				otherTransforms.push_back(adjustment); //save to be deleted upon closing
 
 				idMap[data.id] = std::make_pair(++subid, EntityType::PLAYER);
-				playerMap[subid] = conf_new(Player_Client, data.id, team, nullptr, ozzGeodes[PLAYER_GEODE], adjustment);
+				playerMap[subid] = conf_new(Player_Client, GO_data, data.id, team, nullptr, ozzGeodes[PLAYER_GEODE], adjustment);
 			}
 			else if (ID_BASE_MIN <= data.id && data.id <= ID_BASE_MAX) {
 				//idMap[id_str] = new Base();
@@ -238,19 +249,19 @@ void SceneManager_Client::updateScene(std::vector<Client::UpdateData> updateBuf)
 				std::cout << "creating new minion, id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				idMap[data.id] = std::make_pair(++subid, EntityType::MINION);
-				minionMap[subid] = conf_new(Minion_Client, data.id, team, nullptr, renderer, ozzGeodes[MINION_GEODE], transforms[data.id], particleRootSignature);
+				minionMap[subid] = conf_new(Minion_Client, GO_data, data.id, team, nullptr, renderer, ozzGeodes[MINION_GEODE], transforms[data.id], particleRootSignature);
 			}
 			else if (ID_SUPER_MINION_MIN <= data.id && data.id <= ID_SUPER_MINION_MAX) {
 				std::cout << "creating new super minion, id: " << data.id << "\n";
 				idMap[data.id] = std::make_pair(++subid, EntityType::OTHER);
-				entityMap[subid] = conf_new(SuperMinion, data.id, team, nullptr);
+				entityMap[subid] = conf_new(SuperMinion, GO_data, data.id, team, nullptr);
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				transforms[data.id]->addChild(gltfGeodes[SUPER_MINION_GEODE]);
 			}
 			else if (ID_LASER_MIN <= data.id && data.id <= ID_LASER_MAX) {
 				std::cout << "creating new laser tower, id: " << data.id << "\n";
 				idMap[data.id] = std::make_pair(++subid, EntityType::LASER_TOWER);
-				laserTowerMap[subid] = conf_new(LaserTower_Client, data.id, team, nullptr, renderer);
+				laserTowerMap[subid] = conf_new(LaserTower_Client, GO_data, data.id, team, nullptr, renderer);
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				transforms[data.id]->addChild(gltfGeodes[LASER_TOWER_GEODE]);
 				transforms[data.id]->addChild(laserTowerMap[subid]->laserTransform);
@@ -259,21 +270,21 @@ void SceneManager_Client::updateScene(std::vector<Client::UpdateData> updateBuf)
 			else if (ID_CLAW_MIN <= data.id && data.id <= ID_CLAW_MAX) {
 				std::cout << "creating new claw tower, id: " << data.id << "\n";
 				idMap[data.id] = std::make_pair(++subid, EntityType::OTHER);
-				entityMap[subid] = conf_new(ClawTower, data.id, team, nullptr);
+				entityMap[subid] = conf_new(ClawTower, GO_data, data.id, team, nullptr);
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				transforms[data.id]->addChild(gltfGeodes[CLAW_TOWER_GEODE]);
 			}
 			else if (ID_DUMPSTER_MIN <= data.id && data.id <= ID_DUMPSTER_MAX) {
 				std::cout << "creating new dumpster, id: " << data.id << "\n";
 				idMap[data.id] = std::make_pair(++subid, EntityType::OTHER);
-				entityMap[subid] = conf_new(Resource, DUMPSTER_TYPE, data.id, nullptr);
+				entityMap[subid] = conf_new(Resource, DUMPSTER_TYPE, GO_data, data.id, nullptr);
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				transforms[data.id]->addChild(gltfGeodes[DUMPSTER_GEODE]);
 			}
 			else if (ID_RECYCLING_BIN_MIN <= data.id && data.id <= ID_RECYCLING_BIN_MAX) {
 				std::cout << "creating new recycling bin id: " << data.id << "\n";
 				idMap[data.id] = std::make_pair(++subid, EntityType::OTHER);
-				entityMap[subid] = conf_new(Resource, RECYCLING_BIN_TYPE, data.id, nullptr);
+				entityMap[subid] = conf_new(Resource, RECYCLING_BIN_TYPE, GO_data, data.id, nullptr);
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				transforms[data.id]->addChild(gltfGeodes[RECYCLING_BIN_GEODE]);
 			}
@@ -281,7 +292,7 @@ void SceneManager_Client::updateScene(std::vector<Client::UpdateData> updateBuf)
 			this->addChild(transforms[data.id]);
 		}
 		
-		if (data.ent_data.health <= 0) { //updated health marks entity as dead
+		if (data.ent_data.health <= 0) { //if updated health marks entity as dead
 			//TODO play death animation
 
 			int id = idMap[data.id].first;
@@ -321,16 +332,15 @@ void SceneManager_Client::updateScene(std::vector<Client::UpdateData> updateBuf)
 			switch (idMap[data.id].second) {
 			case EntityType::LASER_TOWER:
 				laserTowerMap[id]->setEntData(data.ent_data);
-				if (laserTowerMap[id]->getActionState() == LASER_ACTION_FIRE) {
-					//print(entityMap[idMap[laserTowerMap[id]->getTargetID()].first]->getMatrix());
-					//print(laserTowerMap[id]->getMatrix());
+				if (laserTowerMap[id]->getActionState() == ACTION_STATE_FIRE) {
+					AudioManager::playAudioSource(laserTowerMap[id]->getPosition(), "laser");
 					laserTowerMap[id]->activate(minionMap[idMap[laserTowerMap[id]->getTargetID()].first]->getPosition());
 				}
 				transforms[data.id]->setMatrix(mat4::translation(vec3(-20,0,0)) * laserTowerMap[id]->getMatrix()); // TODO remove translation
 				break;
 			case EntityType::MINION:
 				minionMap[id]->setEntData(data.ent_data);
-				if (minionMap[id]->getActionState() == MINION_ACTION_FIRE) {
+				if (minionMap[id]->getActionState() == ACTION_STATE_FIRE) {
 					minionMap[id]->setEntData(data.ent_data);
 					minionMap[id]->shoot();
 				}
@@ -446,6 +456,7 @@ mat4 SceneManager_Client::getPlayerTransformMat() {
 void SceneManager_Client::update(float deltaTime)
 {
 	if (counter % 100 == 0) animators[9999999]->SetClip(smallMinionActions[animCounter]);
+	//if (counter % 100 == 0)	AudioManager::playAudioSource(vec3(0), "laser");
 	if (counter++ % 100 == 0) animators[8888888]->SetClip(superMinionActions[animCounter = (animCounter + 1) % 3]);
 	Transform::update(deltaTime);
 }

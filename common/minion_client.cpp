@@ -6,7 +6,7 @@ namespace {
 	const char* smallMinionActions[2] = { "Walking", "Fighting" };
 }
 
-Minion_Client::Minion_Client(int id, Team* t, SceneManager_Server* sm, Renderer* renderer, OzzGeode* geode, Transform* parent, RootSignature* root) : Minion(id, t, sm)
+Minion_Client::Minion_Client(GameObjectData data, int id, Team* t, SceneManager_Server* sm, Renderer* renderer, OzzGeode* geode, Transform* parent, RootSignature* root) : Minion(data, id, t, sm)
 {
 	ParticleSystem::ParticleSystemParams params = {};
 	params.spriteFile = MINION_BULLET_SPRITE;

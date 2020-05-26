@@ -1,8 +1,8 @@
 #include "lasertower.h"
 #include "../server/SceneManager_Server.h"
 
-LaserTower::LaserTower(int id, Team* t, SceneManager_Server* sm_server) : Tower(id, LASER_TOWER_HEALTH, LASER_TOWER_ATTACK, t, sm_server) {
-	actionState = LASER_ACTION_IDLE;
+LaserTower::LaserTower(GameObjectData data, int id, Team* t, SceneManager_Server* sm_server) : Tower(data, id, LASER_TOWER_HEALTH, LASER_TOWER_ATTACK, t, sm_server) {
+	actionState = ACTION_STATE_IDLE;
 	
 	attackRange = LASER_FIRE_RANGE;
 	attackInterval = LASER_FIRE_INTERVAL; //interval between firing at attack target
@@ -37,7 +37,7 @@ void LaserTower::update(float deltaTime) { //should they be able to switch attac
 
 	if (attackTarget != nullptr) {
 		timeElapsed += deltaTime; //increase timeElapsed
-		actionState = LASER_ACTION_ATTACK;
+		actionState = ACTION_STATE_ATTACK;
 
 		if (timeElapsed >= attackInterval) { //only attack on an interval
 			std::cout << "laser " << id << " attacking " << attackTargetID << "\n";
@@ -45,20 +45,20 @@ void LaserTower::update(float deltaTime) { //should they be able to switch attac
 			timeElapsed = 0;
 		}
 	}
-	else actionState = LASER_ACTION_IDLE;
+	else actionState = ACTION_STATE_IDLE;
 
-	ObjectDetection::updateObject(this);
+	//ObjectDetection::updateObject(this);
 }
 
 void LaserTower::attack() {
 	attackTarget->takeDamage(this->attackDamage);
-	actionState = LASER_ACTION_FIRE;
+	actionState = ACTION_STATE_FIRE;
 	//TODO manipulate necessary data to spawn particle systems
 }
 
 void LaserTower::setEntData(EntityData data) {
 	Entity::setEntData(data);
-	//std::cout << "laser " << id << " targetID: " << attackTargetID << "\n";
+	//if(actionState != ACTION_STATE_IDLE) std::cout << "laser " << id << " actionState: " << (int)actionState << "\n";
 }
 
 /* TESTING SPECIFIC FUNCTIONALITY - DO NOT USE */

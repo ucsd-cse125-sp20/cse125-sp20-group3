@@ -12,7 +12,17 @@ private:
     int baseHealth;
     int minionCount;
     int towerCount;
+
 public:
+	struct TeamData {
+		char teamColor;
+		int metalCount;
+		int plasticCount;
+		int baseHealth;
+		int minionCount;
+		int towerCount;
+	};
+
     char teamColor;
     Team(char color);
 	void incMinion();
@@ -20,6 +30,10 @@ public:
     void incTower();
 	void decTower();
     bool checkResources(char entityType);
+
+	void setData(TeamData data);
+	int writeData(char buf[], int index);
+	void print();
 };
 
 #endif

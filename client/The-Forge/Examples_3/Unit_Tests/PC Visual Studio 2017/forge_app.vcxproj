@@ -28,21 +28,24 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\..\common\base.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\buildNode.cpp" />
     <ClCompile Include="..\..\..\..\..\common\clawtower.cpp" />
     <ClCompile Include="..\..\..\..\..\common\GameObject.cpp" />
     <ClCompile Include="..\..\..\..\..\common\lasertower.cpp" />
     <ClCompile Include="..\..\..\..\..\common\lasertower_client.cpp" />
-    <ClCompile Include="..\..\..\..\..\common\mapNode.cpp" />
     <ClCompile Include="..\..\..\..\..\common\MathUtils.cpp" />
     <ClCompile Include="..\..\..\..\..\common\minion.cpp" />
     <ClCompile Include="..\..\..\..\..\common\minion_client.cpp" />
     <ClCompile Include="..\..\..\..\..\common\ObjectDetection.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\pathNode.cpp" />
     <ClCompile Include="..\..\..\..\..\common\player.cpp" />
     <ClCompile Include="..\..\..\..\..\common\player_client.cpp" />
     <ClCompile Include="..\..\..\..\..\common\resource.cpp" />
     <ClCompile Include="..\..\..\..\..\common\superminion.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\wallNode.cpp" />
     <ClCompile Include="..\..\..\..\..\server\SceneManager_Server.cpp" />
     <ClCompile Include="..\..\..\..\src\Animator.cpp" />
+    <ClCompile Include="..\..\..\..\src\AudioManager.cpp" />
     <ClCompile Include="..\..\..\..\src\OzzGeode.cpp" />
     <ClCompile Include="..\..\..\..\src\OzzObject.cpp" />
     <ClCompile Include="..\..\..\..\..\common\team.cpp" />
@@ -59,6 +62,52 @@
     <ClCompile Include="..\..\..\..\src\TimedTransform.cpp" />
     <ClCompile Include="..\..\..\..\src\Transform.cpp" />
     <ClCompile Include="..\..\..\..\src\UIUtils.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\monotone\soloud_monotone.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\openmpt\soloud_openmpt.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\openmpt\soloud_openmpt_dll.c" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\sfxr\soloud_sfxr.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\speech\darray.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\speech\klatt.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\speech\resonator.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\speech\soloud_speech.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\speech\tts.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\tedsid\sid.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\tedsid\soloud_tedsid.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\tedsid\ted.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\vic\soloud_vic.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\vizsn\soloud_vizsn.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\wav\dr_impl.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\wav\soloud_wav.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\wav\soloud_wavstream.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\wav\stb_vorbis.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\backend\winmm\soloud_winmm.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\core\soloud.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\core\soloud_audiosource.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\core\soloud_bus.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\core\soloud_core_3d.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\core\soloud_core_basicops.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\core\soloud_core_faderops.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\core\soloud_core_filterops.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\core\soloud_core_getters.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\core\soloud_core_setters.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\core\soloud_core_voicegroup.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\core\soloud_core_voiceops.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\core\soloud_fader.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\core\soloud_fft.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\core\soloud_fft_lut.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\core\soloud_file.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\core\soloud_filter.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\core\soloud_queue.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\core\soloud_thread.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\filter\soloud_bassboostfilter.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\filter\soloud_biquadresonantfilter.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\filter\soloud_dcremovalfilter.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\filter\soloud_echofilter.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\filter\soloud_fftfilter.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\filter\soloud_flangerfilter.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\filter\soloud_lofifilter.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\filter\soloud_robotizefilter.cpp" />
+    <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\filter\soloud_waveshaperfilter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\src\Shaders\D3D12\basic.frag" />
@@ -93,6 +142,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\common\base.h" />
+    <ClInclude Include="..\..\..\..\..\common\buildNode.h" />
     <ClInclude Include="..\..\..\..\..\common\clawtower.h" />
     <ClInclude Include="..\..\..\..\..\common\client2server.h" />
     <ClInclude Include="..\..\..\..\..\common\entity.h" />
@@ -100,19 +150,21 @@
     <ClInclude Include="..\..\..\..\..\common\lasertower.h" />
     <ClInclude Include="..\..\..\..\..\common\macros.h" />
     <ClInclude Include="..\..\..\..\..\common\MathUtils.h" />
-    <ClInclude Include="..\..\..\..\..\common\mapNode.h" />
     <ClInclude Include="..\..\..\..\..\common\minion.h" />
     <ClInclude Include="..\..\..\..\..\common\minion_client.h" />
     <ClInclude Include="..\..\..\..\..\common\ObjectDetection.h" />
+    <ClInclude Include="..\..\..\..\..\common\pathNode.h" />
     <ClInclude Include="..\..\..\..\..\common\player.h" />
     <ClInclude Include="..\..\..\..\..\common\player_client.h" />
     <ClInclude Include="..\..\..\..\..\common\resource.h" />
     <ClInclude Include="..\..\..\..\..\common\superminion.h" />
     <ClInclude Include="..\..\..\..\..\common\team.h" />
     <ClInclude Include="..\..\..\..\..\common\tower.h" />
+    <ClInclude Include="..\..\..\..\..\common\wallNode.h" />
     <ClInclude Include="..\..\..\..\..\common\lasertower_client.h" />
     <ClInclude Include="..\..\..\..\..\server\SceneManager_Server.h" />
     <ClInclude Include="..\..\..\..\src\Animator.h" />
+    <ClInclude Include="..\..\..\..\src\AudioManager.h" />
     <ClInclude Include="..\..\..\..\src\OzzGeode.h" />
     <ClInclude Include="..\..\..\..\src\OzzObject.h" />
     <ClInclude Include="..\..\..\..\src\Application.h" />
@@ -130,6 +182,47 @@
     <ClInclude Include="..\..\..\..\src\Transform.h" />
     <ClInclude Include="..\..\..\..\src\UIUtils.h" />
     <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\cgltf\cgltf.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_audiosource.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_bassboostfilter.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_biquadresonantfilter.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_bus.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_dcremovalfilter.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_echofilter.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_error.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_fader.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_fft.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_fftfilter.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_file.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_file_hack_off.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_file_hack_on.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_filter.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_flangerfilter.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_internal.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_lofifilter.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_monotone.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_openmpt.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_queue.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_robotizefilter.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_sfxr.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_speech.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_tedsid.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_thread.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_vic.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_vizsn.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_wav.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_waveshaperfilter.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\soloud_wavstream.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\speech\darray.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\speech\klatt.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\speech\resonator.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\speech\tts.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\tedsid\sid.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\tedsid\ted.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\wav\dr_flac.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\wav\dr_mp3.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\wav\dr_wav.h" />
+    <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\wav\stb_vorbis.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{72714A3C-1FFA-412F-A6B0-130550B1DD2C}</ProjectGuid>
@@ -211,7 +304,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDx|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IntDir>$(SolutionDir)\$(Platform)\$(Configuration)\Intermediate\$(ProjectName)\</IntDir>
-    <IncludePath>$(IncludePath)</IncludePath>
+    <IncludePath>$(IncludePath);$(SolutionDir)..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\include\</IncludePath>
     <LibraryPath>$(SolutionDir)\$(Platform)\$(Configuration);$(LibraryPath);</LibraryPath>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>

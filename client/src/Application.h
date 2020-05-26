@@ -11,6 +11,7 @@
 #include "Input.h"
 
 #include "SceneManager_Client.h"
+#include "AudioManager.h"
 
 #include "UIUtils.h"
 #include "../The-Forge/Common_3/ThirdParty/OpenSource/imgui/imgui.h"

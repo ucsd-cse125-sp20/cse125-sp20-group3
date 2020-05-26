@@ -5,9 +5,9 @@
 #include "GameObject.h"
 #include "ObjectDetection.h"
 
-class buildNode : public GameObject {
+class BuildNode : public GameObject {
     public:
         char teamColor;
-        buildNode(char team, float x_index, float z_index);
+        BuildNode(char team, float x_index, float z_index);
 };
 #endif

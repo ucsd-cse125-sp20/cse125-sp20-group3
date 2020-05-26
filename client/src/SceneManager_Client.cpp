@@ -175,9 +175,13 @@ SceneManager_Client::~SceneManager_Client()
 {
 	//printf("ASDFASDFASDF\n");
 	for (std::pair<int, Entity*> e : entityMap) conf_delete(e.second);
-	for (std::pair<int, LaserTower_Client*> t : laserTowerMap) conf_delete(t.second);
-	for (std::pair<int, Minion_Client*> m : minionMap) conf_delete(m.second);
 	for (std::pair<int, Player_Client*> p : playerMap) conf_delete(p.second);
+	for (std::pair<int, Minion_Client*> m : minionMap) conf_delete(m.second);
+	//super_minion
+	for (std::pair<int, LaserTower_Client*> t : laserTowerMap) conf_delete(t.second);
+	//claw_tower
+	//dumpster
+	//recycling_bin
 	for (std::pair<int, Transform*> t : transforms) conf_delete(t.second);
 	for (std::pair<int, Animator*> t : animators) conf_delete(t.second);
 	for (std::pair<std::string, GLTFGeode*> g : gltfGeodes) conf_delete(g.second);

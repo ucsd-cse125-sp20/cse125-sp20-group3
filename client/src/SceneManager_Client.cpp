@@ -18,9 +18,9 @@ namespace {
 	const char* smallMinionActions[3] = { "Walking", "Fighting", "Death" };
 	const char* superMinionDir = "super-minion-A";
 	const char* superMinionActions[3] = { "Walking", "Fighting", "Death" };
-	const char* playerMaleDir = "male-char";
+	const char* playerMaleDir = "male-char-A";
 	const char* playerMaleActions[2] = { "Idle", "Walking" };
-	const char* playerFemaleDir = "female-char";
+	const char* playerFemaleDir = "female-char-B";
 	const char* playerFemaleActions[2] = { "Idle", "Walking" };
 
 	int counter = 1;
@@ -76,28 +76,30 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	animators[key] = a;
 
 	//// TODO This is a hard coded animation example. Remove this later (MALE CHAR)
-	//key = 4672347;
-	//ozzGeodes["blarf3"] = conf_new(OzzGeode, renderer, playerMaleDir);
-	//((OzzObject*)ozzGeodes["blarf3"]->obj)->SetClip(playerMaleActions[1]);
-	//t = conf_new(Transform, mat4::translation(vec3(3, 0, 2)));
-	//a = conf_new(Animator, ozzGeodes["blarf3"]);
-	//a->SetClip(playerMaleActions[1]);
-	//t->addChild(a);
-	//this->addChild(t);
-	//transforms[key] = t;
-	//animators[key] = a;
+	key = 4672347;
+	ozzGeodes["blarf3"] = conf_new(OzzGeode, renderer, playerMaleDir);
+	((OzzObject*)ozzGeodes["blarf3"]->obj)->SetClip(playerMaleActions[1]);
+	t = conf_new(Transform, mat4::translation(vec3(3, 0, 2)));
+	a = conf_new(Animator, ozzGeodes["blarf3"]);
+	a->SetClip(playerMaleActions[1]);
+	t->addChild(a);
+	this->addChild(t);
+	transforms[key] = t;
+	animators[key] = a;
+	key = 4672348;
+
 
 	//// TODO This is a hard coded animation example. Remove this later (FEMALE CHAR)
-	//key = 1734813;
-	//ozzGeodes["blarf4"] = conf_new(OzzGeode, renderer, playerFemaleDir);
-	//((OzzObject*)ozzGeodes["blarf4"]->obj)->SetClip(playerFemaleActions[1]);
-	//t = conf_new(Transform, mat4::translation(vec3(4, 0, 2)));
-	//a = conf_new(Animator, ozzGeodes["blarf4"]);
-	//a->SetClip(playerFemaleActions[1]);
-	//t->addChild(a);
-	//this->addChild(t);
-	//transforms[key] = t;
-	//animators[key] = a;
+	key = 1734813;
+	ozzGeodes["blarf4"] = conf_new(OzzGeode, renderer, playerFemaleDir);
+	((OzzObject*)ozzGeodes["blarf4"]->obj)->SetClip(playerFemaleActions[1]);
+	t = conf_new(Transform, mat4::translation(vec3(4, 0, 2)));
+	a = conf_new(Animator, ozzGeodes["blarf4"]);
+	a->SetClip(playerFemaleActions[1]);
+	t->addChild(a);
+	this->addChild(t);
+	transforms[key] = t;
+	animators[key] = a;
 
 	//// TODO These are hard coded particle examples. Remove them later
 	//key = 7234813;

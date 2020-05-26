@@ -451,6 +451,9 @@ void Application::InitDebugGui()
 	// Example usage
 	// UIUtils::createImage("overlay", "why.png", 0, 0, float2((float)mSettings.mWidth / 1333, (float)mSettings.mHeight / 949), 0);
 
+
+	UIUtils::loadFont("default font", "TitilliumText/TitilliumText-Bold.otf", 128); // All fonts must be loaded beforehand
+
 	// display resources count
 	UIUtils::createImage("overlay", "bottle.png", 250, 900, float2((float)mSettings.mWidth / 15000, (float)mSettings.mHeight / 12000), 0);
 	UIUtils::createText("plastic_text", "placeholder1", 250, 950, "default font", 0xff6655ff, 3);
@@ -464,10 +467,10 @@ void Application::InitDebugGui()
 	UIUtils::createImage("super_minion", "minion.png", 900, 920, float2((float)mSettings.mWidth / 15000, (float)mSettings.mHeight / 12000), 0);
 
 	// display count as text
-	// UIUtils::createText("claw_machine_text", "placeholder1", 600, 950, "default font", 0xff6655ff, 3);
-	// UIUtils::createText("laser_tower_text", "placeholder1", 700, 950, "default font", 0xff6655ff, 3);
-	// UIUtils::createText("minion_text", "placeholder1", 800, 950, "default font", 0xff6655ff, 3);
-	// UIUtils::createText("super_minion_text", "placeholder1", 900, 950, "default font", 0xff6655ff, 3);
+	UIUtils::createText("claw_machine_text", "placeholder1", 600, 950, "default font", 0xff6655ff, 3);
+	UIUtils::createText("laser_tower_text", "placeholder1", 700, 950, "default font", 0xff6655ff, 3);
+	UIUtils::createText("minion_text", "placeholder1", 800, 950, "default font", 0xff6655ff, 3);
+	UIUtils::createText("super_minion_text", "placeholder1", 900, 950, "default font", 0xff6655ff, 3);
 
 	UIUtils::loadTexture("WeirdBox_halo.png"); // Preload textures
 	UIUtils::createImage("start_button", "start.png", 1500, 400, float2(1,1), 1);
@@ -477,8 +480,6 @@ void Application::InitDebugGui()
 		UIUtils::removeImage("start_button"); 
 		UIUtils::createImage("hud", "WeirdBox_halo.png", 400, -10, float2(1.f, 0.05f), 1);
 	});
-
-	UIUtils::loadFont("default font", "TitilliumText/TitilliumText-Bold.otf", 128); // All fonts must be loaded beforehand
 	//UIUtils::createText("testText", "YEET", 500, 800, "default font", 0xff6655ff, 3);
 }
 

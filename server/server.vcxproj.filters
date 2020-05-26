@@ -131,7 +131,7 @@
     <ClInclude Include="..\common\BuildNode.h">
       <Filter>Header Files\Map Nodes</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\PathNode.h">
+    <ClInclude Include="..\common\player_client.h">
       <Filter>Header Files\Map Nodes</Filter>
     </ClInclude>
     <ClInclude Include="..\common\WallNode.h">

@@ -452,7 +452,7 @@ void Application::InitDebugGui()
 	UIUtils::createImage("overlay", "why.png", 0, 0, float2((float)mSettings.mWidth / 1333, (float)mSettings.mHeight / 949), 0);
 
 	UIUtils::loadTexture("WeirdBox_halo.png"); // Preload textures
-	UIUtils::createImage("start_button", "start.png", 1500, 400, float2(1,1), 1);
+	UIUtils::createImage("start_button", "start.png", 500, 400, float2(1,1), 1);
 	UIUtils::addCallbackToImage("start_button", []() { 
 		UIUtils::removeImage("overlay"); 
 		UIUtils::removeText("testText"); 

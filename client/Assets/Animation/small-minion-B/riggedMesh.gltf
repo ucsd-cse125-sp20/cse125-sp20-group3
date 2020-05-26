@@ -1,0 +1,267 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 8138,
+      "min": [-0.573408, -0.00644175, -0.847959],
+      "max": [0.573408, 1.07093, 0.378308]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 8138
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "type": "VEC2",
+      "count": 8138
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5123,
+      "type": "VEC4",
+      "count": 8138
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5126,
+      "type": "VEC4",
+      "count": 8138
+    },
+    {
+      "bufferView": 5,
+      "componentType": 5123,
+      "type": "SCALAR",
+      "count": 38730
+    },
+    {
+      "bufferView": 6,
+      "componentType": 5126,
+      "type": "MAT4",
+      "count": 17
+    }
+  ],
+  "asset": {
+    "generator": "Khronos glTF Blender I/O v1.1.46",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 97656
+    },
+    {
+      "buffer": 0,
+      "byteLength": 97656,
+      "byteOffset": 97656
+    },
+    {
+      "buffer": 0,
+      "byteLength": 65104,
+      "byteOffset": 195312
+    },
+    {
+      "buffer": 0,
+      "byteLength": 65104,
+      "byteOffset": 260416
+    },
+    {
+      "buffer": 0,
+      "byteLength": 130208,
+      "byteOffset": 325520
+    },
+    {
+      "buffer": 0,
+      "byteLength": 77460,
+      "byteOffset": 455728
+    },
+    {
+      "buffer": 0,
+      "byteLength": 1088,
+      "byteOffset": 533188
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "riggedMesh.bin",
+      "byteLength": 534276
+    }
+  ],
+  "images": [
+    {
+      "name": "small_minion_tex_B",
+      "uri": "small_minion_tex_B.png",
+      "mimeType": "image/png"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Body_Sphere",
+      "primitives": [
+        {
+          "indices": 5,
+          "material": 0,
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2,
+            "JOINTS_0": 3,
+            "WEIGHTS_0": 4
+          }
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "Material",
+      "doubleSided": true,
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        },
+        "metallicFactor": 0,
+        "roughnessFactor": 0.5
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "name": "front-leg.L",
+      "translation": [0.259478, -0.187171, 0.0496359],
+      "rotation": [0.0437973, -0.335045, -0.918301, 0.206276],
+      "scale": [1, 1, 1]
+    },
+    {
+      "name": "back-leg.L",
+      "translation": [0.550042, 0.110757, -0.15917],
+      "rotation": [0.0100613, 0.721657, -0.673761, 0.15861],
+      "scale": [1, 1, 1]
+    },
+    {
+      "name": "cannon.L",
+      "translation": [0.473994, 0.835768, -1.20037],
+      "rotation": [0.965094, -4.07964e-07, -1.26496e-06, 0.261902]
+    },
+    {
+      "name": "front-leg.R",
+      "translation": [-0.260909, -0.271449, 0.11167],
+      "rotation": [-0.1759, 0.405294, 0.889533, 0.116306],
+      "scale": [1, 1, 1]
+    },
+    {
+      "name": "back-leg.R",
+      "translation": [-0.322832, -0.0598438, 0.0367937],
+      "rotation": [-0.158851, 0.738864, -0.654845, 0.00495324],
+      "scale": [1, 1, 1]
+    },
+    {
+      "name": "cannon.R",
+      "translation": [-0.475426, 0.60029, -0.892919],
+      "rotation": [0.974856, -3.47444e-07, -1.27784e-06, 0.222836],
+      "scale": [1, 1, 1]
+    },
+    {
+      "name": "ear4.L",
+      "translation": [2.8871e-08, 0.30109, -6.79865e-08],
+      "rotation": [0.265663, 0.110122, -0.0331859, 0.957181]
+    },
+    {
+      "children": [ 6 ],
+      "name": "ear3.L",
+      "translation": [-3.91155e-08, 0.281192, -4.09782e-08],
+      "rotation": [-0.0320931, 0.966833, -0.101031, 0.232374],
+      "scale": [1, 0.999999, 1]
+    },
+    {
+      "children": [ 7 ],
+      "name": "ear2.L",
+      "translation": [-2.77068e-08, 0.315676, -3.07919e-08],
+      "rotation": [-0.306486, -5.53574e-05, -0.0637529, 0.949738]
+    },
+    {
+      "children": [ 8 ],
+      "name": "ear.L",
+      "translation": [0.164845, 0.47642, 0.221991],
+      "rotation": [-0.324667, -0.0305113, -0.307886, 0.893794]
+    },
+    {
+      "name": "ear4.R",
+      "translation": [1.30385e-08, 0.301091, -3.1665e-08],
+      "rotation": [0.259101, 0.0967087, 0.0674141, 0.958629],
+      "scale": [1, 1, 1]
+    },
+    {
+      "children": [ 10 ],
+      "name": "ear3.R",
+      "translation": [5.58794e-08, 0.281192, -5.96046e-08],
+      "rotation": [0.0666551, 0.970101, -0.0824274, 0.218326],
+      "scale": [1, 1, 1]
+    },
+    {
+      "children": [ 11 ],
+      "name": "ear2.R",
+      "translation": [1.61817e-08, 0.317228, -6.29807e-08],
+      "rotation": [-0.265573, 0.115919, -0.166133, 0.942568],
+      "scale": [1, 1, 1]
+    },
+    {
+      "children": [ 12 ],
+      "name": "ear.R",
+      "translation": [-0.16444, 0.477947, 0.221991],
+      "rotation": [-0.396381, 0.343299, 0.28103, 0.803772]
+    },
+    {
+      "name": "eye.L",
+      "translation": [0.295757, 0.338355, 0.291089],
+      "rotation": [0.10523, -0.0118907, 0.479984, 0.870862],
+      "scale": [1, 1, 1]
+    },
+    {
+      "name": "eye.R",
+      "translation": [-0.295085, 0.338355, 0.291089],
+      "rotation": [0.334346, 0.224489, -0.424418, 0.810979],
+      "scale": [1, 1, 1]
+    },
+    {
+      "children": [ 0, 1, 2, 3, 4, 5, 9, 13, 14, 15 ],
+      "name": "body",
+      "translation": [5.55112e-17, -0.642691, 0.00250598],
+      "rotation": [-0.35055, 1.11645e-07, -4.17888e-08, 0.936544]
+    },
+    {
+      "mesh": 0,
+      "name": "Body_Sphere",
+      "skin": 0
+    },
+    {
+      "children": [ 17, 16 ],
+      "name": "Armature",
+      "translation": [0, 0.0506403, 0]
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [ 18 ]
+    }
+  ],
+  "textures": [
+    {
+      "source": 0
+    }
+  ],
+  "skins": [
+    {
+      "inverseBindMatrices": 6,
+      "joints": [ 16, 0, 1, 2, 3, 4, 5, 9, 8, 7, 6, 13, 12, 11, 10, 14, 15 ],
+      "name": "Armature",
+      "extras": [ 1, 11, 10, 9, 8, 7, 6, 5, 15, 16, 17, 4, 12, 13, 14, 3, 2, ],
+    }
+  ]
+}

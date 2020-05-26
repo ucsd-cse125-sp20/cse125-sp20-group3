@@ -2,8 +2,6 @@
 
 #include "Application.h"
 
-uint32_t OzzGeode::animatedInstanceCount = 0;
-
 OzzGeode::OzzGeode(Renderer* renderer, std::string directory)
 {
 	this->obj = conf_new(OzzObject, renderer, directory);

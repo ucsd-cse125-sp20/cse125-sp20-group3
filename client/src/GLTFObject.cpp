@@ -201,7 +201,7 @@ void GLTFObject::createNodeTransformsBuffer()
 		0.5f * (modelBounds[0].getZ() + modelBounds[1].getZ()));
 	Vector3 scaleVector = Vector3(1);
 	scaleVector.setZ(-scaleVector.getZ());
-	mat4 translateScale = mat4::scale(scaleVector) * mat4::translation(Vector3(modelCentreBase));
+	mat4 translateScale = mat4::scale(scaleVector);// *mat4::translation(Vector3(modelCentreBase));
 
 	for (uint32_t i = 0; i < pData->mNodeCount; ++i)
 	{

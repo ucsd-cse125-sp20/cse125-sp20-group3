@@ -26,36 +26,55 @@ void Transform::removeChild(Node* child)
 
 void Transform::update(float deltaTime)
 {
-	for (auto child : children) {
-		child->update(deltaTime);
+	if (active) {
+		for (auto child : children) {
+			child->update(deltaTime);
+		}
 	}
 }
 
 void Transform::updateTransformBuffer(BufferUpdateDesc& desc, mat4 parentTransform)
 {
-	for (auto child : children) {
-		child->updateTransformBuffer(desc, parentTransform * this->M);
+	if (active) {
+		for (auto child : children) {
+			child->updateTransformBuffer(desc, parentTransform * this->M);
+		}
 	}
 }
 
 void Transform::updateBoneBuffer(BufferUpdateDesc& desc, OzzObject::UniformDataBones* boneData)
 {
-	for (auto child : children) {
-		child->updateBoneBuffer(desc, boneData);
+	if (active) {
+		for (auto child : children) {
+			child->updateBoneBuffer(desc, boneData);
+		}
+	}
+}
+
+void Transform::updateParticleBuffer(BufferUpdateDesc& desc)
+{
+	if (active) {
+		for (auto child : children) {
+			child->updateParticleBuffer(desc);
+		}
 	}
 }
 
 void Transform::cull(const vec4 planes[6], bool doCull)
 {
-	for (auto child : children) {
-		child->cull(planes, doCull);
+	if (active) {
+		for (auto child : children) {
+			child->cull(planes, doCull);
+		}
 	}
 }
 
 void Transform::draw(Cmd* cmd)
 {
-	for (auto child : children) {
-		child->draw(cmd);
+	if (active) {
+		for (auto child : children) {
+			child->draw(cmd);
+		}
 	}
 }
 
@@ -69,9 +88,9 @@ void Transform::setPositionDirection(vec3 position, vec3 direction, vec3 up)
 	vec3 forward = normalize(direction);
 	vec3 right = cross(forward, up);
 
-	this->M[0] = vec4(right, 0);
-	this->M[1] = vec4(up, 0);
-	this->M[2] = vec4(-forward, 0);
+	this->M[0] = vec4(-right, 0);
+	this->M[1] = vec4(cross(forward, right), 0);
+	this->M[2] = vec4(forward, 0);
 	this->M[3] = vec4(position, 1);
 }
 

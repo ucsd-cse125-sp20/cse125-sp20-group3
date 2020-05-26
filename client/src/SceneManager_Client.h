@@ -8,6 +8,7 @@
 #include "Transform.h"
 #include "GLTFGeode.h"
 #include "OzzGeode.h"
+#include "ParticleSystemGeode.h"
 #include "Animator.h"
 
 #include "Input.h"
@@ -17,12 +18,12 @@
 #include "../../common/GameObject.h"
 #include "../../common/entity.h"
 #include "../../common/team.h"
-#include "../../common/player.h"
+#include "../../common/player_client.h"
 #include "../../common/base.h"
-#include "../../common/minion.h"
+#include "../../common/minion_client.h"
 #include "../../common/SuperMinion.h"
 #include "../../common/tower.h"
-#include "../../common/lasertower.h"
+#include "../../common/lasertower_client.h"
 #include "../../common/clawtower.h"
 #include "../../common/resource.h"
 #include "../../common/client2server.h"
@@ -43,27 +44,44 @@
 class SceneManager_Client : public Transform
 {
 private:
-	std::map<int, Entity*> idMap;
+	enum class EntityType {
+		PLAYER, LASER_TOWER, MINION, OTHER
+	};
+
+	uint32_t subid = 0;
+
+	std::map<int, std::pair<uint32_t, EntityType>> idMap;
+	std::map<uint32_t, Entity*> entityMap;
+	std::map<uint32_t, Player_Client*> playerMap;
+	std::map<uint32_t, LaserTower_Client*> laserTowerMap;
+	std::map<uint32_t, Minion_Client*> minionMap;
 	std::map<int, Transform*> transforms;
 	std::map<int, Animator*> animators;
 	std::map<std::string, GLTFGeode*> gltfGeodes;
 	std::map<std::string, OzzGeode*> ozzGeodes;
+	std::map<std::string, ParticleSystemGeode*> particleGeodes;
+	std::vector<int> deathlist;
 	int trackedPlayer_ID;
 
 	std::vector<Transform*> otherTransforms;
     
     Buffer** instanceBuffer = NULL;
 	Buffer** boneBuffer = NULL;
+	Buffer** particleBuffer = NULL;
+
+	RootSignature* particleRootSignature = NULL;
 
 	Team *red_team, *blue_team;
 
+	Renderer* renderer;
+
 public:
 	enum class GeodeType {
-		MESH, ANIMATED_MESH
+		MESH, ANIMATED_MESH, PARTICLES
 	};
 
 	enum class SceneBuffer {
-		INSTANCE, BONE
+		INSTANCE, BONE, PARTICLES
 	};
 
 	static bool enableCulling;
@@ -83,9 +101,6 @@ public:
 
 	void trackPlayer(int player_id);
 	mat4 getPlayerTransformMat();
-
-    void randomStaticInstantiation(Geode* g, int num, float range, float minSize, float maxSize);
-	void randomAnimatedInstantiation(OzzGeode* g, int num, float range, float minSize, float maxSize, const char* actions[], int numActions);
 
 	void update(float deltaTime) override;
 	void draw(Cmd* cmd) override;

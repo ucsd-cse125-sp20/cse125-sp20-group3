@@ -32,10 +32,14 @@
     <ClCompile Include="..\..\..\..\..\common\clawtower.cpp" />
     <ClCompile Include="..\..\..\..\..\common\GameObject.cpp" />
     <ClCompile Include="..\..\..\..\..\common\lasertower.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\lasertower_client.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\MathUtils.cpp" />
     <ClCompile Include="..\..\..\..\..\common\minion.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\minion_client.cpp" />
     <ClCompile Include="..\..\..\..\..\common\ObjectDetection.cpp" />
     <ClCompile Include="..\..\..\..\..\common\pathNode.cpp" />
     <ClCompile Include="..\..\..\..\..\common\player.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\player_client.cpp" />
     <ClCompile Include="..\..\..\..\..\common\resource.cpp" />
     <ClCompile Include="..\..\..\..\..\common\superminion.cpp" />
     <ClCompile Include="..\..\..\..\..\common\wallNode.cpp" />
@@ -51,14 +55,19 @@
     <ClCompile Include="..\..\..\..\src\GLTFGeode.cpp" />
     <ClCompile Include="..\..\..\..\src\GLTFObject.cpp" />
     <ClCompile Include="..\..\..\..\src\Input.cpp" />
+    <ClCompile Include="..\..\..\..\src\ParticleSystem.cpp" />
+    <ClCompile Include="..\..\..\..\src\ParticleSystemGeode.cpp" />
     <ClCompile Include="..\..\..\..\src\SceneManager_Client.cpp" />
+    <ClCompile Include="..\..\..\..\src\TimedTransform.cpp" />
     <ClCompile Include="..\..\..\..\src\Transform.cpp" />
-    <ClCompile Include="..\..\..\..\src\UIManager.cpp" />
+    <ClCompile Include="..\..\..\..\src\UIUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\src\Shaders\D3D12\basic.frag" />
     <None Include="..\..\..\..\src\Shaders\D3D12\basic.vert" />
     <None Include="..\..\..\..\src\Shaders\D3D12\FXAA.frag" />
+    <None Include="..\..\..\..\src\Shaders\D3D12\particle.frag" />
+    <None Include="..\..\..\..\src\Shaders\D3D12\particle.vert" />
     <None Include="..\..\..\..\src\Shaders\D3D12\profile.frag" />
     <None Include="..\..\..\..\src\Shaders\D3D12\profile.vert" />
     <None Include="..\..\..\..\src\Shaders\D3D12\skinning.frag" />
@@ -93,15 +102,19 @@
     <ClInclude Include="..\..\..\..\..\common\GameObject.h" />
     <ClInclude Include="..\..\..\..\..\common\lasertower.h" />
     <ClInclude Include="..\..\..\..\..\common\macros.h" />
+    <ClInclude Include="..\..\..\..\..\common\MathUtils.h" />
     <ClInclude Include="..\..\..\..\..\common\minion.h" />
+    <ClInclude Include="..\..\..\..\..\common\minion_client.h" />
     <ClInclude Include="..\..\..\..\..\common\ObjectDetection.h" />
     <ClInclude Include="..\..\..\..\..\common\pathNode.h" />
     <ClInclude Include="..\..\..\..\..\common\player.h" />
+    <ClInclude Include="..\..\..\..\..\common\player_client.h" />
     <ClInclude Include="..\..\..\..\..\common\resource.h" />
     <ClInclude Include="..\..\..\..\..\common\superminion.h" />
     <ClInclude Include="..\..\..\..\..\common\team.h" />
     <ClInclude Include="..\..\..\..\..\common\tower.h" />
     <ClInclude Include="..\..\..\..\..\common\wallNode.h" />
+    <ClInclude Include="..\..\..\..\..\common\lasertower_client.h" />
     <ClInclude Include="..\..\..\..\..\server\SceneManager_Server.h" />
     <ClInclude Include="..\..\..\..\src\Animator.h" />
     <ClInclude Include="..\..\..\..\src\OzzGeode.h" />
@@ -114,9 +127,12 @@
     <ClInclude Include="..\..\..\..\src\Input.h" />
     <ClInclude Include="..\..\..\..\src\Node.h" />
     <ClInclude Include="..\..\..\..\src\Object.h" />
+    <ClInclude Include="..\..\..\..\src\ParticleSystem.h" />
+    <ClInclude Include="..\..\..\..\src\ParticleSystemGeode.h" />
     <ClInclude Include="..\..\..\..\src\SceneManager_Client.h" />
+    <ClInclude Include="..\..\..\..\src\TimedTransform.h" />
     <ClInclude Include="..\..\..\..\src\Transform.h" />
-    <ClInclude Include="..\..\..\..\src\UIManager.h" />
+    <ClInclude Include="..\..\..\..\src\UIUtils.h" />
     <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\cgltf\cgltf.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

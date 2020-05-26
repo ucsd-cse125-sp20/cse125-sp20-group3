@@ -601,6 +601,13 @@ IWidget* GuiComponent::AddWidget(const IWidget& widget, bool clone /* = true*/)
 	return mWidgets.back();
 }
 
+IWidget* GuiComponent::AddWidget(IWidget* widget)
+{
+	mWidgets.emplace_back(widget);
+	mWidgetsClone.emplace_back(false);
+	return mWidgets.back();
+}
+
 void GuiComponent::RemoveWidget(IWidget* pWidget)
 {
 	decltype(mWidgets)::iterator it = eastl::find(mWidgets.begin(), mWidgets.end(), pWidget);

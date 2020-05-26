@@ -37,6 +37,7 @@ public:
 	void update(float deltaTime) override;
 	void updateTransformBuffer(BufferUpdateDesc& desc, mat4 parentTransform) override;
 	void updateBoneBuffer(BufferUpdateDesc& desc, OzzObject::UniformDataBones* boneData) override {}
+	void updateParticleBuffer(BufferUpdateDesc& desc) override {}
 	void cull(const vec4 planes[6], bool doCull) override;
 	void draw(Cmd* cmd) override;
 };

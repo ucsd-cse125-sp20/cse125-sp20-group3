@@ -45,7 +45,7 @@ class SceneManager_Client : public Transform
 {
 private:
 	enum class EntityType {
-		PLAYER, LASER_TOWER, MINION, OTHER
+		PLAYER, MINION, SUPER_MINION, LASER_TOWER, CLAW_TOWER, DUMPSTER, RECYCLING_BIN, OTHER
 	};
 
 	uint32_t subid = 0;
@@ -53,8 +53,12 @@ private:
 	std::map<int, std::pair<uint32_t, EntityType>> idMap;
 	std::map<uint32_t, Entity*> entityMap;
 	std::map<uint32_t, Player_Client*> playerMap;
-	std::map<uint32_t, LaserTower_Client*> laserTowerMap;
 	std::map<uint32_t, Minion_Client*> minionMap;
+	//super minions
+	std::map<uint32_t, LaserTower_Client*> laserTowerMap;
+	//claw towers
+	//dumpsters
+	//recycling bins
 	std::map<int, Transform*> transforms;
 	std::map<int, Animator*> animators;
 	std::map<std::string, GLTFGeode*> gltfGeodes;

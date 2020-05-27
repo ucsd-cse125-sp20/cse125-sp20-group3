@@ -13,7 +13,7 @@
 
 class Minion : public Entity {
 protected:
-	pathNode* destNode;
+	PathNode* destNode;
 	int attackRange;
 	float attackInterval;
 	float velocity;

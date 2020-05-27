@@ -20,7 +20,7 @@ private:
     float velocity_x, velocity_z, acceleration_x, acceleration_z;
     float rotation_y;
 	BUILD_MODE buildMode;
-	BuildNode* buildTarget;
+	vec3 interactPos;
 
 public:
     Player(GameObjectData data, int id, Team* t, SceneManager_Server* sm);

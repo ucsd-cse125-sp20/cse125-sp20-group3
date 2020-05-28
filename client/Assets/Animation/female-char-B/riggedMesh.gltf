@@ -1,0 +1,290 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 3672,
+      "min": [-0.596124, -0.011853, -0.338319],
+      "max": [0.60472, 2.68955, 0.302809]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 3672
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "type": "VEC2",
+      "count": 3672
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5123,
+      "type": "VEC4",
+      "count": 3672
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5126,
+      "type": "VEC4",
+      "count": 3672
+    },
+    {
+      "bufferView": 5,
+      "componentType": 5123,
+      "type": "SCALAR",
+      "count": 9465
+    },
+    {
+      "bufferView": 6,
+      "componentType": 5126,
+      "type": "MAT4",
+      "count": 20
+    }
+  ],
+  "asset": {
+    "generator": "Khronos glTF Blender I/O v1.1.46",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 44064
+    },
+    {
+      "buffer": 0,
+      "byteLength": 44064,
+      "byteOffset": 44064
+    },
+    {
+      "buffer": 0,
+      "byteLength": 29376,
+      "byteOffset": 88128
+    },
+    {
+      "buffer": 0,
+      "byteLength": 29376,
+      "byteOffset": 117504
+    },
+    {
+      "buffer": 0,
+      "byteLength": 58752,
+      "byteOffset": 146880
+    },
+    {
+      "buffer": 0,
+      "byteLength": 18930,
+      "byteOffset": 205632
+    },
+    {
+      "buffer": 0,
+      "byteLength": 1280,
+      "byteOffset": 224564
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "riggedMesh.bin",
+      "byteLength": 225844
+    }
+  ],
+  "images": [
+    {
+      "name": "female_char_tex_B",
+      "uri": "female_char_tex_B.png",
+      "mimeType": "image/png"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Female_Cube.007",
+      "primitives": [
+        {
+          "indices": 5,
+          "material": 0,
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2,
+            "JOINTS_0": 3,
+            "WEIGHTS_0": 4
+          }
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "Material",
+      "doubleSided": true,
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        },
+        "metallicFactor": 0
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "name": "head",
+      "translation": [-2.22045e-15, 0.173519, 7.45058e-09],
+      "rotation": [-0.0150099, 2.08745e-14, -3.57864e-09, 0.999887],
+      "scale": [1, 1, 1]
+    },
+    {
+      "children": [ 0 ],
+      "name": "neck",
+      "translation": [-2.80331e-15, 0.508823, 1.17579e-08],
+      "rotation": [0.0745711, -3.33997e-15, 1.77791e-08, 0.997216],
+      "scale": [1, 1, 1]
+    },
+    {
+      "name": "hand.L",
+      "translation": [9.48785e-09, 0.300487, 8.3819e-09],
+      "rotation": [0.0371125, -0.00311692, -0.0372755, 0.998611],
+      "scale": [1, 1, 1]
+    },
+    {
+      "children": [ 2 ],
+      "name": "arm2.L",
+      "translation": [-7.81438e-08, 0.293648, -3.72529e-09],
+      "rotation": [0.040638, 0.00827696, -0.0588961, 0.997402],
+      "scale": [1, 1, 1]
+    },
+    {
+      "children": [ 3 ],
+      "name": "arm.L",
+      "translation": [0.191837, 0.468061, -0.0213039],
+      "rotation": [-0.0338493, -0.0781571, -0.97761, 0.192416]
+    },
+    {
+      "name": "hand.R",
+      "translation": [-5.68107e-08, 0.300487, -8.3819e-09],
+      "rotation": [0.00258605, 0.00873997, 0.0745971, 0.997172],
+      "scale": [1, 1, 1]
+    },
+    {
+      "children": [ 5 ],
+      "name": "arm2.R",
+      "translation": [1.00583e-07, 0.293648, 3.35276e-08],
+      "rotation": [0.0898595, 0.129483, 0.0460408, 0.986428],
+      "scale": [1, 1, 1]
+    },
+    {
+      "children": [ 6 ],
+      "name": "arm.R",
+      "translation": [-0.180168, 0.468061, -0.021304],
+      "rotation": [0.128411, -0.226855, 0.943596, 0.204144],
+      "scale": [1, 1, 1]
+    },
+    {
+      "children": [ 1, 4, 7 ],
+      "name": "upperbody",
+      "translation": [3.55271e-15, 0.340967, -1.49012e-08],
+      "rotation": [-0.211576, 3.635e-15, -5.04436e-08, 0.977362]
+    },
+    {
+      "name": "foot.L",
+      "translation": [1.46655e-08, 0.503262, 2.98314e-10],
+      "rotation": [0.705352, -0.00290786, 0.00286986, 0.708845],
+      "scale": [1, 1, 1]
+    },
+    {
+      "children": [ 9 ],
+      "name": "leg2.L",
+      "translation": [2.0723e-09, 0.566611, 7.71252e-10],
+      "rotation": [-0.243375, 2.40309e-05, -0.00467091, 0.969921],
+      "scale": [1, 1, 1]
+    },
+    {
+      "children": [ 10 ],
+      "name": "leg.L",
+      "translation": [0.165215, 0.0691366, 0.010938],
+      "rotation": [-0.000381867, -0.0500968, 0.998741, -0.00257598]
+    },
+    {
+      "name": "foot.R",
+      "translation": [-3.14321e-09, 0.503262, 4.28554e-09],
+      "rotation": [0.70067, -0.000393928, -0.00570734, 0.713462],
+      "scale": [1, 1, 1]
+    },
+    {
+      "children": [ 12 ],
+      "name": "leg2.R",
+      "translation": [-2.92948e-09, 0.566611, -4.97676e-09],
+      "rotation": [-0.170629, -0.00017272, 0.00457342, 0.985325],
+      "scale": [1, 1, 1]
+    },
+    {
+      "children": [ 13 ],
+      "name": "leg.R",
+      "translation": [-0.168573, 0.0691366, 0.0109379],
+      "rotation": [-0.00138147, 0.445872, 0.895093, 0.00220759],
+      "scale": [1, 1, 0.999999]
+    },
+    {
+      "name": "skirt.L",
+      "translation": [0.146004, 0.364343, 0.208191],
+      "rotation": [-0.000248891, 0.233659, 0.972315, 0.00258619],
+      "scale": [1, 1, 1]
+    },
+    {
+      "name": "skirt.R",
+      "translation": [-0.175764, 0.317855, 0.169477],
+      "rotation": [0.00113075, 0.3052, 0.952285, -0.00233911],
+      "scale": [1, 1, 1]
+    },
+    {
+      "name": "skirt-back.R",
+      "translation": [-0.136475, 0.248728, -0.149829],
+      "rotation": [-0.101068, -0.0475211, 0.981381, 0.156264],
+      "scale": [0.999999, 1, 1]
+    },
+    {
+      "name": "skirt-back.L",
+      "translation": [0.118032, 0.248728, -0.149829],
+      "rotation": [0.120634, 0.0812159, -0.979169, 0.141705],
+      "scale": [0.999999, 1, 1]
+    },
+    {
+      "children": [ 8, 11, 14, 15, 16, 17, 18 ],
+      "name": "pelvis",
+      "translation": [-1.25217e-09, 1.04823, -0.0737702],
+      "rotation": [0.167949, 1.17516e-07, 2.0021e-08, 0.985796],
+      "scale": [1, 1, 1]
+    },
+    {
+      "mesh": 0,
+      "name": "Female_Cube.007",
+      "skin": 0
+    },
+    {
+      "children": [ 20, 19 ],
+      "name": "Armature"
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [ 21 ]
+    }
+  ],
+  "textures": [
+    {
+      "source": 0
+    }
+  ],
+  "skins": [
+    {
+      "inverseBindMatrices": 6,
+      "joints": [ 19, 8, 1, 0, 4, 3, 2, 7, 6, 5, 11, 10, 9, 14, 13, 12, 15, 16, 17, 18 ],
+      "name": "Armature",
+      "extras": [ 1, 8, 15, 20, 14, 18, 19, 13, 16, 17, 7, 11, 12, 6, 9, 10, 5, 4, 3, 2, ],
+    }
+  ]
+}

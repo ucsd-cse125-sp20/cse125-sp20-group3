@@ -48,6 +48,40 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	ozzGeodes[PLAYER_GEODE] = conf_new(OzzGeode, renderer, playerMaleDir);
 	((OzzObject*)ozzGeodes[PLAYER_GEODE]->obj)->SetClip(playerMaleActions[0]); // Set a default action
 
+
+	ParticleSystem::ParticleSystemParams particleParams = {};
+	particleParams.spriteFile = LASER_TOWER_BEAM_SPRITE;
+	particleParams.numParticles = MAX_PARTICLES;
+	particleParams.life = 20;
+	particleParams.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
+		float r = MathUtils::randfUniform(0, 0.1f);
+		float a = MathUtils::randfUniform(0, 2 * PI);
+		float z = 0;
+
+		pd->position = float3(r * cos(a), r * sin(a), z);
+		pd->color = float4(0.8f, 0.8f, 1.0f, 1.0f);
+		pd->scale = float2(0.2f, 0.2f);
+		pad->velocity = float3(0.f, 0.f, LASER_TOWER_BEAM_SPEED);
+	};
+	particleGeodes[LASER_TOWER_GEODE] = conf_new(ParticleSystemGeode, renderer, particleParams);
+
+
+	particleParams = {};
+	particleParams.spriteFile = MINION_BULLET_SPRITE;
+	particleParams.numParticles = 10;
+	particleParams.life = 0.5f;
+	particleParams.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
+		float r = MathUtils::randfUniform(0, 0.05f);
+		float a = MathUtils::randfUniform(0, 2 * PI);
+		float z = 0;
+
+		pd->position = float3(r * cos(a), r * sin(a), z);
+		pd->color = float4(1.0f, 1.0f, 0.5f, 1.0f);
+		pd->scale = float2(0.2f, 0.05f);
+		pad->velocity = float3(0.f, 0.f, MINION_BULLET_SPEED);
+	};
+	particleGeodes[MINION_GEODE] = conf_new(ParticleSystemGeode, renderer, particleParams);
+
 	///////////////////////////////////////////////////////////////////////////////
 	
     // TODO This is a hard coded animation example. Remove this later (SMALL MINION)
@@ -249,7 +283,7 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 				std::cout << "creating new minion, id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				idMap[data.id] = std::make_pair(++subid, EntityType::MINION);
-				minionMap[subid] = conf_new(Minion_Client, GO_data, data.id, team, nullptr, renderer, ozzGeodes[MINION_GEODE], transforms[data.id], particleRootSignature);
+				minionMap[subid] = conf_new(Minion_Client, GO_data, data.id, team, nullptr, ozzGeodes[MINION_GEODE], particleGeodes[MINION_GEODE], transforms[data.id]);
 			}
 			else if (ID_SUPER_MINION_MIN <= data.id && data.id <= ID_SUPER_MINION_MAX) {
 				std::cout << "creating new super minion, id: " << data.id << "\n";
@@ -261,11 +295,8 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 			else if (ID_LASER_MIN <= data.id && data.id <= ID_LASER_MAX) {
 				std::cout << "creating new laser tower, id: " << data.id << "\n";
 				idMap[data.id] = std::make_pair(++subid, EntityType::LASER_TOWER);
-				laserTowerMap[subid] = conf_new(LaserTower_Client, GO_data, data.id, team, nullptr, renderer);
 				transforms[data.id] = conf_new(Transform, mat4::identity());
-				transforms[data.id]->addChild(gltfGeodes[LASER_TOWER_GEODE]);
-				transforms[data.id]->addChild(laserTowerMap[subid]->laserTransform);
-				laserTowerMap[subid]->laser->createSpriteResources(particleRootSignature);
+				laserTowerMap[subid] = conf_new(LaserTower_Client, GO_data, data.id, team, nullptr, gltfGeodes[LASER_TOWER_GEODE], particleGeodes[LASER_TOWER_GEODE], transforms[data.id]);
 			}
 			else if (ID_CLAW_MIN <= data.id && data.id <= ID_CLAW_MAX) {
 				std::cout << "creating new claw tower, id: " << data.id << "\n";
@@ -333,7 +364,6 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 			case EntityType::LASER_TOWER:
 				laserTowerMap[id]->setEntData(data.ent_data);
 				if (laserTowerMap[id]->getActionState() == ACTION_STATE_FIRE) {
-					AudioManager::playAudioSource(laserTowerMap[id]->getPosition(), "laser");
 					laserTowerMap[id]->activate(minionMap[idMap[laserTowerMap[id]->getTargetID()].first]->getPosition());
 				}
 				transforms[data.id]->setMatrix(mat4::translation(vec3(-20,0,0)) * laserTowerMap[id]->getMatrix()); // TODO remove translation
@@ -366,8 +396,8 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 				// We can suspend removal here to play a death animation
 				if (!minionMap[id]->alive) {
 					this->removeChild(transforms[mapID]);
-					//conf_delete(minionMap[id]);							// TODO Memory issues here. Possibly fix by optimizing texture usage
-					//minionMap.erase(id);
+					conf_delete(minionMap[id]);
+					minionMap.erase(id);
 					idMap.erase(mapID);
 					conf_delete(transforms[mapID]);
 					transforms.erase(mapID);
@@ -429,12 +459,6 @@ void SceneManager_Client::setProgram(SceneManager_Client::GeodeType type, Geode:
 	case SceneManager_Client::GeodeType::PARTICLES:
 		for (auto ge : particleGeodes) {
 			ge.second->setProgram(program);
-		}
-		for (auto ltower : laserTowerMap) {
-			ltower.second->setProgram(program);
-		}
-		for (auto minion : minionMap) {
-			minion.second->setProgram(program);
 		}
 		break;
 	}

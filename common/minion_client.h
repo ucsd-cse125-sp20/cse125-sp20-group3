@@ -17,7 +17,6 @@
 
 class Minion_Client : public Minion {
 public:
-	static std::vector<ParticleSystemGeode*> geodes;
 	ParticleSystemGeode* bullets;
 	TimedTransform* bulletTransform;
 	Transform *bulletTransform1, *bulletTransform2;
@@ -26,10 +25,8 @@ public:
 	bool alive = true;
 	int deathCounter = 5;
 
-	Minion_Client(GameObjectData data, int id, Team* t, SceneManager_Server* sm, Renderer* renderer, OzzGeode* geode, Transform* parent, RootSignature* root);
+	Minion_Client(GameObjectData data, int id, Team* t, SceneManager_Server* sm, OzzGeode* geode, ParticleSystemGeode* bullets, Transform* parent);
 	~Minion_Client();
-
-	static void setProgram(Geode::GeodeShaderDesc shader);
 
 	void shoot();
 	void kill();

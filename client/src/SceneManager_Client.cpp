@@ -288,7 +288,7 @@ void SceneManager_Client::updateUI(Team * teamColor){
 	if (claw_machine){
 		UIUtils::changeImage(CLAW_MACHINE_UI_ICON, "tower_3.png",  float2((float)Application::width / 3200, (float)Application::height / 2000));
 	}else{
-		UIUtils::changeImage(CLAW_MACHINE_UI_ICON, "tower_3_low.png",  float2((float)Application::height / 3200, (float)Application::height / 2000));
+		UIUtils::changeImage(CLAW_MACHINE_UI_ICON, "tower_3_low.png",  float2((float)Application::width / 3200, (float)Application::height / 2000));
 	}
 
 	if (super_minion){

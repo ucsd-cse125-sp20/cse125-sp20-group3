@@ -481,7 +481,7 @@ void Application::InitDebugGui()
 		UIUtils::removeImage("overlay"); 
 		UIUtils::removeText("testText"); 
 		UIUtils::removeImage("start_button"); 
-		UIUtils::createImage("hud", "WeirdBox_halo.png", 400, -10, float2(1.f, 0.05f), 1);
+		// UIUtils::createImage("hud", "WeirdBox_halo.png", 400, -10, float2(1.f, 0.05f), 1);
 	});
 	//UIUtils::createText("testText", "YEET", 500, 800, "default font", 0xff6655ff, 3);
 }

@@ -117,6 +117,7 @@ GameObject* ObjectDetection::getNearestObject(vec2 position, int flags, int radi
 						vec2 objPosition = vec2(data.x, data.z);
 						if (length(position - objPosition) < shortestDistance) {
 							closestObject = otherObj;
+							shortestDistance = length(position - objPosition);
 						}
 					}
 				}

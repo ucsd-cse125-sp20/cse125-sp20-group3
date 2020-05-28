@@ -108,4 +108,6 @@ public:
 
 	void update(float deltaTime) override;
 	void draw(Cmd* cmd) override;
+
+	void updateUI(Team* teamColor);
 };

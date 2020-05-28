@@ -70,13 +70,25 @@ void Player::processInput(PlayerInput in) {
 
 				switch (buildMode) { //build something based on buildMode
 				case LASER:
-					if (team->checkResources(LASER_TYPE)) manager->spawnEntity(LASER_TYPE, buildPos.getX(), buildPos.getZ(), 0, this->team);
+					if (team->checkResources(LASER_TYPE))
+					{
+						team->buildEntity(LASER_TYPE);
+						manager->spawnEntity(LASER_TYPE, buildPos.getX(), buildPos.getZ(), 0, this->team);
+					}
 					break;
 				case CLAW:
-					if (team->checkResources(CLAW_TYPE)) manager->spawnEntity(CLAW_TYPE, buildPos.getX(), buildPos.getZ(), 0, this->team);
+					if (team->checkResources(CLAW_TYPE))
+					{
+						team->buildEntity(CLAW_TYPE);
+						manager->spawnEntity(CLAW_TYPE, buildPos.getX(), buildPos.getZ(), 0, this->team);
+					} 
 					break;
 				case SUPER_MINION:
-					if (team->checkResources(SUPER_MINION_TYPE)) manager->spawnEntity(SUPER_MINION_TYPE, buildPos.getX(), buildPos.getZ(), 0, this->team);
+					if (team->checkResources(SUPER_MINION_TYPE))
+					{
+						team->buildEntity(SUPER_MINION);
+						manager->spawnEntity(SUPER_MINION_TYPE, buildPos.getX(), buildPos.getZ(), 0, this->team);
+					} 
 					break;
 				default:
 					std::cout << "invalid buildMode\n";

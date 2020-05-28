@@ -220,7 +220,49 @@ void SceneManager_Client::updateStateAndScene(Client::UpData data) {
 
 void SceneManager_Client::updateState(Client::StateUpdateData updateData) {
 	red_team->setData(updateData.redTeamData);
+	SceneManager_Client::updateUI(red_team);
 	blue_team->setData(updateData.blueTeamData);
+	SceneManager_Client::updateUI(blue_team);
+}
+
+void SceneManager_Client::updateUI(Team * teamColor){
+	int plasticCount = teamColor->getPlasticCount();
+	int metalCount = teamColor->getMetalCount();
+	UIUtils::editText(PLASTIC_UI_TEXT, std::to_string(plasticCount), "small font", 0xff6655ff);
+	UIUtils::editText(METAL_UI_TEXT, std::to_string(metalCount), "small font", 0xff6655ff);
+	if (plasticCount <= 0){
+		UIUtils::changeImage(PLASTIC_UI_ICON, "resource_plastic_alert.png",  float2((float)mSettings.mWidth / 3200, (float)mSettings.mHeight / 2000));
+	}else{
+		UIUtils::changeImage(PLASTIC_UI_ICON, "resource_plastic.png",  float2((float)mSettings.mWidth / 3200, (float)mSettings.mHeight / 2000));
+	}
+	if (metalCount <= 0){
+		UIUtils::changeImage(METAL_UI_ICON, "resource_metal_alert.png",  float2((float)mSettings.mWidth / 3200, (float)mSettings.mHeight / 2000));
+	}else{
+		UIUtils::changeImage(METAL_UI_ICON, "resource_metal.png",  float2((float)mSettings.mWidth / 3200, (float)mSettings.mHeight / 2000));
+	}
+
+	bool super_minion = teamColor->checkResources(SUPER_MINION_TYPE);
+	bool claw_machine = teamColor->checkResources(CLAW_TYPE);
+	bool laser_tower = teamColor->checkResources(LASER_TYPE);
+
+	if (laser_tower){
+		UIUtils::changeImage(LASER_TOWER_UI_ICON, "tower_2.png",  float2((float)mSettings.mWidth / 3200, (float)mSettings.mHeight / 2000));
+	}else{
+		UIUtils::changeImage(LASER_TOWER_UI_ICON, "tower_2_low.png",  float2((float)mSettings.mWidth / 3200, (float)mSettings.mHeight / 2000));
+	}
+
+	if (claw_machine){
+		UIUtils::changeImage(CLAW_MACHINE_UI_ICON, "tower_3.png",  float2((float)mSettings.mWidth / 3200, (float)mSettings.mHeight / 2000));
+	}else{
+		UIUtils::changeImage(CLAW_MACHINE_UI_ICON, "tower_3_low.png",  float2((float)mSettings.mWidth / 3200, (float)mSettings.mHeight / 2000));
+	}
+
+	if (super_minion){
+		UIUtils::changeImage(SUPER_MINION_UI_ICON, "tower_4.png",  float2((float)mSettings.mWidth / 3200, (float)mSettings.mHeight / 2000));
+	}else{
+		UIUtils::changeImage(SUPER_MINION_UI_ICON, "tower_4_low.png",  float2((float)mSettings.mWidth / 3200, (float)mSettings.mHeight / 2000));
+	}
+
 }
 
 void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)

@@ -29,7 +29,10 @@ public:
 	void decMinion();
     void incTower();
 	void decTower();
+	int getPlasticCount();
+	int getMetalCount();
     bool checkResources(char entityType);
+	void buildEntity(char entityType);
 	void addResource(char type, int amount);
 
 	void setData(TeamData data);

@@ -453,24 +453,24 @@ void Application::InitDebugGui()
 
 
 	UIUtils::loadFont("default font", "TitilliumText/TitilliumText-Bold.otf", 128); // All fonts must be loaded beforehand
+	UIUtils::loadFont("small font", "TitilliumText/TitilliumText-Bold.otf", 20); // All fonts must be loaded beforehand
 
 	// display resources count
-	UIUtils::createImage("overlay", "bottle.png", 250, 900, float2((float)mSettings.mWidth / 15000, (float)mSettings.mHeight / 12000), 0);
-	UIUtils::createText("plastic_text", "placeholder1", 250, 950, "default font", 0xff6655ff, 3);
-	UIUtils::createImage("overlay1", "metal.png", 400, 900, float2((float)mSettings.mWidth / 15000, (float)mSettings.mHeight / 12000), 0);
-	UIUtils::createText("metal_text", "placeholder2", 400, 950, "default font", 0xff6655ff, 3);
+	UIUtils::createImage("resource_plastic", "resource_plastic.png", 250, 850, float2((float)mSettings.mWidth / 3200, (float)mSettings.mHeight / 2000), 0);
+	UIUtils::createText("plastic_text", "0", 250, 900, "small font", 0xff6655ff, 3);
+	UIUtils::createImage("resource_metal", "resource_metal.png", 320, 850, float2((float)mSettings.mWidth / 3200, (float)mSettings.mHeight / 2000), 0);
+	UIUtils::createText("metal_text", "0", 320, 900, "samll font", 0xff6655ff, 3);
 
 	// display tower/minion count
-	UIUtils::createImage("claw_machine", "claw_machine.png", 600, 920, float2((float)mSettings.mWidth / 15000, (float)mSettings.mHeight / 12000), 0);
-	UIUtils::createImage("laser_tower", "laser_tower.png", 700, 920, float2((float)mSettings.mWidth / 15000, (float)mSettings.mHeight / 12000), 0);
-	UIUtils::createImage("minion", "minion.png", 800, 920, float2((float)mSettings.mWidth / 15000, (float)mSettings.mHeight / 12000), 0);
-	UIUtils::createImage("super_minion", "minion.png", 900, 920, float2((float)mSettings.mWidth / 15000, (float)mSettings.mHeight / 12000), 0);
+	// UIUtils::createImage("minion", "tower_1_low.png", 600, 870, float2((float)mSettings.mWidth / 3200, (float)mSettings.mHeight / 2000), 0);
+	UIUtils::createImage("laser_tower", "tower_2_low.png", 600, 870, float2((float)mSettings.mWidth / 3200, (float)mSettings.mHeight / 2000), 0);
+	UIUtils::createImage("claw_machine", "tower_3_low.png", 680, 870, float2((float)mSettings.mWidth / 3200, (float)mSettings.mHeight / 2000), 0);
+	UIUtils::createImage("super_minion", "tower_4_low.png", 760, 870, float2((float)mSettings.mWidth / 3200, (float)mSettings.mHeight / 2000), 0);
 
 	// display count as text
-	UIUtils::createText("claw_machine_text", "placeholder1", 600, 950, "default font", 0xff6655ff, 3);
-	UIUtils::createText("laser_tower_text", "placeholder1", 700, 950, "default font", 0xff6655ff, 3);
-	UIUtils::createText("minion_text", "placeholder1", 800, 950, "default font", 0xff6655ff, 3);
-	UIUtils::createText("super_minion_text", "placeholder1", 900, 950, "default font", 0xff6655ff, 3);
+	UIUtils::createText("claw_machine_text", "1", 600, 900, "small font", 0xff6655ff, 3);
+	UIUtils::createText("laser_tower_text", "2", 680, 900, "small font", 0xff6655ff, 3);
+	UIUtils::createText("super_minion_text", "3", 760, 900, "small font", 0xff6655ff, 3);
 
 	UIUtils::loadTexture("WeirdBox_halo.png"); // Preload textures
 	UIUtils::createImage("start_button", "start.png", 500, 400, float2(1,1), 1);

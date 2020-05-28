@@ -91,8 +91,10 @@ void ObjectDetection::updateObject(GameObject* obj, int flags)
 void ObjectDetection::removeObject(GameObject* obj)
 {
 	std::cout << "removing " << ((Entity*)obj)->getID() << "\n";
-	SpatialCell cell = *(obj->objDectData.cell);
-	cell.objects.erase(std::remove(cell.objects.begin(), cell.objects.end(), obj), cell.objects.end());
+	SpatialCell* cell = obj->objDectData.cell;
+	printf("%d\n", (int)cell->objects.size());
+	cell->objects.erase(std::remove(cell->objects.begin(), cell->objects.end(), obj), cell->objects.end());
+	printf("%d\n", (int)cell->objects.size());
 }
 
 GameObject* ObjectDetection::getNearestObject(vec2 position, int flags, int radius)

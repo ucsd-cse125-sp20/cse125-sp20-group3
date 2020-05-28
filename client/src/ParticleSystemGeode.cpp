@@ -34,8 +34,16 @@ void ParticleSystemGeode::updateParticleBuffer(BufferUpdateDesc& desc)
 	((ParticleSystem*)this->obj)->fillParticleData(&((ParticleSystem::ParticleData*)desc.pMappedData)[particleID * (int)MAX_PARTICLES]);
 }
 
+void ParticleSystemGeode::update(float deltaTime)
+{
+	if (updated) return;
+	updated = true;
+	obj->update(deltaTime);
+}
+
 void ParticleSystemGeode::draw(Cmd* cmd)
 {
+	updated = false;
 	countingInstances = false;
 	countingParticleInstances = false;
 	int particleID = particleInstanceIDs.front();

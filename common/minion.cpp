@@ -10,7 +10,7 @@ Minion::Minion(GameObjectData data, int id, Team* t, SceneManager_Server* sm) : 
 	if (sm != nullptr) { //only execute on server
 		t->incMinion();
 
-		destNode = (pathNode*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_PATH_NODE, 10);
+		destNode = (PathNode*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_PATH_NODE, 10);
 
 		int flags = DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE | DETECTION_FLAG_MINION | 
 					DETECTION_FLAG_MINION_TARGET | DETECTION_FLAG_LASER_TARGET;
@@ -29,7 +29,7 @@ Minion::Minion(GameObjectData data, int id, int health, int attack, int range, f
 	if (sm != nullptr) { //only execute on server
 		t->incMinion();
 
-		destNode = (pathNode*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_PATH_NODE, 10);
+		destNode = (PathNode*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_PATH_NODE, 10);
 
 		int flags = DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE | DETECTION_FLAG_MINION |
 					DETECTION_FLAG_MINION_TARGET | DETECTION_FLAG_LASER_TARGET;
@@ -92,7 +92,7 @@ void Minion::update(float deltaTime) { //should they be able to switch attack ta
 void Minion::takeDamage(int damage) {
 	Entity::takeDamage(damage);
 	std::cout << "minion: " << id << " took " << damage << " damage | remaining health: " << health << "\n";
-	if (health <= 0) { team->decMinion(); std::cout << "i die\n"; }
+	if (health <= 0) { team->decMinion(); std::cout << "minion " << id << " dying\n"; }
 }
 
 void Minion::attack() {
@@ -127,7 +127,7 @@ void Minion::move(float deltaTime) {
 		model[2] = vec4(-forward, 0);
 
 		if (this->getPosition() == destNode->getPosition()) { //reached destNode with this iteration
-			pathNode* nextNode; //continue moving to the next node
+			PathNode* nextNode; //continue moving to the next node
 			if (this->team->teamColor == RED_TEAM) nextNode = this->destNode->next_red;
 			else nextNode = this->destNode->next_blue;
 

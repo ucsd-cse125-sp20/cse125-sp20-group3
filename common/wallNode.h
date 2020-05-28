@@ -4,8 +4,8 @@
 #include "GameObject.h"
 #include "ObjectDetection.h"
 
-class wallNode : public GameObject {
+class WallNode : public GameObject {
     public: 
-        wallNode(float x_index, float z_index);
+        WallNode(float x_index, float z_index);
 };
 #endif

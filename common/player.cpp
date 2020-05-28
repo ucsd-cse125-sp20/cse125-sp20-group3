@@ -8,6 +8,7 @@ Player::Player(GameObjectData data, int id, Team* t, SceneManager_Server* sm) : 
 	acceleration_x = 0.f;
 	acceleration_z = 0.f;
 	buildMode = NEUTRAL;
+	interactPos = vec3(0, 0, 0);
 
 	if (sm != nullptr) {
 		int flags = DETECTION_FLAG_PLAYER | DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE;
@@ -41,6 +42,8 @@ void Player::update(float deltaTime) {
 	//std::cout << "player x: " << xpos << " z: " << zpos << " y: " << yrot << "\n";
 
 	ObjectDetection::updateObject(this);
+
+	interactPos = this->getPosition() + (normalize(forward) * INTERACT_DISTANCE);
 }
 
 void Player::processInput(PlayerInput in) {
@@ -48,42 +51,59 @@ void Player::processInput(PlayerInput in) {
 
 	//std::cout << "intent: " << in.buildIntent << " buildType: " << in.buildType << " harvestResource: " << in.harvestResource << "\n";
 
+	
+
 	if (in.buildIntent == BUILD_CANCEL) {
 		buildMode = NEUTRAL;
-		std::cout << "cancelling\n";
+		std::cout << "canceling\n";
 	}
 	else {
 		if (in.buildIntent == BUILD_CONFIRM && buildMode != NEUTRAL) {
-			std::cout << "building\n";
-			//TODO: do math to figure out where to build
+			int flags = DETECTION_FLAG_BUILD_NODE;
+			if (team->teamColor == RED_TEAM) flags = flags | DETECTION_FLAG_RED_TEAM;
+			else flags = flags | DETECTION_FLAG_BLUE_TEAM;
+			BuildNode* buildTarget = (BuildNode*)ObjectDetection::getNearestObject(vec2(interactPos.getX(), interactPos.getZ()), flags, 0);
+			
+			if (buildTarget != nullptr) {
+				vec3 buildPos = buildTarget->getPosition();
+				std::cout << "building at " << buildPos.getX() << " " << buildPos.getZ() << "\n";
 
-			switch (buildMode) { //build something based on buildMode
-			case LASER: //TODO: getNearestObject(position + forward, BUILD_NODE_FLAG)
-				if (team->checkResources(LASER_TYPE))//manager->spawnEntity(LASER_TYPE, x, z, y);
-				break;
-			case CLAW:
-				if (team->checkResources(CLAW_TYPE))//manager->spawnEntity(CLAW_TYPE, x, z, y);
-				break;
-			case SUPER_MINION:
-				if (team->checkResources(SUPER_MINION_TYPE))//manager->spawnEntity(SUPER_MINION_TYPE, x, z, y);
-				break;
-			default:
-				std::cout << "invalid buildMode\n";
+				switch (buildMode) { //build something based on buildMode
+				case LASER:
+					if (team->checkResources(LASER_TYPE)) manager->spawnEntity(LASER_TYPE, buildPos.getX(), buildPos.getZ(), 0, this->team);
+					break;
+				case CLAW:
+					if (team->checkResources(CLAW_TYPE)) manager->spawnEntity(CLAW_TYPE, buildPos.getX(), buildPos.getZ(), 0, this->team);
+					break;
+				case SUPER_MINION:
+					if (team->checkResources(SUPER_MINION_TYPE)) manager->spawnEntity(SUPER_MINION_TYPE, buildPos.getX(), buildPos.getZ(), 0, this->team);
+					break;
+				default:
+					std::cout << "invalid buildMode\n";
+				}
+
+				buildMode = NEUTRAL; //reset to neutral after building
 			}
-
-			buildMode = NEUTRAL; //reset to neutral after building
+			else std::cout << "tried building but no BuildNode in front\n";
 		}
 		else {
 			buildMode = in.buildType == LASER_TYPE ? LASER : 
 						in.buildType == CLAW_TYPE ? CLAW : 
 						in.buildType == SUPER_MINION_TYPE ? SUPER_MINION : 
 						buildMode;
+			if(in.buildType != NO_BUILD_TYPE) std::cout << "setting buildMode to " << buildMode << "\n";
 		}
 	}
 
 	if (in.harvestResource) {
-		//TODO: check front of player based on position and rotation and harvest resource if present
 		std::cout << "harvesting\n";
+		std::cout << "player at " << getPosition().getX() << " " << getPosition().getZ() << "\n";
+		std::cout << "interact at " << interactPos.getX() << " " << interactPos.getZ() << "\n";
+		Resource* res = (Resource*)ObjectDetection::getNearestObject(vec2(interactPos.getX(), interactPos.getZ()), DETECTION_FLAG_RESOURCE, 0);
+		if (res != nullptr && res->isActive()) {
+			std::pair<char, int> resCount = res->harvest();
+			this->team->addResource(resCount.first, resCount.second);
+		}
 	}
 }
 

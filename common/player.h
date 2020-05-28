@@ -8,8 +8,10 @@
 #include "entity.h"
 #include "client2server.h"
 #include "macros.h"
+#include "BuildNode.h"
 
 #define MOVE_SPEED 1
+#define INTERACT_DISTANCE 5
 
 class Player : public Entity {
 private:
@@ -18,13 +20,9 @@ private:
     float velocity_x, velocity_z, acceleration_x, acceleration_z;
     float rotation_y;
 	BUILD_MODE buildMode;
-public:
-	/*struct PlayerData {
-		std::string id;
-		float velocity_x;
-		float velocity_z;
-	};*/
+	vec3 interactPos;
 
+public:
     Player(GameObjectData data, int id, Team* t, SceneManager_Server* sm);
 	
     void update(float deltaTime) override; //server-side state management

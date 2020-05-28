@@ -30,6 +30,7 @@ public:
     void incTower();
 	void decTower();
     bool checkResources(char entityType);
+	void addResource(char type, int amount);
 
 	void setData(TeamData data);
 	int writeData(char buf[], int index);

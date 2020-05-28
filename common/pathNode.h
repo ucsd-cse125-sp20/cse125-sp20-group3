@@ -4,13 +4,13 @@
 #include "GameObject.h"
 #include "ObjectDetection.h"
 
-class pathNode : public GameObject {
+class PathNode : public GameObject {
     public:
-        pathNode* next_red = nullptr;
-        pathNode* next_blue = nullptr;
+        PathNode* next_red = nullptr;
+        PathNode* next_blue = nullptr;
 
-        pathNode(float x_index, float z_index);
-        void setNextRed(pathNode *next_red_node);
-        void setNextBlue(pathNode *next_blue_node);
+        PathNode(float x_index, float z_index);
+        void setNextRed(PathNode *next_red_node);
+        void setNextBlue(PathNode *next_blue_node);
 };
 #endif

@@ -18,9 +18,9 @@
 #include "../common/resource.h"
 
 #include "../common/ObjectDetection.h"
-#include "../common/pathNode.h"
-#include "../common/buildNode.h"
-#include "../common/wallNode.h"
+#include "../common/PathNode.h"
+#include "../common/BuildNode.h"
+#include "../common/WallNode.h"
 
 
 class SceneManager_Server {
@@ -31,9 +31,9 @@ private:
 
 public:
 	std::map<int, Entity*> idMap;
-	std::vector<pathNode*> pathNodes;
-	std::vector<wallNode*> wallNodes;
-	std::vector<buildNode*> buildNodes;
+	std::vector<PathNode*> pathNodes;
+	std::vector<WallNode*> wallNodes;
+	std::vector<BuildNode*> buildNodes;
 
 	SceneManager_Server();
 	~SceneManager_Server();
@@ -51,6 +51,7 @@ public:
 
 	void populateScene();
 	void testAttacking();
+	void testBuilding();
 };
 
 #endif

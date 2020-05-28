@@ -473,7 +473,7 @@ void Application::InitDebugGui()
 	UIUtils::createText("super_minion_text", "placeholder1", 900, 950, "default font", 0xff6655ff, 3);
 
 	UIUtils::loadTexture("WeirdBox_halo.png"); // Preload textures
-	UIUtils::createImage("start_button", "start.png", 1500, 400, float2(1,1), 1);
+	UIUtils::createImage("start_button", "start.png", 500, 400, float2(1,1), 1);
 	UIUtils::addCallbackToImage("start_button", []() { 
 		UIUtils::removeImage("overlay"); 
 		UIUtils::removeText("testText"); 

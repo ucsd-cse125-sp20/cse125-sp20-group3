@@ -11,6 +11,8 @@
 #include <ctime>
 #include <map>
 
+#define MINION_MOVE_ATTEMPTS 5
+
 class Minion : public Entity {
 protected:
 	PathNode* destNode;

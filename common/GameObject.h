@@ -15,14 +15,15 @@ struct ObjDectData {
 
 class GameObject 
 {
+protected:
+	mat4 model;
+
 public:
 	struct GameObjectData {
 		float x, z, rot;
 	};
 
 	ObjDectData objDectData = {};
-
-	mat4 model;
 
 	GameObject();
 	GameObject(GameObjectData data);

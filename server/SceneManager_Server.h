@@ -52,6 +52,7 @@ public:
 	void populateScene();
 	void testAttacking();
 	void testBuilding();
+	void testWalls();
 };
 
 #endif

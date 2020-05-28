@@ -17,12 +17,13 @@ SceneManager_Server::SceneManager_Server() :
 	blue_team = new Team(BLUE_TEAM);
 
 	this->populatePaths();
-	this->populateWalls();
+	//this->populateWalls();
 	this->populateBuilds();
 
 	//this->populateScene();
 	this->testAttacking();
-	this->testBuilding();
+	//this->testBuilding();
+	//this->testWalls();
 }
 
 SceneManager_Server::~SceneManager_Server() {
@@ -780,25 +781,25 @@ void SceneManager_Server::testAttacking() {
 	ClawTower* c1 = new ClawTower(data, id, red_team, this);
 	idMap[id] = c1;*/
 
-	/*id = next_laser_id;
+	id = next_laser_id;
 	next_laser_id++;
-	data = { 2.5, 2.5, 0 };
+	data = { 0, 10, 0 };
 	LaserTower* l1 = new LaserTower(data, id, blue_team, this);
-	idMap[id] = l1;*/
+	idMap[id] = l1;
 
-	/*id = next_laser_id;
+	id = next_laser_id;
 	next_laser_id++;
-	data = { 0, 0, 0 };
+	data = { 0, 20, 0 };
 	LaserTower* l2 = new LaserTower(data, id, red_team, this);
-	idMap[id] = l2;*/
+	idMap[id] = l2;
 
-	/*id = next_minion_id;
+	id = next_minion_id;
 	next_minion_id++;
-	data = { 20, 24, 0 };
+	data = { -10, 10, 0 };
 	Minion* m2 = new Minion(data, id, red_team, this);
-	idMap[id] = m2;*/
+	idMap[id] = m2;
 
-	id = next_dumpster_id;
+	/*id = next_dumpster_id;
 	next_dumpster_id++;
 	data = { 5, 15, 0 };
 	Resource* d1 = new Resource(DUMPSTER_TYPE, data, id, this);
@@ -806,11 +807,15 @@ void SceneManager_Server::testAttacking() {
 	id = next_recycling_bin_id;
 	next_recycling_bin_id++;
 	data = { -5, -15, 0 };
-	Resource* r1 = new Resource(RECYCLING_BIN_TYPE, data, id, this);
+	Resource* r1 = new Resource(RECYCLING_BIN_TYPE, data, id, this);*/
 }
 
 void SceneManager_Server::testBuilding() {
 	new BuildNode(RED_TEAM, 0, 0);
+}
+
+void SceneManager_Server::testWalls() {
+	new WallNode(-0.5f, -0.5f);
 }
 
 /***** legacy code *****/

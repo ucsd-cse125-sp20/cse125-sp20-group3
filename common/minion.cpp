@@ -16,7 +16,7 @@ Minion::Minion(GameObjectData data, int id, Team* t, SceneManager_Server* sm) : 
 					DETECTION_FLAG_MINION_TARGET | DETECTION_FLAG_LASER_TARGET;
 		if (t->teamColor == RED_TEAM) flags = flags | DETECTION_FLAG_RED_TEAM;
 		else flags = flags | DETECTION_FLAG_BLUE_TEAM;
-		ObjectDetection::addObject(this, flags);
+		ObjectDetection::addObject(this, flags, -0.25f, 0.25f, -0.25f, 0.25f);
 	}
 }
 
@@ -35,7 +35,7 @@ Minion::Minion(GameObjectData data, int id, int health, int attack, int range, f
 					DETECTION_FLAG_MINION_TARGET | DETECTION_FLAG_LASER_TARGET;
 		if (t->teamColor == RED_TEAM) flags = flags | DETECTION_FLAG_RED_TEAM;
 		else flags = flags | DETECTION_FLAG_BLUE_TEAM;
-		ObjectDetection::addObject(this, flags);
+		ObjectDetection::addObject(this, flags, -0.25f, 0.25f, -0.25f, 0.25f);
 	}
 }
 
@@ -92,7 +92,11 @@ void Minion::update(float deltaTime) { //should they be able to switch attack ta
 void Minion::takeDamage(int damage) {
 	Entity::takeDamage(damage);
 	std::cout << "minion: " << id << " took " << damage << " damage | remaining health: " << health << "\n";
-	if (health <= 0) { team->decMinion(); std::cout << "minion " << id << " dying\n"; }
+	if (health <= 0) {
+		std::cout << "minion " << id << " dying\n";
+		team->decMinion(); 
+		ObjectDetection::removeObject(this);
+	}
 }
 
 void Minion::attack() {
@@ -112,19 +116,36 @@ void Minion::move(float deltaTime) {
 		vec3 dest_vec = destNode->getPosition() - this->getPosition(); //vector to reach destNode
 		float dest_dist = length(dest_vec); //distance between this and destNode
 		float move_dist = std::min(remaining_move_dist, dest_dist); //this iteration, move full move_dist, or only to destNode if closer
-
 		vec3 move_vec = move_dist > 0 ? normalize(dest_vec) * move_dist : vec3(0); //move calculated distance along vector to destination
 
-		float lastXPos = model[3][0];
-		float lastZPos = model[3][2];
-		model[3][0] += move_vec[0];
-		model[3][2] += move_vec[2];
-		//if (doneMoving) std::cout << "x: " << model[3][0] << " z: " << model[3][2] << "\n";
-		remaining_move_dist -= move_dist; //decrease remaining movement distance
-		vec3 forward = normalize(vec3(model[3][0] - lastXPos, 0, model[3][2] - lastZPos));
-		vec3 right = cross(forward, vec3(0, 1, 0));
-		model[0] = vec4(right, 0);
-		model[2] = vec4(-forward, 0);
+		int move_attempts = 0;
+		mat4 oldModel = model;
+		while (move_attempts < MINION_MOVE_ATTEMPTS) { //attempt to move along dest_vec and check for collisions. if collision, adjust and try again
+			move_attempts++;
+
+			model[3][0] += move_vec[0];
+			model[3][2] += move_vec[2];
+			vec3 forward = normalize(vec3(model[3][0] - oldModel[3][0], 0, model[3][2] - oldModel[3][2]));
+			vec3 right = cross(forward, vec3(0, 1, 0));
+			model[0] = vec4(right, 0);
+			model[2] = vec4(-forward, 0);
+
+			std::vector<GameObject*> collisions = ObjectDetection::getCollisions(this, DETECTION_FLAG_COLLIDABLE);
+			if (collisions.size() > 0) {
+				std::cout << "minion " << id << " detected collision on move_attempt " << move_attempts << "\n";
+				this->model = oldModel;
+				vec4 move_vec4 = vec4(move_vec, 0);
+				float rot_degrees = (float)pow(-1, move_attempts - 1) * ((float)move_attempts * 10); //10, -20, 30, -40, last one doesn't matter
+				move_vec = (mat4::rotationY(degToRad(rot_degrees)) * move_vec4).getXYZ();
+			}
+			else break;
+
+			if (move_attempts == MINION_MOVE_ATTEMPTS) {
+				remaining_move_dist = 0;
+			}
+		}
+
+		remaining_move_dist -= move_dist;
 
 		if (this->getPosition() == destNode->getPosition()) { //reached destNode with this iteration
 			PathNode* nextNode; //continue moving to the next node

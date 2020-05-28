@@ -33,15 +33,15 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 {
 	this->renderer = renderer;
 	// It'd be nice if I could put this in a loop later
-	gltfGeodes[ENV_GEODE] = conf_new(GLTFGeode, renderer, mapFile);
+	gltfGeodes[ENV_GEODE] = conf_new(GLTFGeode, renderer, mapFile); //ok
 	gltfGeodes[PLAYER_GEODE] = conf_new(GLTFGeode, renderer, playerFile);
 	//gltfGeodes[BASE_GEODE] = conf_new(GLTFGeode, renderer, baseFile);
 	gltfGeodes[MINION_GEODE] = conf_new(GLTFGeode, renderer, minionFile);
 	gltfGeodes[SUPER_MINION_GEODE] = conf_new(GLTFGeode, renderer, superMinionFile);
-	gltfGeodes[LASER_TOWER_GEODE] = conf_new(GLTFGeode, renderer, laserTowerFile);
+	gltfGeodes[LASER_TOWER_GEODE] = conf_new(GLTFGeode, renderer, laserTowerFile); //ok
 	gltfGeodes[CLAW_TOWER_GEODE] = conf_new(GLTFGeode, renderer, clawTowerFile);
-	gltfGeodes[DUMPSTER_GEODE] = conf_new(GLTFGeode, renderer, dumpsterFile);
-	gltfGeodes[RECYCLING_BIN_GEODE] = conf_new(GLTFGeode, renderer, recyclingBinFile);
+	gltfGeodes[DUMPSTER_GEODE] = conf_new(GLTFGeode, renderer, dumpsterFile); //ok
+	gltfGeodes[RECYCLING_BIN_GEODE] = conf_new(GLTFGeode, renderer, recyclingBinFile); //ok
 
 	ozzGeodes[MINION_GEODE] = conf_new(OzzGeode, renderer, smallMinionDir);
 	((OzzObject*)ozzGeodes[MINION_GEODE]->obj)->SetClip(smallMinionActions[0]); // Set a default action
@@ -345,7 +345,7 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 			case EntityType::MINION:
 				minionMap[id]->setEntData(data.ent_data);
 				if (minionMap[id]->getActionState() == ACTION_STATE_FIRE) {
-					minionMap[id]->setEntData(data.ent_data);
+					minionMap[id]->setEntData(data.ent_data); //TODO ask kevin what this does
 					minionMap[id]->shoot();
 				}
 				transforms[data.id]->setMatrix(minionMap[id]->getMatrix());

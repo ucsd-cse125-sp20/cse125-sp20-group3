@@ -9,12 +9,16 @@ Tower::Tower(GameObjectData data, int id, int health, int attack, Team* t, Scene
 					DETECTION_FLAG_MINION_TARGET;
 		if (t->teamColor == RED_TEAM) flags = flags | DETECTION_FLAG_RED_TEAM;
 		else flags = flags | DETECTION_FLAG_BLUE_TEAM;
-		ObjectDetection::addObject(this, flags);
+		ObjectDetection::addObject(this, flags, -0.5, 0.5, -0.5, 0.5);
 	}
 }
 
 void Tower::takeDamage(int damage) {
 	Entity::takeDamage(damage);
 	std::cout << "tower: " << id << " took " << damage << " damage | remaining health: " << health << "\n";
-	if (health <= 0) { team->decTower(); std::cout << "tower " << id << " dying\n"; }
+	if (health <= 0) {
+		std::cout << "tower " << id << " dying\n";
+		team->decTower(); 
+		ObjectDetection::removeObject(this);
+	}
 }

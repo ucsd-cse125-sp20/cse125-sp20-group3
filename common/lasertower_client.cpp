@@ -2,6 +2,7 @@
 
 std::vector<ParticleSystemGeode*> LaserTower_Client::geodes = std::vector<ParticleSystemGeode*>();
 
+//pass in gltfGeode and position transform as parent
 LaserTower_Client::LaserTower_Client(GameObjectData data, int id, Team* t, SceneManager_Server* sm_server, Renderer* renderer) : LaserTower(data, id, t, sm_server)
 {
 	ParticleSystem::ParticleSystemParams params = {};
@@ -13,6 +14,9 @@ LaserTower_Client::LaserTower_Client(GameObjectData data, int id, Team* t, Scene
 
 	laserTransform = conf_new(TimedTransform, mat4::translation(LASER_TOWER_BEAM_OFFSET));
 	laserTransform->addChild(laser);
+
+	//parent gltfGeode
+	//parent laserTransform
 }
 
 LaserTower_Client::~LaserTower_Client()

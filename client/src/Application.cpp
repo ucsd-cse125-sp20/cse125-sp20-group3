@@ -196,6 +196,9 @@ char sendbuf[DEFAULT_BUFLEN];
 //char recvbuf[SERVER_SENDBUFLEN];
 Client::UpData updateData;
 
+int Application::height = 0;
+int Application::width = 0;
+
 // ======================================================================================================
 // ==============================================[ CODE STARTS HERE ]====================================
 // ======================================================================================================
@@ -1045,6 +1048,9 @@ bool Application::Load()
 	PrepareDescriptorSets();
 
 	LoadPipelines();
+
+	Application::height = mSettings.mHeight;
+	Application::width = mSettings.mWidth;
 
 	return true;
 }

@@ -55,6 +55,9 @@ public:
     static uint32_t gImageCount, gFrameIndex;
     static mat4 projMat, viewMat;
 
+	static int height;
+	static int width;
+
 	Application();
 
 	static bool InitSceneResources();
@@ -87,6 +90,7 @@ public:
 	static void getFrustumCorners(mat4 frustum, vec3 corners[8]);
 
 	const char* Application::GetName() { return "client"; }
+
 };
 
 #endif

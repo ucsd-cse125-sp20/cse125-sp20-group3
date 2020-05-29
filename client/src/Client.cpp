@@ -189,7 +189,9 @@ Client::UpData Client::recvAndFormatData() {
 
 				if (recvbuf[i] == DELIMITER) {
 					//std::cout << "state 1 delimiter at i: " << i << "\n";
-					idEntMap[id] = ent_data; //overwrite old data in the case of multiple updates on same object in one tick
+					int oldActionState = idEntMap.find(id) != idEntMap.end() ? idEntMap[id].actionState : ACTION_STATE_IDLE; //we don't want to overwrite action state fires
+					idEntMap[id] = ent_data; //overwrite everything else in the case of multiple updates on same object in one tick
+					idEntMap[id].actionState = oldActionState == ACTION_STATE_FIRE ? ACTION_STATE_FIRE : idEntMap[id].actionState;
 					state = 0; //end of data confirmed, reset to reading id bytes
 				}
 				else {

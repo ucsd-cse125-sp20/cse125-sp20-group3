@@ -22,7 +22,4 @@ public:
 	~LaserTower_Client();
 
 	void activate(vec3 target);
-
-	int getTargetID() { return attackTargetID; }
-	int getActionState() { return actionState; }
 };

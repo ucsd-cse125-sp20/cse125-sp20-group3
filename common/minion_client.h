@@ -30,7 +30,4 @@ public:
 
 	void shoot();
 	void kill();
-
-	int getTargetID() { return attackTargetID; }
-	int getActionState() { return actionState; }
 };

@@ -45,7 +45,10 @@ public:
 	};
 	virtual void update(float deltaTime) {} //server only function
 	bool isEnemyTeam(Team* checkTeam) { return this->team != checkTeam; }
+	Team* getTeam() { return this->team; }
 	int getID() { return id; }
+	char getActionState() { return actionState; }
+	int getAttackTargetID() { return attackTargetID; }
 	int getHealth() { return health; }
 	void setHealth(int new_health) { health = new_health; }
 	virtual void takeDamage(int damage) { health = std::max(health - damage, 0);	}

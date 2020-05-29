@@ -781,7 +781,7 @@ void SceneManager_Server::testAttacking() {
 	ClawTower* c1 = new ClawTower(data, id, red_team, this);
 	idMap[id] = c1;*/
 
-	/*id = next_laser_id;
+	id = next_laser_id;
 	next_laser_id++;
 	data = { 0, 10, 0 };
 	LaserTower* l1 = new LaserTower(data, id, blue_team, this);
@@ -791,7 +791,7 @@ void SceneManager_Server::testAttacking() {
 	next_laser_id++;
 	data = { 0, 20, 0 };
 	LaserTower* l2 = new LaserTower(data, id, red_team, this);
-	idMap[id] = l2;*/
+	idMap[id] = l2;
 
 	id = next_minion_id;
 	next_minion_id++;

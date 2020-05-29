@@ -1,6 +1,8 @@
 #include "SceneManager_Client.h"
 #include "Application.h"
 
+static bool first_update = true;
+
 namespace {
 	// Models
 	const char* mapFile = "map.gltf";
@@ -248,21 +250,20 @@ void SceneManager_Client::updateState(Client::StateUpdateData updateData) {
 	red_team->setData(updateData.redTeamData);
 	blue_team->setData(updateData.blueTeamData);
 	
-	//if (idMap[trackedPlayer_ID] != nullptr) SceneManager_Client::updateUI();
+	if (!first_update) SceneManager_Client::updateUI();
 }
 
 void SceneManager_Client::updateUI(){
-	std::cout << "tracked id: " << trackedPlayer_ID << "\n";
-	std::cout << "player pointer: " << idMap[trackedPlayer_ID] << "\n";
 	Team* trackedPlayerTeam = idMap[trackedPlayer_ID]->getTeam();
+	if (trackedPlayerTeam->teamColor != RED_TEAM && trackedPlayerTeam->teamColor != BLUE_TEAM) return;
 
 	int plasticCount = trackedPlayerTeam->getPlasticCount();
-	std::cout << "team plastic count: " << plasticCount;
+	std::cout << "team " << trackedPlayerTeam->teamColor << " plastic count: " << plasticCount << "\n";
 	int metalCount = trackedPlayerTeam->getMetalCount();
-	std::cout << "team metal count: " << metalCount;
+	std::cout << "team " << trackedPlayerTeam->teamColor << " metal count: " << metalCount << "\n";
 	UIUtils::editText(PLASTIC_UI_TEXT, std::to_string(plasticCount), "small font", 0xff6655ff);
 	UIUtils::editText(METAL_UI_TEXT, std::to_string(metalCount), "small font", 0xff6655ff);
-	if (plasticCount <= 0){ //counts shouldn't ever be negative
+	if (plasticCount <= 0){ //counts shouldn't ever be negative but it can't hurt to check
 		UIUtils::changeImage(PLASTIC_UI_ICON, "resource_plastic_alert.png",  float2((float)Application::width / 3200, (float)Application::height / 2000));
 	}else{
 		UIUtils::changeImage(PLASTIC_UI_ICON, "resource_plastic.png",  float2((float)Application::width / 3200, (float)Application::height / 2000));
@@ -300,6 +301,8 @@ void SceneManager_Client::updateUI(){
 void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 {
 	std::vector<int> deadEntities;
+
+	if (updateData.entUpdates.size() > 0) first_update = false;
 
 	//std::cout << "updating from client buf of size " << updateData.entUpdates.size() << "\n";
 	for (Client::IDEntData data : updateData.entUpdates) {

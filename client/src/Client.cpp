@@ -189,9 +189,22 @@ Client::UpData Client::recvAndFormatData() {
 
 				if (recvbuf[i] == DELIMITER) {
 					//std::cout << "state 1 delimiter at i: " << i << "\n";
-					int oldActionState = idEntMap.find(id) != idEntMap.end() ? idEntMap[id].actionState : ACTION_STATE_IDLE; //we don't want to overwrite action state fires
-					idEntMap[id] = ent_data; //overwrite everything else in the case of multiple updates on same object in one tick
-					idEntMap[id].actionState = oldActionState == ACTION_STATE_FIRE ? ACTION_STATE_FIRE : idEntMap[id].actionState;
+					char oldActionState;
+					int oldTargetID; //we want to preserve firing states in the case of multiple server ticks within one client update
+					if (idEntMap.find(id) != idEntMap.end()) {
+						oldActionState = idEntMap[id].actionState;
+						oldTargetID = idEntMap[id].targetID;
+					}
+					else {
+						oldActionState = ACTION_STATE_IDLE;
+						oldTargetID = -1;
+					}
+
+					idEntMap[id] = ent_data; //overwrite everything else
+					if (oldActionState == ACTION_STATE_FIRE) { //preserve firing states
+						idEntMap[id].actionState = ACTION_STATE_FIRE;
+						idEntMap[id].targetID = oldTargetID;
+					}
 					state = 0; //end of data confirmed, reset to reading id bytes
 				}
 				else {

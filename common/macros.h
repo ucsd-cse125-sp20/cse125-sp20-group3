@@ -115,4 +115,15 @@
 #define CLAW_METAL_REQ 8
 #define CLAW_PLASTIC_REQ 16
 
+#define PLASTIC_UI_ICON "resource_plastic"
+#define METAL_UI_ICON "resource_metal"
+
+#define PLASTIC_UI_TEXT "plastic_text"
+#define METAL_UI_TEXT "metal_text"
+
+#define MINION_UI_ICON "minion"
+#define LASER_TOWER_UI_ICON "laser_tower"
+#define CLAW_MACHINE_UI_ICON "claw_machine"
+#define SUPER_MINION_UI_ICON "super_minion"
+
 #endif

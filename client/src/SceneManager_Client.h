@@ -44,28 +44,13 @@
 class SceneManager_Client : public Transform
 {
 private:
-	enum class EntityType {
-		PLAYER, MINION, SUPER_MINION, LASER_TOWER, CLAW_TOWER, DUMPSTER, RECYCLING_BIN, OTHER
-	};
-
-	uint32_t subid = 0;
-
-	std::map<int, std::pair<uint32_t, EntityType>> idMap; //can just map to entity*, infer type of entity based on range of id
-	std::map<uint32_t, Entity*> entityMap;
-	std::map<uint32_t, Player_Client*> playerMap;
-	std::map<uint32_t, Minion_Client*> minionMap;
-	//super minions
-	std::map<uint32_t, LaserTower_Client*> laserTowerMap;
-	//claw towers
-	//dumpsters
-	//recycling bins
+	std::map<int, Entity*> idMap;
 	std::map<int, Transform*> transforms;
 	std::map<int, Animator*> animators;
 	std::map<std::string, GLTFGeode*> gltfGeodes;
 	std::map<std::string, OzzGeode*> ozzGeodes;
 	std::map<std::string, ParticleSystemGeode*> particleGeodes;
-	std::vector<int> deathlist;
-	int trackedPlayer_ID;
+	int trackedPlayer_ID = -1;
 
 	std::vector<Transform*> otherTransforms;
     
@@ -108,4 +93,6 @@ public:
 
 	void update(float deltaTime) override;
 	void draw(Cmd* cmd) override;
+
+	void updateUI();
 };

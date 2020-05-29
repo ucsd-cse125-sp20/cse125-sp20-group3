@@ -82,13 +82,25 @@ void Player::processInput(PlayerInput in) {
 
 				switch (buildMode) { //build something based on buildMode
 				case LASER:
-					if (team->checkResources(LASER_TYPE)) manager->spawnEntity(LASER_TYPE, buildPos.getX(), buildPos.getZ(), 0, this->team);
+					if (team->checkResources(LASER_TYPE))
+					{
+						team->buildEntity(LASER_TYPE);
+						manager->spawnEntity(LASER_TYPE, buildPos.getX(), buildPos.getZ(), 0, this->team);
+					}
 					break;
 				case CLAW:
-					if (team->checkResources(CLAW_TYPE)) manager->spawnEntity(CLAW_TYPE, buildPos.getX(), buildPos.getZ(), 0, this->team);
+					if (team->checkResources(CLAW_TYPE))
+					{
+						team->buildEntity(CLAW_TYPE);
+						manager->spawnEntity(CLAW_TYPE, buildPos.getX(), buildPos.getZ(), 0, this->team);
+					} 
 					break;
 				case SUPER_MINION:
-					if (team->checkResources(SUPER_MINION_TYPE)) manager->spawnEntity(SUPER_MINION_TYPE, buildPos.getX(), buildPos.getZ(), 0, this->team);
+					if (team->checkResources(SUPER_MINION_TYPE))
+					{
+						team->buildEntity(SUPER_MINION);
+						manager->spawnEntity(SUPER_MINION_TYPE, buildPos.getX(), buildPos.getZ(), 0, this->team);
+					} 
 					break;
 				default:
 					std::cout << "invalid buildMode\n";
@@ -133,12 +145,40 @@ void Player::setMoveAndDir(int move_x, int move_z, float view_y_rot) {
 	rotation_y = view_y_rot;
 }
 
+BUILD_MODE Player::getBuildMode() {
+	return this->buildMode;
+}
+
 void Player::setEntData(EntityData data) {
+	if (data.actionState == ACTION_STATE_IDLE) this->buildMode = NEUTRAL;
+	else if (data.actionState == ACTION_STATE_MOVE) this->buildMode = LASER;
+	else if (data.actionState == ACTION_STATE_ATTACK) this->buildMode = CLAW;
+	else if (data.actionState == ACTION_STATE_FIRE) this->buildMode = SUPER_MINION;
+
+	data.actionState = ACTION_STATE_IDLE;
 	Entity::setEntData(data);
-	vec3 move_dir = this->getPosition() - lastPosition;
+	//vec3 move_dir = this->getPosition() - lastPosition;
 	//std::cout << "player actionState: " << (int)actionState << "\n";
 	//std::cout << "player move_dir x: " << move_dir.getX() << " z: " << move_dir.getZ() << "\n";
 	//TODO set run animation in move_dir taking into account forward vector
 
 	//this->team->print();
+
+	//std::cout << "player " << id << " buildMode: " << this->buildMode << "\n";
+}
+
+int Player::writeData(char buf[], int index) {
+	EntityData entData;
+	entData.GO_data = this->GameObject::getData();
+
+	if (this->buildMode == NEUTRAL) entData.actionState = ACTION_STATE_IDLE;
+	else if (this->buildMode == LASER) entData.actionState = ACTION_STATE_MOVE;
+	else if (this->buildMode == CLAW) entData.actionState = ACTION_STATE_ATTACK;
+	else if (this->buildMode == SUPER_MINION) entData.actionState = ACTION_STATE_FIRE;
+
+	entData.teamColor = team != nullptr ? team->teamColor : NO_TEAM;
+	entData.health = this->health;
+	entData.targetID = attackTarget != nullptr ? attackTargetID : NO_TARGET_ID;
+	((EntityData*)(buf + index))[0] = entData;
+	return sizeof(EntityData);
 }

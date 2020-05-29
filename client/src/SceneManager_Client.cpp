@@ -242,8 +242,10 @@ void SceneManager_Client::createMaterialResources(SceneManager_Client::GeodeType
 }
 
 void SceneManager_Client::updateStateAndScene(Client::UpData data) {
-	this->updateScene(data.sceneUpdate);
-	this->updateState(data.stateUpdate);
+	if (data.sceneUpdate.entUpdates.size() > 0) {
+		this->updateScene(data.sceneUpdate);
+		this->updateState(data.stateUpdate);
+	}
 }
 
 void SceneManager_Client::updateState(Client::StateUpdateData updateData) {
@@ -258,9 +260,13 @@ void SceneManager_Client::updateUI(){
 	if (trackedPlayerTeam->teamColor != RED_TEAM && trackedPlayerTeam->teamColor != BLUE_TEAM) return;
 
 	int plasticCount = trackedPlayerTeam->getPlasticCount();
-	std::cout << "team " << trackedPlayerTeam->teamColor << " plastic count: " << plasticCount << "\n";
+	//std::cout << "team " << trackedPlayerTeam->teamColor << " plastic count: " << plasticCount << "\n";
 	int metalCount = trackedPlayerTeam->getMetalCount();
-	std::cout << "team " << trackedPlayerTeam->teamColor << " metal count: " << metalCount << "\n";
+	//std::cout << "team " << trackedPlayerTeam->teamColor << " metal count: " << metalCount << "\n";
+
+	BUILD_MODE buildMode = ((Player_Client*)idMap[trackedPlayer_ID])->getBuildMode();
+	//std::cout << "buildMode " << buildMode << "\n";
+
 	UIUtils::editText(PLASTIC_UI_TEXT, std::to_string(plasticCount), "small font", 0xff6655ff);
 	UIUtils::editText(METAL_UI_TEXT, std::to_string(metalCount), "small font", 0xff6655ff);
 	if (plasticCount <= 0){ //counts shouldn't ever be negative but it can't hurt to check

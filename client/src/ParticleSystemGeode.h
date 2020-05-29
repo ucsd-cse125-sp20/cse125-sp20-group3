@@ -17,6 +17,8 @@ public:
 	int selfParticleInstanceCount = 0;
 	std::deque<int> particleInstanceIDs;
 
+	bool updated = false;
+
 	ParticleSystemGeode(Renderer* renderer, ParticleSystem::ParticleSystemParams params);
 	~ParticleSystemGeode();
 
@@ -24,5 +26,6 @@ public:
 
 	void createSpriteResources(RootSignature* pRootSignature);
 
+	void update(float deltaTime) override;
 	void draw(Cmd* cmd) override;
 };

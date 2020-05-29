@@ -1,0 +1,169 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 325297,
+      "min": [-0.463207, -0.00583101, -0.461429],
+      "max": [1.03565, 1.79487, 0.46143]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 325297
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "type": "VEC2",
+      "count": 325297
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5123,
+      "type": "VEC4",
+      "count": 325297
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5126,
+      "type": "VEC4",
+      "count": 325297
+    },
+    {
+      "bufferView": 5,
+      "componentType": 5125,
+      "type": "SCALAR",
+      "count": 530052
+    },
+    {
+      "bufferView": 6,
+      "componentType": 5126,
+      "type": "MAT4",
+      "count": 1
+    }
+  ],
+  "asset": {
+    "generator": "Khronos glTF Blender I/O v1.1.46",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 3903564
+    },
+    {
+      "buffer": 0,
+      "byteLength": 3903564,
+      "byteOffset": 3903564
+    },
+    {
+      "buffer": 0,
+      "byteLength": 2602376,
+      "byteOffset": 7807128
+    },
+    {
+      "buffer": 0,
+      "byteLength": 2602376,
+      "byteOffset": 10409504
+    },
+    {
+      "buffer": 0,
+      "byteLength": 5204752,
+      "byteOffset": 13011880
+    },
+    {
+      "buffer": 0,
+      "byteLength": 2120208,
+      "byteOffset": 18216632
+    },
+    {
+      "buffer": 0,
+      "byteLength": 64,
+      "byteOffset": 20336840
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "riggedMesh.bin",
+      "byteLength": 20336904
+    }
+  ],
+  "images": [
+    {
+      "name": "recycling_bin_tex",
+      "uri": "recycling_bin_tex.png",
+      "mimeType": "image/png"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Recycling_Bin_Cube.006",
+      "primitives": [
+        {
+          "indices": 5,
+          "material": 0,
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2,
+            "JOINTS_0": 3,
+            "WEIGHTS_0": 4
+          }
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "Material.001",
+      "doubleSided": true,
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        },
+        "metallicFactor": 0,
+        "roughnessFactor": 0.5
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "name": "base",
+      "scale": [1, 0.994566, 1]
+    },
+    {
+      "mesh": 0,
+      "name": "Recycling_Bin_Cube.006",
+      "skin": 0
+    },
+    {
+      "children": [ 1, 0 ],
+      "name": "Armature",
+      "translation": [0, 0.0987485, 0],
+      "scale": [1.54857, 1.54857, 1.54857]
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [ 2 ]
+    }
+  ],
+  "textures": [
+    {
+      "source": 0
+    }
+  ],
+  "skins": [
+    {
+      "inverseBindMatrices": 6,
+      "joints": [ 0 ],
+      "name": "Armature",
+      "extras": [ 1, ],
+    }
+  ]
+}

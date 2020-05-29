@@ -1,4 +1,5 @@
 #include "ObjectDetection.h"
+#include <bitset>
 
 std::unordered_map<uint64_t, SpatialCell> ObjectDetection::spatialHash = std::unordered_map<uint64_t, SpatialCell>();
 
@@ -85,8 +86,10 @@ void ObjectDetection::updateObject(GameObject* obj, int flags)
 
 void ObjectDetection::removeObject(GameObject* obj)
 {
-	SpatialCell cell = *obj->objDectData.cell;
-	cell.objects.erase(std::remove(cell.objects.begin(), cell.objects.end(), obj), cell.objects.end());
+	SpatialCell* cell = obj->objDectData.cell;
+	//printf("%d\n", (int)cell->objects.size());
+	cell->objects.erase(std::remove(cell->objects.begin(), cell->objects.end(), obj), cell->objects.end());
+	//printf("%d\n", (int)cell->objects.size());
 }
 
 GameObject* ObjectDetection::getNearestObject(vec2 position, int flags, int radius)
@@ -147,7 +150,6 @@ GameObject* ObjectDetection::getNearestObject(GameObject* ref, int flags, int ra
 			if (spatialHash.find(key) != spatialHash.end()) {
 				//printf("%d\n", spatialHash[key].objects.size());
 				for (auto otherObj : spatialHash[key].objects) {
-					//printf("obj ");
 					// Also verify other object is not the current object
 					if (ref != otherObj && (flags == DETECTION_FLAG_NONE || (flags & otherObj->objDectData.flags) == flags)) {
 						GameObject::GameObjectData data = otherObj->getData();
@@ -168,11 +170,16 @@ GameObject* ObjectDetection::getNearestObject(GameObject* ref, int flags, int ra
 
 std::vector<GameObject*> ObjectDetection::getCollisions(GameObject* ref, int flags)
 {
-	std::vector<GameObject*> collisions = std::vector<GameObject*>();
+	std::vector<GameObject*> collisions;
 
 	vec3 pos3 = ref->getPosition();
 	vec2 position = vec2(pos3[0], pos3[2]);
 	auto bounds = ref->objDectData;
+
+	float minX = position[0] + bounds.minX;
+	float maxX = position[0] + bounds.maxX;
+	float minZ = position[1] + bounds.minZ;
+	float maxZ = position[1] + bounds.maxZ;
 
 	uint64_t key = keyOf(ref);
 	auto coords = unkey(key);
@@ -185,14 +192,25 @@ std::vector<GameObject*> ObjectDetection::getCollisions(GameObject* ref, int fla
 			if (spatialHash.find(key) != spatialHash.end()) {
 				for (auto otherObj : spatialHash[key].objects) {
 					auto otherBounds = otherObj->objDectData;
+					//std::bitset<32> b(otherBounds.flags);
+					//std::cout << "otherObj flags: " << b << "\n";
 					if (ref != otherObj && (flags == DETECTION_FLAG_NONE || (flags & otherBounds.flags) == flags)) {
 						GameObject::GameObjectData data = otherObj->getData();
 						vec2 objPosition = vec2(data.x, data.z);
+
+						float otherMinX = objPosition[0] + otherBounds.minX;
+						float otherMaxX = objPosition[0] + otherBounds.maxX;
+						float otherMinZ = objPosition[1] + otherBounds.minZ;
+						float otherMaxZ = objPosition[1] + otherBounds.maxZ;
 						// AABB collision detection
-						if ((position[0] + bounds.minX >= objPosition[0] + otherBounds.maxX ||
-							position[0] + bounds.maxX <= objPosition[0] + otherBounds.minX) &&
-							(position[2] + bounds.minZ >= objPosition[2] + otherBounds.maxZ ||
-							position[2] + bounds.maxZ <= objPosition[2] + otherBounds.minZ)) {
+						if ((minX <= otherMaxX && maxX >= otherMinX) && (minZ <= otherMaxZ && maxZ >= otherMinZ)) {
+							//std::cout << "collision found\n";
+							/*std::cout << "other id: " << ((Entity*)otherObj)->getID() << "\n";
+							std::cout << "other position x: " << objPosition[0] << " z: " << objPosition[1] << "\n";
+							std::cout << "minX: " << position[0] + bounds.minX << " <= " << objPosition[0] + otherBounds.maxX << " ||\n";
+							std::cout << "maxX: " << position[0] + bounds.maxX << " >= " << objPosition[0] + otherBounds.minX << "?\n";
+							std::cout << "minZ: " << position[1] + bounds.minZ << " <= " << objPosition[1] + otherBounds.maxZ << " ||\n";
+							std::cout << "maxZ: " << position[1] + bounds.maxZ << " >= " << objPosition[1] + otherBounds.minZ << "?\n";*/
 							collisions.push_back(otherObj);
 						}
 					}
@@ -201,5 +219,5 @@ std::vector<GameObject*> ObjectDetection::getCollisions(GameObject* ref, int fla
 		}
 	}
 
-	return std::vector<GameObject*>();
+	return collisions;
 }

@@ -50,7 +50,7 @@ private:
 
 	uint32_t subid = 0;
 
-	std::map<int, std::pair<uint32_t, EntityType>> idMap;
+	std::map<int, std::pair<uint32_t, EntityType>> idMap; //can just map to entity*, infer type of entity based on range of id
 	std::map<uint32_t, Entity*> entityMap;
 	std::map<uint32_t, Player_Client*> playerMap;
 	std::map<uint32_t, Minion_Client*> minionMap;

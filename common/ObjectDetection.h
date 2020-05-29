@@ -12,7 +12,6 @@
 // This number must be larger than the largest object/bounding box in the scene
 #define SPATIAL_HASH_SIZE 5
 
-
 #define DETECTION_FLAG_NONE 1 << 0
 #define DETECTION_FLAG_RED_TEAM 1 << 1
 #define DETECTION_FLAG_BLUE_TEAM 1 << 2

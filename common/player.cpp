@@ -14,7 +14,7 @@ Player::Player(GameObjectData data, int id, Team* t, SceneManager_Server* sm) : 
 		int flags = DETECTION_FLAG_PLAYER | DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE;
 		if (t->teamColor == RED_TEAM) flags = flags | DETECTION_FLAG_RED_TEAM;
 		else flags = flags | DETECTION_FLAG_BLUE_TEAM;
-		ObjectDetection::addObject(this, flags);
+		ObjectDetection::addObject(this, flags, 0, 0, 0, 0); //-PLAYER_WIDTH, PLAYER_WIDTH, -PLAYER_LENGTH, PLAYER_LENGTH);
 	}
 }
 
@@ -27,8 +27,22 @@ void Player::update(float deltaTime) {
 	velocity_z += (cos(rotation_y) * acceleration_z + sin(rotation_y) * acceleration_x) * deltaTime;
 	//printf("%f %f %f %f %f\n", velocity_x, velocity_z, acceleration_x, acceleration_z, deltaTime);
 
-	if (sqrt(velocity_x * velocity_x + velocity_z * velocity_z) > 0.001) {
-		model[3] += vec4(velocity_x, 0, velocity_z, 0);
+	mat4 oldModel = model;
+	if (sqrt(velocity_x * velocity_x) > 0.001) {
+		model[3][0] += velocity_x;
+	}
+	std::vector<GameObject*> c = ObjectDetection::getCollisions(this, DETECTION_FLAG_COLLIDABLE);
+	if (c.size() > 0) {
+		model = oldModel;
+	}
+
+	oldModel = model;
+	if (sqrt(velocity_z * velocity_z) > 0.001) {
+		model[3][2] += velocity_z;
+	}
+	c = ObjectDetection::getCollisions(this, DETECTION_FLAG_COLLIDABLE);
+	if (c.size() > 0) {
+		model = oldModel;
 	}
 
 	vec3 forward = vec3(cos(rotation_y), 0, sin(rotation_y));
@@ -50,8 +64,6 @@ void Player::processInput(PlayerInput in) {
 	this->setMoveAndDir(in.move_x, in.move_z, in.view_y_rot);
 
 	//std::cout << "intent: " << in.buildIntent << " buildType: " << in.buildType << " harvestResource: " << in.harvestResource << "\n";
-
-	
 
 	if (in.buildIntent == BUILD_CANCEL) {
 		buildMode = NEUTRAL;

@@ -7,7 +7,9 @@ Resource::Resource(char resourceType, GameObjectData data, int id, SceneManager_
 
 	if (sm_server != nullptr) { //only execute on server
 		int flags = DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE | DETECTION_FLAG_RESOURCE;
-		ObjectDetection::addObject(this, flags);
+		float width = resourceType == DUMPSTER_TYPE ? DUMPSTER_WIDTH : RECYCLING_BIN_WIDTH;
+		float length = resourceType == DUMPSTER_TYPE ? DUMPSTER_LENGTH : RECYCLING_BIN_LENGTH;
+		ObjectDetection::addObject(this, flags, -width, width, -length, length);
 	}
 }
 

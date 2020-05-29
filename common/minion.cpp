@@ -16,7 +16,7 @@ Minion::Minion(GameObjectData data, int id, Team* t, SceneManager_Server* sm) : 
 					DETECTION_FLAG_MINION_TARGET | DETECTION_FLAG_LASER_TARGET;
 		if (t->teamColor == RED_TEAM) flags = flags | DETECTION_FLAG_RED_TEAM;
 		else flags = flags | DETECTION_FLAG_BLUE_TEAM;
-		ObjectDetection::addObject(this, flags, -0.25f, 0.25f, -0.25f, 0.25f);
+		ObjectDetection::addObject(this, flags, -MINION_WIDTH, MINION_WIDTH, -MINION_LENGTH, MINION_LENGTH);
 	}
 }
 
@@ -30,12 +30,6 @@ Minion::Minion(GameObjectData data, int id, int health, int attack, int range, f
 		t->incMinion();
 
 		destNode = (PathNode*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_PATH_NODE, 10);
-
-		int flags = DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE | DETECTION_FLAG_MINION |
-					DETECTION_FLAG_MINION_TARGET | DETECTION_FLAG_LASER_TARGET;
-		if (t->teamColor == RED_TEAM) flags = flags | DETECTION_FLAG_RED_TEAM;
-		else flags = flags | DETECTION_FLAG_BLUE_TEAM;
-		ObjectDetection::addObject(this, flags, -0.25f, 0.25f, -0.25f, 0.25f);
 	}
 }
 
@@ -135,7 +129,7 @@ void Minion::move(float deltaTime) {
 				std::cout << "minion " << id << " detected collision on move_attempt " << move_attempts << "\n";
 				this->model = oldModel;
 				vec4 move_vec4 = vec4(move_vec, 0);
-				float rot_degrees = (float)pow(-1, move_attempts - 1) * ((float)move_attempts * 10); //10, -20, 30, -40, last one doesn't matter
+				float rot_degrees = (float)pow(-1, move_attempts - 1) * ((float)move_attempts * 20); //20, -40, 60, -80, 100, -120, last one doesn't matter
 				move_vec = (mat4::rotationY(degToRad(rot_degrees)) * move_vec4).getXYZ();
 			}
 			else break;

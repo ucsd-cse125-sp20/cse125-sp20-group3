@@ -1,6 +1,5 @@
 #include "ObjectDetection.h"
 #include <bitset>
-#include "entity.h"
 
 std::unordered_map<uint64_t, SpatialCell> ObjectDetection::spatialHash = std::unordered_map<uint64_t, SpatialCell>();
 
@@ -35,9 +34,7 @@ std::pair<int, int> ObjectDetection::unkey(uint64_t key)
 
 void ObjectDetection::addObject(GameObject* obj, int flag, float minX, float maxX, float minZ, float maxZ)
 {
-	std::cout << "adding " << ((Entity*)obj)->getID() << " to object detection";
 	auto key = keyOf(obj);
-	std::cout << " at key " << key << "\n";
 	if (spatialHash.find(key) == spatialHash.end()) {
 		// If cell not in data structure, initialize
 		SpatialCell cell;
@@ -67,7 +64,6 @@ void ObjectDetection::updateObject(GameObject* obj, int flags)
 	uint64_t currKey = keyOf(obj);
 	// Check if the object is in a new cell
 	if (currKey != oldCell.key) {
-		std::cout << ((Entity*)obj)->getID() << " moved to key " << currKey << "\n";
 		//printf("new cell %" PRIx64 " =====================================================\n", currKey);
 		// Remove object from previous cell
 		removeObject(obj);
@@ -90,11 +86,10 @@ void ObjectDetection::updateObject(GameObject* obj, int flags)
 
 void ObjectDetection::removeObject(GameObject* obj)
 {
-	std::cout << "removing " << ((Entity*)obj)->getID() << "\n";
 	SpatialCell* cell = obj->objDectData.cell;
-	printf("%d\n", (int)cell->objects.size());
+	//printf("%d\n", (int)cell->objects.size());
 	cell->objects.erase(std::remove(cell->objects.begin(), cell->objects.end(), obj), cell->objects.end());
-	printf("%d\n", (int)cell->objects.size());
+	//printf("%d\n", (int)cell->objects.size());
 }
 
 GameObject* ObjectDetection::getNearestObject(vec2 position, int flags, int radius)
@@ -155,7 +150,6 @@ GameObject* ObjectDetection::getNearestObject(GameObject* ref, int flags, int ra
 			if (spatialHash.find(key) != spatialHash.end()) {
 				//printf("%d\n", spatialHash[key].objects.size());
 				for (auto otherObj : spatialHash[key].objects) {
-					//printf("obj ");
 					// Also verify other object is not the current object
 					if (ref != otherObj && (flags == DETECTION_FLAG_NONE || (flags & otherObj->objDectData.flags) == flags)) {
 						GameObject::GameObjectData data = otherObj->getData();
@@ -182,6 +176,11 @@ std::vector<GameObject*> ObjectDetection::getCollisions(GameObject* ref, int fla
 	vec2 position = vec2(pos3[0], pos3[2]);
 	auto bounds = ref->objDectData;
 
+	float minX = position[0] + bounds.minX;
+	float maxX = position[0] + bounds.maxX;
+	float minZ = position[1] + bounds.minZ;
+	float maxZ = position[1] + bounds.maxZ;
+
 	uint64_t key = keyOf(ref);
 	auto coords = unkey(key);
 	int x = coords.first;
@@ -191,31 +190,24 @@ std::vector<GameObject*> ObjectDetection::getCollisions(GameObject* ref, int fla
 		for (int j = z - 1; j <= z + 1; j++) {
 			key = keyOf(i, j);
 			if (spatialHash.find(key) != spatialHash.end()) {
-				//std::cout << "i: " << i << " j: " << j << " spatialHash size: " << spatialHash[key].objects.size() << "\n";
 				for (auto otherObj : spatialHash[key].objects) {
 					auto otherBounds = otherObj->objDectData;
-					std::bitset<32> b(otherBounds.flags);
+					//std::bitset<32> b(otherBounds.flags);
 					//std::cout << "otherObj flags: " << b << "\n";
 					if (ref != otherObj && (flags == DETECTION_FLAG_NONE || (flags & otherBounds.flags) == flags)) {
-						//std::cout << "collidable object found\n";
 						GameObject::GameObjectData data = otherObj->getData();
 						vec2 objPosition = vec2(data.x, data.z);
-						/*std::cout << "this position x: " << position[0] << " z: " << position[1] << "\n";
-						std::cout << "other position x: " << objPosition[0] << " z: " << objPosition[1] << "\n";
-						std::cout << "minX: " << position[0] + bounds.minX << " <= " << objPosition[0] + otherBounds.maxX << " ||\n";
-						std::cout << "maxX: " << position[0] + bounds.maxX << " >= " << objPosition[0] + otherBounds.minX << "?\n";
-						std::cout << "minZ: " << position[1] + bounds.minZ << " <= " << objPosition[1] + otherBounds.maxZ << " ||\n";
-						std::cout << "maxZ: " << position[1] + bounds.maxZ << " >= " << objPosition[1] + otherBounds.minZ << "?\n";*/
 
+						float otherMinX = objPosition[0] + otherBounds.minX;
+						float otherMaxX = objPosition[0] + otherBounds.maxX;
+						float otherMinZ = objPosition[1] + otherBounds.minZ;
+						float otherMaxZ = objPosition[1] + otherBounds.maxZ;
 						// AABB collision detection
-						if ((position[0] + bounds.minX <= objPosition[0] + otherBounds.maxX ||
-							position[0] + bounds.maxX >= objPosition[0] + otherBounds.minX) &&
-							(position[1] + bounds.minZ <= objPosition[1] + otherBounds.maxZ ||
-							position[1] + bounds.maxZ >= objPosition[1] + otherBounds.minZ)) {
+						if ((minX <= otherMaxX && maxX >= otherMinX) && (minZ <= otherMaxZ && maxZ >= otherMinZ)) {
 							//std::cout << "collision found\n";
-							std::cout << "other id: " << ((Entity*)otherObj)->getID() << "\n";
+							/*std::cout << "other id: " << ((Entity*)otherObj)->getID() << "\n";
 							std::cout << "other position x: " << objPosition[0] << " z: " << objPosition[1] << "\n";
-							/*std::cout << "minX: " << position[0] + bounds.minX << " <= " << objPosition[0] + otherBounds.maxX << " ||\n";
+							std::cout << "minX: " << position[0] + bounds.minX << " <= " << objPosition[0] + otherBounds.maxX << " ||\n";
 							std::cout << "maxX: " << position[0] + bounds.maxX << " >= " << objPosition[0] + otherBounds.minX << "?\n";
 							std::cout << "minZ: " << position[1] + bounds.minZ << " <= " << objPosition[1] + otherBounds.maxZ << " ||\n";
 							std::cout << "maxZ: " << position[1] + bounds.maxZ << " >= " << objPosition[1] + otherBounds.minZ << "?\n";*/

@@ -11,7 +11,7 @@
 #include <ctime>
 #include <map>
 
-#define MINION_MOVE_ATTEMPTS 5
+#define MINION_MOVE_ATTEMPTS 7
 
 class Minion : public Entity {
 protected:

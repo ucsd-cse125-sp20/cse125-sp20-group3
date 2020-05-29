@@ -6,6 +6,14 @@ LaserTower::LaserTower(GameObjectData data, int id, Team* t, SceneManager_Server
 	
 	attackRange = LASER_FIRE_RANGE;
 	attackInterval = LASER_FIRE_INTERVAL; //interval between firing at attack target
+
+	if (sm_server != nullptr) {
+		int flags = DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE | DETECTION_FLAG_TOWER |
+			DETECTION_FLAG_MINION_TARGET;
+		if (t->teamColor == RED_TEAM) flags = flags | DETECTION_FLAG_RED_TEAM;
+		else flags = flags | DETECTION_FLAG_BLUE_TEAM;
+		ObjectDetection::addObject(this, flags, -LASER_WIDTH, LASER_WIDTH, -LASER_LENGTH, LASER_LENGTH);
+	}
 }
 
 void LaserTower::update(float deltaTime) { //should they be able to switch attack targets instantaneously?

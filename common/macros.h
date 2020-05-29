@@ -36,6 +36,22 @@
 #define ID_RECYCLING_BIN_MIN 7000
 #define ID_RECYCLING_BIN_MAX 7999
 
+//length is z, width is x
+#define PLAYER_LENGTH 0.2f //checked
+#define PLAYER_WIDTH 0.5f
+#define MINION_LENGTH 0.5f //checked
+#define MINION_WIDTH 0.5f
+#define SUPER_MINION_LENGTH 0.5f
+#define SUPER_MINION_WIDTH 0.5f
+#define LASER_LENGTH 1.5f //checked
+#define LASER_WIDTH 1.5f
+#define CLAW_LENGTH 1.0f
+#define CLAW_WIDTH 0.5f
+#define DUMPSTER_LENGTH 0.5f
+#define DUMPSTER_WIDTH 1.0f
+#define RECYCLING_BIN_LENGTH 0.25f
+#define RECYCLING_BIN_WIDTH 0.25f
+
 #define BUILD_CONFIRM 1
 #define BUILD_CANCEL -1
 

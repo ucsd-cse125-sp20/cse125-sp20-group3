@@ -14,7 +14,7 @@ Player::Player(GameObjectData data, int id, Team* t, SceneManager_Server* sm) : 
 		int flags = DETECTION_FLAG_PLAYER | DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE;
 		if (t->teamColor == RED_TEAM) flags = flags | DETECTION_FLAG_RED_TEAM;
 		else flags = flags | DETECTION_FLAG_BLUE_TEAM;
-		ObjectDetection::addObject(this, flags);
+		ObjectDetection::addObject(this, flags, 0, 0, 0, 0); //-PLAYER_WIDTH, PLAYER_WIDTH, -PLAYER_LENGTH, PLAYER_LENGTH);
 	}
 }
 
@@ -34,9 +34,6 @@ void Player::update(float deltaTime) {
 	std::vector<GameObject*> c = ObjectDetection::getCollisions(this, DETECTION_FLAG_COLLIDABLE);
 	if (c.size() > 0) {
 		model = oldModel;
-		//std::cout << "player " << id << " ignoring x movement\n";
-		//std::cout << "collisions size: " << c.size() << "\n";
-		//std::cout << "c[0] x: " << c[0]->getData().x << " z: " << c[0]->getData().z << "\n";
 	}
 
 	oldModel = model;
@@ -46,9 +43,6 @@ void Player::update(float deltaTime) {
 	c = ObjectDetection::getCollisions(this, DETECTION_FLAG_COLLIDABLE);
 	if (c.size() > 0) {
 		model = oldModel;
-		//std::cout << "collisions size: " << c.size() << "\n";
-		//std::cout << "c[0] x: " << c[0]->getData().x << " z: " << c[0]->getData().z << "\n";
-		//std::cout << "player " << id << " ignoring z movement\n";
 	}
 
 	vec3 forward = vec3(cos(rotation_y), 0, sin(rotation_y));

@@ -1,10 +1,11 @@
 #include "minion_client.h"
+#include "../client/src/SceneManager_Client.h"
 
 namespace {
 	const char* smallMinionActions[2] = { "Walking", "Fighting" };
 }
 
-Minion_Client::Minion_Client(GameObjectData data, int id, Team* t, SceneManager_Server* sm, OzzGeode* geode, ParticleSystemGeode* bullets, Transform* parent) : Minion(data, id, t, sm)
+Minion_Client::Minion_Client(GameObjectData data, int id, Team* t, SceneManager_Client* sm_c, OzzGeode* geode, ParticleSystemGeode* bullets, Transform* parent) : Minion(data, id, t, nullptr), Entity_Client(sm_c)
 {
 	this->bullets = bullets;
 
@@ -31,6 +32,39 @@ Minion_Client::~Minion_Client()
 	conf_delete(animator);
 }
 
+void Minion_Client::updateAnimParticles() {
+	this->processAction(this->actionState);
+}
+
+void Minion_Client::idleAction() {
+
+}
+
+void Minion_Client::moveAction() { 
+	animator->SetClip(smallMinionActions[0]);
+}
+
+void Minion_Client::attackAction() { 
+	animator->SetClip(smallMinionActions[1]);
+}
+
+void Minion_Client::fireAction() {
+	/*((ParticleSystem*)bullets->obj)->reset(0, 1);
+	bulletTransform->activate(MINION_BULLET_TIMEOUT);
+	animator->SetClip(smallMinionActions[1]);*/
+	((ParticleSystem*)bullets->obj)->reset(0, 1);
+
+	bulletTransform->setPositionDirection(getPosition(), sm_c->getTargetPosition(this->attackTargetID) - getPosition());
+	mat4 currMat = this->getMatrix();
+	mat4 inverseMat = inverse(currMat);
+	bulletTransform->setMatrix(inverseMat * mat4::translation(this->getPosition()) * bulletTransform->getMatrix());
+
+	bulletTransform->activate(MINION_BULLET_TIMEOUT);
+	//AudioManager::playAudioSource(this->getPosition(), "minion fire");
+}
+
+/* legacy code */
+/*
 void Minion_Client::shoot()
 {
 	((ParticleSystem*)bullets->obj)->reset(0, 1);
@@ -38,6 +72,17 @@ void Minion_Client::shoot()
 	animator->SetClip(smallMinionActions[1]);
 }
 
-void Minion_Client::kill()
+void Minion_Client::shoot(vec3 target)
 {
+	((ParticleSystem*)bullets->obj)->reset(0, 1);
+	animator->SetClip(smallMinionActions[1]);
+
+	bulletTransform->setPositionDirection(getPosition(), target - getPosition());
+	mat4 currMat = this->getMatrix();
+	mat4 inverseMat = inverse(currMat);
+	bulletTransform->setMatrix(inverseMat * mat4::translation(this->getPosition()) * bulletTransform->getMatrix());
+
+	bulletTransform->activate(MINION_BULLET_TIMEOUT);
+	//AudioManager::playAudioSource(this->getPosition(), "minion fire");
 }
+*/

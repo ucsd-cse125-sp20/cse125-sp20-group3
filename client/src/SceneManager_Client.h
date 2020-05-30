@@ -21,11 +21,11 @@
 #include "../../common/player_client.h"
 #include "../../common/base.h"
 #include "../../common/minion_client.h"
-#include "../../common/SuperMinion.h"
+#include "../../common/superminion_client.h"
 #include "../../common/tower.h"
 #include "../../common/lasertower_client.h"
-#include "../../common/clawtower.h"
-#include "../../common/resource.h"
+#include "../../common/clawtower_client.h"
+#include "../../common/resource_client.h"
 #include "../../common/client2server.h"
 
 #define GROUND_KEY 111111
@@ -44,24 +44,14 @@
 class SceneManager_Client : public Transform
 {
 private:
-	enum class EntityType {
-		PLAYER, LASER_TOWER, MINION, OTHER
-	};
-
-	uint32_t subid = 0;
-
-	std::map<int, std::pair<uint32_t, EntityType>> idMap;
-	std::map<uint32_t, Entity*> entityMap;
-	std::map<uint32_t, Player_Client*> playerMap;
-	std::map<uint32_t, LaserTower_Client*> laserTowerMap;
-	std::map<uint32_t, Minion_Client*> minionMap;
+	std::map<int, Entity*> idMap;
+	std::map<int, Entity_Client*> wrapperMap;
 	std::map<int, Transform*> transforms;
 	std::map<int, Animator*> animators;
 	std::map<std::string, GLTFGeode*> gltfGeodes;
 	std::map<std::string, OzzGeode*> ozzGeodes;
 	std::map<std::string, ParticleSystemGeode*> particleGeodes;
-	std::vector<int> deathlist;
-	int trackedPlayer_ID;
+	int trackedPlayer_ID = -1;
 
 	std::vector<Transform*> otherTransforms;
     
@@ -96,6 +86,8 @@ public:
 	void updateScene(Client::SceneUpdateData updateData);
 	void updateFromInputBuf(float deltaTime);
 
+	vec3 getTargetPosition(int targetID);
+
 	void setBuffer(SceneManager_Client::SceneBuffer type, Buffer** buffers); // TODO Could probably mange instance buffers within class, rather than app
 	void setProgram(SceneManager_Client::GeodeType type, Geode::GeodeShaderDesc program);
 
@@ -104,4 +96,6 @@ public:
 
 	void update(float deltaTime) override;
 	void draw(Cmd* cmd) override;
+
+	void updateUI();
 };

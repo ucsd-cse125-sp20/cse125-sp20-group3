@@ -36,6 +36,22 @@
 #define ID_RECYCLING_BIN_MIN 7000
 #define ID_RECYCLING_BIN_MAX 7999
 
+//length is z, width is x
+#define PLAYER_LENGTH 0.2f //checked
+#define PLAYER_WIDTH 0.5f
+#define MINION_LENGTH 0.5f //checked
+#define MINION_WIDTH 0.5f
+#define SUPER_MINION_LENGTH 0.9f //checked
+#define SUPER_MINION_WIDTH 0.75f
+#define LASER_LENGTH 1.5f //checked
+#define LASER_WIDTH 1.5f
+#define CLAW_LENGTH 1.0f //checked
+#define CLAW_WIDTH 1.0f
+#define DUMPSTER_LENGTH 1.8f //checked
+#define DUMPSTER_WIDTH 1.0f
+#define RECYCLING_BIN_LENGTH 0.4f //checked kinda
+#define RECYCLING_BIN_WIDTH 0.4f
+
 #define BUILD_CONFIRM 1
 #define BUILD_CANCEL -1
 
@@ -94,9 +110,20 @@
 #define SUPER_MINION_PLASTIC_REQ 12
 //#define TOWER_METAL_REQ 5
 //#define TOWER_PLASTIC_REQ 20
-#define LASER_METAL_REQ 2
-#define LASER_PLASTIC_REQ 4
+#define LASER_METAL_REQ 0//2
+#define LASER_PLASTIC_REQ 0//4
 #define CLAW_METAL_REQ 8
 #define CLAW_PLASTIC_REQ 16
+
+#define PLASTIC_UI_ICON "resource_plastic"
+#define METAL_UI_ICON "resource_metal"
+
+#define PLASTIC_UI_TEXT "plastic_text"
+#define METAL_UI_TEXT "metal_text"
+
+#define MINION_UI_ICON "minion"
+#define LASER_TOWER_UI_ICON "laser_tower"
+#define CLAW_MACHINE_UI_ICON "claw_machine"
+#define SUPER_MINION_UI_ICON "super_minion"
 
 #endif

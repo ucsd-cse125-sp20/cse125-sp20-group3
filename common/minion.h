@@ -11,9 +11,11 @@
 #include <ctime>
 #include <map>
 
+#define MINION_MOVE_ATTEMPTS 7
+
 class Minion : public Entity {
 protected:
-	pathNode* destNode;
+	PathNode* destNode;
 	int attackRange;
 	float attackInterval;
 	float velocity;

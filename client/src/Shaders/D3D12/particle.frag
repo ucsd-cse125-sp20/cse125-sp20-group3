@@ -39,13 +39,5 @@ float4 main(VSOutput input) : SV_Target0
     diffuse.rgb = lerp(diffuse.rgb, lum.xxx, 0.8);
     diffuse.rgb *= input.color.rgb;
 
-	float fog_maxdist = 50.0f;
-	float fog_mindist = 5.0f;
-	float3 fog_color = float3(0.1f, 0.1f, 0.1f);
-	float dist = length(camPos.xyz - input.pos);
-	float fog_factor = (fog_maxdist - dist) / (fog_maxdist - fog_mindist);
-	fog_factor = fog_factor < 0 ? 0 : (fog_factor > 1 ? 1 : fog_factor);
-	diffuse.rgb = fog_factor * diffuse.rgb + (1 - fog_factor) * fog_color;
-
     return diffuse;
 }

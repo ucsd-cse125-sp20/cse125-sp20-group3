@@ -129,15 +129,6 @@
     <ClCompile Include="..\..\..\..\..\common\ObjectDetection.cpp">
       <Filter>Source Files\Server Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\common\pathNode.cpp">
-      <Filter>Source Files\Server Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\common\buildNode.cpp">
-      <Filter>Source Files\Server Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\common\wallNode.cpp">
-      <Filter>Source Files\Server Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\..\common\minion_client.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
@@ -293,6 +284,24 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\speech\tts.cpp">
       <Filter>Header Files\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\BuildNode.cpp">
+      <Filter>Source Files\Server Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\PathNode.cpp">
+      <Filter>Source Files\Server Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\WallNode.cpp">
+      <Filter>Source Files\Server Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\superminion_client.cpp">
+      <Filter>Source Files\Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\clawtower_client.cpp">
+      <Filter>Source Files\Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\resource_client.cpp">
+      <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -487,15 +496,6 @@
     <ClInclude Include="..\..\..\..\..\server\SceneManager_Server.h">
       <Filter>Header Files\Server Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\common\pathNode.h">
-      <Filter>Header Files\Server Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\common\buildNode.h">
-      <Filter>Header Files\Server Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\common\wallNode.h">
-      <Filter>Header Files\Server Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\src\TimedTransform.h">
       <Filter>Header Files\Scene Graph</Filter>
     </ClInclude>
@@ -633,6 +633,27 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\tedsid\ted.h">
       <Filter>Header Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\BuildNode.h">
+      <Filter>Header Files\Server Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\PathNode.h">
+      <Filter>Header Files\Server Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\WallNode.h">
+      <Filter>Header Files\Server Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\superminion_client.h">
+      <Filter>Header Files\Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\clawtower_client.h">
+      <Filter>Header Files\Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\resource_client.h">
+      <Filter>Header Files\Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\entity_client.h">
+      <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

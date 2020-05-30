@@ -19,6 +19,12 @@
     <Filter Include="Source Files\Game Objects">
       <UniqueIdentifier>{d810fad0-683c-4f5b-9eaa-8a40d4b9b15a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Map Nodes">
+      <UniqueIdentifier>{97f4aae6-b2a0-42a4-b0ab-67393451a99c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Map Nodes">
+      <UniqueIdentifier>{b2b728de-931d-47d8-93a6-9890e16c3e18}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Server.cpp">
@@ -63,14 +69,14 @@
     <ClCompile Include="..\common\superminion.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\wallNode.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\common\BuildNode.cpp">
+      <Filter>Source Files\Map Nodes</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\buildNode.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\common\PathNode.cpp">
+      <Filter>Source Files\Map Nodes</Filter>
     </ClCompile>
-    <ClCompile Include="..\common\pathNode.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\common\WallNode.cpp">
+      <Filter>Source Files\Map Nodes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -122,14 +128,14 @@
     <ClInclude Include="..\common\superminion.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\wallNode.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\common\BuildNode.h">
+      <Filter>Header Files\Map Nodes</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\buildNode.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\common\player_client.h">
+      <Filter>Header Files\Map Nodes</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\pathNode.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="..\common\WallNode.h">
+      <Filter>Header Files\Map Nodes</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

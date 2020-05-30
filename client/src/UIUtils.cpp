@@ -126,22 +126,14 @@ void UIUtils::drawImages(Cmd* cmd)
 	auto ctx = ImGui::GetCurrentContext();
 	std::stable_sort(ctx->Windows.begin(), ctx->Windows.end(),
 		[](const ImGuiWindow* a, const ImGuiWindow* b) {
-			//printf("comparing %s and %s\n", a->Name, b->Name);
 			if (UIUtils::windows.find(a->Name) == UIUtils::windows.end() || UIUtils::windows.find(b->Name) == UIUtils::windows.end()) return false;
-			//printf("priorities %d and %d\n", UIUtils::windows[a->Name].priority, UIUtils::windows[b->Name].priority);
 			return UIUtils::windows[a->Name].priority < UIUtils::windows[b->Name].priority;
 		}
 	);
-
-	for (auto w : ctx->Windows) {
-		//printf("%s ", w->Name);
-	}
-
 	for (auto w : windows) {
 		//printf("->%s ", w.first.c_str());
 		Application::gAppUI.Gui(w.second.gui);
 	}
-	//printf("\n");
 }
 
 static void CloneCallbacks(IWidget* pSrc, IWidget* pDst)

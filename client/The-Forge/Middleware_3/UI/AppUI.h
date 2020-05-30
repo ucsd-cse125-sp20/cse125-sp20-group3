@@ -902,7 +902,7 @@ struct UIAppImpl
 class UIApp: public IMiddleware
 {
 	public:
-	UIApp(int32_t const fontAtlasSize = 0, uint32_t const maxDynamicUIUpdatesPerBatch = 20u);
+	UIApp(int32_t const fontAtlasSize = 0, uint32_t const maxDynamicUIUpdatesPerBatch = 1000u);
 
 	bool Init(Renderer* renderer);
 	void Exit();

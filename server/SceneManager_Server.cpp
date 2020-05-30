@@ -769,17 +769,17 @@ void SceneManager_Server::testAttacking() {
 	idMap[id] = sm1;
 	std::cout << "created super minion at id " << id << "\n";*/
 
-	/*id = next_super_minion_id;
+	id = next_super_minion_id;
 	next_super_minion_id++;
-	data = { -5, 0, 0 };
-	SuperMinion* sm2 = new SuperMinion(data, id, blue_team, this);
-	idMap[id] = sm2;*/
+	data = { -10, 10, 0 };
+	SuperMinion* sm2 = new SuperMinion(data, id, red_team, this);
+	idMap[id] = sm2;
 
-	/*id = next_claw_id;
+	id = next_claw_id;
 	next_claw_id++;
-	data = { 32.5, 67.5, 0 };
+	data = { 7.5, 27.5, 0 };
 	ClawTower* c1 = new ClawTower(data, id, red_team, this);
-	idMap[id] = c1;*/
+	idMap[id] = c1;
 
 	id = next_laser_id;
 	next_laser_id++;
@@ -793,21 +793,23 @@ void SceneManager_Server::testAttacking() {
 	LaserTower* l2 = new LaserTower(data, id, red_team, this);
 	idMap[id] = l2;
 
-	id = next_minion_id;
+	/*id = next_minion_id;
 	next_minion_id++;
 	data = { -10, 10, 0 };
 	Minion* m2 = new Minion(data, id, red_team, this);
-	idMap[id] = m2;
+	idMap[id] = m2;*/
 
-	/*id = next_dumpster_id;
+	id = next_dumpster_id;
 	next_dumpster_id++;
-	data = { 5, 15, 0 };
+	data = { 10, 10, 0 };
 	Resource* d1 = new Resource(DUMPSTER_TYPE, data, id, this);
+	idMap[id] = d1;
 
 	id = next_recycling_bin_id;
 	next_recycling_bin_id++;
-	data = { -5, -15, 0 };
-	Resource* r1 = new Resource(RECYCLING_BIN_TYPE, data, id, this);*/
+	data = { 0, -10, 0 };
+	Resource* r1 = new Resource(RECYCLING_BIN_TYPE, data, id, this);
+	idMap[id] = r1;
 }
 
 void SceneManager_Server::testBuilding() {

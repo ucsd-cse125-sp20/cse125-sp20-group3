@@ -21,11 +21,11 @@
 #include "../../common/player_client.h"
 #include "../../common/base.h"
 #include "../../common/minion_client.h"
-#include "../../common/SuperMinion.h"
+#include "../../common/superminion_client.h"
 #include "../../common/tower.h"
 #include "../../common/lasertower_client.h"
-#include "../../common/clawtower.h"
-#include "../../common/resource.h"
+#include "../../common/clawtower_client.h"
+#include "../../common/resource_client.h"
 #include "../../common/client2server.h"
 
 #define GROUND_KEY 111111
@@ -45,6 +45,7 @@ class SceneManager_Client : public Transform
 {
 private:
 	std::map<int, Entity*> idMap;
+	std::map<int, Entity_Client*> wrapperMap;
 	std::map<int, Transform*> transforms;
 	std::map<int, Animator*> animators;
 	std::map<std::string, GLTFGeode*> gltfGeodes;
@@ -84,6 +85,8 @@ public:
 	void updateState(Client::StateUpdateData updateData);
 	void updateScene(Client::SceneUpdateData updateData);
 	void updateFromInputBuf(float deltaTime);
+
+	vec3 getTargetPosition(int targetID);
 
 	void setBuffer(SceneManager_Client::SceneBuffer type, Buffer** buffers); // TODO Could probably mange instance buffers within class, rather than app
 	void setProgram(SceneManager_Client::GeodeType type, Geode::GeodeShaderDesc program);

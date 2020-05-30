@@ -41,16 +41,16 @@
 #define PLAYER_WIDTH 0.5f
 #define MINION_LENGTH 0.5f //checked
 #define MINION_WIDTH 0.5f
-#define SUPER_MINION_LENGTH 0.5f
-#define SUPER_MINION_WIDTH 0.5f
+#define SUPER_MINION_LENGTH 0.9f //checked
+#define SUPER_MINION_WIDTH 0.75f
 #define LASER_LENGTH 1.5f //checked
 #define LASER_WIDTH 1.5f
-#define CLAW_LENGTH 1.0f
-#define CLAW_WIDTH 0.5f
-#define DUMPSTER_LENGTH 0.5f
+#define CLAW_LENGTH 1.0f //checked
+#define CLAW_WIDTH 1.0f
+#define DUMPSTER_LENGTH 1.8f //checked
 #define DUMPSTER_WIDTH 1.0f
-#define RECYCLING_BIN_LENGTH 0.25f
-#define RECYCLING_BIN_WIDTH 0.25f
+#define RECYCLING_BIN_LENGTH 0.4f //checked kinda
+#define RECYCLING_BIN_WIDTH 0.4f
 
 #define BUILD_CONFIRM 1
 #define BUILD_CANCEL -1

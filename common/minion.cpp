@@ -126,7 +126,7 @@ void Minion::move(float deltaTime) {
 
 			std::vector<GameObject*> collisions = ObjectDetection::getCollisions(this, DETECTION_FLAG_COLLIDABLE);
 			if (collisions.size() > 0) {
-				std::cout << "minion " << id << " detected collision on move_attempt " << move_attempts << "\n";
+				//std::cout << "minion " << id << " detected collision on move_attempt " << move_attempts << "\n";
 				this->model = oldModel;
 				vec4 move_vec4 = vec4(move_vec, 0);
 				float rot_degrees = (float)pow(-1, move_attempts - 1) * ((float)move_attempts * 20); //20, -40, 60, -80, 100, -120, last one doesn't matter

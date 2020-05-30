@@ -30,6 +30,7 @@
     <ClCompile Include="..\..\..\..\..\common\base.cpp" />
     <ClCompile Include="..\..\..\..\..\common\BuildNode.cpp" />
     <ClCompile Include="..\..\..\..\..\common\clawtower.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\clawtower_client.cpp" />
     <ClCompile Include="..\..\..\..\..\common\GameObject.cpp" />
     <ClCompile Include="..\..\..\..\..\common\lasertower.cpp" />
     <ClCompile Include="..\..\..\..\..\common\lasertower_client.cpp" />
@@ -41,7 +42,9 @@
     <ClCompile Include="..\..\..\..\..\common\player.cpp" />
     <ClCompile Include="..\..\..\..\..\common\player_client.cpp" />
     <ClCompile Include="..\..\..\..\..\common\resource.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\resource_client.cpp" />
     <ClCompile Include="..\..\..\..\..\common\superminion.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\superminion_client.cpp" />
     <ClCompile Include="..\..\..\..\..\common\WallNode.cpp" />
     <ClCompile Include="..\..\..\..\..\server\SceneManager_Server.cpp" />
     <ClCompile Include="..\..\..\..\src\Animator.cpp" />
@@ -144,8 +147,10 @@
     <ClInclude Include="..\..\..\..\..\common\base.h" />
     <ClInclude Include="..\..\..\..\..\common\BuildNode.h" />
     <ClInclude Include="..\..\..\..\..\common\clawtower.h" />
+    <ClInclude Include="..\..\..\..\..\common\clawtower_client.h" />
     <ClInclude Include="..\..\..\..\..\common\client2server.h" />
     <ClInclude Include="..\..\..\..\..\common\entity.h" />
+    <ClInclude Include="..\..\..\..\..\common\entity_client.h" />
     <ClInclude Include="..\..\..\..\..\common\GameObject.h" />
     <ClInclude Include="..\..\..\..\..\common\lasertower.h" />
     <ClInclude Include="..\..\..\..\..\common\macros.h" />
@@ -157,7 +162,9 @@
     <ClInclude Include="..\..\..\..\..\common\player.h" />
     <ClInclude Include="..\..\..\..\..\common\player_client.h" />
     <ClInclude Include="..\..\..\..\..\common\resource.h" />
+    <ClInclude Include="..\..\..\..\..\common\resource_client.h" />
     <ClInclude Include="..\..\..\..\..\common\superminion.h" />
+    <ClInclude Include="..\..\..\..\..\common\superminion_client.h" />
     <ClInclude Include="..\..\..\..\..\common\team.h" />
     <ClInclude Include="..\..\..\..\..\common\tower.h" />
     <ClInclude Include="..\..\..\..\..\common\lasertower_client.h" />

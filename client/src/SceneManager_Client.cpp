@@ -2,18 +2,17 @@
 #include "Application.h"
 
 namespace {
-	// Models
+	//////////////////////////////// Models //////////////////////////////////
 	const char* mapFile = "map.gltf";
+	const char* dumpsterFile = "resource-1-dumpster.gltf";
+	const char* recyclingBinFile = "resource-2-recycling-bin.gltf";
 	const char* playerFile = "char-1-female.gltf";
-	const char* groundFile = "map.gltf";
 	const char* minionFile = "minion-retry.gltf";
 	const char* superMinionFile = "minion-2-super.gltf";
 	const char* laserTowerFile = "tower-1-laser.gltf";
 	const char* clawTowerFile = "tower-3-claw-machine.gltf";
-	const char* dumpsterFile = "resource-1-dumpster.gltf";
-	const char* recyclingBinFile = "resource-2-recycling-bin.gltf";
 
-	// Animations
+	//////////////////////////// Animations ///////////////////////////////////
 	const char* smallMinionDir = "small-minion-B";
 	const char* smallMinionActions[3] = { "Walking", "Fighting", "Death" };
 	const char* superMinionDir = "super-minion-A";
@@ -22,6 +21,12 @@ namespace {
 	const char* playerMaleActions[2] = { "Idle", "Walking" };
 	const char* playerFemaleDir = "female-char-B";
 	const char* playerFemaleActions[2] = { "Idle", "Walking" };
+
+	const char* dumpsterDir = "dumpster";
+	const char* dumpsterActions[1] = { "OpenAndClose" };
+	const char* recyclingBinDir = "recycling-bin";
+	const char* recyclingBinActions[1] = { "Harvested" };
+
 
 	int counter = 1;
 	int animCounter = 1;
@@ -109,31 +114,53 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	transforms[key] = t;
 	animators[key] = a;
 
-	//// TODO This is a hard coded animation example. Remove this later (MALE CHAR)
-	key = 4672347;
-	ozzGeodes["blarf3"] = conf_new(OzzGeode, renderer, playerMaleDir);
-	((OzzObject*)ozzGeodes["blarf3"]->obj)->SetClip(playerMaleActions[1]);
-	t = conf_new(Transform, mat4::translation(vec3(3, 0, 2)));
-	a = conf_new(Animator, ozzGeodes["blarf3"]);
-	a->SetClip(playerMaleActions[1]);
-	t->addChild(a);
-	this->addChild(t);
-	transforms[key] = t;
-	animators[key] = a;
-	key = 4672348;
+	////// TODO This is a hard coded animation example. Remove this later (MALE CHAR)
+	//key = 4672347;
+	//ozzGeodes["blarf3"] = conf_new(OzzGeode, renderer, playerMaleDir);
+	//((OzzObject*)ozzGeodes["blarf3"]->obj)->SetClip(playerMaleActions[1]);
+	//t = conf_new(Transform, mat4::translation(vec3(3, 0, 2)));
+	//a = conf_new(Animator, ozzGeodes["blarf3"]);
+	//a->SetClip(playerMaleActions[1]);
+	//t->addChild(a);
+	//this->addChild(t);
+	//transforms[key] = t;
+	//animators[key] = a;
+	//key = 4672348;
 
 
-	//// TODO This is a hard coded animation example. Remove this later (FEMALE CHAR)
-	key = 1734813;
-	ozzGeodes["blarf4"] = conf_new(OzzGeode, renderer, playerFemaleDir);
-	((OzzObject*)ozzGeodes["blarf4"]->obj)->SetClip(playerFemaleActions[1]);
-	t = conf_new(Transform, mat4::translation(vec3(4, 0, 2)));
-	a = conf_new(Animator, ozzGeodes["blarf4"]);
-	a->SetClip(playerFemaleActions[1]);
-	t->addChild(a);
-	this->addChild(t);
-	transforms[key] = t;
-	animators[key] = a;
+	////// TODO This is a hard coded animation example. Remove this later (FEMALE CHAR)
+	//key = 1734813;
+	//ozzGeodes["blarf4"] = conf_new(OzzGeode, renderer, playerFemaleDir);
+	//((OzzObject*)ozzGeodes["blarf4"]->obj)->SetClip(playerFemaleActions[1]);
+	//t = conf_new(Transform, mat4::translation(vec3(4, 0, 2)));
+	//a = conf_new(Animator, ozzGeodes["blarf4"]);
+	//a->SetClip(playerFemaleActions[1]);
+	//t->addChild(a);
+	//this->addChild(t);
+	//transforms[key] = t;
+	//animators[key] = a;
+
+	//key = 1734873;
+	//ozzGeodes["blarf5"] = conf_new(OzzGeode, renderer, dumpsterDir);
+	//((OzzObject*)ozzGeodes["blarf5"]->obj)->SetClip(dumpsterActions[0]);
+	//t = conf_new(Transform, mat4::translation(vec3(4, 0, 2)));
+	//a = conf_new(Animator, ozzGeodes["blarf5"]);
+	//a->SetClip(dumpsterActions[0]);
+	//t->addChild(a);
+	//this->addChild(t);
+	//transforms[key] = t;
+	//animators[key] = a;
+
+	//key = 1735873;
+	//ozzGeodes["blarf6"] = conf_new(OzzGeode, renderer, recyclingBinDir);
+	//((OzzObject*)ozzGeodes["blarf6"]->obj)->SetClip(recyclingBinActions[0]);
+	//t = conf_new(Transform, mat4::translation(vec3(2, 0, 5)));
+	//a = conf_new(Animator, ozzGeodes["blarf6"]);
+	//a->SetClip(recyclingBinActions[0]);
+	//t->addChild(a);
+	//this->addChild(t);
+	//transforms[key] = t;
+	//animators[key] = a;
 
 	//// TODO These are hard coded particle examples. Remove them later
 	//key = 7234813;
@@ -202,6 +229,12 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	transforms[GROUND_KEY] = conf_new(Transform, mat4::identity());
 	transforms[GROUND_KEY]->addChild(gltfGeodes[ENV_GEODE]);
 	this->addChild(transforms[GROUND_KEY]);
+
+	// Testing Dumpster mesh
+	key = GROUND_KEY + 1;
+	transforms[key] = conf_new(Transform, mat4::translation(vec3(4, 0, 5)));
+	transforms[key]->addChild(gltfGeodes[RECYCLING_BIN_GEODE]);
+	this->addChild(transforms[key]);
 
 	red_team = new Team(RED_TEAM);
 	blue_team = new Team(BLUE_TEAM);

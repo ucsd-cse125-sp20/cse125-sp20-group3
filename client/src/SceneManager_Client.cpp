@@ -219,7 +219,32 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 
 SceneManager_Client::~SceneManager_Client()
 {
-	for (std::pair<int, Entity*> e : idMap) conf_delete(e.second);
+	for (std::pair<int, Entity*> e : idMap) {
+		if (ID_PLAYER_MIN <= e.first && e.first <= ID_PLAYER_MAX) {
+			conf_delete((Player_Client*)e.second);
+		}
+		if (ID_BASE_MIN <= e.first && e.first <= ID_BASE_MAX) {
+
+		}
+		if (ID_MINION_MIN <= e.first && e.first <= ID_MINION_MAX) {
+			conf_delete((Minion_Client*)e.second);
+		}
+		if (ID_SUPER_MINION_MIN <= e.first && e.first <= ID_SUPER_MINION_MAX) {
+			conf_delete((SuperMinion_Client*)e.second);
+		}
+		if (ID_LASER_MIN <= e.first && e.first <= ID_LASER_MAX) {
+			conf_delete((LaserTower_Client*)e.second);
+		}
+		if (ID_CLAW_MIN <= e.first && e.first <= ID_CLAW_MAX) {
+			conf_delete((ClawTower_Client*)e.second);
+		}
+		if (ID_DUMPSTER_MIN <= e.first && e.first <= ID_DUMPSTER_MAX) {
+			conf_delete((Resource_Client*)e.second);
+		}
+		if (ID_RECYCLING_BIN_MIN <= e.first && e.first <= ID_RECYCLING_BIN_MAX) {
+			conf_delete((Resource_Client*)e.second);
+		}
+	}
 	for (std::pair<int, Transform*> t : transforms) conf_delete(t.second);
 	for (std::pair<int, Animator*> t : animators) conf_delete(t.second);
 	for (std::pair<std::string, GLTFGeode*> g : gltfGeodes) conf_delete(g.second);

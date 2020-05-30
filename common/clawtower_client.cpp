@@ -15,7 +15,7 @@ ClawTower_Client::ClawTower_Client(GameObjectData data, int id, Team* t, SceneMa
 
 ClawTower_Client::~ClawTower_Client()
 {
-	conf_delete(animator);
+	//conf_delete(animator);
 }
 
 void ClawTower_Client::updateAnimParticles() {

@@ -8,17 +8,28 @@
         {
             "name" : "Scene",
             "nodes" : [
-                1
+                2
             ]
         }
     ],
     "nodes" : [
         {
-            "name" : "base"
+            "name" : "bottles",
+            "translation" : [
+                0.499589741230011,
+                -0.06382203102111816,
+                0
+            ]
         },
         {
             "children" : [
                 0
+            ],
+            "name" : "base"
+        },
+        {
+            "children" : [
+                1
             ],
             "name" : "Armature",
             "scale" : [
@@ -39,19 +50,40 @@
                 {
                     "sampler" : 0,
                     "target" : {
-                        "node" : 0,
+                        "node" : 1,
                         "path" : "translation"
                     }
                 },
                 {
                     "sampler" : 1,
                     "target" : {
-                        "node" : 0,
+                        "node" : 1,
                         "path" : "rotation"
                     }
                 },
                 {
                     "sampler" : 2,
+                    "target" : {
+                        "node" : 1,
+                        "path" : "scale"
+                    }
+                },
+                {
+                    "sampler" : 3,
+                    "target" : {
+                        "node" : 0,
+                        "path" : "translation"
+                    }
+                },
+                {
+                    "sampler" : 4,
+                    "target" : {
+                        "node" : 0,
+                        "path" : "rotation"
+                    }
+                },
+                {
+                    "sampler" : 5,
                     "target" : {
                         "node" : 0,
                         "path" : "scale"
@@ -74,6 +106,21 @@
                     "input" : 0,
                     "interpolation" : "LINEAR",
                     "output" : 3
+                },
+                {
+                    "input" : 0,
+                    "interpolation" : "LINEAR",
+                    "output" : 4
+                },
+                {
+                    "input" : 0,
+                    "interpolation" : "LINEAR",
+                    "output" : 5
+                },
+                {
+                    "input" : 0,
+                    "interpolation" : "LINEAR",
+                    "output" : 6
                 }
             ]
         }
@@ -108,6 +155,24 @@
             "componentType" : 5126,
             "count" : 20,
             "type" : "VEC3"
+        },
+        {
+            "bufferView" : 4,
+            "componentType" : 5126,
+            "count" : 20,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 5,
+            "componentType" : 5126,
+            "count" : 20,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 6,
+            "componentType" : 5126,
+            "count" : 20,
+            "type" : "VEC3"
         }
     ],
     "bufferViews" : [
@@ -130,11 +195,26 @@
             "buffer" : 0,
             "byteLength" : 240,
             "byteOffset" : 640
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 240,
+            "byteOffset" : 880
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 320,
+            "byteOffset" : 1120
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 240,
+            "byteOffset" : 1440
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 880,
+            "byteLength" : 1680,
             "uri" : "Harvested.bin"
         }
     ]

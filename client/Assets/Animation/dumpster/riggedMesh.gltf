@@ -4,7 +4,7 @@
       "bufferView": 0,
       "componentType": 5126,
       "type": "VEC3",
-      "count": 13005,
+      "count": 18751,
       "min": [-1.75683, -0.00380282, -1.1047],
       "max": [1.74799, 2.47864, 1.09242]
     },
@@ -12,31 +12,31 @@
       "bufferView": 1,
       "componentType": 5126,
       "type": "VEC3",
-      "count": 13005
+      "count": 18751
     },
     {
       "bufferView": 2,
       "componentType": 5126,
       "type": "VEC2",
-      "count": 13005
+      "count": 18751
     },
     {
       "bufferView": 3,
       "componentType": 5123,
       "type": "VEC4",
-      "count": 13005
+      "count": 18751
     },
     {
       "bufferView": 4,
       "componentType": 5126,
       "type": "VEC4",
-      "count": 13005
+      "count": 18751
     },
     {
       "bufferView": 5,
       "componentType": 5123,
       "type": "SCALAR",
-      "count": 37560
+      "count": 46644
     },
     {
       "bufferView": 6,
@@ -52,43 +52,43 @@
   "bufferViews": [
     {
       "buffer": 0,
-      "byteLength": 156060
+      "byteLength": 225012
     },
     {
       "buffer": 0,
-      "byteLength": 156060,
-      "byteOffset": 156060
+      "byteLength": 225012,
+      "byteOffset": 225012
     },
     {
       "buffer": 0,
-      "byteLength": 104040,
-      "byteOffset": 312120
+      "byteLength": 150008,
+      "byteOffset": 450024
     },
     {
       "buffer": 0,
-      "byteLength": 104040,
-      "byteOffset": 416160
+      "byteLength": 150008,
+      "byteOffset": 600032
     },
     {
       "buffer": 0,
-      "byteLength": 208080,
-      "byteOffset": 520200
+      "byteLength": 300016,
+      "byteOffset": 750040
     },
     {
       "buffer": 0,
-      "byteLength": 75120,
-      "byteOffset": 728280
+      "byteLength": 93288,
+      "byteOffset": 1050056
     },
     {
       "buffer": 0,
       "byteLength": 128,
-      "byteOffset": 803400
+      "byteOffset": 1143344
     }
   ],
   "buffers": [
     {
       "uri": "riggedMesh.bin",
-      "byteLength": 803528
+      "byteLength": 1143472
     }
   ],
   "images": [
@@ -133,14 +133,12 @@
     {
       "name": "lid",
       "translation": [-1.25116e-16, 1.37266, -0.563475],
-      "rotation": [-0.182438, -8.19351e-07, 1.05318e-07, 0.983217],
-      "scale": [1, 1, 1]
+      "rotation": [0.750759, -5.51229e-07, -6.26485e-07, 0.660576]
     },
     {
       "children": [ 0 ],
       "name": "base",
-      "translation": [0, -0.0398554, 0],
-      "scale": [1, 0.990787, 1]
+      "translation": [0, -0.0398554, 0]
     },
     {
       "mesh": 0,

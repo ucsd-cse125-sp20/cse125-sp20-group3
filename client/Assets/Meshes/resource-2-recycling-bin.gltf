@@ -15,22 +15,12 @@
     "nodes" : [
         {
             "mesh" : 0,
-            "name" : "Recycling Bin",
+            "name" : "Recycling_Bin_Cube.003",
             "rotation" : [
-                0.006231586914509535,
-                -0.3324258625507355,
-                0.025605211034417152,
-                0.9427611231803894
-            ],
-            "scale" : [
-                0.2087201327085495,
-                0.001401421963237226,
-                0.2407505363225937
-            ],
-            "translation" : [
-                -2.068363666534424,
-                0.012355194427073002,
-                -0.05799131840467453
+                0.7071068286895752,
+                0,
+                0,
+                0.7071067094802856
             ]
         }
     ],
@@ -42,7 +32,7 @@
                 0,
                 0
             ],
-            "name" : "Material",
+            "name" : "base",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 0,
@@ -55,15 +45,17 @@
     ],
     "meshes" : [
         {
-            "name" : "Cube.006",
+            "name" : "Recycling_Bin_Cube.003",
             "primitives" : [
                 {
                     "attributes" : {
                         "POSITION" : 0,
                         "NORMAL" : 1,
-                        "TEXCOORD_0" : 2
+                        "TEXCOORD_0" : 2,
+                        "JOINTS_0" : 3,
+                        "WEIGHTS_0" : 4
                     },
-                    "indices" : 3,
+                    "indices" : 5,
                     "material" : 0
                 }
             ]
@@ -85,63 +77,85 @@
         {
             "bufferView" : 0,
             "componentType" : 5126,
-            "count" : 352490,
+            "count" : 3492,
             "max" : [
-                2.6825754642486572,
-                1293.2646484375,
-                4.0403594970703125
+                1.1739760637283325,
+                0.461777001619339,
+                0.018071986734867096
             ],
             "min" : [
-                -4.670231342315674,
-                -23.22732162475586,
-                -2.000659465789795
+                -0.461777001619339,
+                -0.461777001619339,
+                -1.7786509990692139
             ],
             "type" : "VEC3"
         },
         {
             "bufferView" : 1,
             "componentType" : 5126,
-            "count" : 352490,
+            "count" : 3492,
             "type" : "VEC3"
         },
         {
             "bufferView" : 2,
             "componentType" : 5126,
-            "count" : 352490,
+            "count" : 3492,
             "type" : "VEC2"
         },
         {
             "bufferView" : 3,
-            "componentType" : 5125,
-            "count" : 530052,
+            "componentType" : 5123,
+            "count" : 3492,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 4,
+            "componentType" : 5126,
+            "count" : 3492,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 5,
+            "componentType" : 5123,
+            "count" : 12108,
             "type" : "SCALAR"
         }
     ],
     "bufferViews" : [
         {
             "buffer" : 0,
-            "byteLength" : 4229880,
+            "byteLength" : 41904,
             "byteOffset" : 0
         },
         {
             "buffer" : 0,
-            "byteLength" : 4229880,
-            "byteOffset" : 4229880
+            "byteLength" : 41904,
+            "byteOffset" : 41904
         },
         {
             "buffer" : 0,
-            "byteLength" : 2819920,
-            "byteOffset" : 8459760
+            "byteLength" : 27936,
+            "byteOffset" : 83808
         },
         {
             "buffer" : 0,
-            "byteLength" : 2120208,
-            "byteOffset" : 11279680
+            "byteLength" : 27936,
+            "byteOffset" : 111744
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 55872,
+            "byteOffset" : 139680
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 24216,
+            "byteOffset" : 195552
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 13399888,
+            "byteLength" : 219768,
             "uri" : "resource-2-recycling-bin.bin"
         }
     ]

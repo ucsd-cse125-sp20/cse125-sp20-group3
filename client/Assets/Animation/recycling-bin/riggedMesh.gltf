@@ -4,45 +4,45 @@
       "bufferView": 0,
       "componentType": 5126,
       "type": "VEC3",
-      "count": 325297,
-      "min": [-0.463207, -0.00583101, -0.461429],
-      "max": [1.03565, 1.79487, 0.46143]
+      "count": 3492,
+      "min": [-0.461777, -0.0180719, -0.461777],
+      "max": [1.17398, 1.77865, 0.461777]
     },
     {
       "bufferView": 1,
       "componentType": 5126,
       "type": "VEC3",
-      "count": 325297
+      "count": 3492
     },
     {
       "bufferView": 2,
       "componentType": 5126,
       "type": "VEC2",
-      "count": 325297
+      "count": 3492
     },
     {
       "bufferView": 3,
       "componentType": 5123,
       "type": "VEC4",
-      "count": 325297
+      "count": 3492
     },
     {
       "bufferView": 4,
       "componentType": 5126,
       "type": "VEC4",
-      "count": 325297
+      "count": 3492
     },
     {
       "bufferView": 5,
-      "componentType": 5125,
+      "componentType": 5123,
       "type": "SCALAR",
-      "count": 530052
+      "count": 12108
     },
     {
       "bufferView": 6,
       "componentType": 5126,
       "type": "MAT4",
-      "count": 1
+      "count": 2
     }
   ],
   "asset": {
@@ -52,43 +52,43 @@
   "bufferViews": [
     {
       "buffer": 0,
-      "byteLength": 3903564
+      "byteLength": 41904
     },
     {
       "buffer": 0,
-      "byteLength": 3903564,
-      "byteOffset": 3903564
+      "byteLength": 41904,
+      "byteOffset": 41904
     },
     {
       "buffer": 0,
-      "byteLength": 2602376,
-      "byteOffset": 7807128
+      "byteLength": 27936,
+      "byteOffset": 83808
     },
     {
       "buffer": 0,
-      "byteLength": 2602376,
-      "byteOffset": 10409504
+      "byteLength": 27936,
+      "byteOffset": 111744
     },
     {
       "buffer": 0,
-      "byteLength": 5204752,
-      "byteOffset": 13011880
+      "byteLength": 55872,
+      "byteOffset": 139680
     },
     {
       "buffer": 0,
-      "byteLength": 2120208,
-      "byteOffset": 18216632
+      "byteLength": 24216,
+      "byteOffset": 195552
     },
     {
       "buffer": 0,
-      "byteLength": 64,
-      "byteOffset": 20336840
+      "byteLength": 128,
+      "byteOffset": 219768
     }
   ],
   "buffers": [
     {
       "uri": "riggedMesh.bin",
-      "byteLength": 20336904
+      "byteLength": 219896
     }
   ],
   "images": [
@@ -100,7 +100,7 @@
   ],
   "meshes": [
     {
-      "name": "Recycling_Bin_Cube.006",
+      "name": "Recycling_Bin_Cube.003",
       "primitives": [
         {
           "indices": 5,
@@ -118,7 +118,7 @@
   ],
   "materials": [
     {
-      "name": "Material.001",
+      "name": "base",
       "doubleSided": true,
       "pbrMetallicRoughness": {
         "baseColorTexture": {
@@ -131,16 +131,21 @@
   ],
   "nodes": [
     {
+      "name": "bottles",
+      "translation": [0.49959, -0.063822, 0]
+    },
+    {
+      "children": [ 0 ],
       "name": "base",
-      "scale": [1, 0.994566, 1]
+      "scale": [1, 0.966144, 1]
     },
     {
       "mesh": 0,
-      "name": "Recycling_Bin_Cube.006",
+      "name": "Recycling_Bin_Cube.003",
       "skin": 0
     },
     {
-      "children": [ 1, 0 ],
+      "children": [ 2, 1 ],
       "name": "Armature",
       "translation": [0, 0.0987485, 0],
       "scale": [1.54857, 1.54857, 1.54857]
@@ -150,7 +155,7 @@
   "scenes": [
     {
       "name": "Scene",
-      "nodes": [ 2 ]
+      "nodes": [ 3 ]
     }
   ],
   "textures": [
@@ -161,9 +166,9 @@
   "skins": [
     {
       "inverseBindMatrices": 6,
-      "joints": [ 0 ],
+      "joints": [ 1, 0 ],
       "name": "Armature",
-      "extras": [ 1, ],
+      "extras": [ 1, 2, ],
     }
   ]
 }

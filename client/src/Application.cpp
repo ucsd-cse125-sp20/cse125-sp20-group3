@@ -174,7 +174,7 @@ uint32_t			guiModelToLoadIndex = 0;
 
 const wchar_t* gMissingTextureString = L"MissingTexture";
 
-const uint			gBackroundColor = { 0xb2b2b2ff };
+const uint			gBackroundColor = { 0x222242ff };
 static uint			gLightColor[gTotalLightCount] = { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffff66 };
 static float		gLightColorIntensity[gTotalLightCount] = { 1.0f, 0.2f, 0.2f, 0.25f };
 static float2		gLightDirection = { -122.0f, 222.0f };

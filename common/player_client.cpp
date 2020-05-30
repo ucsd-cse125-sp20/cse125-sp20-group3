@@ -1,10 +1,11 @@
 #include "player_client.h"
+#include "../client/src/SceneManager_Client.h"
 
 namespace {
 	const char* playerActions[2] = { "Idle", "Walking" };
 }
 
-Player_Client::Player_Client(GameObjectData data, int id, Team* t, SceneManager_Server* sm, OzzGeode* geode, Transform* parent) : Player(data, id, t, sm)
+Player_Client::Player_Client(GameObjectData data, int id, Team* t, SceneManager_Client* sm_c, OzzGeode* geode, Transform* parent) : Player(data, id, t, nullptr), Entity_Client(sm_c)
 {
 	rotator = conf_new(Transform);
 

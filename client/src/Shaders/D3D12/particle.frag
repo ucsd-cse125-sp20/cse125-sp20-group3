@@ -38,5 +38,6 @@ float4 main(VSOutput input) : SV_Target0
     float lum = dot(diffuse.rgb, 0.333);
     diffuse.rgb = lerp(diffuse.rgb, lum.xxx, 0.8);
     diffuse.rgb *= input.color.rgb;
+
     return diffuse;
 }

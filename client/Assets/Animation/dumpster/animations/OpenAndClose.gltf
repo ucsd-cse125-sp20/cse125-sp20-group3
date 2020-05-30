@@ -1,0 +1,232 @@
+{
+    "asset" : {
+        "generator" : "Khronos glTF Blender I/O v1.1.46",
+        "version" : "2.0"
+    },
+    "scene" : 0,
+    "scenes" : [
+        {
+            "name" : "Scene",
+            "nodes" : [
+                2
+            ]
+        }
+    ],
+    "nodes" : [
+        {
+            "name" : "lid",
+            "rotation" : [
+                0.750759482383728,
+                -5.512291068043851e-07,
+                -6.264845069381408e-07,
+                0.6605756878852844
+            ],
+            "translation" : [
+                -1.2511646748368418e-16,
+                1.3726608753204346,
+                -0.5634745359420776
+            ]
+        },
+        {
+            "children" : [
+                0
+            ],
+            "name" : "base",
+            "translation" : [
+                0,
+                -0.039855360984802246,
+                0
+            ]
+        },
+        {
+            "children" : [
+                1
+            ],
+            "name" : "Armature",
+            "scale" : [
+                1.493543267250061,
+                1.493543267250061,
+                1.493543267250061
+            ],
+            "translation" : [
+                0,
+                0.40471819043159485,
+                0
+            ]
+        }
+    ],
+    "animations" : [
+        {
+            "channels" : [
+                {
+                    "sampler" : 0,
+                    "target" : {
+                        "node" : 1,
+                        "path" : "translation"
+                    }
+                },
+                {
+                    "sampler" : 1,
+                    "target" : {
+                        "node" : 1,
+                        "path" : "rotation"
+                    }
+                },
+                {
+                    "sampler" : 2,
+                    "target" : {
+                        "node" : 1,
+                        "path" : "scale"
+                    }
+                },
+                {
+                    "sampler" : 3,
+                    "target" : {
+                        "node" : 0,
+                        "path" : "translation"
+                    }
+                },
+                {
+                    "sampler" : 4,
+                    "target" : {
+                        "node" : 0,
+                        "path" : "rotation"
+                    }
+                },
+                {
+                    "sampler" : 5,
+                    "target" : {
+                        "node" : 0,
+                        "path" : "scale"
+                    }
+                }
+            ],
+            "name" : "OpenAndClose",
+            "samplers" : [
+                {
+                    "input" : 0,
+                    "interpolation" : "LINEAR",
+                    "output" : 1
+                },
+                {
+                    "input" : 0,
+                    "interpolation" : "LINEAR",
+                    "output" : 2
+                },
+                {
+                    "input" : 0,
+                    "interpolation" : "LINEAR",
+                    "output" : 3
+                },
+                {
+                    "input" : 0,
+                    "interpolation" : "LINEAR",
+                    "output" : 4
+                },
+                {
+                    "input" : 0,
+                    "interpolation" : "LINEAR",
+                    "output" : 5
+                },
+                {
+                    "input" : 0,
+                    "interpolation" : "LINEAR",
+                    "output" : 6
+                }
+            ]
+        }
+    ],
+    "accessors" : [
+        {
+            "bufferView" : 0,
+            "componentType" : 5126,
+            "count" : 70,
+            "max" : [
+                2.9166666666666665
+            ],
+            "min" : [
+                0.041666666666666664
+            ],
+            "type" : "SCALAR"
+        },
+        {
+            "bufferView" : 1,
+            "componentType" : 5126,
+            "count" : 70,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 2,
+            "componentType" : 5126,
+            "count" : 70,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 3,
+            "componentType" : 5126,
+            "count" : 70,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 4,
+            "componentType" : 5126,
+            "count" : 70,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 5,
+            "componentType" : 5126,
+            "count" : 70,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 6,
+            "componentType" : 5126,
+            "count" : 70,
+            "type" : "VEC3"
+        }
+    ],
+    "bufferViews" : [
+        {
+            "buffer" : 0,
+            "byteLength" : 280,
+            "byteOffset" : 0
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 840,
+            "byteOffset" : 280
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 1120,
+            "byteOffset" : 1120
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 840,
+            "byteOffset" : 2240
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 840,
+            "byteOffset" : 3080
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 1120,
+            "byteOffset" : 3920
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 840,
+            "byteOffset" : 5040
+        }
+    ],
+    "buffers" : [
+        {
+            "byteLength" : 5880,
+            "uri" : "OpenAndClose.bin"
+        }
+    ]
+}

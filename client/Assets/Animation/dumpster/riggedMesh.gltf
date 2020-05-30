@@ -1,0 +1,175 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 18751,
+      "min": [-1.75683, -0.00380282, -1.1047],
+      "max": [1.74799, 2.47864, 1.09242]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 18751
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "type": "VEC2",
+      "count": 18751
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5123,
+      "type": "VEC4",
+      "count": 18751
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5126,
+      "type": "VEC4",
+      "count": 18751
+    },
+    {
+      "bufferView": 5,
+      "componentType": 5123,
+      "type": "SCALAR",
+      "count": 46644
+    },
+    {
+      "bufferView": 6,
+      "componentType": 5126,
+      "type": "MAT4",
+      "count": 2
+    }
+  ],
+  "asset": {
+    "generator": "Khronos glTF Blender I/O v1.1.46",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 225012
+    },
+    {
+      "buffer": 0,
+      "byteLength": 225012,
+      "byteOffset": 225012
+    },
+    {
+      "buffer": 0,
+      "byteLength": 150008,
+      "byteOffset": 450024
+    },
+    {
+      "buffer": 0,
+      "byteLength": 150008,
+      "byteOffset": 600032
+    },
+    {
+      "buffer": 0,
+      "byteLength": 300016,
+      "byteOffset": 750040
+    },
+    {
+      "buffer": 0,
+      "byteLength": 93288,
+      "byteOffset": 1050056
+    },
+    {
+      "buffer": 0,
+      "byteLength": 128,
+      "byteOffset": 1143344
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "riggedMesh.bin",
+      "byteLength": 1143472
+    }
+  ],
+  "images": [
+    {
+      "name": "dumpster_tex-01",
+      "uri": "dumpster_tex-01.png",
+      "mimeType": "image/png"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Dumpster_Cube.017",
+      "primitives": [
+        {
+          "indices": 5,
+          "material": 0,
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2,
+            "JOINTS_0": 3,
+            "WEIGHTS_0": 4
+          }
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "Texture",
+      "doubleSided": true,
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        },
+        "metallicFactor": 0,
+        "roughnessFactor": 0.5
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "name": "lid",
+      "translation": [-1.25116e-16, 1.37266, -0.563475],
+      "rotation": [0.750759, -5.51229e-07, -6.26485e-07, 0.660576]
+    },
+    {
+      "children": [ 0 ],
+      "name": "base",
+      "translation": [0, -0.0398554, 0]
+    },
+    {
+      "mesh": 0,
+      "name": "Dumpster_Cube.017",
+      "skin": 0
+    },
+    {
+      "children": [ 2, 1 ],
+      "name": "Armature",
+      "translation": [0, 0.404718, 0],
+      "scale": [1.49354, 1.49354, 1.49354]
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [ 3 ]
+    }
+  ],
+  "textures": [
+    {
+      "source": 0
+    }
+  ],
+  "skins": [
+    {
+      "inverseBindMatrices": 6,
+      "joints": [ 1, 0 ],
+      "name": "Armature",
+      "extras": [ 1, 2, ],
+    }
+  ]
+}

@@ -445,6 +445,14 @@ PSOut main(PsIn input) : SV_TARGET
 	// Tonemap and gamma correct
 	// result = result/(result+float3(1.0, 1.0, 1.0));
 
+	float fog_maxdist = 50.0f;
+	float fog_mindist = 5.0f;
+	float3 fog_color = float3(0.1f, 0.1f, 0.1f);
+	float dist = length(camPos.xyz - input.pos);
+	float fog_factor = (fog_maxdist - dist) / (fog_maxdist - fog_mindist);
+	fog_factor = fog_factor < 0 ? 0 : (fog_factor > 1 ? 1 : fog_factor);
+	result = fog_factor * result + (1 - fog_factor) * fog_color;
+
 	Out.outColor = float4(result.r, result.g, result.b, baseColor.a);
 	return Out;
 }

@@ -1,0 +1,240 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 20781,
+      "min": [-1.04829, -0.0140027, -0.96986],
+      "max": [1.04829, 4.02664, 1.13971]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 20781
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "type": "VEC2",
+      "count": 20781
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5123,
+      "type": "VEC4",
+      "count": 20781
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5126,
+      "type": "VEC4",
+      "count": 20781
+    },
+    {
+      "bufferView": 5,
+      "componentType": 5123,
+      "type": "SCALAR",
+      "count": 78888
+    },
+    {
+      "bufferView": 6,
+      "componentType": 5126,
+      "type": "MAT4",
+      "count": 10
+    }
+  ],
+  "asset": {
+    "generator": "Khronos glTF Blender I/O v1.1.46",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 249372
+    },
+    {
+      "buffer": 0,
+      "byteLength": 249372,
+      "byteOffset": 249372
+    },
+    {
+      "buffer": 0,
+      "byteLength": 166248,
+      "byteOffset": 498744
+    },
+    {
+      "buffer": 0,
+      "byteLength": 166248,
+      "byteOffset": 664992
+    },
+    {
+      "buffer": 0,
+      "byteLength": 332496,
+      "byteOffset": 831240
+    },
+    {
+      "buffer": 0,
+      "byteLength": 157776,
+      "byteOffset": 1163736
+    },
+    {
+      "buffer": 0,
+      "byteLength": 640,
+      "byteOffset": 1321512
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "riggedMesh.bin",
+      "byteLength": 1322152
+    }
+  ],
+  "images": [
+    {
+      "name": "claw_machine_tex_A",
+      "uri": "claw_machine_tex_A.png",
+      "mimeType": "image/png"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Claw_Machine_Tower_Cube.036",
+      "primitives": [
+        {
+          "indices": 5,
+          "material": 0,
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2,
+            "JOINTS_0": 3,
+            "WEIGHTS_0": 4
+          }
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "Claw Machine Base",
+      "doubleSided": true,
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        },
+        "metallicFactor": 0,
+        "roughnessFactor": 0.5
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "name": "claw3.R",
+      "translation": [5.6283e-10, 0.250058, 4.68203e-08],
+      "rotation": [0.381089, -4.62278e-08, -1.17947e-07, 0.924538]
+    },
+    {
+      "children": [ 0 ],
+      "name": "claw2.R",
+      "translation": [-1.95708e-10, 0.428485, 1.35128e-07],
+      "rotation": [0.318485, -1.3174e-07, -3.58931e-08, 0.947928],
+      "scale": [1, 1, 1]
+    },
+    {
+      "children": [ 1 ],
+      "name": "claw.R",
+      "translation": [-2.02229e-10, 0.706429, -5.62505e-11],
+      "rotation": [-0.626315, 7.11229e-08, -1.04174e-07, 0.77957],
+      "scale": [1, 1, 1]
+    },
+    {
+      "name": "claw3.L",
+      "translation": [-3.56209e-10, 0.26861, 6.99459e-08],
+      "rotation": [-0.454816, 3.54607e-08, -2.25053e-07, 0.890586],
+      "scale": [1, 1, 1]
+    },
+    {
+      "children": [ 3 ],
+      "name": "claw2.L",
+      "translation": [3.86045e-10, 0.415981, -8.14619e-08],
+      "rotation": [-0.214328, -1.26697e-08, -1.01197e-07, 0.976762],
+      "scale": [1, 1, 1]
+    },
+    {
+      "children": [ 4 ],
+      "name": "claw.L",
+      "translation": [-2.02229e-10, 0.706429, -5.62505e-11],
+      "rotation": [0.605694, 1.08319e-07, 7.10276e-08, 0.795698],
+      "scale": [1, 1, 1]
+    },
+    {
+      "children": [ 2, 5 ],
+      "name": "claw-rod2",
+      "translation": [-0.00163114, 0.740444, 0.011722],
+      "rotation": [-4.31149e-09, 0.707107, 3.4457e-07, 0.707107]
+    },
+    {
+      "children": [ 6 ],
+      "name": "claw-rod1",
+      "translation": [0.00827162, -0.0904971, -0.0131716],
+      "rotation": [-5.88275e-08, 4.88187e-08, -7.03906e-08, 1]
+    },
+    {
+      "name": "single-plushie",
+      "translation": [0.0815916, 5.24602, -0.0161391],
+      "rotation": [-0.997221, -0.00877507, 0.0132485, 0.0727818],
+      "scale": [1, 1, 1]
+    },
+    {
+      "name": "all",
+      "translation": [-0.677739, 5.34722, -0.699394],
+      "rotation": [1, 1.57043e-07, 1.57043e-07, -1.29713e-07]
+    },
+    {
+      "mesh": 0,
+      "name": "Claw_Machine_Tower_Cube.036",
+      "skin": 0
+    },
+    {
+      "children": [ 10, 7, 8, 9 ],
+      "name": "Armature",
+      "translation": [-0.439883, 3.74109, 0.45394],
+      "rotation": [0, 0, -1, -1.62921e-07],
+      "scale": [0.649046, 0.649046, 0.649046]
+    },
+    {
+      "name": "Armature.001",
+      "translation": [-0.439883, 3.74109, 0.45394],
+      "rotation": [0, 0, -1, -1.62921e-07],
+      "scale": [0.649046, 0.649046, 0.649046]
+    },
+    {
+      "name": "Armature.002",
+      "translation": [-0.439883, 3.74109, 0.45394],
+      "rotation": [0, 0, -1, -1.62921e-07],
+      "scale": [0.649046, 0.649046, 0.649046]
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [ 11, 12, 13 ]
+    }
+  ],
+  "textures": [
+    {
+      "source": 0
+    }
+  ],
+  "skins": [
+    {
+      "inverseBindMatrices": 6,
+      "joints": [ 7, 6, 2, 1, 0, 5, 4, 3, 8, 9 ],
+      "name": "Armature",
+      "extras": [ 3, 4, 6, 9, 10, 5, 7, 8, 2, 1, ],
+    }
+  ]
+}

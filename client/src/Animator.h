@@ -14,6 +14,7 @@
 
 class Animator : public Transform {
 public:
+
 	AnimatedObject animObject;
 	Animation animation;
 
@@ -25,6 +26,7 @@ public:
 	Rig rig;
 
 	std::string directory;
+	std::string currClip;
 
 	bool updated = false;
 
@@ -39,6 +41,9 @@ public:
 	~Animator();
 
 	void SetClip(std::string clipName);
+	void SetLoop(bool state);
+	void SetPlay(bool state);
+	void SetTime(float time);
 
 	void update(float deltaTime) override;
 	

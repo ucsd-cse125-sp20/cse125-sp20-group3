@@ -59,8 +59,8 @@ Animator::~Animator()
 	rig.Destroy();
 	animation.Destroy();
 	animObject.Destroy();
-	for (auto timeEntry : times) {
-		conf_delete(timeEntry.second);
+	for (auto d : times) {
+		conf_delete(d.second);
 	}
 	for (auto ccEntry : clipControllers) {
 		conf_delete(ccEntry.second);
@@ -73,6 +73,7 @@ Animator::~Animator()
 
 void Animator::SetClip(std::string clipName)
 {
+	currClip = clipName;
 	for (auto cmEntry : clipMasks) {
 		if (cmEntry.first == clipName) {
 			cmEntry.second->EnableAllJoints();
@@ -80,6 +81,27 @@ void Animator::SetClip(std::string clipName)
 		else {
 			cmEntry.second->DisableAllJoints();
 		}
+	}
+}
+
+void Animator::SetLoop(bool state)
+{
+	if (clipControllers.find(currClip) != clipControllers.end()) {
+		clipControllers[currClip]->SetLoop(state);
+	}
+}
+
+void Animator::SetPlay(bool state)
+{
+	if (clipControllers.find(currClip) != clipControllers.end()) {
+		clipControllers[currClip]->SetPlay(state);
+	}
+}
+
+void Animator::SetTime(float time)
+{
+	if (clipControllers.find(currClip) != clipControllers.end()) {
+		clipControllers[currClip]->SetTimeRatio(time);
 	}
 }
 

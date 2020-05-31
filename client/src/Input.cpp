@@ -82,7 +82,6 @@ bool Input::Init(WindowsDesc* window, UIApp* appUI, IApp* app, ICameraController
 			else {
 				inputs[INPUT_UP] = 0.0f;
 			}
-
 			if (ctx->mFloat2.y < 0.0) {
 				inputs[INPUT_DOWN] = 1.0f;
 			}

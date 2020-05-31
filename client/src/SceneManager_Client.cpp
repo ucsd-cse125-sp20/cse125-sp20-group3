@@ -60,7 +60,7 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	((OzzObject*)ozzGeodes[PLAYER_GEODE]->obj)->SetClip(playerMaleActions[0]); // Set a default action
 	ozzGeodes[CLAW_TOWER_GEODE] = conf_new(OzzGeode, renderer, clawTowerDir);
 	((OzzObject*)ozzGeodes[CLAW_TOWER_GEODE]->obj)->SetClip(clawTowerActions[0]);
-	
+
 
 	ParticleSystem::ParticleSystemParams particleParams = {};
 	particleParams.spriteFile = LASER_TOWER_BEAM_SPRITE;
@@ -96,18 +96,18 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	particleGeodes[MINION_GEODE] = conf_new(ParticleSystemGeode, renderer, particleParams);
 
 	///////////////////////////////////////////////////////////////////////////////
-	
-    // TODO This is a hard coded animation example. Remove this later (SMALL MINION)
+
+	// TODO This is a hard coded animation example. Remove this later (SMALL MINION)
 	int key = 9999999;
-    ozzGeodes["blarf"] = conf_new(OzzGeode, renderer, smallMinionDir);
+	ozzGeodes["blarf"] = conf_new(OzzGeode, renderer, smallMinionDir);
 	((OzzObject*)ozzGeodes["blarf"]->obj)->SetClip(smallMinionActions[2]);
-    Transform* t = conf_new(Transform, mat4::translation(vec3(-1, 0, 2)));
-    Animator* a = conf_new(Animator, ozzGeodes["blarf"]);
-    a->SetClip(smallMinionActions[2]);
-    t->addChild(a);
-    this->addChild(t);
-    transforms[key] = t;
-    animators[key] = a;
+	Transform* t = conf_new(Transform, mat4::translation(vec3(-1, 0, 2)));
+	Animator* a = conf_new(Animator, ozzGeodes["blarf"]);
+	a->SetClip(smallMinionActions[2]);
+	t->addChild(a);
+	this->addChild(t);
+	transforms[key] = t;
+	animators[key] = a;
 
 
 	// TODO This is a hard coded animation example. Remove this later (SUPER MINION)
@@ -304,11 +304,11 @@ void SceneManager_Client::updateStateAndScene(Client::UpData data) {
 void SceneManager_Client::updateState(Client::StateUpdateData updateData) {
 	red_team->setData(updateData.redTeamData);
 	blue_team->setData(updateData.blueTeamData);
-	
+
 	if (!first_update) SceneManager_Client::updateUI();
 }
 
-void SceneManager_Client::updateUI(){
+void SceneManager_Client::updateUI() {
 	Team* trackedPlayerTeam = idMap[trackedPlayer_ID]->getTeam();
 	if (trackedPlayerTeam->teamColor != RED_TEAM && trackedPlayerTeam->teamColor != BLUE_TEAM) return;
 
@@ -322,37 +322,42 @@ void SceneManager_Client::updateUI(){
 
 	UIUtils::editText(PLASTIC_UI_TEXT, std::to_string(plasticCount), "small font", 0xff6655ff);
 	UIUtils::editText(METAL_UI_TEXT, std::to_string(metalCount), "small font", 0xff6655ff);
-	if (plasticCount <= 0){ //counts shouldn't ever be negative but it can't hurt to check
-		UIUtils::changeImage(PLASTIC_UI_ICON, "resource_plastic_alert.png",  float2((float)Application::width / 3200, (float)Application::height / 2000));
-	}else{
-		UIUtils::changeImage(PLASTIC_UI_ICON, "resource_plastic.png",  float2((float)Application::width / 3200, (float)Application::height / 2000));
+	if (plasticCount <= 0) { //counts shouldn't ever be negative but it can't hurt to check
+		UIUtils::changeImage(PLASTIC_UI_ICON, "resource_plastic_alert.png", float2((float)Application::width / 3200, (float)Application::height / 2000));
 	}
-	if (metalCount <= 0){
-		UIUtils::changeImage(METAL_UI_ICON, "resource_metal_alert.png",  float2((float)Application::width / 3200, (float)Application::height / 2000));
-	}else{
-		UIUtils::changeImage(METAL_UI_ICON, "resource_metal.png",  float2((float)Application::width / 3200, (float)Application::height / 2000));
+	else {
+		UIUtils::changeImage(PLASTIC_UI_ICON, "resource_plastic.png", float2((float)Application::width / 3200, (float)Application::height / 2000));
+	}
+	if (metalCount <= 0) {
+		UIUtils::changeImage(METAL_UI_ICON, "resource_metal_alert.png", float2((float)Application::width / 3200, (float)Application::height / 2000));
+	}
+	else {
+		UIUtils::changeImage(METAL_UI_ICON, "resource_metal.png", float2((float)Application::width / 3200, (float)Application::height / 2000));
 	}
 
 	bool super_minion = trackedPlayerTeam->checkResources(SUPER_MINION_TYPE);
 	bool claw_machine = trackedPlayerTeam->checkResources(CLAW_TYPE);
 	bool laser_tower = trackedPlayerTeam->checkResources(LASER_TYPE);
 
-	if (laser_tower){
-		UIUtils::changeImage(LASER_TOWER_UI_ICON, "tower_2.png",  float2((float)Application::width / 3200, (float)Application::height / 2000));
-	}else{
-		UIUtils::changeImage(LASER_TOWER_UI_ICON, "tower_2_low.png",  float2((float)Application::width / 3200, (float)Application::height / 2000));
+	if (laser_tower) {
+		UIUtils::changeImage(LASER_TOWER_UI_ICON, "tower_2.png", float2((float)Application::width / 3200, (float)Application::height / 2000));
+	}
+	else {
+		UIUtils::changeImage(LASER_TOWER_UI_ICON, "tower_2_low.png", float2((float)Application::width / 3200, (float)Application::height / 2000));
 	}
 
-	if (claw_machine){
-		UIUtils::changeImage(CLAW_MACHINE_UI_ICON, "tower_3.png",  float2((float)Application::width / 3200, (float)Application::height / 2000));
-	}else{
-		UIUtils::changeImage(CLAW_MACHINE_UI_ICON, "tower_3_low.png",  float2((float)Application::width / 3200, (float)Application::height / 2000));
+	if (claw_machine) {
+		UIUtils::changeImage(CLAW_MACHINE_UI_ICON, "tower_3.png", float2((float)Application::width / 3200, (float)Application::height / 2000));
+	}
+	else {
+		UIUtils::changeImage(CLAW_MACHINE_UI_ICON, "tower_3_low.png", float2((float)Application::width / 3200, (float)Application::height / 2000));
 	}
 
-	if (super_minion){
-		UIUtils::changeImage(SUPER_MINION_UI_ICON, "tower_4.png",  float2((float)Application::width / 3200, (float)Application::height / 2000));
-	}else{
-		UIUtils::changeImage(SUPER_MINION_UI_ICON, "tower_4_low.png",  float2((float)Application::width / 3200, (float)Application::height / 2000));
+	if (super_minion) {
+		UIUtils::changeImage(SUPER_MINION_UI_ICON, "tower_4.png", float2((float)Application::width / 3200, (float)Application::height / 2000));
+	}
+	else {
+		UIUtils::changeImage(SUPER_MINION_UI_ICON, "tower_4_low.png", float2((float)Application::width / 3200, (float)Application::height / 2000));
 	}
 
 }
@@ -436,7 +441,7 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 
 			this->addChild(transforms[data.id]);
 		}
-		
+
 		if (data.ent_data.health <= 0) { //if updated health marks entity as dead
 			deadEntities.push_back(data.id); //delay actual deletion until after all particle systems have been fired
 		}
@@ -567,7 +572,7 @@ void SceneManager_Client::trackPlayer(int player_id) {
 }
 
 mat4 SceneManager_Client::getPlayerTransformMat() {
-	
+
 	if (trackedPlayer_ID != NO_TRACKED_PLAYER && transforms.find(trackedPlayer_ID) != transforms.end()) {
 		return transforms[trackedPlayer_ID]->getMatrix();
 	}
@@ -589,7 +594,7 @@ void SceneManager_Client::draw(Cmd* cmd)
 	beginUpdateResource(&shaderCbv);
 	updateTransformBuffer(shaderCbv, mat4::identity());
 	endUpdateResource(&shaderCbv, NULL);
-	
+
 	shaderCbv = { boneBuffer[Application::gFrameIndex] };
 	beginUpdateResource(&shaderCbv);
 	updateBoneBuffer(shaderCbv, NULL);
@@ -604,7 +609,7 @@ void SceneManager_Client::draw(Cmd* cmd)
 	vec4 frustumPlanes[6];
 	mat4::extractFrustumClipPlanes(Application::projMat * Application::viewMat, frustumPlanes[0], frustumPlanes[1], frustumPlanes[2], frustumPlanes[3], frustumPlanes[4], frustumPlanes[5], true);
 	cull(frustumPlanes, SceneManager_Client::enableCulling);
-	
+
 	// Draw Graph
 	Transform::draw(cmd);
 }
@@ -627,7 +632,6 @@ else {
 			else { //read id bytes one by one, appending to id_str
 				id_str += buf[i];
 			}
-
 		}
 		else if (state == 1) {
 			int move_x = ((int*)(buf + i))[0];
@@ -636,7 +640,6 @@ else {
 			//std::cout << "move_x: " << move_x << " move_z: " << move_z << " rot_y: " << rot_y << "\n";
 			data = ((GameObject::GameObjectData*)(buf + i))[0];
 			i += (sizeof GameObject::GameObjectData); //advance i to where delimiter should be
-
 			if (buf[i] == DELIMITER) {
 				//std::cout << "state 1 delimiter at i: " << i << "\n";
 				state++; //end of state found, advance to next state
@@ -648,12 +651,9 @@ else {
 		else if (state == 2) {
 			health = ((int*)(buf + i))[0];
 			i += sizeof(int); //advance i to where delimiter should be
-
 			if (buf[i] == DELIMITER) { //end of data line found, write to map, advance to possible final state
 				//std::cout << "id: " << id_str << " x: " << data.x << " z: " << data.z << " y: " << data.rot << " health: " << health << "\n";
 				//std::cout << "state 2 delimiter at i: " << i << "\n";
-
-
 			}
 			else {
 				std::cout << "state 2 delimiter not found when expected, i: " << i << "\n";

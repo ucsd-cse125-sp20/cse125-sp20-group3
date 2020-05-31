@@ -485,6 +485,7 @@ void Application::InitDebugGui()
 	UIUtils::createImage("health_backdrop", "base_health_bars_backdrop.png", 685, 4, float2((float)1/2,(float)1.04/2), 0);
 	UIUtils::createImage("health_frame", "base_health_bars_frame.png", 685, 4, float2((float)1/2,(float)1.04/2), 1);
 	UIUtils::createImage("health_bar_blue", "base_health_bars_blue.png", 702, 24, float2((float)1/2,(float)1/2), 2);
+	UIUtils::createImage("health_bar_blue_deducted", "base_health_bars_blue.png", 702, 24, float2((float)1 / 2, (float)1 / 2), 3);
 	UIUtils::createImage("health_bar_red", "base_health_bars_red.png", 981, 24, float2((float)1/2, (float)1/2), 2);
 
 	UIUtils::loadTexture("WeirdBox_halo.png"); // Preload textures

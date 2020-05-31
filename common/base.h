@@ -3,7 +3,6 @@
 
 #include "macros.h"
 #include "entity.h"
-#include "team.h"
 #include <iostream>
 #include <chrono>
 #include <ctime>
@@ -11,7 +10,6 @@
 class Base : public Entity {
 public:
         Base(GameObjectData data, int id, Team* t, SceneManager_Server* sm);
-        void update(float deltaTime) override;
 };
 
 #endif

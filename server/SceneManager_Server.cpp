@@ -22,7 +22,7 @@ SceneManager_Server::SceneManager_Server() :
 
 	//this->populateScene();
 	this->testAttacking();
-	//this->testBuilding();
+	this->testBuilding();
 	//this->testWalls();
 }
 

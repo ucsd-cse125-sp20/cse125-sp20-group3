@@ -82,7 +82,6 @@ bool Input::Init(WindowsDesc* window, UIApp* appUI, IApp* app, ICameraController
 			else {
 				inputs[INPUT_UP] = 0.0f;
 			}
-
 			if (ctx->mFloat2.y < 0.0) {
 				inputs[INPUT_DOWN] = 1.0f;
 			}
@@ -103,14 +102,25 @@ bool Input::Init(WindowsDesc* window, UIApp* appUI, IApp* app, ICameraController
 			//printf("%f %f\n", Input::camera->getRotationXY().getX(), Input::camera->getRotationXY().getY());
 			//printf("%d %d %d %d", ctx->pCaptured[0], ctx->mBinding, ctx->mPhase, ctx->mDeviceType);
 			
-			//if ((Input::camera->getRotationXY().getX() < 0 && ctx->mFloat2.y >= 0)
-			//	|| (Input::camera->getRotationXY().getX() > PI / 3 && ctx->mFloat2.y <= 0)) {
-			//	float2 clipped(ctx->mFloat2.x, 0.0f);
-			//	Input::camera->onRotate(clipped);
-			//}
-			//else {
-				Input::camera->onRotate(ctx->mFloat2);
-			//}
+			float2 mov = ctx->mFloat2;
+			
+			if ((Input::camera->getRotationXY().getX() < 0 && ctx->mFloat2.y >= 0)
+				|| (Input::camera->getRotationXY().getX() > PI / 3 && ctx->mFloat2.y <= 0)) {
+				mov[1] = 0;
+			}
+			if (mov[0] > 1) {
+				mov[0] = sqrt(sqrt(mov[0]));
+			} 
+			if (mov[0] < -1) {
+				mov[0] = -sqrt(sqrt(-mov[0]));
+			}
+			if (mov[1] > 1) {
+				mov[1] = sqrt(sqrt(mov[1]));
+			} 
+			if (mov[1] < -1) {
+				mov[1] = -sqrt(sqrt(-mov[1]));
+			}
+			Input::camera->onRotate(mov);
 		}
 		return true;
 	};

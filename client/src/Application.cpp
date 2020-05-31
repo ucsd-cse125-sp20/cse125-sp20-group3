@@ -177,7 +177,7 @@ const wchar_t* gMissingTextureString = L"MissingTexture";
 const uint			gBackroundColor = { 0x222242ff };
 static uint			gLightColor[gTotalLightCount] = { 0xffeeeeff, 0xaabbffff, 0xffffffff, 0xffffff66 };
 static float		gLightColorIntensity[gTotalLightCount] = { 0.25f, 0.25f, 0.1f, 0.75f };
-static float2		gLightDirection = { 0.0f, 200.0f };
+static float2		gLightDirection = { 180.0f, 200.0f };
 
 mat4 Application::viewMat = mat4::identity();
 mat4 Application::projMat = mat4::identity();

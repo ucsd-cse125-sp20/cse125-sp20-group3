@@ -5,7 +5,7 @@
 #define SERVER_SENDBUFLEN 1024
 #define SERVER_TICKRATE 20 // times per second
 #define DEFAULT_PORT "27015"
-#define NUM_PLAYERS 1 //change to 4 eventually //upper bound, no more than 15 (1 byte) because of Server recv
+#define NUM_PLAYERS 4 //change to 4 eventually //upper bound, no more than 15 (1 byte) because of Server recv
 #define DELIMITER ','
 
 #define NO_TARGET_ID -1
@@ -39,6 +39,8 @@
 //length is z, width is x
 #define PLAYER_LENGTH 0.2f //checked
 #define PLAYER_WIDTH 0.5f
+#define BASE_LENGTH 1.0f
+#define BASE_WIDTH 1.0f
 #define MINION_LENGTH 0.5f //checked
 #define MINION_WIDTH 0.5f
 #define SUPER_MINION_LENGTH 0.9f //checked
@@ -84,9 +86,9 @@
 #define CLAW_TOWER_ATTACK 0
 #define RESOURCE_ATTACK 0
 
-#define MINION_ATK_RANGE 15
+#define MINION_ATK_RANGE 7
 //#define MINION_MV_RANGE 20
-#define SUPER_MINION_ATK_RANGE 10
+#define SUPER_MINION_ATK_RANGE 2
 #define LASER_FIRE_RANGE 20
 
 #define MINION_ATK_INTERVAL 1.0

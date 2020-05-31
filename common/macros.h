@@ -2,10 +2,10 @@
 #define _MACROS_H_
 
 #define DEFAULT_BUFLEN 512
-#define SERVER_SENDBUFLEN 1024
+#define SERVER_SENDBUFLEN 512000
 #define SERVER_TICKRATE 20 // times per second
 #define DEFAULT_PORT "27015"
-#define NUM_PLAYERS 4 //change to 4 eventually //upper bound, no more than 15 (1 byte) because of Server recv
+#define NUM_PLAYERS 3 //change to 4 eventually //upper bound, no more than 15 (1 byte) because of Server recv
 #define DELIMITER ','
 
 #define NO_TARGET_ID -1

@@ -9,6 +9,7 @@ namespace {
 	const char* dumpsterFile = "resource-1-dumpster.gltf";
 	const char* recyclingBinFile = "resource-2-recycling-bin.gltf";
 	const char* playerFile = "char-1-female.gltf";
+	//const char* baseFile = "";
 	const char* minionFile = "minion-retry.gltf";
 	const char* superMinionFile = "minion-2-super.gltf";
 	const char* laserTowerFile = "tower-1-laser.gltf";
@@ -242,7 +243,7 @@ SceneManager_Client::~SceneManager_Client()
 			conf_delete((Player_Client*)e.second);
 		}
 		if (ID_BASE_MIN <= e.first && e.first <= ID_BASE_MAX) {
-
+			conf_delete((Base_Client*)e.second);
 		}
 		if (ID_MINION_MIN <= e.first && e.first <= ID_MINION_MAX) {
 			conf_delete((Minion_Client*)e.second);
@@ -423,12 +424,16 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 
 				otherTransforms.push_back(adjustment); //save to be deleted upon closing
 
-				Player_Client* p_c = conf_new(Player_Client, GO_data, data.id, team, nullptr, ozzGeodes[PLAYER_GEODE], adjustment);
+				Player_Client* p_c = conf_new(Player_Client, GO_data, data.id, team, this, ozzGeodes[PLAYER_GEODE], adjustment);
 				idMap[data.id] = p_c;
 				wrapperMap[data.id] = p_c;
 			}
 			else if (ID_BASE_MIN <= data.id && data.id <= ID_BASE_MAX) {
-				//idMap[id_str] = new Base();
+				std::cout << "creating new base, id: " << data.id << "\n";
+				transforms[data.id] = conf_new(Transform, mat4::identity());
+				Base_Client* b_c = conf_new(Base_Client, GO_data, data.id, team, this, ozzGeodes[MINION_GEODE], transforms[data.id]);
+				idMap[data.id] = b_c;
+				wrapperMap[data.id] = b_c;
 			}
 			else if (ID_MINION_MIN <= data.id && data.id <= ID_MINION_MAX) {
 				std::cout << "creating new minion, id: " << data.id << "\n";

@@ -28,6 +28,7 @@ private:
 		
 		int next_player_id, next_base_id, next_minion_id, next_super_minion_id, next_laser_id, next_claw_id, next_dumpster_id, next_recycling_bin_id;
 		Team *red_team, *blue_team;
+		Base *red_base, *blue_base;
 
 public:
 	std::map<int, Entity*> idMap;
@@ -42,6 +43,7 @@ public:
 	int spawnEntity(char spawnType, float pos_x, float pos_z, float rot_y, Team* t);
 	bool checkEntityAlive(int id);
 	void update(float deltaTime);
+	bool getGameOver();
 	int encodeState(char buf[], int start_index);
 	int encodeScene(char buf[], int start_index);
 

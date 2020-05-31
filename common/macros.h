@@ -36,11 +36,16 @@
 #define ID_RECYCLING_BIN_MIN 7000
 #define ID_RECYCLING_BIN_MAX 7999
 
+#define RED_BASE_X -10
+#define RED_BASE_Z 10
+#define BLUE_BASE_X -8
+#define BLUE_BASE_Z 8
+
 //length is z, width is x
 #define PLAYER_LENGTH 0.2f //checked
 #define PLAYER_WIDTH 0.5f
-#define BASE_LENGTH 1.0f
-#define BASE_WIDTH 1.0f
+#define BASE_LENGTH 0.5f
+#define BASE_WIDTH 0.5f
 #define MINION_LENGTH 0.5f //checked
 #define MINION_WIDTH 0.5f
 #define SUPER_MINION_LENGTH 0.9f //checked

@@ -16,6 +16,15 @@ SceneManager_Server::SceneManager_Server() :
 	red_team = new Team(RED_TEAM);
 	blue_team = new Team(BLUE_TEAM);
 
+	GameObject::GameObjectData red_base_data = { RED_BASE_X, RED_BASE_Z, 0 };
+	int id = next_base_id++;
+	red_base = new Base(red_base_data, id, red_team, this);
+	idMap[id] = red_base;
+	GameObject::GameObjectData blue_base_data = { BLUE_BASE_X, BLUE_BASE_Z, 0 };
+	id = next_base_id++;
+	blue_base = new Base(blue_base_data, id, blue_team, this);
+	idMap[id] = blue_base;
+
 	this->populatePaths();
 	//this->populateWalls();
 	this->populateBuilds();
@@ -41,7 +50,10 @@ bool SceneManager_Server::addPlayer(int player_id) {
 	//TODO figure out player spawn locations
 	GameObject::GameObjectData data = { 0.0f, 0.0f, 0.0f };
 	if (idMap.find(player_id) == idMap.end()) { //player_id not in map, create a new player
-		idMap[player_id] = new Player(data, player_id, red_team, this); //TODO assign players teams based on lobby choices
+		Team* team;
+		if (player_id == 0 || player_id == 2) team = red_team;
+		else team = blue_team;
+		idMap[player_id] = new Player(data, player_id, team, this); //TODO assign players teams based on lobby choices
 		std::cout << "created new player id: " << player_id << " at " << idMap[player_id] << "\n";
 
 		return true; //return true that a player was added
@@ -175,6 +187,10 @@ void SceneManager_Server::update(float deltaTime) {
 	for (std::pair<int, Entity*> idEntPair : idMap) { //second pass, update as usual
 		idEntPair.second->update(deltaTime);
 	}
+}
+
+bool SceneManager_Server::getGameOver() {
+	return red_base->getHealth() == 0 || blue_base->getHealth() == 0;
 }
 
 int SceneManager_Server::encodeState(char buf[], int start_index) {
@@ -770,13 +786,13 @@ void SceneManager_Server::testAttacking() {
 	idMap[id] = sm1;
 	std::cout << "created super minion at id " << id << "\n";*/
 
-	id = next_super_minion_id;
+	/*id = next_super_minion_id;
 	next_super_minion_id++;
 	data = { -10, 10, 0 };
 	SuperMinion* sm2 = new SuperMinion(data, id, red_team, this);
-	idMap[id] = sm2;
+	idMap[id] = sm2;*/
 
-	id = next_claw_id;
+	/*id = next_claw_id;
 	next_claw_id++;
 	data = { 7.5, 27.5, 0 };
 	ClawTower* c1 = new ClawTower(data, id, red_team, this);
@@ -792,7 +808,7 @@ void SceneManager_Server::testAttacking() {
 	next_laser_id++;
 	data = { 0, 20, 0 };
 	LaserTower* l2 = new LaserTower(data, id, red_team, this);
-	idMap[id] = l2;
+	idMap[id] = l2;*/
 
 	/*id = next_minion_id;
 	next_minion_id++;

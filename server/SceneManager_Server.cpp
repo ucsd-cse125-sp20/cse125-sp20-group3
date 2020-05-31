@@ -17,12 +17,12 @@ SceneManager_Server::SceneManager_Server() :
 	blue_team = new Team(BLUE_TEAM);
 
 	this->populatePaths();
-	//this->populateWalls();
+	this->populateWalls();
 	this->populateBuilds();
 
 	//this->populateScene();
-	this->testAttacking();
-	this->testBuilding();
+	//this->testAttacking();
+	//this->testBuilding();
 	//this->testWalls();
 }
 
@@ -39,7 +39,7 @@ void SceneManager_Server::processInput(int player_id, PlayerInput in) {
 
 bool SceneManager_Server::addPlayer(int player_id) {
 	//TODO figure out player spawn locations
-	GameObject::GameObjectData data = { 0.0f, 0.0f, 0.0f };
+	GameObject::GameObjectData data = { 2.5f, -2.5f, 0.0f };
 	if (idMap.find(player_id) == idMap.end()) { //player_id not in map, create a new player
 		idMap[player_id] = new Player(data, player_id, red_team, this); //TODO assign players teams based on lobby choices
 		std::cout << "created new player id: " << player_id << " at " << idMap[player_id] << "\n";
@@ -249,7 +249,7 @@ void SceneManager_Server::populatePaths() {
 	pathNodes[9]->setNextRed(pathNodes[10]);
 	pathNodes.push_back(new PathNode(24, 15)); //11
 	pathNodes[10]->setNextRed(pathNodes[11]);
-	pathNodes.push_back(new PathNode(7, 4)); //12
+	pathNodes.push_back(new PathNode(8, 4)); //12 // Changed (7,4)
 	pathNodes[12]->setNextRed(pathNodes[1]);
 	pathNodes.push_back(new PathNode(10, 7)); //13
 	pathNodes.push_back(new PathNode(14, 7)); //14
@@ -300,7 +300,7 @@ void SceneManager_Server::populatePaths() {
 	pathNodes[28]->setNextBlue(pathNodes[9]);
 	pathNodes.push_back(new PathNode(17, 7)); //29
 	pathNodes[29]->setNextBlue(pathNodes[8]);
-	pathNodes.push_back(new PathNode(7, 9)); //30
+	pathNodes.push_back(new PathNode(8, 9)); //30 // Changed (7,9)
 	pathNodes[30]->setNextBlue(pathNodes[2]);
 
 	// Add map nodes next to the towers for smooth animation
@@ -309,7 +309,7 @@ void SceneManager_Server::populatePaths() {
 	pathNodes.push_back(new PathNode(4, 4)); // 33
 	pathNodes.push_back(new PathNode(6, 4)); // 34
 	pathNodes.push_back(new PathNode(5, 5)); // 35
-	pathNodes.push_back(new PathNode(7, 5)); // 36
+	pathNodes.push_back(new PathNode(8, 5)); // 36 // Changed (7,5)
 	pathNodes.push_back(new PathNode(5, 8)); // 37
 	pathNodes.push_back(new PathNode(3, 9)); // 38
 	pathNodes.push_back(new PathNode(4, 9)); // 39
@@ -421,6 +421,16 @@ void SceneManager_Server::populatePaths() {
 }
 
 void SceneManager_Server::populateWalls(){
+	// boundaries
+	for (float i = -1; i < 27; i++) {
+		wallNodes.push_back(new WallNode(i, -1.0f));
+		wallNodes.push_back(new WallNode(i, 20.0f));
+	}
+	for (float i = 0; i < 20; i++) {
+		wallNodes.push_back(new WallNode(-1.0f, i));
+		wallNodes.push_back(new WallNode(26.0f, i));
+	}
+
 	wallNodes.push_back(new WallNode(0,3)); 
 	wallNodes.push_back(new WallNode(0,4)); 
 	wallNodes.push_back(new WallNode(0,5));
@@ -440,7 +450,7 @@ void SceneManager_Server::populateWalls(){
 	wallNodes.push_back(new WallNode(16,0));
 	wallNodes.push_back(new WallNode(17,0));
 	wallNodes.push_back(new WallNode(18,0));
-	wallNodes.push_back(new WallNode(9,3));
+	//wallNodes.push_back(new WallNode(9,3));
 	wallNodes.push_back(new WallNode(10,3));
 	wallNodes.push_back(new WallNode(11,3));
 	wallNodes.push_back(new WallNode(12,3));
@@ -465,10 +475,10 @@ void SceneManager_Server::populateWalls(){
 	wallNodes.push_back(new WallNode(1,9));
 	wallNodes.push_back(new WallNode(6,6));
 	wallNodes.push_back(new WallNode(6,7));
-	wallNodes.push_back(new WallNode(8,4));
-	wallNodes.push_back(new WallNode(8,6));
-	wallNodes.push_back(new WallNode(8,7));
-	wallNodes.push_back(new WallNode(8,8));
+	//wallNodes.push_back(new WallNode(8,4));
+	//wallNodes.push_back(new WallNode(8,6));
+	//wallNodes.push_back(new WallNode(8,7));
+	//wallNodes.push_back(new WallNode(8,8));
 	wallNodes.push_back(new WallNode(9,7));
 	wallNodes.push_back(new WallNode(9,8));
 	wallNodes.push_back(new WallNode(11,6));
@@ -499,32 +509,57 @@ void SceneManager_Server::populateWalls(){
 	wallNodes.push_back(new WallNode(23,12));
 	wallNodes.push_back(new WallNode(25,15));
 	wallNodes.push_back(new WallNode(25,16));
+	wallNodes.push_back(new WallNode(0,10)); // New
+	wallNodes.push_back(new WallNode(0,13)); // New
+	wallNodes.push_back(new WallNode(1,6)); // New
 	wallNodes.push_back(new WallNode(1,11));
 	wallNodes.push_back(new WallNode(1,12));
+	wallNodes.push_back(new WallNode(1,14)); // New
+	wallNodes.push_back(new WallNode(1,17)); // New
+	wallNodes.push_back(new WallNode(1,18)); // New
+	wallNodes.push_back(new WallNode(2,6)); // New
 	wallNodes.push_back(new WallNode(2,14));
 	wallNodes.push_back(new WallNode(2,15));
 	wallNodes.push_back(new WallNode(2,16));
 	wallNodes.push_back(new WallNode(2,19));
+	wallNodes.push_back(new WallNode(3,0)); // New
+	wallNodes.push_back(new WallNode(3,1)); // New
+	wallNodes.push_back(new WallNode(3,2)); // New
+	wallNodes.push_back(new WallNode(3,6)); // New
 	wallNodes.push_back(new WallNode(3,11));
+	wallNodes.push_back(new WallNode(4,2)); // New
 	wallNodes.push_back(new WallNode(4,11));
 	wallNodes.push_back(new WallNode(4,12));
 	wallNodes.push_back(new WallNode(4,13));
 	wallNodes.push_back(new WallNode(4,14));
+	wallNodes.push_back(new WallNode(5,2)); // New
+	wallNodes.push_back(new WallNode(5,17)); // New
 	wallNodes.push_back(new WallNode(5,18));
+	wallNodes.push_back(new WallNode(6,17)); // New
+	wallNodes.push_back(new WallNode(7,2)); // New
+	wallNodes.push_back(new WallNode(7,3)); // New
+	wallNodes.push_back(new WallNode(7,5)); // New
+	wallNodes.push_back(new WallNode(7,6)); // New
+	wallNodes.push_back(new WallNode(7,7)); // New
+	wallNodes.push_back(new WallNode(7,8)); // New
 	wallNodes.push_back(new WallNode(7,10));
 	wallNodes.push_back(new WallNode(7,11));
 	wallNodes.push_back(new WallNode(7,13));
 	wallNodes.push_back(new WallNode(7,14));
 	wallNodes.push_back(new WallNode(7,16));
+	wallNodes.push_back(new WallNode(7,16)); // New
 	wallNodes.push_back(new WallNode(8,10));
 	wallNodes.push_back(new WallNode(8,11));
 	wallNodes.push_back(new WallNode(8,14));
 	wallNodes.push_back(new WallNode(8,16));
 	wallNodes.push_back(new WallNode(8,18));
+	wallNodes.push_back(new WallNode(9,4)); // New
+	wallNodes.push_back(new WallNode(9,6)); // New
 	wallNodes.push_back(new WallNode(9,11));
 	wallNodes.push_back(new WallNode(9,14));
 	wallNodes.push_back(new WallNode(9,16));
 	wallNodes.push_back(new WallNode(9,18));
+	wallNodes.push_back(new WallNode(10,5)); // New
 	wallNodes.push_back(new WallNode(10,13));
 	wallNodes.push_back(new WallNode(10,14));
 	wallNodes.push_back(new WallNode(10,16));
@@ -537,6 +572,7 @@ void SceneManager_Server::populateWalls(){
 	wallNodes.push_back(new WallNode(11,17));
 	wallNodes.push_back(new WallNode(11,18));
 	wallNodes.push_back(new WallNode(12,8));
+	wallNodes.push_back(new WallNode(12,9)); // New
 	wallNodes.push_back(new WallNode(13,8));
 	wallNodes.push_back(new WallNode(13,9));
 	wallNodes.push_back(new WallNode(13,10));
@@ -545,6 +581,7 @@ void SceneManager_Server::populateWalls(){
 	wallNodes.push_back(new WallNode(13,14));
 	wallNodes.push_back(new WallNode(13,15));
 	wallNodes.push_back(new WallNode(13,16));
+	wallNodes.push_back(new WallNode(14,13)); // New
 	wallNodes.push_back(new WallNode(14,14));
 	wallNodes.push_back(new WallNode(14,15));
 	wallNodes.push_back(new WallNode(14,16));
@@ -563,15 +600,29 @@ void SceneManager_Server::populateWalls(){
 	wallNodes.push_back(new WallNode(17,18));
 	wallNodes.push_back(new WallNode(18,14));
 	wallNodes.push_back(new WallNode(18,15));
+	wallNodes.push_back(new WallNode(18,19)); // New
 	wallNodes.push_back(new WallNode(19,14));
 	wallNodes.push_back(new WallNode(19,12));
+	wallNodes.push_back(new WallNode(19,19)); // New
 	wallNodes.push_back(new WallNode(20,12));
+	wallNodes.push_back(new WallNode(20,19)); // New
+	wallNodes.push_back(new WallNode(21,2)); // New
 	wallNodes.push_back(new WallNode(21,12));
+	wallNodes.push_back(new WallNode(21,19)); // New
 	wallNodes.push_back(new WallNode(21,13));
 	wallNodes.push_back(new WallNode(21,14));
 	wallNodes.push_back(new WallNode(22,16));
 	wallNodes.push_back(new WallNode(22,17));
+	wallNodes.push_back(new WallNode(22,18)); // New
+	wallNodes.push_back(new WallNode(22,19)); // New
+	wallNodes.push_back(new WallNode(23,3)); // New
 	wallNodes.push_back(new WallNode(23,16));
+	wallNodes.push_back(new WallNode(24,8)); // New
+	wallNodes.push_back(new WallNode(24,9)); // New
+	wallNodes.push_back(new WallNode(24,10)); // New
+	wallNodes.push_back(new WallNode(24,13)); // New
+	wallNodes.push_back(new WallNode(25,8)); // New
+	wallNodes.push_back(new WallNode(25,14)); // New
 }
 
 void SceneManager_Server::populateBuilds(){
@@ -581,7 +632,7 @@ void SceneManager_Server::populateBuilds(){
 	buildNodes.push_back(new BuildNode(RED_TEAM, 4, 3)); //4
 	buildNodes.push_back(new BuildNode(RED_TEAM, 5, 3)); //5
 	buildNodes.push_back(new BuildNode(RED_TEAM, 6, 3)); //6
-	buildNodes.push_back(new BuildNode(RED_TEAM, 8, 5)); //7
+	buildNodes.push_back(new BuildNode(RED_TEAM, 9, 5)); //7 // Changed (8,5)
 	buildNodes.push_back(new BuildNode(RED_TEAM, 6, 8)); //8
 	buildNodes.push_back(new BuildNode(RED_TEAM, 3, 10)); //9
 	buildNodes.push_back(new BuildNode(RED_TEAM, 4, 10)); //10

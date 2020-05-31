@@ -1,7 +1,7 @@
 #include "BuildNode.h"
 
 BuildNode::BuildNode(char team, float x_index, float z_index) : GameObject(){
-	GameObjectData data = { x_index * 5.0f + 2.5f, z_index * 5.0f + 2.5f, 0.0f };
+	GameObjectData data = { x_index * 5.0f + 2.5f, -(z_index * 5.0f + 2.5f), 0.0f };
     this->setGOData(data);
     this->teamColor = team;
 

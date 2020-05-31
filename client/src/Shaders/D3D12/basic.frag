@@ -418,6 +418,11 @@ PSOut main(PsIn input) : SV_TARGET
 	float3 V = normalize(camPos.xyz - input.pos);
 	float NoV = max(dot(N,V), 0.0);	
 
+	if (NoV < 0.05f && N.x != 0  && N.z != 0) {
+		Out.outColor = float4(0.1f, 0.1f, 0.1f, baseColor.a);
+		return Out;
+	}
+
 	float3 result = float3(0.0, 0.0, 0.0);		
 
 	[unroll]
@@ -447,7 +452,7 @@ PSOut main(PsIn input) : SV_TARGET
 
 	float fog_maxdist = 50.0f;
 	float fog_mindist = 5.0f;
-	float3 fog_color = float3(0.1f, 0.1f, 0.1f);
+	float3 fog_color = float3(0.2f, 0.2f, 0.2f) * result;
 	float dist = length(camPos.xyz - input.pos);
 	float fog_factor = (fog_maxdist - dist) / (fog_maxdist - fog_mindist);
 	fog_factor = fog_factor < 0 ? 0 : (fog_factor > 1 ? 1 : fog_factor);

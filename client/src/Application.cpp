@@ -175,14 +175,14 @@ uint32_t			guiModelToLoadIndex = 0;
 const wchar_t* gMissingTextureString = L"MissingTexture";
 
 const uint			gBackroundColor = { 0x222242ff };
-static uint			gLightColor[gTotalLightCount] = { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffff66 };
-static float		gLightColorIntensity[gTotalLightCount] = { 1.0f, 0.2f, 0.2f, 0.25f };
-static float2		gLightDirection = { -122.0f, 222.0f };
+static uint			gLightColor[gTotalLightCount] = { 0xffeeeeff, 0xaabbffff, 0xffffffff, 0xffffff66 };
+static float		gLightColorIntensity[gTotalLightCount] = { 0.25f, 0.25f, 0.1f, 0.75f };
+static float2		gLightDirection = { 0.0f, 200.0f };
 
 mat4 Application::viewMat = mat4::identity();
 mat4 Application::projMat = mat4::identity();
 
-vec3 cameraOffset(0, 5, -5);
+vec3 cameraOffset(0, 2, -10);
 
 float rot = 0.f;
 
@@ -1125,14 +1125,14 @@ void Application::Update(float deltaTime)
 	pCameraController->moveTo(playerPos);
 
 	pCameraController->update(deltaTime);
-	Application::viewMat = mat4::translation(vec3(0,-2,10)) * pCameraController->getViewMatrix();
+	Application::viewMat = mat4::translation(-cameraOffset) * pCameraController->getViewMatrix();
 	const float aspectInverse = (float)mSettings.mHeight / (float)mSettings.mWidth;
 	const float horizontal_fov = PI / 3.0f;
 	Application::projMat = mat4::perspectiveReverseZ(horizontal_fov, aspectInverse, 0.001f, 1000.0f);
 	gUniformData.mProjectView = projMat * viewMat;
 	gUniformData.mProj = projMat;
 	gUniformData.mView = viewMat;
-	gUniformData.mCameraPosition = vec4(pCameraController->getViewPosition() + cameraOffset, 1.0f);
+	gUniformData.mCameraPosition = vec4(inverse(mat4::translation(-cameraOffset) * pCameraController->getViewMatrix())[3].getXYZ(), 1.0f);
 
 	mat4 viewProj = Application::projMat * Application::viewMat;
 

@@ -17,6 +17,7 @@ void Resource::update(float deltaTime) {
 	if (!active) timeElapsed += deltaTime;
 	if (timeElapsed >= RESOURCE_REACTIVATION_TIME) {
 		active = true;
+		actionState = ACTION_STATE_ATTACK;
 		timeElapsed = 0;
 		std::cout << "resource " << id << " going active\n";
 	}
@@ -39,6 +40,7 @@ std::pair<char, int> Resource::harvest() {
 
 	//this->takeDamage(RESOURCE_HEALTH); //mark as "dead" to indicate used
 	active = false;
+	actionState = ACTION_STATE_IDLE;
 
 	return res;
 }

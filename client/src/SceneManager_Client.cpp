@@ -43,14 +43,14 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	this->renderer = renderer;
 	// It'd be nice if I could put this in a loop later
 	gltfGeodes[ENV_GEODE] = conf_new(GLTFGeode, renderer, mapFile); //ok
-	gltfGeodes[PLAYER_GEODE] = conf_new(GLTFGeode, renderer, playerFile);
+	//gltfGeodes[PLAYER_GEODE] = conf_new(GLTFGeode, renderer, playerFile);
 	//gltfGeodes[BASE_GEODE] = conf_new(GLTFGeode, renderer, baseFile);
-	gltfGeodes[MINION_GEODE] = conf_new(GLTFGeode, renderer, minionFile);
-	gltfGeodes[SUPER_MINION_GEODE] = conf_new(GLTFGeode, renderer, superMinionFile);
+	//gltfGeodes[MINION_GEODE] = conf_new(GLTFGeode, renderer, minionFile);
+	//gltfGeodes[SUPER_MINION_GEODE] = conf_new(GLTFGeode, renderer, superMinionFile);
 	gltfGeodes[LASER_TOWER_GEODE] = conf_new(GLTFGeode, renderer, laserTowerFile); //ok
-	gltfGeodes[CLAW_TOWER_GEODE] = conf_new(GLTFGeode, renderer, clawTowerFile);
-	gltfGeodes[DUMPSTER_GEODE] = conf_new(GLTFGeode, renderer, dumpsterFile); //ok
-	gltfGeodes[RECYCLING_BIN_GEODE] = conf_new(GLTFGeode, renderer, recyclingBinFile); //ok
+	//gltfGeodes[CLAW_TOWER_GEODE] = conf_new(GLTFGeode, renderer, clawTowerFile);
+	//gltfGeodes[DUMPSTER_GEODE] = conf_new(GLTFGeode, renderer, dumpsterFile); //ok
+	//gltfGeodes[RECYCLING_BIN_GEODE] = conf_new(GLTFGeode, renderer, recyclingBinFile); //ok
 
 	ozzGeodes[MINION_GEODE] = conf_new(OzzGeode, renderer, smallMinionDir);
 	((OzzObject*)ozzGeodes[MINION_GEODE]->obj)->SetClip(smallMinionActions[0]); // Set a default action
@@ -60,6 +60,10 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	((OzzObject*)ozzGeodes[PLAYER_GEODE]->obj)->SetClip(playerMaleActions[0]); // Set a default action
 	ozzGeodes[CLAW_TOWER_GEODE] = conf_new(OzzGeode, renderer, clawTowerDir);
 	((OzzObject*)ozzGeodes[CLAW_TOWER_GEODE]->obj)->SetClip(clawTowerActions[0]);
+	ozzGeodes[RECYCLING_BIN_GEODE] = conf_new(OzzGeode, renderer, recyclingBinDir);
+	((OzzObject*)ozzGeodes[RECYCLING_BIN_GEODE]->obj)->SetClip(recyclingBinActions[0]);
+	ozzGeodes[DUMPSTER_GEODE] = conf_new(OzzGeode, renderer, dumpsterDir);
+	((OzzObject*)ozzGeodes[DUMPSTER_GEODE]->obj)->SetClip(dumpsterActions[0]);
 
 
 	ParticleSystem::ParticleSystemParams particleParams = {};
@@ -97,139 +101,22 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 
 	///////////////////////////////////////////////////////////////////////////////
 
-	// TODO This is a hard coded animation example. Remove this later (SMALL MINION)
-	int key = 9999999;
-	ozzGeodes["blarf"] = conf_new(OzzGeode, renderer, smallMinionDir);
-	((OzzObject*)ozzGeodes["blarf"]->obj)->SetClip(smallMinionActions[2]);
-	Transform* t = conf_new(Transform, mat4::translation(vec3(-1, 0, 2)));
-	Animator* a = conf_new(Animator, ozzGeodes["blarf"]);
-	a->SetClip(smallMinionActions[2]);
+
+	// TODO This is a hard coded animation example. Remove this later (SUPER MINION)
+	int key = 8888828;
+	Transform* t = conf_new(Transform, mat4::translation(vec3(1, 0, 0)));
+	Animator* a = conf_new(Animator, ozzGeodes[DUMPSTER_GEODE]);
+	a->SetClip(dumpsterActions[0]);
 	t->addChild(a);
 	this->addChild(t);
 	transforms[key] = t;
 	animators[key] = a;
-
-
-	// TODO This is a hard coded animation example. Remove this later (SUPER MINION)
-	key = 8888888;
-	ozzGeodes["blarf2"] = conf_new(OzzGeode, renderer, superMinionDir);
-	((OzzObject*)ozzGeodes["blarf2"]->obj)->SetClip(superMinionActions[0]);
-	t = conf_new(Transform, mat4::translation(vec3(1, 0, 2)));
-	a = conf_new(Animator, ozzGeodes["blarf2"]);
-	a->SetClip(superMinionActions[0]);
-	t->addChild(a);
-	this->addChild(t);
-	transforms[key] = t;
-	animators[key] = a;
-
-
-	// TODO This is a hard coded animation example. Remove this later (SUPER MINION)
-	key = 8888828;
-	t = conf_new(Transform, mat4::translation(vec3(1, 0, 0)));
-	a = conf_new(Animator, ozzGeodes[CLAW_TOWER_GEODE]);
-	a->SetClip(clawTowerActions[0]);
-	t->addChild(a);
-	//this->addChild(t);
-	transforms[key] = t;
-	animators[key] = a;
-
-	//// TODO This is a hard coded animation example. Remove this later (MALE CHAR)
-	//key = 4672347;
-	//ozzGeodes["blarf3"] = conf_new(OzzGeode, renderer, playerMaleDir);
-	//((OzzObject*)ozzGeodes["blarf3"]->obj)->SetClip(playerMaleActions[1]);
-	//t = conf_new(Transform, mat4::translation(vec3(3, 0, 2)));
-	//a = conf_new(Animator, ozzGeodes["blarf3"]);
-	//a->SetClip(playerMaleActions[1]);
-	//t->addChild(a);
-	//this->addChild(t);
-	//transforms[key] = t;
-	//animators[key] = a;
-
-	//// TODO This is a hard coded animation example. Remove this later (FEMALE CHAR)
-	//key = 1734813;
-	//ozzGeodes["blarf4"] = conf_new(OzzGeode, renderer, playerFemaleDir);
-	//((OzzObject*)ozzGeodes["blarf4"]->obj)->SetClip(playerFemaleActions[1]);
-	//t = conf_new(Transform, mat4::translation(vec3(4, 0, 2)));
-	//a = conf_new(Animator, ozzGeodes["blarf4"]);
-	//a->SetClip(playerFemaleActions[1]);
-	//t->addChild(a);
-	//this->addChild(t);
-	//transforms[key] = t;
-	//animators[key] = a;
-
-	//// TODO These are hard coded particle examples. Remove them later
-	//key = 7234813;
-	//ParticleSystem::ParticleSystemParams params = {};
-	//params.spriteFile = "LaserParticle.png";
-	//params.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
-	//	float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.1f);
-	//	float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2 * PI));
-	//	float z = 0;
-
-	//	pd->position = float3(r * cos(a), z, r * sin(a));
-	//	pd->color = float4(0.8f, 0.8f, 1.0f, 1.0f);
-	//	pd->scale = float2(0.2f, 0.2f);
-	//	pad->velocity = float3(0, 5, 0);
-	//};
-	//params.numParticles = 1000;
-	//params.life = 1.0f;
-	//particleGeodes["blarf5"] = conf_new(ParticleSystemGeode, renderer, params);
-	//t = conf_new(Transform, mat4::translation(vec3(-2, 0, 4)));
-	//t->addChild(particleGeodes["blarf5"]);
-	//this->addChild(t);
-	//transforms[key] = t;
-
-	//key = 4201387;
-	//params.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
-	//	float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.1f);
-	//	float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2 * PI));
-	//	float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 5);
-
-	//	pd->position = float3(r * cos(a), z, r * sin(a));
-	//	pd->color = float4(0.8f, 0.8f, 1.0f, 1.0f);
-	//	pd->scale = float2(0.2f, 0.2f);
-	//	pad->velocity = float3(cos(a), 0.0f, sin(a));
-	//};
-	//params.updater = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad, float deltaTime) {
-	//	pd->scale *= 0.95f;
-	//};
-	//particleGeodes["blarf6"] = conf_new(ParticleSystemGeode, renderer, params);
-	//t = conf_new(Transform, mat4::translation(vec3(0, 0, 4)));
-	//t->addChild(particleGeodes["blarf6"]);
-	//this->addChild(t);
-	//transforms[key] = t;
-
-	//key = 6672073;
-	//params.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
-	//	float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.1f);
-	//	float a = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / (2 * PI));
-	//	float z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 5);
-
-	//	pd->position = float3(r * cos(a), z, r * sin(a));
-	//	pd->color = float4(0.8f, 0.8f, 1.0f, 1.0f);
-	//	pd->scale = float2(0.2f, 0.2f);
-	//	pad->velocity = float3(cos(a), 0.0f, sin(a));
-	//};
-	//params.updater = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad, float deltaTime) {
-	//	pad->velocity += float3(-pd->position.x, 0.0f, -pd->position.z);
-	//};
-	//particleGeodes["blarf7"] = conf_new(ParticleSystemGeode, renderer, params);
-	//t = conf_new(Transform, mat4::translation(vec3(2, 0, 4)));
-	//t->addChild(particleGeodes["blarf7"]);
-	//this->addChild(t);
-	//transforms[key] = t;
 
 	trackedPlayer_ID = NO_TRACKED_PLAYER;
 
-	transforms[GROUND_KEY] = conf_new(Transform, mat4::identity());
+	transforms[GROUND_KEY] = conf_new(Transform, mat4::scale(vec3(1.31f)) * mat4::translation(vec3(49.7f, 0.0f, -38.5f)));
 	transforms[GROUND_KEY]->addChild(gltfGeodes[ENV_GEODE]);
 	this->addChild(transforms[GROUND_KEY]);
-
-	// Testing Dumpster mesh
-	key = GROUND_KEY + 1;
-	transforms[key] = conf_new(Transform, mat4::translation(vec3(4, 0, 5)));
-	transforms[key]->addChild(gltfGeodes[RECYCLING_BIN_GEODE]);
-	this->addChild(transforms[key]);
 
 	red_team = new Team(RED_TEAM);
 	blue_team = new Team(BLUE_TEAM);
@@ -427,14 +314,14 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 			else if (ID_DUMPSTER_MIN <= data.id && data.id <= ID_DUMPSTER_MAX) {
 				std::cout << "creating new dumpster, id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
-				Resource_Client* d_c = conf_new(Resource_Client, DUMPSTER_TYPE, GO_data, data.id, this, gltfGeodes[DUMPSTER_GEODE], transforms[data.id]);
+				Resource_Client* d_c = conf_new(Resource_Client, DUMPSTER_TYPE, GO_data, data.id, this, ozzGeodes[DUMPSTER_GEODE], transforms[data.id]);
 				idMap[data.id] = d_c;
 				wrapperMap[data.id] = d_c;
 			}
 			else if (ID_RECYCLING_BIN_MIN <= data.id && data.id <= ID_RECYCLING_BIN_MAX) {
 				std::cout << "creating new recycling bin id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
-				Resource_Client* r_b_c = conf_new(Resource_Client, RECYCLING_BIN_TYPE, GO_data, data.id, this, gltfGeodes[RECYCLING_BIN_GEODE], transforms[data.id]);
+				Resource_Client* r_b_c = conf_new(Resource_Client, RECYCLING_BIN_TYPE, GO_data, data.id, this, ozzGeodes[RECYCLING_BIN_GEODE], transforms[data.id]);
 				idMap[data.id] = r_b_c;
 				wrapperMap[data.id] = r_b_c;
 			}
@@ -581,9 +468,9 @@ mat4 SceneManager_Client::getPlayerTransformMat() {
 
 void SceneManager_Client::update(float deltaTime)
 {
-	if (counter % 100 == 0) animators[9999999]->SetClip(smallMinionActions[animCounter]);
+	//if (counter % 100 == 0) animators[9999999]->SetClip(smallMinionActions[animCounter]);
 	//if (counter % 100 == 0)	AudioManager::playAudioSource(vec3(0), "laser");
-	if (counter++ % 100 == 0) animators[8888888]->SetClip(superMinionActions[animCounter = (animCounter + 1) % 3]);
+	//if (counter++ % 100 == 0) animators[8888888]->SetClip(superMinionActions[animCounter = (animCounter + 1) % 3]);
 	Transform::update(deltaTime);
 }
 

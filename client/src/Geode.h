@@ -26,7 +26,7 @@ public:
 
 	std::queue<vec3> positions;
 	std::queue<bool> shouldCull;
-	float radius = 0.0f;
+	float radius = 100.0f;
 
 	Geode();
 	Geode(Object* obj);

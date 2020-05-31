@@ -39,7 +39,7 @@ public:
 	~SceneManager_Server();
 	void processInput(int player_id, PlayerInput in);
 	bool addPlayer(int player_id);
-	void spawnEntity(char spawnType, float pos_x, float pos_z, float rot_y, Team* t);
+	int spawnEntity(char spawnType, float pos_x, float pos_z, float rot_y, Team* t);
 	bool checkEntityAlive(int id);
 	void update(float deltaTime);
 	int encodeState(char buf[], int start_index);

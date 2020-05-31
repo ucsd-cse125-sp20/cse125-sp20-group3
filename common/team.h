@@ -31,6 +31,7 @@ public:
 	void decTower();
 	int getPlasticCount();
 	int getMetalCount();
+	int getBaseHealth();
     bool checkResources(char entityType);
 	void buildEntity(char entityType);
 	void addResource(char type, int amount);

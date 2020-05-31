@@ -312,6 +312,12 @@ void SceneManager_Client::updateUI(){
 	Team* trackedPlayerTeam = idMap[trackedPlayer_ID]->getTeam();
 	if (trackedPlayerTeam->teamColor != RED_TEAM && trackedPlayerTeam->teamColor != BLUE_TEAM) return;
 
+	if (trackedPlayerTeam->teamColor == RED_TEAM){
+		UIUtils::editText(TEAM_TEXT, "Red Team", "small font", 0xff6655ff);
+	}else{
+		UIUtils::editText(TEAM_TEXT, "Blue Team", "small font", 0xff6655ff);
+	}
+
 	int plasticCount = trackedPlayerTeam->getPlasticCount();
 	//std::cout << "team " << trackedPlayerTeam->teamColor << " plastic count: " << plasticCount << "\n";
 	int metalCount = trackedPlayerTeam->getMetalCount();
@@ -344,15 +350,51 @@ void SceneManager_Client::updateUI(){
 	}
 
 	if (claw_machine){
-		UIUtils::changeImage(CLAW_MACHINE_UI_ICON, "tower_3.png",  float2((float)Application::width / 3200, (float)Application::height / 2000));
+		UIUtils::changeImage(CLAW_MACHINE_UI_ICON, "tower_1.png",  float2((float)Application::width / 3200, (float)Application::height / 2000));
 	}else{
-		UIUtils::changeImage(CLAW_MACHINE_UI_ICON, "tower_3_low.png",  float2((float)Application::width / 3200, (float)Application::height / 2000));
+		UIUtils::changeImage(CLAW_MACHINE_UI_ICON, "tower_1_low.png",  float2((float)Application::width / 3200, (float)Application::height / 2000));
 	}
 
 	if (super_minion){
 		UIUtils::changeImage(SUPER_MINION_UI_ICON, "tower_4.png",  float2((float)Application::width / 3200, (float)Application::height / 2000));
 	}else{
 		UIUtils::changeImage(SUPER_MINION_UI_ICON, "tower_4_low.png",  float2((float)Application::width / 3200, (float)Application::height / 2000));
+	}
+
+	if(buildMode == LASER){
+		UIUtils::changeImage(LASER_TOWER_UI_ICON, "tower_2_build_mode.png", float2((float)Application::width / 3200, (float)Application::height / 2000));
+	}
+
+	if(buildMode == CLAW){
+		UIUtils::changeImage(CLAW_MACHINE_UI_ICON, "tower_1_build_mode.png", float2((float)Application::width / 3200, (float)Application::height / 2000));
+	}
+	
+	if(buildMode == SUPER_MINION){
+		UIUtils::changeImage(SUPER_MINION_UI_ICON, "tower_4_build_mode.png", float2((float)Application::width / 3200, (float)Application::height / 2000));
+	}
+
+	// update base health
+	int red_health = red_team->getBaseHealth();
+	int blue_health = blue_team->getBaseHealth();
+
+	UIUtils::changeImage("health_bar_blue", "start.png", float2((float) blue_health/100, (float)1));
+	UIUtils::changeImage("health_bar_red", "start.png", float2((float) red_health/100,(float)1));
+
+	if (red_health <= 0) {
+		if (trackedPlayerTeam->teamColor == RED_TEAM) {
+			UIUtils::createText("defeat_text", "Defeat", 640, 280, "large font", 0xff6655ff, 3);
+		}
+		else {
+			UIUtils::createText("victory_text", "Victory", 600, 280, "large font", 0xff6655ff, 3);
+		}
+	}
+	else if (blue_health <= 0) {
+		if (trackedPlayerTeam->teamColor == BLUE_TEAM) {
+			UIUtils::createText("defeat_text", "Defeat", 640, 280, "large font", 0xff6655ff, 3);
+		}
+		else {
+			UIUtils::createText("victory_text", "Victory", 600, 280, "large font", 0xff6655ff, 3);
+		}
 	}
 
 }

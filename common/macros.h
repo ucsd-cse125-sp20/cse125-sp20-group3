@@ -128,4 +128,8 @@
 #define CLAW_MACHINE_UI_ICON "claw_machine"
 #define SUPER_MINION_UI_ICON "super_minion"
 
+#define TEAM_TEXT "team_text"
+#define TEAM_BLUE_HEALTH "health_bar_blue"
+#define TEAM_RED_HEALTH "health_bar_red"
+
 #endif

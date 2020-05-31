@@ -19,6 +19,8 @@ int __cdecl main(void)
     char sendbuf[SERVER_SENDBUFLEN] = "I'm server";
 
 	SceneManager_Server* manager = new SceneManager_Server();
+	std::cout << "manager at " << manager << "\n";
+	SceneManager_Server* m = manager;
 	Server* server = new Server(manager);
 
     // Game State data
@@ -39,13 +41,19 @@ int __cdecl main(void)
 
 		std::vector<PlayerInput> inputs = server->pullData();
 
+		//if (manager != m) std::cout << "a manager changed\n";
+
 		/* Process player input */
 		for (int p = 0; p < inputs.size(); p++) {
 			//std::cout << "processing player " << p << "\n";
 
 			manager->processInput(p, inputs[p]);
+
+			//if (manager != m) std::cout << "b manager changed\n";
 			//TODO check for ending game?
 		}
+
+		//if (manager != m) std::cout << "c manager changed\n";
 
 		/* Update Game State */
 		auto currTime = std::chrono::steady_clock::now();
@@ -55,14 +63,20 @@ int __cdecl main(void)
 		manager->update(deltaTime);
 		lastTime = std::chrono::steady_clock::now();
 
+		//if (manager != m) std::cout << "d manager changed\n";
+
 		/* Send updated data back to clients */
 		int statebufSize = manager->encodeState(sendbuf, 0);
 		int sendbufSize = manager->encodeScene(sendbuf, statebufSize);
+
+		//if (manager != m) std::cout << "e manager changed\n";
 		//std::cout << "sendbufSize: " << sendbufSize << std::endl;
 		char sizebuf[4];
 		((int*)sizebuf)[0] = sendbufSize; //push size of data packet to players
 		server->pushDataAll(sizebuf, sizeof(int), 0); //and then push data packet
 		server->pushDataAll(sendbuf, sendbufSize, 0);
+
+		//if (manager != m) std::cout << "f manager changed\n";
 
 		/* wait until end of tick */
 		std::chrono::steady_clock::time_point endTick = std::chrono::steady_clock::now();
@@ -72,6 +86,8 @@ int __cdecl main(void)
 		float sleepSeconds = max((1.0f / SERVER_TICKRATE) - tickTime, 0);
 		//std::cout << "sleeping for " << sleepSeconds << " seconds\n";
 		Sleep(sleepSeconds * 1000); //Sleep only accepts milliseconds
+
+		//if (manager != m) std::cout << "g manager changed\n";
     } while (server->gameInProgress());
 
 	std::cout << "all players disconnected, game over\n";

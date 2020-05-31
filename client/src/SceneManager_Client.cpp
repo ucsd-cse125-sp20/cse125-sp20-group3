@@ -16,9 +16,9 @@ namespace {
 
 	//////////////////////////// Animations ///////////////////////////////////
 	// Animations
-	const char* playerMaleDir = "male-char";
+	const char* playerMaleDir = "male-char-A";
 	const char* playerMaleActions[2] = { "Idle", "Walking" };
-	const char* playerFemaleDir = "female-char";
+	const char* playerFemaleDir = "female-char-A";
 	const char* playerFemaleActions[2] = { "Idle", "Walking" };
 	const char* smallMinionDir = "small-minion-B";
 	const char* smallMinionActions[3] = { "Walking", "Fighting", "Death" };

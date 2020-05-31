@@ -380,8 +380,8 @@ void SceneManager_Client::updateUI(){
 
 	//printf("%s %d %d\n", "base health red and blue", red_health, blue_health);
 	
-	UIUtils::changeImage("health_bar_blue", "base_health_bars_blue.png", float2((float)blue_health/(2 * 2000), (float)1/2));
-	UIUtils::changeImage("health_bar_red", "base_health_bars_red.png", float2((float)red_health / (2 * 2000),(float)1/2));
+	UIUtils::changeImage(HEALTH_BAR_BLUE_TEAM, "base_health_bars_blue.png", float2((float)blue_health/(2 * BASE_HEALTH), (float)1/2));
+	UIUtils::changeImage(HEALTH_BAR_RED_TEAM, "base_health_bars_red.png", float2((float)red_health / (2 * BASE_HEALTH),(float)1/2));
 
 	if (red_health <= 0) {
 		if (trackedPlayerTeam->teamColor == RED_TEAM) {

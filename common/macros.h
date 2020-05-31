@@ -137,4 +137,7 @@
 #define TEAM_BLUE_HEALTH "health_bar_blue"
 #define TEAM_RED_HEALTH "health_bar_red"
 
+#define HEALTH_BAR_BLUE_TEAM "health_bar_blue"
+#define HEALTH_BAR_RED_TEAM "health_bar_red"
+
 #endif

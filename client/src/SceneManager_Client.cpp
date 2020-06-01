@@ -102,11 +102,12 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	///////////////////////////////////////////////////////////////////////////////
 
 
-	// TODO This is a hard coded animation example. Remove this later (SUPER MINION)
+	// TODO This is a hard coded animation example. Remove this later
 	int key = 8888828;
-	Transform* t = conf_new(Transform, mat4::translation(vec3(1, 0, 0)));
-	Animator* a = conf_new(Animator, ozzGeodes[DUMPSTER_GEODE]);
-	a->SetClip(dumpsterActions[0]);
+	Transform* t = conf_new(Transform, mat4::scale(vec3(0.5f)) * mat4::translation(vec3(0, 5.5, 0)) * mat4::rotationX(PI));
+	Animator* a = conf_new(Animator, ozzGeodes[CLAW_TOWER_GEODE]);
+	a->SetClip(clawTowerActions[0]);
+	t->setColor(vec4(1.f, 1.f, 1.f, 1.f));
 	t->addChild(a);
 	this->addChild(t);
 	transforms[key] = t;
@@ -276,6 +277,13 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 				Player_Client* p_c = conf_new(Player_Client, GO_data, data.id, team, nullptr, ozzGeodes[PLAYER_GEODE], adjustment);
 				idMap[data.id] = p_c;
 				wrapperMap[data.id] = p_c;
+
+				Transform* previewAdjustment = conf_new(Transform, mat4::scale(vec3(0.5f)) * mat4::translation(vec3(0, 5.5, 0)) * mat4::rotationX(PI));
+				previewAdjustment->addChild(ozzGeodes[CLAW_TOWER_GEODE]);
+				otherTransforms.push_back(previewAdjustment);
+				p_c->setPreview(BUILD_MODE::SUPER_MINION, ozzGeodes[SUPER_MINION_GEODE]);
+				p_c->setPreview(BUILD_MODE::CLAW, previewAdjustment);
+				p_c->setPreview(BUILD_MODE::LASER, gltfGeodes[LASER_TOWER_GEODE]);
 			}
 			else if (ID_BASE_MIN <= data.id && data.id <= ID_BASE_MAX) {
 				//idMap[id_str] = new Base();
@@ -479,7 +487,7 @@ void SceneManager_Client::draw(Cmd* cmd)
 	// Update per-instance uniforms
 	BufferUpdateDesc shaderCbv = { instanceBuffer[Application::gFrameIndex] };
 	beginUpdateResource(&shaderCbv);
-	updateTransformBuffer(shaderCbv, mat4::identity());
+	updateTransformBuffer(shaderCbv, mat4::identity(), vec4(1));
 	endUpdateResource(&shaderCbv, NULL);
 
 	shaderCbv = { boneBuffer[Application::gFrameIndex] };

@@ -33,7 +33,7 @@ void Geode::update(float deltaTime)
 	obj->update(deltaTime);
 }
 
-void Geode::updateTransformBuffer(BufferUpdateDesc& desc, mat4 parentTransform)
+void Geode::updateTransformBuffer(BufferUpdateDesc& desc, mat4 parentTransform, vec4 color)
 {
 	if (!countingInstances) {
 		instanceIDs = std::deque<int>();
@@ -48,6 +48,7 @@ void Geode::updateTransformBuffer(BufferUpdateDesc& desc, mat4 parentTransform)
 	//print(parentTransform[3].getXYZ());
 	mat4* instanceData = (mat4*)desc.pMappedData;
 	instanceData[instanceID] = parentTransform;
+	instanceData[instanceID].setRow(3, color);
 }
 
 void Geode::cull(const vec4 planes[6], bool doCull)

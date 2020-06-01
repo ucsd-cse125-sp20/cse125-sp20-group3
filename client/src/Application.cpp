@@ -1481,16 +1481,6 @@ void Application::drawShadowMap(Cmd* cmd)
 		meshShaderDesc.descriptorSets[i] = pDescriptorSetsShadow[i];
 	}
 
-	// Update per-instance uniforms
-	shaderCbv = { pShadowInstanceBuffer[Application::gFrameIndex] };
-	beginUpdateResource(&shaderCbv);
-	scene->updateTransformBuffer(shaderCbv, mat4::identity());
-	endUpdateResource(&shaderCbv, NULL);
-
-	vec4 frustumPlanes[6];
-	mat4::extractFrustumClipPlanes(gShadowUniformData.ViewProj, frustumPlanes[0], frustumPlanes[1], frustumPlanes[2], frustumPlanes[3], frustumPlanes[4], frustumPlanes[5], true);
-	scene->cull(frustumPlanes, bToggleCull);
-
 	scene->setProgram(SceneManager_Client::GeodeType::MESH, meshShaderDesc);
 	GLTFGeode::useMaterials = false;
 	scene->draw(cmd);

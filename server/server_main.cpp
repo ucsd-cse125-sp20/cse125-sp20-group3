@@ -18,7 +18,7 @@ int __cdecl main(void)
 	int iSendResult;
     char sendbuf[SERVER_SENDBUFLEN] = "I'm server";
 	SceneManager_Server* manager = new SceneManager_Server();
-	std::cout << "manager at " << manager << "\n";
+	//std::cout << "manager at " << manager << "\n";
 	SceneManager_Server* m = manager;
 	Server* server = new Server(manager);
 
@@ -69,6 +69,7 @@ int __cdecl main(void)
 		/* Send updated data back to clients */
 		int statebufSize = manager->encodeState(sendbuf, 0);
 		int sendbufSize = manager->encodeScene(sendbuf, statebufSize);
+		//std::cout << "sending\n";
 
 		//if (manager != m) std::cout << "e manager changed\n";
 		//std::cout << "sendbufSize: " << sendbufSize << std::endl;

@@ -104,7 +104,7 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 
 
 	// TODO This is a hard coded animation example. Remove this later
-	int key = 8888828;
+	/*int key = 8888828;
 	Transform* t = conf_new(Transform, mat4::scale(vec3(0.5f)) * mat4::translation(vec3(0, 5.5, 0)) * mat4::rotationX(PI));
 	Animator* a = conf_new(Animator, ozzGeodes[CLAW_TOWER_GEODE]);
 	a->SetClip(clawTowerActions[0]);
@@ -112,7 +112,7 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	t->addChild(a);
 	this->addChild(t);
 	transforms[key] = t;
-	animators[key] = a;
+	animators[key] = a;*/
 
 	trackedPlayer_ID = NO_TRACKED_PLAYER;
 
@@ -268,6 +268,7 @@ void SceneManager_Client::updateUI() {
 
 	// update base health
 	int red_health = red_team->getBaseHealth();
+	std::cout << "red health: " << red_health << "\n";
 	int blue_health = blue_team->getBaseHealth();
 
 	//printf("%s %d %d\n", "base health red and blue", red_health, blue_health);
@@ -378,7 +379,10 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 			else if (ID_RECYCLING_BIN_MIN <= data.id && data.id <= ID_RECYCLING_BIN_MAX) {
 				std::cout << "creating new recycling bin id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
-				Resource_Client* r_b_c = conf_new(Resource_Client, RECYCLING_BIN_TYPE, GO_data, data.id, this, ozzGeodes[RECYCLING_BIN_GEODE], transforms[data.id]);
+				Transform* adjustment = conf_new(Transform, mat4::scale(vec3(2.0f)));
+				transforms[data.id]->addChild(adjustment);
+				Resource_Client* r_b_c = conf_new(Resource_Client, RECYCLING_BIN_TYPE, GO_data, data.id, this, ozzGeodes[RECYCLING_BIN_GEODE], adjustment);
+				otherTransforms.push_back(adjustment);
 				idMap[data.id] = r_b_c;
 				wrapperMap[data.id] = r_b_c;
 			}
@@ -386,7 +390,8 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 			this->addChild(transforms[data.id]);
 		}
 
-		if (data.ent_data.health <= 0) { //if updated health marks entity as dead
+		if (data.ent_data.health <= 0 && (data.id < ID_BASE_MIN || data.id > ID_BASE_MAX)) { //if updated health marks entity as dead
+			//ignore bases, we want to know that bases reached 0 health
 			deadEntities.push_back(data.id); //delay actual deletion until after all particle systems have been fired
 		}
 		else { //otherwise, update the entity's data and transform
@@ -457,6 +462,8 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 		conf_delete(transforms[id]);
 		transforms.erase(id);
 	}
+
+	std::cout << "red base health: " << idMap[1000]->getHealth() << "\n";
 }
 
 void SceneManager_Client::updateFromInputBuf(float deltaTime)

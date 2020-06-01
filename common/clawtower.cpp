@@ -11,6 +11,10 @@ ClawTower::ClawTower(GameObjectData data, int id, Team* t, SceneManager_Server* 
 		if (nearPathNode == nullptr) std::cout << "claw tower " << id << " couldn't find a nearby path!\n";
 		else std::cout << "claw tower " << id << " using x: " << nearPathNode->getPosition().getX() << " z: " << nearPathNode->getPosition().getZ() << " as spawnPoint\n";
 		spawnPoint = nearPathNode->getPosition();
+		vec3 forward = normalize(spawnPoint - this->getPosition());
+		vec3 right = cross(forward, vec3(0, 1, 0));
+		model[0] = vec4(right, 0);
+		model[2] = vec4(forward, 0); //should be -forward, but the model is backwards
 
 		int flags = DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE | DETECTION_FLAG_TOWER |
 			DETECTION_FLAG_MINION_TARGET;

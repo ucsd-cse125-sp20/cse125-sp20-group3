@@ -15,7 +15,7 @@
     "nodes" : [
         {
             "mesh" : 0,
-            "name" : "Recycling_Bin_Cube.003",
+            "name" : "Dumpster_Cube.017",
             "rotation" : [
                 0.7071068286895752,
                 0,
@@ -32,7 +32,7 @@
                 0,
                 0
             ],
-            "name" : "base",
+            "name" : "Texture",
             "pbrMetallicRoughness" : {
                 "baseColorTexture" : {
                     "index" : 0,
@@ -45,7 +45,7 @@
     ],
     "meshes" : [
         {
-            "name" : "Recycling_Bin_Cube.003",
+            "name" : "Dumpster_Cube.017",
             "primitives" : [
                 {
                     "attributes" : {
@@ -69,94 +69,94 @@
     "images" : [
         {
             "mimeType" : "image/png",
-            "name" : "recycling_bin_tex",
-            "uri" : "recycling_bin_tex.png"
+            "name" : "dumpster_tex-01",
+            "uri" : "dumpster_tex-01.png"
         }
     ],
     "accessors" : [
         {
             "bufferView" : 0,
             "componentType" : 5126,
-            "count" : 3492,
+            "count" : 18761,
             "max" : [
-                1.1739760637283325,
-                0.461777001619339,
-                0.018071986734867096
+                1.7479891777038574,
+                1.092419981956482,
+                0.0038030147552490234
             ],
             "min" : [
-                -0.461777001619339,
-                -0.461777001619339,
-                -1.7786509990692139
+                -1.756830096244812,
+                -1.1046971082687378,
+                -2.4785075187683105
             ],
             "type" : "VEC3"
         },
         {
             "bufferView" : 1,
             "componentType" : 5126,
-            "count" : 3492,
+            "count" : 18761,
             "type" : "VEC3"
         },
         {
             "bufferView" : 2,
             "componentType" : 5126,
-            "count" : 3492,
+            "count" : 18761,
             "type" : "VEC2"
         },
         {
             "bufferView" : 3,
             "componentType" : 5123,
-            "count" : 3492,
+            "count" : 18761,
             "type" : "VEC4"
         },
         {
             "bufferView" : 4,
             "componentType" : 5126,
-            "count" : 3492,
+            "count" : 18761,
             "type" : "VEC4"
         },
         {
             "bufferView" : 5,
             "componentType" : 5123,
-            "count" : 12108,
+            "count" : 46638,
             "type" : "SCALAR"
         }
     ],
     "bufferViews" : [
         {
             "buffer" : 0,
-            "byteLength" : 41904,
+            "byteLength" : 225132,
             "byteOffset" : 0
         },
         {
             "buffer" : 0,
-            "byteLength" : 41904,
-            "byteOffset" : 41904
+            "byteLength" : 225132,
+            "byteOffset" : 225132
         },
         {
             "buffer" : 0,
-            "byteLength" : 27936,
-            "byteOffset" : 83808
+            "byteLength" : 150088,
+            "byteOffset" : 450264
         },
         {
             "buffer" : 0,
-            "byteLength" : 27936,
-            "byteOffset" : 111744
+            "byteLength" : 150088,
+            "byteOffset" : 600352
         },
         {
             "buffer" : 0,
-            "byteLength" : 55872,
-            "byteOffset" : 139680
+            "byteLength" : 300176,
+            "byteOffset" : 750440
         },
         {
             "buffer" : 0,
-            "byteLength" : 24216,
-            "byteOffset" : 195552
+            "byteLength" : 93276,
+            "byteOffset" : 1050616
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 219768,
-            "uri" : "resource-2-recycling-bin.bin"
+            "byteLength" : 1143892,
+            "uri" : "dumpster-closed.bin"
         }
     ]
 }

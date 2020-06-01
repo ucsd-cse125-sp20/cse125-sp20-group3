@@ -45,7 +45,7 @@ void Player::update(float deltaTime) {
 		model = oldModel;
 	}
 
-	vec3 forward = vec3(cos(rotation_y), 0, sin(rotation_y));
+	vec3 forward = vec3(-sin(rotation_y), 0, cos(rotation_y));
 	vec3 right = cross(forward, vec3(0, 1, 0));
 	model[0] = vec4(right, 0);
 	model[2] = vec4(-forward, 0);

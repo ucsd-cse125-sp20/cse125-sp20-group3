@@ -13,6 +13,7 @@ protected:
 	std::vector<Node*> children;
 public:
 	bool active = true;
+	vec4 color = vec4(1);
 
 	Transform();
 	Transform(mat4 transformation);
@@ -22,7 +23,7 @@ public:
 	void removeChild(Node* child);
 
 	void update(float deltaTime) override;
-	void updateTransformBuffer(BufferUpdateDesc& desc, mat4 parentTransform) override;
+	void updateTransformBuffer(BufferUpdateDesc& desc, mat4 parentTransform, vec4 color) override;
 	void updateBoneBuffer(BufferUpdateDesc& desc, OzzObject::UniformDataBones* boneData) override;
 	void updateParticleBuffer(BufferUpdateDesc& desc) override;
 	void cull(const vec4 planes[6], bool doCull) override;
@@ -33,4 +34,6 @@ public:
 	void setPositionDirection(vec3 position, vec3 direction, vec3 up);
 	void setPositionDirection(vec3 position, vec3 direction);
 	void setPositionDirection(vec3 position, float angle);
+
+	void setColor(vec4 c);
 };

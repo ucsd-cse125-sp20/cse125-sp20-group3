@@ -76,7 +76,7 @@ void Player::processInput(PlayerInput in) {
 			else flags = flags | DETECTION_FLAG_BLUE_TEAM;
 			BuildNode* buildTarget = (BuildNode*)ObjectDetection::getNearestObject(vec2(interactPos.getX(), interactPos.getZ()), flags, 0);
 			
-			if (buildTarget != nullptr) {
+			if (buildTarget != nullptr && buildTarget->isOccupied() == false) {
 				vec3 buildPos = buildTarget->getPosition();
 				std::cout << "building at " << buildPos.getX() << " " << buildPos.getZ() << "\n";
 
@@ -85,21 +85,24 @@ void Player::processInput(PlayerInput in) {
 					if (team->checkResources(LASER_TYPE))
 					{
 						team->buildEntity(LASER_TYPE);
-						manager->spawnEntity(LASER_TYPE, buildPos.getX(), buildPos.getZ(), 0, this->team);
+						int id = manager->spawnEntity(LASER_TYPE, buildPos.getX(), buildPos.getZ(), 0, this->team);
+						buildTarget->build(id);
 					}
 					break;
 				case CLAW:
 					if (team->checkResources(CLAW_TYPE))
 					{
 						team->buildEntity(CLAW_TYPE);
-						manager->spawnEntity(CLAW_TYPE, buildPos.getX(), buildPos.getZ(), 0, this->team);
+						int id = manager->spawnEntity(CLAW_TYPE, buildPos.getX(), buildPos.getZ(), 0, this->team);
+						buildTarget->build(id);
 					} 
 					break;
 				case SUPER_MINION:
 					if (team->checkResources(SUPER_MINION_TYPE))
 					{
 						team->buildEntity(SUPER_MINION);
-						manager->spawnEntity(SUPER_MINION_TYPE, buildPos.getX(), buildPos.getZ(), 0, this->team);
+						int id = manager->spawnEntity(SUPER_MINION_TYPE, buildPos.getX(), buildPos.getZ(), 0, this->team);
+						buildTarget->build(id);
 					} 
 					break;
 				default:

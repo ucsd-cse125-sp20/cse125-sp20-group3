@@ -9,6 +9,7 @@ namespace {
 	const char* dumpsterFile = "resource-1-dumpster.gltf";
 	const char* recyclingBinFile = "resource-2-recycling-bin.gltf";
 	const char* playerFile = "char-1-female.gltf";
+	//const char* baseFile = "";
 	const char* minionFile = "minion-retry.gltf";
 	const char* superMinionFile = "minion-2-super.gltf";
 	const char* laserTowerFile = "tower-1-laser.gltf";
@@ -130,7 +131,7 @@ SceneManager_Client::~SceneManager_Client()
 			conf_delete((Player_Client*)e.second);
 		}
 		if (ID_BASE_MIN <= e.first && e.first <= ID_BASE_MAX) {
-
+			conf_delete((Base_Client*)e.second);
 		}
 		if (ID_MINION_MIN <= e.first && e.first <= ID_MINION_MAX) {
 			conf_delete((Minion_Client*)e.second);
@@ -200,6 +201,12 @@ void SceneManager_Client::updateUI() {
 	Team* trackedPlayerTeam = idMap[trackedPlayer_ID]->getTeam();
 	if (trackedPlayerTeam->teamColor != RED_TEAM && trackedPlayerTeam->teamColor != BLUE_TEAM) return;
 
+	if (trackedPlayerTeam->teamColor == RED_TEAM){
+		UIUtils::editText(TEAM_TEXT, "Red Team", "small font", 0xffffffff);
+	}else{
+		UIUtils::editText(TEAM_TEXT, "Blue Team", "small font", 0xffffffff);
+	}
+
 	int plasticCount = trackedPlayerTeam->getPlasticCount();
 	//std::cout << "team " << trackedPlayerTeam->teamColor << " plastic count: " << plasticCount << "\n";
 	int metalCount = trackedPlayerTeam->getMetalCount();
@@ -234,11 +241,10 @@ void SceneManager_Client::updateUI() {
 		UIUtils::changeImage(LASER_TOWER_UI_ICON, "tower_2_low.png", float2((float)Application::width / 3200, (float)Application::height / 2000));
 	}
 
-	if (claw_machine) {
-		UIUtils::changeImage(CLAW_MACHINE_UI_ICON, "tower_3.png", float2((float)Application::width / 3200, (float)Application::height / 2000));
-	}
-	else {
-		UIUtils::changeImage(CLAW_MACHINE_UI_ICON, "tower_3_low.png", float2((float)Application::width / 3200, (float)Application::height / 2000));
+	if (claw_machine){
+		UIUtils::changeImage(CLAW_MACHINE_UI_ICON, "tower_1.png",  float2((float)Application::width / 3200, (float)Application::height / 2000));
+	}else{
+		UIUtils::changeImage(CLAW_MACHINE_UI_ICON, "tower_1_low.png",  float2((float)Application::width / 3200, (float)Application::height / 2000));
 	}
 
 	if (super_minion) {
@@ -246,6 +252,45 @@ void SceneManager_Client::updateUI() {
 	}
 	else {
 		UIUtils::changeImage(SUPER_MINION_UI_ICON, "tower_4_low.png", float2((float)Application::width / 3200, (float)Application::height / 2000));
+	}
+
+	if(buildMode == LASER){
+		UIUtils::changeImage(LASER_TOWER_UI_ICON, "tower_2_build_mode.png", float2((float)Application::width / 3200, (float)Application::height / 2000));
+	}
+
+	if(buildMode == CLAW){
+		UIUtils::changeImage(CLAW_MACHINE_UI_ICON, "tower_1_build_mode.png", float2((float)Application::width / 3200, (float)Application::height / 2000));
+	}
+	
+	if(buildMode == SUPER_MINION){
+		UIUtils::changeImage(SUPER_MINION_UI_ICON, "tower_4_build_mode.png", float2((float)Application::width / 3200, (float)Application::height / 2000));
+	}
+
+	// update base health
+	int red_health = red_team->getBaseHealth();
+	int blue_health = blue_team->getBaseHealth();
+
+	//printf("%s %d %d\n", "base health red and blue", red_health, blue_health);
+	
+	//UIUtils::changeImage(HEALTH_BAR_BLUE_TEAM, "base_health_bars_blue.png", float2((float)blue_health/(2 * BASE_HEALTH), (float)1/2));
+	UIUtils::changeImage(HEALTH_BAR_BLUE_TEAM_DEDUCTED, "base_health_bars_black.png", float2((float)(BASE_HEALTH - blue_health) / (2 * BASE_HEALTH), (float)1 / 2));
+	UIUtils::changeImage(HEALTH_BAR_RED_TEAM, "base_health_bars_red.png", float2((float)red_health / (2 * BASE_HEALTH),(float)1/2));
+
+	if (red_health <= 0) {
+		if (trackedPlayerTeam->teamColor == RED_TEAM) {
+			UIUtils::createText("defeat_text", "Defeat", 640, 280, "large font", 0xff6655ff, 3);
+		}
+		else {
+			UIUtils::createText("victory_text", "Victory", 600, 280, "large font", 0xff6655ff, 3);
+		}
+	}
+	else if (blue_health <= 0) {
+		if (trackedPlayerTeam->teamColor == BLUE_TEAM) {
+			UIUtils::createText("defeat_text", "Defeat", 640, 280, "large font", 0xff6655ff, 3);
+		}
+		else {
+			UIUtils::createText("victory_text", "Victory", 600, 280, "large font", 0xff6655ff, 3);
+		}
 	}
 
 }
@@ -274,7 +319,7 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 
 				otherTransforms.push_back(adjustment); //save to be deleted upon closing
 
-				Player_Client* p_c = conf_new(Player_Client, GO_data, data.id, team, nullptr, ozzGeodes[PLAYER_GEODE], adjustment);
+				Player_Client* p_c = conf_new(Player_Client, GO_data, data.id, team, this, ozzGeodes[PLAYER_GEODE], adjustment);
 				idMap[data.id] = p_c;
 				wrapperMap[data.id] = p_c;
 
@@ -286,7 +331,11 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 				p_c->setPreview(BUILD_MODE::LASER, gltfGeodes[LASER_TOWER_GEODE]);
 			}
 			else if (ID_BASE_MIN <= data.id && data.id <= ID_BASE_MAX) {
-				//idMap[id_str] = new Base();
+				std::cout << "creating new base, id: " << data.id << "\n";
+				transforms[data.id] = conf_new(Transform, mat4::identity());
+				Base_Client* b_c = conf_new(Base_Client, GO_data, data.id, team, this, ozzGeodes[MINION_GEODE], transforms[data.id]);
+				idMap[data.id] = b_c;
+				wrapperMap[data.id] = b_c;
 			}
 			else if (ID_MINION_MIN <= data.id && data.id <= ID_MINION_MAX) {
 				std::cout << "creating new minion, id: " << data.id << "\n";

@@ -36,11 +36,16 @@
 #define ID_RECYCLING_BIN_MIN 7000
 #define ID_RECYCLING_BIN_MAX 7999
 
+#define RED_BASE_X -10
+#define RED_BASE_Z 10
+#define BLUE_BASE_X -8
+#define BLUE_BASE_Z 8
+
 //length is z, width is x
 #define PLAYER_LENGTH 0.2f //checked
 #define PLAYER_WIDTH 0.5f
-#define BASE_LENGTH 1.0f
-#define BASE_WIDTH 1.0f
+#define BASE_LENGTH 0.5f
+#define BASE_WIDTH 0.5f
 #define MINION_LENGTH 0.5f //checked
 #define MINION_WIDTH 0.5f
 #define SUPER_MINION_LENGTH 0.9f //checked
@@ -127,5 +132,12 @@
 #define LASER_TOWER_UI_ICON "laser_tower"
 #define CLAW_MACHINE_UI_ICON "claw_machine"
 #define SUPER_MINION_UI_ICON "super_minion"
+
+#define TEAM_TEXT "team_text"
+#define TEAM_BLUE_HEALTH "health_bar_blue"
+#define TEAM_RED_HEALTH "health_bar_red"
+
+#define HEALTH_BAR_BLUE_TEAM_DEDUCTED "health_bar_blue_deducted"
+#define HEALTH_BAR_RED_TEAM "health_bar_red"
 
 #endif

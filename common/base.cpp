@@ -9,3 +9,7 @@ Base::Base(GameObjectData data, int id, Team* t, SceneManager_Server* sm) : Enti
 		ObjectDetection::addObject(this, flags, -BASE_WIDTH, BASE_WIDTH, -BASE_LENGTH, BASE_LENGTH);
 	}
 }
+
+void Base::update(float deltaTime) {
+	this->team->setBaseHealth(this->getHealth());
+}

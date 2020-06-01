@@ -17,6 +17,8 @@ void Team::decTower() { towerCount--; }
 
 int Team::getPlasticCount(){ return this->plasticCount; }
 int Team::getMetalCount(){ return this->metalCount; }
+void Team::setBaseHealth(int health) { this->baseHealth = health; }
+int Team::getBaseHealth(){ return this->baseHealth; }
 
 bool Team::checkResources(char entityType) {
 	switch (entityType) {
@@ -48,18 +50,21 @@ void Team::buildEntity(char entityType){
 			metalCount -= LASER_METAL_REQ;
 			plasticCount -= LASER_PLASTIC_REQ;
 		}
+		break;
 	case CLAW_TYPE:
 		if (metalCount >= CLAW_METAL_REQ && plasticCount >= CLAW_PLASTIC_REQ) {
 			metalCount -= CLAW_METAL_REQ;
 			plasticCount -= CLAW_PLASTIC_REQ;
 		}
+		break;
 	case SUPER_MINION_TYPE:
 		if (metalCount >= SUPER_MINION_METAL_REQ && plasticCount >= SUPER_MINION_PLASTIC_REQ) {
 			metalCount -= SUPER_MINION_METAL_REQ;
 			plasticCount -= SUPER_MINION_PLASTIC_REQ;
 		}
+		break;
 	default:
-		std::cout << "Invalid entityType of " << entityType << " passed to team->checkResources!\n";
+		std::cout << "Invalid entityType of " << entityType << " passed to team->buildEntity!\n";
 	}
 }
 

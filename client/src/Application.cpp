@@ -452,10 +452,11 @@ void Application::InitDebugGui()
 	pDebugGui->AddWidget(GuiWidgets);
 
 	// Example usage
-	// UIUtils::createImage("overlay", "why.png", 0, 0, float2((float)mSettings.mWidth / 1333, (float)mSettings.mHeight / 949), 0);
+	UIUtils::createImage("overlay", "why.png", 0, 0, float2((float)mSettings.mWidth / 1333, (float)mSettings.mHeight / 949), 10);
 
 
 	UIUtils::loadFont("default font", "TitilliumText/TitilliumText-Bold.otf", 128); // All fonts must be loaded beforehand
+	UIUtils::loadFont("large font", "TitilliumText/TitilliumText-Bold.otf", 300); // All fonts must be loaded beforehand
 	UIUtils::loadFont("small font", "TitilliumText/TitilliumText-Bold.otf", 25); // All fonts must be loaded beforehand
 
 	// display resources count
@@ -467,7 +468,7 @@ void Application::InitDebugGui()
 	// display tower/minion count
 	// UIUtils::createImage("minion", "tower_1_low.png", 600, 870, float2((float)mSettings.mWidth / 3200, (float)mSettings.mHeight / 2000), 0);
 	UIUtils::createImage("laser_tower", "tower_2_low.png", 600, 870, float2((float)mSettings.mWidth / 3200, (float)mSettings.mHeight / 2000), 0);
-	UIUtils::createImage("claw_machine", "tower_3_low.png", 720, 870, float2((float)mSettings.mWidth / 3200, (float)mSettings.mHeight / 2000), 0);
+	UIUtils::createImage("claw_machine", "tower_1_low.png", 720, 870, float2((float)mSettings.mWidth / 3200, (float)mSettings.mHeight / 2000), 0);
 	UIUtils::createImage("super_minion", "tower_4_low.png", 840, 870, float2((float)mSettings.mWidth / 3200, (float)mSettings.mHeight / 2000), 0);
 
 	// display count as text
@@ -475,15 +476,36 @@ void Application::InitDebugGui()
 	UIUtils::createText("laser_tower_text", "2", 740, 955, "small font", 0xff6655ff, 3);
 	UIUtils::createText("super_minion_text", "3", 860, 955, "small font", 0xff6655ff, 3);
 
+	// display team as text
+	UIUtils::createText("team_text", " ", 1780, 20, "small font", 0xff6655ff, 3 );
+
+	// display base health TODO REPLACE PICS
+	// UIUtils::createText("team_red_base_health", "Red Team:        /100", 900, 30, "small font", 0xff6655ff, 3);
+	// UIUtils::createText("team_blue_base_health", "Blue Team:       /100", 900, 60, "small font", 0xff6655ff, 3);
+	UIUtils::createImage("health_backdrop", "base_health_bars_backdrop_nontransparent.png", 685, 4, float2((float)1/2,(float)1.04/2), 0);
+	UIUtils::createImage("health_frame", "base_health_bars_frame.png", 685, 4, float2((float)1/2,(float)1.04/2), 1);
+	UIUtils::createImage("health_bar_blue", "base_health_bars_blue.png", 702, 24, float2((float)1/2,(float)1/2), 2);
+	UIUtils::createImage("health_bar_blue_deducted", "base_health_bars_blue.png", 702, 24, float2((float)1 / 2, (float)1 / 2), 3);
+	UIUtils::createImage("health_bar_red", "base_health_bars_red.png", 981, 24, float2((float)1/2, (float)1/2), 2);
+
 	UIUtils::loadTexture("WeirdBox_halo.png"); // Preload textures
-	UIUtils::createImage("start_button", "start.png", 500, 400, float2(1,1), 1);
-	UIUtils::addCallbackToImage("start_button", []() { 
-		UIUtils::removeImage("overlay"); 
-		UIUtils::removeText("testText"); 
-		UIUtils::removeImage("start_button"); 
-		// UIUtils::createImage("hud", "WeirdBox_halo.png", 400, -10, float2(1.f, 0.05f), 1);
+
+	// Join red/blue team button TODO REPLACE PICTURES
+	UIUtils::createImage("start_button_red", "start.png", 600, 400, float2(1,1), 11);
+	UIUtils::addCallbackToImage("start_button_red", []() { 
+		UIUtils::removeImage("overlay");
+		UIUtils::removeImage("start_button_blue");
+		UIUtils::removeImage("start_button_red"); 
+		//TODO choose team
 	});
-	//UIUtils::createText("testText", "YEET", 500, 800, "default font", 0xff6655ff, 3);
+
+	UIUtils::createImage("start_button_blue", "start.png", 1000, 400, float2(1,1), 11);
+	UIUtils::addCallbackToImage("start_button_blue", []() { 
+		UIUtils::removeImage("overlay");
+		UIUtils::removeImage("start_button_blue"); 
+		UIUtils::removeImage("start_button_red");
+		//TODO choose team
+	});
 }
 
 void Application::ToggleClient()

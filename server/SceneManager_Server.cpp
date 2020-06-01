@@ -3,6 +3,9 @@
 #include "SceneManager_Server.h"
 #include <vector>
 
+const GameObject::GameObjectData red_spawns[4] = { {7.5f, -17.5f, 0.0f}, {7.5f, -22.5f, 0.0f}, {12.5f, -22.5f, 0.0f}, {17.5f, -22.5f, 0.0f} };
+const GameObject::GameObjectData blue_spawns[4] = { {122.5f, -82.5f, 0.0f}, {122.5f, -77.5f, 0.0f}, {117.5f, -77.5f, 0.0f}, {112.5f, -77.5f, 0.0} };
+
 SceneManager_Server::SceneManager_Server() :
 	next_player_id(ID_PLAYER_MIN),
 	next_base_id(ID_BASE_MIN),
@@ -16,21 +19,10 @@ SceneManager_Server::SceneManager_Server() :
 	red_team = new Team(RED_TEAM);
 	blue_team = new Team(BLUE_TEAM);
 
-	GameObject::GameObjectData red_base_data = { RED_BASE_X, RED_BASE_Z, 0 };
-	int id = next_base_id++;
-	red_base = new Base(red_base_data, id, red_team, this);
-	idMap[id] = red_base;
-	GameObject::GameObjectData blue_base_data = { BLUE_BASE_X, BLUE_BASE_Z, 0 };
-	id = next_base_id++;
-	blue_base = new Base(blue_base_data, id, blue_team, this);
-	idMap[id] = blue_base;
+	this->buildScene();
 
-	this->populatePaths();
-	this->populateWalls();
-	this->populateBuilds();
-
-	//this->populateScene();
-	//this->testAttacking();
+	//this->testScene();
+	this->testAttacking();
 	//this->testBuilding();
 	//this->testWalls();
 }
@@ -48,11 +40,17 @@ void SceneManager_Server::processInput(int player_id, PlayerInput in) {
 
 bool SceneManager_Server::addPlayer(int player_id) {
 	//TODO figure out player spawn locations
-	GameObject::GameObjectData data = { 2.5f, -2.5f, 0.0f };
 	if (idMap.find(player_id) == idMap.end()) { //player_id not in map, create a new player
 		Team* team;
-		if (player_id == 0 || player_id == 2) team = red_team;
-		else team = blue_team;
+		GameObject::GameObjectData data;
+		if (player_id == 0 || player_id == 2) {
+			team = red_team;
+			data = red_spawns[num_red++];
+		}
+		else {
+			team = blue_team;
+			data = blue_spawns[num_blue++];
+		}
 		idMap[player_id] = new Player(data, player_id, team, this); //TODO assign players teams based on lobby choices
 		std::cout << "created new player id: " << player_id << " at " << idMap[player_id] << "\n";
 
@@ -172,6 +170,7 @@ void SceneManager_Server::update(float deltaTime) {
 	std::vector<int> deadIDs;
 	std::vector<Entity*> deadEntities;
 	for (std::pair<int, Entity*> idEntPair : idMap) { //first pass, check for anything that died last cycle
+		if (idEntPair.second == red_base || idEntPair.second == blue_base) continue; //skip bases
 		if (idEntPair.second->getHealth() <= 0) {	//entity reached 0 health last cycle, mark it for deletion
 			std::cout << "marking entity id " << idEntPair.first << " addr " << idEntPair.second << " to be deleted\n";
 			deadIDs.push_back(idEntPair.first);
@@ -187,6 +186,8 @@ void SceneManager_Server::update(float deltaTime) {
 	for (std::pair<int, Entity*> idEntPair : idMap) { //second pass, update as usual
 		idEntPair.second->update(deltaTime);
 	}
+
+	std::cout << "red base health: " << red_base->getHealth() << "\n";
 }
 
 bool SceneManager_Server::getGameOver() {
@@ -194,8 +195,10 @@ bool SceneManager_Server::getGameOver() {
 }
 
 int SceneManager_Server::encodeState(char buf[], int start_index) {
+	std::cout << "encoding state\n";
 	int i = start_index;
 
+	std::cout << "encoded red team base health: " << red_team->getBaseHealth() << "\n";
 	i += red_team->writeData(buf, i);
 	buf[i] = DELIMITER;
 	i++;
@@ -240,6 +243,21 @@ int SceneManager_Server::encodeScene(char buf[], int start_index) {
 	buf[i] = DELIMITER; //append an extra delimiter to indicate the end of the data
 	i++;
 	return i;
+}
+
+void SceneManager_Server::buildScene() {
+	this->populatePaths();
+	this->populateBuilds();
+	this->populateWalls();
+	this->populateBases();
+	this->populateResources();
+}
+
+void SceneManager_Server::populateBases() {
+	int red_base_id = this->spawnEntity(BASE_TYPE, 7.5, -7.5, 0, red_team);
+	red_base = (Base*)idMap[red_base_id];
+	int blue_base_id = this->spawnEntity(BASE_TYPE, 122.5, -92.5, 0, blue_team);
+	blue_base = (Base*)idMap[blue_base_id];
 }
 
 void SceneManager_Server::populatePaths() {
@@ -435,6 +453,14 @@ void SceneManager_Server::populatePaths() {
 	pathNodes[83]->setNextBlue(pathNodes[84]);
 	pathNodes[84]->setNextBlue(pathNodes[27]);
 
+	//adding pathNodes for bases
+	pathNodes.push_back(new PathNode(1, 1)); //85
+	pathNodes.push_back(new PathNode(24, 18)); //86
+
+	pathNodes[85]->setNextRed(pathNodes[0]);
+	pathNodes[0]->setNextBlue(pathNodes[85]);
+	pathNodes[86]->setNextBlue(pathNodes[11]);
+	pathNodes[11]->setNextRed(pathNodes[86]);
 }
 
 void SceneManager_Server::populateWalls(){
@@ -717,7 +743,17 @@ void SceneManager_Server::populateBuilds(){
 	
 }
 
-void SceneManager_Server::populateScene() { //testing only
+void SceneManager_Server::populateResources() {
+	this->spawnEntity(DUMPSTER_TYPE, 2.5, -12.5, 0, nullptr); //yellow resources
+	this->spawnEntity(DUMPSTER_TYPE, 7.5, -52.5, 0, nullptr);
+	this->spawnEntity(RECYCLING_BIN_TYPE, 42.5, -17.5, 0, nullptr);
+
+	this->spawnEntity(RECYCLING_BIN_TYPE, 82.5, -87.5, 0, nullptr); //green resources
+	this->spawnEntity(DUMPSTER_TYPE, 102.5, -52.5, -PI / 2, nullptr);
+	this->spawnEntity(DUMPSTER_TYPE, 127.5, -87.5, PI, nullptr);
+}
+
+void SceneManager_Server::testScene() { //testing only
 	//NOTE: number of objects should not exceed sendbuf capacity
 	//sendbufsize >= (NUM_PLAYERS * 20) + (# of minions and towers * 23) + 1
 	srand((unsigned int)time(NULL));
@@ -843,13 +879,13 @@ void SceneManager_Server::testAttacking() {
 	SuperMinion* sm2 = new SuperMinion(data, id, red_team, this);
 	idMap[id] = sm2;*/
 
-	/*id = next_claw_id;
+	id = next_claw_id;
 	next_claw_id++;
-	data = { 7.5, 27.5, 0 };
-	ClawTower* c1 = new ClawTower(data, id, red_team, this);
+	data = { 32.5, -27.5, 0 };
+	ClawTower* c1 = new ClawTower(data, id, blue_team, this);
 	idMap[id] = c1;
 
-	id = next_laser_id;
+	/*id = next_laser_id;
 	next_laser_id++;
 	data = { 0, 10, 0 };
 	LaserTower* l1 = new LaserTower(data, id, blue_team, this);
@@ -867,7 +903,7 @@ void SceneManager_Server::testAttacking() {
 	Minion* m2 = new Minion(data, id, red_team, this);
 	idMap[id] = m2;*/
 
-	id = next_dumpster_id;
+	/*id = next_dumpster_id;
 	next_dumpster_id++;
 	data = { 10, 10, 0 };
 	Resource* d1 = new Resource(DUMPSTER_TYPE, data, id, this);
@@ -877,7 +913,7 @@ void SceneManager_Server::testAttacking() {
 	next_recycling_bin_id++;
 	data = { 0, -10, 0 };
 	Resource* r1 = new Resource(RECYCLING_BIN_TYPE, data, id, this);
-	idMap[id] = r1;
+	idMap[id] = r1;*/
 }
 
 void SceneManager_Server::testBuilding() {

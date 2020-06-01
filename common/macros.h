@@ -36,11 +36,6 @@
 #define ID_RECYCLING_BIN_MIN 7000
 #define ID_RECYCLING_BIN_MAX 7999
 
-#define RED_BASE_X -10
-#define RED_BASE_Z 10
-#define BLUE_BASE_X -8
-#define BLUE_BASE_Z 8
-
 //length is z, width is x
 #define PLAYER_LENGTH 0.2f //checked
 #define PLAYER_WIDTH 0.5f
@@ -92,7 +87,6 @@
 #define RESOURCE_ATTACK 0
 
 #define MINION_ATK_RANGE 7
-//#define MINION_MV_RANGE 20
 #define SUPER_MINION_ATK_RANGE 2
 #define LASER_FIRE_RANGE 20
 
@@ -111,12 +105,8 @@
 #define DUMPSTER_PLASTIC 3
 #define RECYCLING_BIN_METAL 2
 
-#define MINION_METAL_REQ 2
-#define MINION_PLASTIC_REQ 8
 #define SUPER_MINION_METAL_REQ 4
 #define SUPER_MINION_PLASTIC_REQ 12
-//#define TOWER_METAL_REQ 5
-//#define TOWER_PLASTIC_REQ 20
 #define LASER_METAL_REQ 0//2
 #define LASER_PLASTIC_REQ 0//4
 #define CLAW_METAL_REQ 8

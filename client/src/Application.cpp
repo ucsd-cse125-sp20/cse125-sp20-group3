@@ -477,12 +477,12 @@ void Application::InitDebugGui()
 	UIUtils::createText("super_minion_text", "3", 860, 955, "small font", 0xff6655ff, 3);
 
 	// display team as text
-	UIUtils::createText("team_text", " ", 1800, 30, "small font", 0xff6655ff, 3 );
+	UIUtils::createText("team_text", " ", 1780, 20, "small font", 0xff6655ff, 3 );
 
 	// display base health TODO REPLACE PICS
 	// UIUtils::createText("team_red_base_health", "Red Team:        /100", 900, 30, "small font", 0xff6655ff, 3);
 	// UIUtils::createText("team_blue_base_health", "Blue Team:       /100", 900, 60, "small font", 0xff6655ff, 3);
-	UIUtils::createImage("health_backdrop", "base_health_bars_backdrop.png", 685, 4, float2((float)1/2,(float)1.04/2), 0);
+	UIUtils::createImage("health_backdrop", "base_health_bars_backdrop_nontransparent.png", 685, 4, float2((float)1/2,(float)1.04/2), 0);
 	UIUtils::createImage("health_frame", "base_health_bars_frame.png", 685, 4, float2((float)1/2,(float)1.04/2), 1);
 	UIUtils::createImage("health_bar_blue", "base_health_bars_blue.png", 702, 24, float2((float)1/2,(float)1/2), 2);
 	UIUtils::createImage("health_bar_blue_deducted", "base_health_bars_blue.png", 702, 24, float2((float)1 / 2, (float)1 / 2), 3);

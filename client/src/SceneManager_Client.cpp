@@ -314,9 +314,9 @@ void SceneManager_Client::updateUI(){
 	if (trackedPlayerTeam->teamColor != RED_TEAM && trackedPlayerTeam->teamColor != BLUE_TEAM) return;
 
 	if (trackedPlayerTeam->teamColor == RED_TEAM){
-		UIUtils::editText(TEAM_TEXT, "Red Team", "small font", 0xff6655ff);
+		UIUtils::editText(TEAM_TEXT, "Red Team", "small font", 0xffffffff);
 	}else{
-		UIUtils::editText(TEAM_TEXT, "Blue Team", "small font", 0xff6655ff);
+		UIUtils::editText(TEAM_TEXT, "Blue Team", "small font", 0xffffffff);
 	}
 
 	int plasticCount = trackedPlayerTeam->getPlasticCount();
@@ -380,9 +380,8 @@ void SceneManager_Client::updateUI(){
 
 	//printf("%s %d %d\n", "base health red and blue", red_health, blue_health);
 	
-	UIUtils::changeImage(HEALTH_BAR_BLUE_TEAM, "base_health_bars_blue.png", float2((float)blue_health/(2 * BASE_HEALTH), (float)1/2));
-	//todo change pic
-	//UIUtils::changeImage("health_bar_blue_deducted", "base_health_bars_blue.png", float2((float)(BASE_HEALTH - blue_health) / (2 * BASE_HEALTH), (float)1 / 2));
+	//UIUtils::changeImage(HEALTH_BAR_BLUE_TEAM, "base_health_bars_blue.png", float2((float)blue_health/(2 * BASE_HEALTH), (float)1/2));
+	UIUtils::changeImage(HEALTH_BAR_BLUE_TEAM_DEDUCTED, "base_health_bars_black.png", float2((float)(BASE_HEALTH - blue_health) / (2 * BASE_HEALTH), (float)1 / 2));
 	UIUtils::changeImage(HEALTH_BAR_RED_TEAM, "base_health_bars_red.png", float2((float)red_health / (2 * BASE_HEALTH),(float)1/2));
 
 	if (red_health <= 0) {

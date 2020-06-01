@@ -124,8 +124,16 @@ struct GLTFMaterialData
 	GLTFTextureProperties mEmissiveTextureProperties;
 };
 
-cbuffer cbMaterialData : register(b0, UPDATE_FREQ_PER_DRAW) {
+cbuffer cbMaterialData : register(b1, UPDATE_FREQ_PER_DRAW) {
 	GLTFMaterialData materialData;
+};
+
+StructuredBuffer<float4x4> instanceBuffer : register(t0, UPDATE_FREQ_PER_BATCH);
+
+cbuffer cbRootConstants : register(b2) {
+	uint nodeIndex;
+    uint instanceIndex;
+	uint modelIndex;
 };
 
 Texture2D baseColorMap			: register(t3, UPDATE_FREQ_PER_DRAW);
@@ -418,9 +426,9 @@ PSOut main(PsIn input) : SV_TARGET
 	float3 V = normalize(camPos.xyz - input.pos);
 	float NoV = max(dot(N,V), 0.0);	
 
-	if (NoV < 0.05f && N.x != 0  && N.z != 0) {
-		Out.outColor = float4(0.1f, 0.1f, 0.1f, baseColor.a);
-		return Out;
+	if (NoV < 0.05f && N.x < 1 && N.y < 1 && N.z < 1) {
+		//Out.outColor = float4(0.1f, 0.1f, 0.1f, baseColor.a);
+		//return Out;
 	}
 
 	float3 result = float3(0.0, 0.0, 0.0);		
@@ -445,7 +453,7 @@ PSOut main(PsIn input) : SV_TARGET
 	// Ambeint Light
 	result += baseColor.rgb * lightColor[3].rgb * lightColor[3].a;
 	result += emissive;
-	//result *= instanceBuffer[instanceIndex].baseColor;
+	result *= instanceBuffer[instanceIndex][3].rgb;
 	
 	// Tonemap and gamma correct
 	// result = result/(result+float3(1.0, 1.0, 1.0));
@@ -458,6 +466,6 @@ PSOut main(PsIn input) : SV_TARGET
 	fog_factor = fog_factor < 0 ? 0 : (fog_factor > 1 ? 1 : fog_factor);
 	result = fog_factor * result + (1 - fog_factor) * fog_color;
 
-	Out.outColor = float4(result.r, result.g, result.b, baseColor.a);
+	Out.outColor = float4(result.r, result.g, result.b, baseColor.a * instanceBuffer[instanceIndex][3].w);
 	return Out;
 }

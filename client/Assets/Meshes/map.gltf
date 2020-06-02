@@ -742,7 +742,7 @@
         {
             "mimeType" : "image/png",
             "name" : "ground_tex_baked",
-            "uri" : "ground_tex_baked.png"
+            "uri" : "ground_marked_tex.png"
         },
         {
             "mimeType" : "image/png",

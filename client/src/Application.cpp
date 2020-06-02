@@ -491,6 +491,8 @@ void Application::InitDebugGui()
 	UIUtils::createText("defeat_text", "", 640, 280, "small font", 0xff6655ff, 4);
 	UIUtils::createText("victory_text", "", 600, 280, "small font", 0xff6655ff, 4);
 
+	UIUtils::createText("waiting", "Waiting for players", 640, 280, "small font", 0xffffffff, 4);
+
 	UIUtils::loadTexture("WeirdBox_halo.png"); // Preload textures
 
 	// Join red/blue team button TODO REPLACE PICTURES

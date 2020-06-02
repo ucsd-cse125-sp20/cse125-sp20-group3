@@ -44,8 +44,8 @@ bool SceneManager_Server::addPlayer(int player_id) {
 		Team* team;
 		GameObject::GameObjectData data;
 		if (player_id == 0 || player_id == 2) {
-			team = red_team;
-			data = red_spawns[num_red++];
+			team = blue_team;
+			data = blue_spawns[num_red++];
 		}
 		else {
 			team = blue_team;
@@ -187,7 +187,8 @@ void SceneManager_Server::update(float deltaTime) {
 		idEntPair.second->update(deltaTime);
 	}
 
-	std::cout << "red base health: " << red_base->getHealth() << "\n";
+	red_team->setBaseHealth(red_base->getHealth());
+	blue_team->setBaseHealth(blue_base->getHealth());
 }
 
 bool SceneManager_Server::getGameOver() {
@@ -195,10 +196,8 @@ bool SceneManager_Server::getGameOver() {
 }
 
 int SceneManager_Server::encodeState(char buf[], int start_index) {
-	std::cout << "encoding state\n";
 	int i = start_index;
 
-	std::cout << "encoded red team base health: " << red_team->getBaseHealth() << "\n";
 	i += red_team->writeData(buf, i);
 	buf[i] = DELIMITER;
 	i++;
@@ -303,6 +302,7 @@ void SceneManager_Server::populatePaths() {
 	pathNodes[19]->setNextRed(pathNodes[20]);
 	pathNodes.push_back(new PathNode(21, 15)); //21
 	pathNodes[20]->setNextRed(pathNodes[21]);
+	pathNodes[21]->setNextRed(pathNodes[10]);
 	pathNodes.push_back(new PathNode(10, 12)); //22
 	pathNodes[22]->setNextRed(pathNodes[13]);
 	pathNodes[11]->setNextBlue(pathNodes[10]);
@@ -945,11 +945,17 @@ void SceneManager_Server::testAttacking() {
 	SuperMinion* sm2 = new SuperMinion(data, id, red_team, this);
 	idMap[id] = sm2;*/
 
+	/*id = next_claw_id;
+	next_claw_id++;
+	data = { 92.5, -82.5, 0 };
+	ClawTower* c1 = new ClawTower(data, id, red_team, this);
+	idMap[id] = c1;*/
+
 	id = next_claw_id;
 	next_claw_id++;
 	data = { 32.5, -27.5, 0 };
-	ClawTower* c1 = new ClawTower(data, id, blue_team, this);
-	idMap[id] = c1;
+	ClawTower* c2 = new ClawTower(data, id, blue_team, this);
+	idMap[id] = c2;
 
 	/*id = next_laser_id;
 	next_laser_id++;

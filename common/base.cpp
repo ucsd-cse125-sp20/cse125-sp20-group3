@@ -11,5 +11,5 @@ Base::Base(GameObjectData data, int id, Team* t, SceneManager_Server* sm) : Enti
 }
 
 void Base::update(float deltaTime) {
-	this->team->setBaseHealth(this->getHealth());
+	//this->team->setBaseHealth(this->getHealth()); *doesn't work if base updates before other things attack it
 }

@@ -268,7 +268,6 @@ void SceneManager_Client::updateUI() {
 
 	// update base health
 	int red_health = red_team->getBaseHealth();
-	std::cout << "red health: " << red_health << "\n";
 	int blue_health = blue_team->getBaseHealth();
 
 	//printf("%s %d %d\n", "base health red and blue", red_health, blue_health);
@@ -462,8 +461,6 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 		conf_delete(transforms[id]);
 		transforms.erase(id);
 	}
-
-	std::cout << "red base health: " << idMap[1000]->getHealth() << "\n";
 }
 
 void SceneManager_Client::updateFromInputBuf(float deltaTime)

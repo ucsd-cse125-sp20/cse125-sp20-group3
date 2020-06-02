@@ -1,5 +1,6 @@
 #include "SceneManager_Client.h"
 #include "Application.h"
+#include "AudioManager.h"
 
 static bool first_update = true;
 
@@ -17,15 +18,19 @@ namespace {
 
 	//////////////////////////// Animations ///////////////////////////////////
 	// Animations
-	const char* playerMaleDir = "male-char-A";
-	const char* playerMaleActions[2] = { "Idle", "Walking" };
-	const char* playerFemaleDir = "female-char-A";
-	const char* playerFemaleActions[2] = { "Idle", "Walking" };
-	const char* smallMinionDir = "small-minion-B";
+	const char* playerMaleDirR = "male-char-A";
+	const char* playerMaleDirB = "male-char-B";
+	const char* playerFemaleDirR = "female-char-A";
+	const char* playerFemaleDirB = "female-char-B";
+	const char* playerActions[2] = { "Idle", "Walking" };
+	const char* smallMinionDirR = "small-minion-A";
+	const char* smallMinionDirB = "small-minion-B";
 	const char* smallMinionActions[3] = { "Walking", "Fighting", "Death" };
-	const char* superMinionDir = "super-minion-A";
+	const char* superMinionDirR = "super-minion-A";
+	const char* superMinionDirB = "super-minion-B";
 	const char* superMinionActions[3] = { "Walking", "Fighting", "Death" };
-	const char* clawTowerDir = "claw-machine-A";
+	const char* clawTowerDirR = "claw-machine-A";
+	const char* clawTowerDirB = "claw-machine-B";
 	const char* clawTowerActions[1] = { "ClawAction" };
 	const char* dumpsterDir = "dumpster";
 	const char* dumpsterActions[1] = { "OpenAndClose" };
@@ -42,27 +47,36 @@ bool SceneManager_Client::enableCulling = true;
 SceneManager_Client::SceneManager_Client(Renderer* renderer)
 {
 	this->renderer = renderer;
-	// It'd be nice if I could put this in a loop later
-	gltfGeodes[ENV_GEODE] = conf_new(GLTFGeode, renderer, mapFile); //ok
-	//gltfGeodes[PLAYER_GEODE] = conf_new(GLTFGeode, renderer, playerFile);
-	//gltfGeodes[BASE_GEODE] = conf_new(GLTFGeode, renderer, baseFile);
-	//gltfGeodes[MINION_GEODE] = conf_new(GLTFGeode, renderer, minionFile);
-	//gltfGeodes[SUPER_MINION_GEODE] = conf_new(GLTFGeode, renderer, superMinionFile);
-	gltfGeodes[LASER_TOWER_GEODE] = conf_new(GLTFGeode, renderer, laserTowerFile); //ok
-	//gltfGeodes[CLAW_TOWER_GEODE] = conf_new(GLTFGeode, renderer, clawTowerFile);
-	//gltfGeodes[DUMPSTER_GEODE] = conf_new(GLTFGeode, renderer, dumpsterFile); //ok
-	//gltfGeodes[RECYCLING_BIN_GEODE] = conf_new(GLTFGeode, renderer, recyclingBinFile); //ok
 
-	ozzGeodes[MINION_GEODE] = conf_new(OzzGeode, renderer, smallMinionDir);
-	((OzzObject*)ozzGeodes[MINION_GEODE]->obj)->SetClip(smallMinionActions[0]); // Set a default action
-	ozzGeodes[SUPER_MINION_GEODE] = conf_new(OzzGeode, renderer, superMinionDir);
-	((OzzObject*)ozzGeodes[SUPER_MINION_GEODE]->obj)->SetClip(superMinionActions[0]); // Set a default action
-	ozzGeodes[PLAYER_GEODE] = conf_new(OzzGeode, renderer, playerMaleDir);
-	((OzzObject*)ozzGeodes[PLAYER_GEODE]->obj)->SetClip(playerMaleActions[0]); // Set a default action
-	ozzGeodes[CLAW_TOWER_GEODE] = conf_new(OzzGeode, renderer, clawTowerDir);
-	((OzzObject*)ozzGeodes[CLAW_TOWER_GEODE]->obj)->SetClip(clawTowerActions[0]);
+	// Static object initialization
+	gltfGeodes[ENV_GEODE] = conf_new(GLTFGeode, renderer, mapFile); //ok
+	gltfGeodes[LASER_TOWER_GEODE] = conf_new(GLTFGeode, renderer, laserTowerFile); //ok
+
+
+	// Animated object initialization
+	ozzGeodes[MINION_GEODE_R] = conf_new(OzzGeode, renderer, smallMinionDirR);
+	((OzzObject*)ozzGeodes[MINION_GEODE_R]->obj)->SetClip(smallMinionActions[0]); // Set a default action
+	ozzGeodes[MINION_GEODE_B] = conf_new(OzzGeode, renderer, smallMinionDirB);
+	((OzzObject*)ozzGeodes[MINION_GEODE_B]->obj)->SetClip(smallMinionActions[0]); // Set a default action
+
+	ozzGeodes[SUPER_MINION_GEODE_R] = conf_new(OzzGeode, renderer, superMinionDirR);
+	((OzzObject*)ozzGeodes[SUPER_MINION_GEODE_R]->obj)->SetClip(superMinionActions[0]); // Set a default action
+	ozzGeodes[SUPER_MINION_GEODE_B] = conf_new(OzzGeode, renderer, superMinionDirB);
+	((OzzObject*)ozzGeodes[SUPER_MINION_GEODE_B]->obj)->SetClip(superMinionActions[0]); // Set a default action
+
+	ozzGeodes[PLAYER_GEODE_M_R] = conf_new(OzzGeode, renderer, playerMaleDirR);
+	((OzzObject*)ozzGeodes[PLAYER_GEODE_M_R]->obj)->SetClip(playerActions[0]); // Set a default action
+	ozzGeodes[PLAYER_GEODE_M_B] = conf_new(OzzGeode, renderer, playerMaleDirB);
+	((OzzObject*)ozzGeodes[PLAYER_GEODE_M_B]->obj)->SetClip(playerActions[0]); // Set a default action
+
+	ozzGeodes[CLAW_TOWER_GEODE_R] = conf_new(OzzGeode, renderer, clawTowerDirR);
+	((OzzObject*)ozzGeodes[CLAW_TOWER_GEODE_R]->obj)->SetClip(clawTowerActions[0]);
+	ozzGeodes[CLAW_TOWER_GEODE_B] = conf_new(OzzGeode, renderer, clawTowerDirB);
+	((OzzObject*)ozzGeodes[CLAW_TOWER_GEODE_B]->obj)->SetClip(clawTowerActions[0]);
+
 	ozzGeodes[RECYCLING_BIN_GEODE] = conf_new(OzzGeode, renderer, recyclingBinDir);
 	((OzzObject*)ozzGeodes[RECYCLING_BIN_GEODE]->obj)->SetClip(recyclingBinActions[0]);
+
 	ozzGeodes[DUMPSTER_GEODE] = conf_new(OzzGeode, renderer, dumpsterDir);
 	((OzzObject*)ozzGeodes[DUMPSTER_GEODE]->obj)->SetClip(dumpsterActions[0]);
 
@@ -98,7 +112,27 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 		pd->scale = float2(0.1f, 0.05f);
 		pad->velocity = float3(0.f, 0.f, MINION_BULLET_SPEED);
 	};
-	particleGeodes[MINION_GEODE] = conf_new(ParticleSystemGeode, renderer, particleParams);
+	particleGeodes[BULLET_PARTICLES] = conf_new(ParticleSystemGeode, renderer, particleParams);
+
+
+	particleParams = {};
+	particleParams.spriteFile = "LaserParticle.png";
+	particleParams.numParticles = 100;
+	particleParams.life = 3.0f;
+	particleParams.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
+		float r = MathUtils::randfUniform(0.1f, 0.2f);
+		float a = MathUtils::randfUniform(0, 2 * PI);
+
+		pd->position = float3(r * cos(a), 0.f, r * sin(a));
+		pd->color = float4(1.0f, 1.0f, 1.0f, 1.0f);
+		pd->scale = float2(0.05f, 0.05f);
+		pad->velocity = float3(4 * r * cos(a), 5.f, 4 * r * sin(a));
+	};
+	particleParams.updater = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad, float deltaTime) {
+		pad->velocity -= float3(0.f, 5 * deltaTime, 0.f);
+	};
+	particleGeodes[FOUNTAIN_PARTICLES] = conf_new(ParticleSystemGeode, renderer, particleParams);
+	((ParticleSystem*)particleGeodes[FOUNTAIN_PARTICLES]->obj)->reset(-1.f, 0.f);
 
 	///////////////////////////////////////////////////////////////////////////////
 
@@ -320,35 +354,37 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 
 				otherTransforms.push_back(adjustment); //save to be deleted upon closing
 
-				Player_Client* p_c = conf_new(Player_Client, GO_data, data.id, team, this, ozzGeodes[PLAYER_GEODE], adjustment);
+				Player_Client* p_c = conf_new(Player_Client, GO_data, data.id, team, this, ozzGeodes[team == red_team ? PLAYER_GEODE_M_R : PLAYER_GEODE_M_B], adjustment);
 				idMap[data.id] = p_c;
 				wrapperMap[data.id] = p_c;
 
 				Transform* previewAdjustment = conf_new(Transform, mat4::scale(vec3(0.5f)) * mat4::translation(vec3(0, 5.5, 0)) * mat4::rotationX(PI));
-				previewAdjustment->addChild(ozzGeodes[CLAW_TOWER_GEODE]);
+				previewAdjustment->addChild(ozzGeodes[team == red_team ? CLAW_TOWER_GEODE_R : CLAW_TOWER_GEODE_B]);
 				otherTransforms.push_back(previewAdjustment);
-				p_c->setPreview(BUILD_MODE::SUPER_MINION, ozzGeodes[SUPER_MINION_GEODE]);
+				p_c->setPreview(BUILD_MODE::SUPER_MINION, ozzGeodes[team == red_team ? SUPER_MINION_GEODE_R : SUPER_MINION_GEODE_B]);
 				p_c->setPreview(BUILD_MODE::CLAW, previewAdjustment);
 				p_c->setPreview(BUILD_MODE::LASER, gltfGeodes[LASER_TOWER_GEODE]);
 			}
 			else if (ID_BASE_MIN <= data.id && data.id <= ID_BASE_MAX) {
 				std::cout << "creating new base, id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
-				Base_Client* b_c = conf_new(Base_Client, GO_data, data.id, team, this, ozzGeodes[MINION_GEODE], transforms[data.id]);
+				Base_Client* b_c = conf_new(Base_Client, GO_data, data.id, team, this, ozzGeodes[team == red_team ? MINION_GEODE_R : MINION_GEODE_B], transforms[data.id]);
 				idMap[data.id] = b_c;
 				wrapperMap[data.id] = b_c;
 			}
 			else if (ID_MINION_MIN <= data.id && data.id <= ID_MINION_MAX) {
 				std::cout << "creating new minion, id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
-				Minion_Client* m_c = conf_new(Minion_Client, GO_data, data.id, team, this, ozzGeodes[MINION_GEODE], particleGeodes[MINION_GEODE], transforms[data.id]);
+				Minion_Client* m_c = conf_new(Minion_Client, GO_data, data.id, team, this, ozzGeodes[team == red_team ? MINION_GEODE_R : MINION_GEODE_B], particleGeodes[BULLET_PARTICLES], transforms[data.id]);
+				AudioManager::playAudioSource(vec3(data.ent_data.GO_data.x, 0, data.ent_data.GO_data.z), "spawn");
 				idMap[data.id] = m_c;
 				wrapperMap[data.id] = m_c;
 			}
 			else if (ID_SUPER_MINION_MIN <= data.id && data.id <= ID_SUPER_MINION_MAX) {
 				std::cout << "creating new super minion, id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
-				SuperMinion_Client* s_m_c = conf_new(SuperMinion_Client, GO_data, data.id, team, this, ozzGeodes[SUPER_MINION_GEODE], transforms[data.id]);
+				SuperMinion_Client* s_m_c = conf_new(SuperMinion_Client, GO_data, data.id, team, this, ozzGeodes[team == red_team ? SUPER_MINION_GEODE_R : SUPER_MINION_GEODE_B], transforms[data.id]);
+				AudioManager::playAudioSource(vec3(data.ent_data.GO_data.x, 0, data.ent_data.GO_data.z), "super_spawn");
 				idMap[data.id] = s_m_c;
 				wrapperMap[data.id] = s_m_c;
 			}
@@ -356,6 +392,7 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 				std::cout << "creating new laser tower, id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				LaserTower_Client* l_c = conf_new(LaserTower_Client, GO_data, data.id, team, this, gltfGeodes[LASER_TOWER_GEODE], particleGeodes[LASER_TOWER_GEODE], transforms[data.id]);
+				AudioManager::playAudioSource(vec3(data.ent_data.GO_data.x, 0, data.ent_data.GO_data.z), "build");
 				idMap[data.id] = l_c;
 				wrapperMap[data.id] = l_c;
 			}
@@ -364,7 +401,8 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				Transform* adjustment = conf_new(Transform, mat4::scale(vec3(0.5f)) * mat4::translation(vec3(0, 5.5, 0)) * mat4::rotationX(PI));
 				transforms[data.id]->addChild(adjustment);
-				ClawTower_Client* c_c = conf_new(ClawTower_Client, GO_data, data.id, team, this, ozzGeodes[CLAW_TOWER_GEODE], adjustment);
+				ClawTower_Client* c_c = conf_new(ClawTower_Client, GO_data, data.id, team, this, ozzGeodes[team == red_team ? CLAW_TOWER_GEODE_R : CLAW_TOWER_GEODE_B], adjustment);
+				AudioManager::playAudioSource(vec3(data.ent_data.GO_data.x, 0, data.ent_data.GO_data.z), "build");
 				otherTransforms.push_back(adjustment);
 				idMap[data.id] = c_c;
 				wrapperMap[data.id] = c_c;
@@ -372,7 +410,7 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 			else if (ID_DUMPSTER_MIN <= data.id && data.id <= ID_DUMPSTER_MAX) {
 				std::cout << "creating new dumpster, id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
-				Resource_Client* d_c = conf_new(Resource_Client, DUMPSTER_TYPE, GO_data, data.id, this, ozzGeodes[DUMPSTER_GEODE], transforms[data.id]);
+				Resource_Client* d_c = conf_new(Resource_Client, DUMPSTER_TYPE, GO_data, data.id, this, ozzGeodes[DUMPSTER_GEODE], particleGeodes[FOUNTAIN_PARTICLES], transforms[data.id]);
 				idMap[data.id] = d_c;
 				wrapperMap[data.id] = d_c;
 			}
@@ -381,7 +419,7 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				Transform* adjustment = conf_new(Transform, mat4::scale(vec3(2.0f)));
 				transforms[data.id]->addChild(adjustment);
-				Resource_Client* r_b_c = conf_new(Resource_Client, RECYCLING_BIN_TYPE, GO_data, data.id, this, ozzGeodes[RECYCLING_BIN_GEODE], adjustment);
+				Resource_Client* r_b_c = conf_new(Resource_Client, RECYCLING_BIN_TYPE, GO_data, data.id, this, ozzGeodes[RECYCLING_BIN_GEODE], particleGeodes[FOUNTAIN_PARTICLES], adjustment);
 				otherTransforms.push_back(adjustment);
 				idMap[data.id] = r_b_c;
 				wrapperMap[data.id] = r_b_c;

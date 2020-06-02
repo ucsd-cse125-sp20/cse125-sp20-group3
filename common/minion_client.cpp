@@ -1,5 +1,6 @@
 #include "minion_client.h"
 #include "../client/src/SceneManager_Client.h"
+#include "../client/src/AudioManager.h"
 
 namespace {
 	const char* smallMinionActions[2] = { "Walking", "Fighting" };
@@ -61,7 +62,7 @@ void Minion_Client::fireAction() {
 
 	bulletTransform->activate(MINION_BULLET_TIMEOUT);
 	animator->SetClip(smallMinionActions[1]);
-	//AudioManager::playAudioSource(this->getPosition(), "minion fire");
+	AudioManager::playAudioSource(this->getPosition(), "bullets", 0.5f);
 }
 
 /* legacy code */

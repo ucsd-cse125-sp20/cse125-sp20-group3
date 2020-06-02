@@ -54,12 +54,13 @@ void Minion_Client::fireAction() {
 	animator->SetClip(smallMinionActions[1]);*/
 	((ParticleSystem*)bullets->obj)->reset(0, 1);
 
-	bulletTransform->setPositionDirection(getPosition(), sm_c->getTargetPosition(this->attackTargetID) - getPosition());
-	mat4 currMat = this->getMatrix();
-	mat4 inverseMat = inverse(currMat);
-	bulletTransform->setMatrix(inverseMat * mat4::translation(this->getPosition()) * bulletTransform->getMatrix());
+	//bulletTransform->setPositionDirection(getPosition(), sm_c->getTargetPosition(this->attackTargetID) - getPosition());
+	//mat4 currMat = this->getMatrix();
+	//mat4 inverseMat = inverse(currMat);
+	//bulletTransform->setMatrix(inverseMat * mat4::translation(this->getPosition()) * bulletTransform->getMatrix());
 
 	bulletTransform->activate(MINION_BULLET_TIMEOUT);
+	animator->SetClip(smallMinionActions[1]);
 	//AudioManager::playAudioSource(this->getPosition(), "minion fire");
 }
 

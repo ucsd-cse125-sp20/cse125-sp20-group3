@@ -4,6 +4,7 @@
 Resource::Resource(char resourceType, GameObjectData data, int id, SceneManager_Server* sm_server) : Entity(data, id, RESOURCE_HEALTH, RESOURCE_ATTACK, nullptr, sm_server) {
 	type = resourceType;
 	active = true;
+	actionState = ACTION_STATE_ATTACK;
 
 	if (sm_server != nullptr) { //only execute on server
 		int flags = DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE | DETECTION_FLAG_RESOURCE;

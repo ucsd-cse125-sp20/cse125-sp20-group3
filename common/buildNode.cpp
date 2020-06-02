@@ -2,7 +2,7 @@
 #include "../server/SceneManager_Server.h"
 
 BuildNode::BuildNode(char team, float x_index, float z_index, SceneManager_Server *sceneManager_server) : GameObject(){
-	GameObjectData data = { x_index * 5.0f + 2.5f, z_index * 5.0f + 2.5f, 0.0f };
+	GameObjectData data = { x_index * 5.0f + 2.5f, -(z_index * 5.0f + 2.5f), 0.0f };
     this->setGOData(data);
     this->teamColor = team;
 	this->server = sceneManager_server;

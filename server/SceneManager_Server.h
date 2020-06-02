@@ -22,12 +22,13 @@
 #include "../common/BuildNode.h"
 #include "../common/WallNode.h"
 
-
 class SceneManager_Server {
 private:
 		
 		int next_player_id, next_base_id, next_minion_id, next_super_minion_id, next_laser_id, next_claw_id, next_dumpster_id, next_recycling_bin_id;
+		int num_red = 0, num_blue = 0;
 		Team *red_team, *blue_team;
+		Base *red_base, *blue_base;
 
 public:
 	std::map<int, Entity*> idMap;
@@ -42,14 +43,19 @@ public:
 	int spawnEntity(char spawnType, float pos_x, float pos_z, float rot_y, Team* t);
 	bool checkEntityAlive(int id);
 	void update(float deltaTime);
+	bool getGameOver();
 	int encodeState(char buf[], int start_index);
 	int encodeScene(char buf[], int start_index);
+
+	void buildScene();
 
 	void populatePaths();
 	void populateWalls();
 	void populateBuilds();
+	void populateBases();
+	void populateResources();
 
-	void populateScene();
+	void testScene();
 	void testAttacking();
 	void testBuilding();
 	void testWalls();

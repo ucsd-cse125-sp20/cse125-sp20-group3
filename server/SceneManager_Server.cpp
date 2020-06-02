@@ -3,6 +3,9 @@
 #include "SceneManager_Server.h"
 #include <vector>
 
+const GameObject::GameObjectData red_spawns[4] = { {7.5f, -17.5f, 0.0f}, {7.5f, -22.5f, 0.0f}, {12.5f, -22.5f, 0.0f}, {17.5f, -22.5f, 0.0f} };
+const GameObject::GameObjectData blue_spawns[4] = { {122.5f, -82.5f, 0.0f}, {122.5f, -77.5f, 0.0f}, {117.5f, -77.5f, 0.0f}, {112.5f, -77.5f, 0.0} };
+
 SceneManager_Server::SceneManager_Server() :
 	next_player_id(ID_PLAYER_MIN),
 	next_base_id(ID_BASE_MIN),
@@ -16,13 +19,11 @@ SceneManager_Server::SceneManager_Server() :
 	red_team = new Team(RED_TEAM);
 	blue_team = new Team(BLUE_TEAM);
 
-	this->populatePaths();
-	//this->populateWalls();
-	this->populateBuilds();
+	this->buildScene();
 
-	//this->populateScene();
+	//this->testScene();
 	this->testAttacking();
-	this->testBuilding();
+	//this->testBuilding();
 	//this->testWalls();
 }
 
@@ -39,9 +40,18 @@ void SceneManager_Server::processInput(int player_id, PlayerInput in) {
 
 bool SceneManager_Server::addPlayer(int player_id) {
 	//TODO figure out player spawn locations
-	GameObject::GameObjectData data = { 0.0f, 0.0f, 0.0f };
 	if (idMap.find(player_id) == idMap.end()) { //player_id not in map, create a new player
-		idMap[player_id] = new Player(data, player_id, red_team, this); //TODO assign players teams based on lobby choices
+		Team* team;
+		GameObject::GameObjectData data;
+		if (player_id == 0 || player_id == 2) {
+			team = red_team;
+			data = red_spawns[num_red++];
+		}
+		else {
+			team = blue_team;
+			data = blue_spawns[num_blue++];
+		}
+		idMap[player_id] = new Player(data, player_id, team, this); //TODO assign players teams based on lobby choices
 		std::cout << "created new player id: " << player_id << " at " << idMap[player_id] << "\n";
 
 		return true; //return true that a player was added
@@ -160,6 +170,7 @@ void SceneManager_Server::update(float deltaTime) {
 	std::vector<int> deadIDs;
 	std::vector<Entity*> deadEntities;
 	for (std::pair<int, Entity*> idEntPair : idMap) { //first pass, check for anything that died last cycle
+		if (idEntPair.second == red_base || idEntPair.second == blue_base) continue; //skip bases
 		if (idEntPair.second->getHealth() <= 0) {	//entity reached 0 health last cycle, mark it for deletion
 			std::cout << "marking entity id " << idEntPair.first << " addr " << idEntPair.second << " to be deleted\n";
 			deadIDs.push_back(idEntPair.first);
@@ -175,11 +186,19 @@ void SceneManager_Server::update(float deltaTime) {
 	for (std::pair<int, Entity*> idEntPair : idMap) { //second pass, update as usual
 		idEntPair.second->update(deltaTime);
 	}
+
+	std::cout << "red base health: " << red_base->getHealth() << "\n";
+}
+
+bool SceneManager_Server::getGameOver() {
+	return red_base->getHealth() == 0 || blue_base->getHealth() == 0;
 }
 
 int SceneManager_Server::encodeState(char buf[], int start_index) {
+	std::cout << "encoding state\n";
 	int i = start_index;
 
+	std::cout << "encoded red team base health: " << red_team->getBaseHealth() << "\n";
 	i += red_team->writeData(buf, i);
 	buf[i] = DELIMITER;
 	i++;
@@ -224,6 +243,21 @@ int SceneManager_Server::encodeScene(char buf[], int start_index) {
 	buf[i] = DELIMITER; //append an extra delimiter to indicate the end of the data
 	i++;
 	return i;
+}
+
+void SceneManager_Server::buildScene() {
+	this->populatePaths();
+	this->populateBuilds();
+	this->populateWalls();
+	this->populateBases();
+	this->populateResources();
+}
+
+void SceneManager_Server::populateBases() {
+	int red_base_id = this->spawnEntity(BASE_TYPE, 7.5, -7.5, 0, red_team);
+	red_base = (Base*)idMap[red_base_id];
+	int blue_base_id = this->spawnEntity(BASE_TYPE, 122.5, -92.5, 0, blue_team);
+	blue_base = (Base*)idMap[blue_base_id];
 }
 
 void SceneManager_Server::populatePaths() {
@@ -419,9 +453,27 @@ void SceneManager_Server::populatePaths() {
 	pathNodes[83]->setNextBlue(pathNodes[84]);
 	pathNodes[84]->setNextBlue(pathNodes[27]);
 
+	//adding pathNodes for bases
+	pathNodes.push_back(new PathNode(1, 1)); //85
+	pathNodes.push_back(new PathNode(24, 18)); //86
+
+	pathNodes[85]->setNextRed(pathNodes[0]);
+	pathNodes[0]->setNextBlue(pathNodes[85]);
+	pathNodes[86]->setNextBlue(pathNodes[11]);
+	pathNodes[11]->setNextRed(pathNodes[86]);
 }
 
 void SceneManager_Server::populateWalls(){
+	// boundaries
+	for (float i = -1; i < 27; i++) {
+		wallNodes.push_back(new WallNode(i, -1.0f));
+		wallNodes.push_back(new WallNode(i, 20.0f));
+	}
+	for (float i = 0; i < 20; i++) {
+		wallNodes.push_back(new WallNode(-1.0f, i));
+		wallNodes.push_back(new WallNode(26.0f, i));
+	}
+
 	wallNodes.push_back(new WallNode(0,3)); 
 	wallNodes.push_back(new WallNode(0,4)); 
 	wallNodes.push_back(new WallNode(0,5));
@@ -500,44 +552,103 @@ void SceneManager_Server::populateWalls(){
 	wallNodes.push_back(new WallNode(23,12));
 	wallNodes.push_back(new WallNode(25,15));
 	wallNodes.push_back(new WallNode(25,16));
+	wallNodes.push_back(new WallNode(0,10)); // New
+	wallNodes.push_back(new WallNode(0,13)); // New
+	wallNodes.push_back(new WallNode(1,5)); // New
+	wallNodes.push_back(new WallNode(1,6)); // New
 	wallNodes.push_back(new WallNode(1,11));
 	wallNodes.push_back(new WallNode(1,12));
+	wallNodes.push_back(new WallNode(1,13));
+	wallNodes.push_back(new WallNode(1,14)); // New
+	wallNodes.push_back(new WallNode(1,17)); // New
+	wallNodes.push_back(new WallNode(1,18)); // New
+	wallNodes.push_back(new WallNode(2,5)); // New
+	wallNodes.push_back(new WallNode(2,6)); // New
 	wallNodes.push_back(new WallNode(2,14));
 	wallNodes.push_back(new WallNode(2,15));
+	wallNodes.push_back(new WallNode(2,17)); // New
+	wallNodes.push_back(new WallNode(2,18)); // New
 	wallNodes.push_back(new WallNode(2,16));
 	wallNodes.push_back(new WallNode(2,19));
+	wallNodes.push_back(new WallNode(3,0)); // New
+	wallNodes.push_back(new WallNode(3,1)); // New
+	wallNodes.push_back(new WallNode(3,2)); // New
+	wallNodes.push_back(new WallNode(3,5)); // New
+	wallNodes.push_back(new WallNode(3,6)); // New
+	wallNodes.push_back(new WallNode(3,10)); // New
 	wallNodes.push_back(new WallNode(3,11));
+	wallNodes.push_back(new WallNode(4,2)); // New
+	wallNodes.push_back(new WallNode(4,3)); // New
+	wallNodes.push_back(new WallNode(4,10)); // New
 	wallNodes.push_back(new WallNode(4,11));
 	wallNodes.push_back(new WallNode(4,12));
 	wallNodes.push_back(new WallNode(4,13));
 	wallNodes.push_back(new WallNode(4,14));
+	wallNodes.push_back(new WallNode(4,16)); // New
+	wallNodes.push_back(new WallNode(4,17)); // New
+	wallNodes.push_back(new WallNode(4,18)); // New
+	wallNodes.push_back(new WallNode(5,2)); // New
+	wallNodes.push_back(new WallNode(5,3)); // New
+	wallNodes.push_back(new WallNode(5,16)); // New
+	wallNodes.push_back(new WallNode(5,17)); // New
 	wallNodes.push_back(new WallNode(5,18));
+	wallNodes.push_back(new WallNode(6,3)); // New
+	wallNodes.push_back(new WallNode(6,5)); // New
+	wallNodes.push_back(new WallNode(6,8)); // New
+	wallNodes.push_back(new WallNode(6,10)); // New
+	wallNodes.push_back(new WallNode(6,11)); // New
+	wallNodes.push_back(new WallNode(6,13)); // New
+	wallNodes.push_back(new WallNode(6,14)); // New
+	wallNodes.push_back(new WallNode(6,16)); // New
+	wallNodes.push_back(new WallNode(6,17)); // New
+	wallNodes.push_back(new WallNode(6,18)); // New
+	//wallNodes.push_back(new WallNode(7,2)); // New
+	//wallNodes.push_back(new WallNode(7,3)); // New
+	//wallNodes.push_back(new WallNode(7,5)); // New
+	//wallNodes.push_back(new WallNode(7,6)); // New
+	//wallNodes.push_back(new WallNode(7,7)); // New
+	//wallNodes.push_back(new WallNode(7,8)); // New
 	wallNodes.push_back(new WallNode(7,10));
 	wallNodes.push_back(new WallNode(7,11));
 	wallNodes.push_back(new WallNode(7,13));
 	wallNodes.push_back(new WallNode(7,14));
 	wallNodes.push_back(new WallNode(7,16));
+	wallNodes.push_back(new WallNode(7,18)); // New
+	wallNodes.push_back(new WallNode(8,5)); // New
 	wallNodes.push_back(new WallNode(8,10));
 	wallNodes.push_back(new WallNode(8,11));
+	wallNodes.push_back(new WallNode(8,13)); // New
 	wallNodes.push_back(new WallNode(8,14));
 	wallNodes.push_back(new WallNode(8,16));
 	wallNodes.push_back(new WallNode(8,18));
+	wallNodes.push_back(new WallNode(9,4)); // New
+	wallNodes.push_back(new WallNode(9,6)); // New
+	wallNodes.push_back(new WallNode(9,10)); // New
 	wallNodes.push_back(new WallNode(9,11));
+	wallNodes.push_back(new WallNode(9,13)); // New
 	wallNodes.push_back(new WallNode(9,14));
 	wallNodes.push_back(new WallNode(9,16));
 	wallNodes.push_back(new WallNode(9,18));
+	wallNodes.push_back(new WallNode(10,5)); // New
+	wallNodes.push_back(new WallNode(10,6)); // New
 	wallNodes.push_back(new WallNode(10,13));
 	wallNodes.push_back(new WallNode(10,14));
 	wallNodes.push_back(new WallNode(10,16));
 	wallNodes.push_back(new WallNode(10,18));
+	wallNodes.push_back(new WallNode(11,8)); // New
+	wallNodes.push_back(new WallNode(11,9)); // New
 	wallNodes.push_back(new WallNode(11,10));
 	wallNodes.push_back(new WallNode(11,11));
 	wallNodes.push_back(new WallNode(11,12));
 	wallNodes.push_back(new WallNode(11,13));
+	wallNodes.push_back(new WallNode(11,14)); // New
 	wallNodes.push_back(new WallNode(11,16));
 	wallNodes.push_back(new WallNode(11,17));
 	wallNodes.push_back(new WallNode(11,18));
 	wallNodes.push_back(new WallNode(12,8));
+	wallNodes.push_back(new WallNode(12,9)); // New
+	wallNodes.push_back(new WallNode(12,10)); // New
+	wallNodes.push_back(new WallNode(13,3)); // New
 	wallNodes.push_back(new WallNode(13,8));
 	wallNodes.push_back(new WallNode(13,9));
 	wallNodes.push_back(new WallNode(13,10));
@@ -546,33 +657,82 @@ void SceneManager_Server::populateWalls(){
 	wallNodes.push_back(new WallNode(13,14));
 	wallNodes.push_back(new WallNode(13,15));
 	wallNodes.push_back(new WallNode(13,16));
+	wallNodes.push_back(new WallNode(13,17)); // New
+	wallNodes.push_back(new WallNode(13,18)); // New
+	wallNodes.push_back(new WallNode(14,12)); // New
+	wallNodes.push_back(new WallNode(14,13)); // New
 	wallNodes.push_back(new WallNode(14,14));
 	wallNodes.push_back(new WallNode(14,15));
 	wallNodes.push_back(new WallNode(14,16));
 	wallNodes.push_back(new WallNode(14,17));
 	wallNodes.push_back(new WallNode(14,18));
+	wallNodes.push_back(new WallNode(15,2)); // New
+	wallNodes.push_back(new WallNode(15,3)); // New
 	wallNodes.push_back(new WallNode(15,8));
 	wallNodes.push_back(new WallNode(15,9));
+	wallNodes.push_back(new WallNode(15,10)); // New
 	wallNodes.push_back(new WallNode(15,12));
 	wallNodes.push_back(new WallNode(15,13));
+	wallNodes.push_back(new WallNode(16,2)); // New
+	wallNodes.push_back(new WallNode(16,8)); // New
 	wallNodes.push_back(new WallNode(16,9));
 	wallNodes.push_back(new WallNode(16,10));
+	wallNodes.push_back(new WallNode(16,12)); // New
 	wallNodes.push_back(new WallNode(16,13));
+	wallNodes.push_back(new WallNode(16,15)); // New
 	wallNodes.push_back(new WallNode(16,16));
 	wallNodes.push_back(new WallNode(16,18));
 	wallNodes.push_back(new WallNode(16,19));
 	wallNodes.push_back(new WallNode(17,18));
+	wallNodes.push_back(new WallNode(18,3)); // New
+	wallNodes.push_back(new WallNode(18,12)); // New
+	wallNodes.push_back(new WallNode(18,13)); // New
 	wallNodes.push_back(new WallNode(18,14));
 	wallNodes.push_back(new WallNode(18,15));
+	wallNodes.push_back(new WallNode(18,16)); // New
+	wallNodes.push_back(new WallNode(18,18)); // New
+	wallNodes.push_back(new WallNode(18,19)); // New
 	wallNodes.push_back(new WallNode(19,14));
 	wallNodes.push_back(new WallNode(19,12));
+	wallNodes.push_back(new WallNode(19,18)); // New
+	wallNodes.push_back(new WallNode(19,19)); // New
+	wallNodes.push_back(new WallNode(20,1)); // New
+	wallNodes.push_back(new WallNode(20,2)); // New
+	wallNodes.push_back(new WallNode(20,3)); // New
+	wallNodes.push_back(new WallNode(20,23)); // New
 	wallNodes.push_back(new WallNode(20,12));
+	wallNodes.push_back(new WallNode(20,15)); // New
+	wallNodes.push_back(new WallNode(20,16)); // New
+	wallNodes.push_back(new WallNode(20,18)); // New
+	wallNodes.push_back(new WallNode(20,19)); // New
+	wallNodes.push_back(new WallNode(21,1)); // New
+	wallNodes.push_back(new WallNode(21,2)); // New
 	wallNodes.push_back(new WallNode(21,12));
+	wallNodes.push_back(new WallNode(21,18)); // New
+	wallNodes.push_back(new WallNode(21,19)); // New
 	wallNodes.push_back(new WallNode(21,13));
 	wallNodes.push_back(new WallNode(21,14));
 	wallNodes.push_back(new WallNode(22,16));
 	wallNodes.push_back(new WallNode(22,17));
+	wallNodes.push_back(new WallNode(22,18)); // New
+	wallNodes.push_back(new WallNode(22,19)); // New
+	wallNodes.push_back(new WallNode(23,3)); // New
+	wallNodes.push_back(new WallNode(23,8)); // New
+	wallNodes.push_back(new WallNode(23,9)); // New
+	wallNodes.push_back(new WallNode(23,10)); // New
+	wallNodes.push_back(new WallNode(23,13)); // New
+	wallNodes.push_back(new WallNode(23,14)); // New
 	wallNodes.push_back(new WallNode(23,16));
+	wallNodes.push_back(new WallNode(24,3)); // New
+	wallNodes.push_back(new WallNode(24,4)); // New
+	wallNodes.push_back(new WallNode(24,8)); // New
+	wallNodes.push_back(new WallNode(24,9)); // New
+	wallNodes.push_back(new WallNode(24,10)); // New
+	wallNodes.push_back(new WallNode(24,13)); // New
+	wallNodes.push_back(new WallNode(24,14)); // New
+	wallNodes.push_back(new WallNode(25,7)); // New
+	wallNodes.push_back(new WallNode(25,8)); // New
+	wallNodes.push_back(new WallNode(25,14)); // New
 }
 
 void SceneManager_Server::populateBuilds(){
@@ -647,10 +807,19 @@ void SceneManager_Server::populateBuilds(){
 	buildNodes.push_back(new BuildNode(BLUE_TEAM, 6, 18, this)); //68
 	buildNodes.push_back(new BuildNode(BLUE_TEAM, 6, 5, this)); //69
 	buildNodes.push_back(new BuildNode(BLUE_TEAM, 2, 13, this)); //70
-	
 }
 
-void SceneManager_Server::populateScene() { //testing only
+void SceneManager_Server::populateResources() {
+	this->spawnEntity(DUMPSTER_TYPE, 2.5, -12.5, 0, nullptr); //yellow resources
+	this->spawnEntity(DUMPSTER_TYPE, 7.5, -52.5, 0, nullptr);
+	this->spawnEntity(RECYCLING_BIN_TYPE, 42.5, -17.5, 0, nullptr);
+
+	this->spawnEntity(RECYCLING_BIN_TYPE, 82.5, -87.5, 0, nullptr); //green resources
+	this->spawnEntity(DUMPSTER_TYPE, 102.5, -52.5, -PI / 2, nullptr);
+	this->spawnEntity(DUMPSTER_TYPE, 127.5, -87.5, PI, nullptr);
+}
+
+void SceneManager_Server::testScene() { //testing only
 	//NOTE: number of objects should not exceed sendbuf capacity
 	//sendbufsize >= (NUM_PLAYERS * 20) + (# of minions and towers * 23) + 1
 	srand((unsigned int)time(NULL));
@@ -770,19 +939,19 @@ void SceneManager_Server::testAttacking() {
 	idMap[id] = sm1;
 	std::cout << "created super minion at id " << id << "\n";*/
 
-	id = next_super_minion_id;
+	/*id = next_super_minion_id;
 	next_super_minion_id++;
 	data = { -10, 10, 0 };
 	SuperMinion* sm2 = new SuperMinion(data, id, red_team, this);
-	idMap[id] = sm2;
+	idMap[id] = sm2;*/
 
 	id = next_claw_id;
 	next_claw_id++;
-	data = { 7.5, 27.5, 0 };
-	ClawTower* c1 = new ClawTower(data, id, red_team, this);
+	data = { 32.5, -27.5, 0 };
+	ClawTower* c1 = new ClawTower(data, id, blue_team, this);
 	idMap[id] = c1;
 
-	id = next_laser_id;
+	/*id = next_laser_id;
 	next_laser_id++;
 	data = { 0, 10, 0 };
 	LaserTower* l1 = new LaserTower(data, id, blue_team, this);
@@ -792,7 +961,7 @@ void SceneManager_Server::testAttacking() {
 	next_laser_id++;
 	data = { 0, 20, 0 };
 	LaserTower* l2 = new LaserTower(data, id, red_team, this);
-	idMap[id] = l2;
+	idMap[id] = l2;*/
 
 	/*id = next_minion_id;
 	next_minion_id++;
@@ -800,7 +969,7 @@ void SceneManager_Server::testAttacking() {
 	Minion* m2 = new Minion(data, id, red_team, this);
 	idMap[id] = m2;*/
 
-	id = next_dumpster_id;
+	/*id = next_dumpster_id;
 	next_dumpster_id++;
 	data = { 10, 10, 0 };
 	Resource* d1 = new Resource(DUMPSTER_TYPE, data, id, this);
@@ -810,7 +979,7 @@ void SceneManager_Server::testAttacking() {
 	next_recycling_bin_id++;
 	data = { 0, -10, 0 };
 	Resource* r1 = new Resource(RECYCLING_BIN_TYPE, data, id, this);
-	idMap[id] = r1;
+	idMap[id] = r1;*/
 }
 
 void SceneManager_Server::testBuilding() {

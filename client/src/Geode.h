@@ -10,6 +10,7 @@
 class Geode : public Node 
 {
 public:
+
 	struct GeodeShaderDesc {
 		RootSignature* rootSignature;
 		Pipeline* pipeline;
@@ -26,7 +27,7 @@ public:
 
 	std::queue<vec3> positions;
 	std::queue<bool> shouldCull;
-	float radius = 0.0f;
+	float radius = 100.0f;
 
 	Geode();
 	Geode(Object* obj);
@@ -35,9 +36,10 @@ public:
 	void setProgram(GeodeShaderDesc desc);
 
 	void update(float deltaTime) override;
-	void updateTransformBuffer(BufferUpdateDesc& desc, mat4 parentTransform) override;
+	void updateTransformBuffer(BufferUpdateDesc& desc, mat4 parentTransform, vec4 color) override;
 	void updateBoneBuffer(BufferUpdateDesc& desc, OzzObject::UniformDataBones* boneData) override {}
 	void updateParticleBuffer(BufferUpdateDesc& desc) override {}
 	void cull(const vec4 planes[6], bool doCull) override;
+
 	void draw(Cmd* cmd) override;
 };

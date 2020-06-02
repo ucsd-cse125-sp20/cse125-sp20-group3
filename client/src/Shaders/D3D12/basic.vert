@@ -72,7 +72,12 @@ PsIn main(VsIn In)
 {
 	//float4x4 modelToWorld = mul(sceneToWorld, modelToSceneMatrices[nodeIndex]);
 	//float4x4 modelToWorld = sceneToWorld;
-	float4x4 modelToWorld = mul(instanceBuffer[instanceIndex].sceneToWorld, modelToSceneMatrices[modelIndex * MAX_GLTF_NODES + nodeIndex]);
+	float4x4 sceneToWorld = instanceBuffer[instanceIndex].sceneToWorld;
+	sceneToWorld[3][0] = 0;
+	sceneToWorld[3][1] = 0;
+	sceneToWorld[3][2] = 0;
+	sceneToWorld[3][3] = 1;
+	float4x4 modelToWorld = mul(sceneToWorld, modelToSceneMatrices[modelIndex * MAX_GLTF_NODES + nodeIndex]);
 	//modelToWorld = instanceBuffer[instanceIndex].sceneToWorld * modelToSceneMatrices[modelIndex * MAX_GLTF_NODES + nodeIndex];
 	
 	PsIn Out;

@@ -33,11 +33,12 @@ void Transform::update(float deltaTime)
 	}
 }
 
-void Transform::updateTransformBuffer(BufferUpdateDesc& desc, mat4 parentTransform)
+void Transform::updateTransformBuffer(BufferUpdateDesc& desc, mat4 parentTransform, vec4 color)
 {
 	if (active) {
 		for (auto child : children) {
-			child->updateTransformBuffer(desc, parentTransform * this->M);
+			vec4 newColor = vec4(this->color[0] * color[0], this->color[1] * color[1], this->color[2] * color[2], this->color[3] * color[3]);
+			child->updateTransformBuffer(desc, parentTransform * this->M, newColor);
 		}
 	}
 }
@@ -103,4 +104,9 @@ void Transform::setPositionDirection(vec3 position, float angle)
 {
 	vec3 direction = vec3(cos(angle), 0, sin(angle));
 	setPositionDirection(position, direction);
+}
+
+void Transform::setColor(vec4 c)
+{
+	color = c;
 }

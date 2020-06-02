@@ -175,14 +175,14 @@ uint32_t			guiModelToLoadIndex = 0;
 const wchar_t* gMissingTextureString = L"MissingTexture";
 
 const uint			gBackroundColor = { 0x222242ff };
-static uint			gLightColor[gTotalLightCount] = { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffff66 };
-static float		gLightColorIntensity[gTotalLightCount] = { 1.0f, 0.2f, 0.2f, 0.25f };
-static float2		gLightDirection = { -122.0f, 222.0f };
+static uint			gLightColor[gTotalLightCount] = { 0xffeeeeff, 0xaabbffff, 0xffffffff, 0xffffff66 };
+static float		gLightColorIntensity[gTotalLightCount] = { 0.25f, 0.25f, 0.1f, 0.75f };
+static float2		gLightDirection = { 180.0f, 200.0f };
 
 mat4 Application::viewMat = mat4::identity();
 mat4 Application::projMat = mat4::identity();
 
-vec3 cameraOffset(0, 5, -5);
+vec3 cameraOffset(0, 2, -10);
 
 float rot = 0.f;
 
@@ -477,14 +477,16 @@ void Application::InitDebugGui()
 	UIUtils::createText("super_minion_text", "3", 860, 955, "small font", 0xff6655ff, 3);
 
 	// display team as text
-	UIUtils::createText("team_text", " ", 1800, 30, "small font", 0xff6655ff, 3 );
+	UIUtils::createText("team_text", " ", 1780, 20, "small font", 0xff6655ff, 3 );
 
 	// display base health TODO REPLACE PICS
 	// UIUtils::createText("team_red_base_health", "Red Team:        /100", 900, 30, "small font", 0xff6655ff, 3);
 	// UIUtils::createText("team_blue_base_health", "Blue Team:       /100", 900, 60, "small font", 0xff6655ff, 3);
-	UIUtils::createImage("health_frame", "start.png", 750, 25, float2((float)2,(float)1), 1);
-	UIUtils::createImage("health_bar_blue", "start.png", 750, 25, float2((float)1,(float)1), 2);
-	UIUtils::createImage("health_bar_red", "start.png", 1050, 25, float2((float)1, (float)1), 2);
+	UIUtils::createImage("health_backdrop", "base_health_bars_backdrop_nontransparent.png", 685, 4, float2((float)1/2,(float)1.04/2), 0);
+	UIUtils::createImage("health_frame", "base_health_bars_frame.png", 685, 4, float2((float)1/2,(float)1.04/2), 1);
+	UIUtils::createImage("health_bar_blue", "base_health_bars_blue.png", 702, 24, float2((float)1/2,(float)1/2), 2);
+	UIUtils::createImage("health_bar_blue_deducted", "base_health_bars_blue.png", 702, 24, float2((float)1 / 2, (float)1 / 2), 3);
+	UIUtils::createImage("health_bar_red", "base_health_bars_red.png", 981, 24, float2((float)1/2, (float)1/2), 2);
 
 	UIUtils::loadTexture("WeirdBox_halo.png"); // Preload textures
 
@@ -1145,14 +1147,14 @@ void Application::Update(float deltaTime)
 	pCameraController->moveTo(playerPos);
 
 	pCameraController->update(deltaTime);
-	Application::viewMat = mat4::translation(vec3(0,-2,10)) * pCameraController->getViewMatrix();
+	Application::viewMat = mat4::translation(-cameraOffset) * pCameraController->getViewMatrix();
 	const float aspectInverse = (float)mSettings.mHeight / (float)mSettings.mWidth;
 	const float horizontal_fov = PI / 3.0f;
 	Application::projMat = mat4::perspectiveReverseZ(horizontal_fov, aspectInverse, 0.001f, 1000.0f);
 	gUniformData.mProjectView = projMat * viewMat;
 	gUniformData.mProj = projMat;
 	gUniformData.mView = viewMat;
-	gUniformData.mCameraPosition = vec4(pCameraController->getViewPosition() + cameraOffset, 1.0f);
+	gUniformData.mCameraPosition = vec4(inverse(mat4::translation(-cameraOffset) * pCameraController->getViewMatrix())[3].getXYZ(), 1.0f);
 
 	mat4 viewProj = Application::projMat * Application::viewMat;
 
@@ -1500,16 +1502,6 @@ void Application::drawShadowMap(Cmd* cmd)
 	for (int i = 0; i < DESCRIPTOR_UPDATE_FREQ_COUNT; i++) {
 		meshShaderDesc.descriptorSets[i] = pDescriptorSetsShadow[i];
 	}
-
-	// Update per-instance uniforms
-	shaderCbv = { pShadowInstanceBuffer[Application::gFrameIndex] };
-	beginUpdateResource(&shaderCbv);
-	scene->updateTransformBuffer(shaderCbv, mat4::identity());
-	endUpdateResource(&shaderCbv, NULL);
-
-	vec4 frustumPlanes[6];
-	mat4::extractFrustumClipPlanes(gShadowUniformData.ViewProj, frustumPlanes[0], frustumPlanes[1], frustumPlanes[2], frustumPlanes[3], frustumPlanes[4], frustumPlanes[5], true);
-	scene->cull(frustumPlanes, bToggleCull);
 
 	scene->setProgram(SceneManager_Client::GeodeType::MESH, meshShaderDesc);
 	GLTFGeode::useMaterials = false;

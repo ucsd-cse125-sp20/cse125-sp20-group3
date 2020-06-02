@@ -14,7 +14,9 @@ class Resource_Client : public Resource, public Entity_Client {
 public:
 	Animator* animator;
 
-	Resource_Client(char resourceType, GameObjectData data, int id, SceneManager_Client* sm_c, GLTFGeode* geode, Transform* parent);
+	char type;
+
+	Resource_Client(char resourceType, GameObjectData data, int id, SceneManager_Client* sm_c, OzzGeode* geode, Transform* parent);
 	~Resource_Client();
 
 	void updateAnimParticles() override;

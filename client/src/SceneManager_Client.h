@@ -19,7 +19,7 @@
 #include "../../common/entity.h"
 #include "../../common/team.h"
 #include "../../common/player_client.h"
-#include "../../common/base.h"
+#include "../../common/base_client.h"
 #include "../../common/minion_client.h"
 #include "../../common/superminion_client.h"
 #include "../../common/tower.h"

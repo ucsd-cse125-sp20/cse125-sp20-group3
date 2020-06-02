@@ -17,15 +17,15 @@ int __cdecl main(void)
     int iResult;
 	int iSendResult;
     char sendbuf[SERVER_SENDBUFLEN] = "I'm server";
-
 	SceneManager_Server* manager = new SceneManager_Server();
-	std::cout << "manager at " << manager << "\n";
+	//std::cout << "manager at " << manager << "\n";
 	SceneManager_Server* m = manager;
 	Server* server = new Server(manager);
 
     // Game State data
 	std::chrono::steady_clock::time_point lastTime = std::chrono::steady_clock::now();
 	float deltaTime;
+	bool gameOver = false;
 
     std::cout << "server started" << std::endl;
 
@@ -60,14 +60,16 @@ int __cdecl main(void)
 		std::chrono::duration<float> deltaDuration = currTime - lastTime;
 		deltaTime = deltaDuration.count();
 		//std::cout << "deltaTime: " << deltaTime << "\n";
-		manager->update(deltaTime);
+		if (!gameOver) manager->update(deltaTime);
 		lastTime = std::chrono::steady_clock::now();
+		if (!gameOver && manager->getGameOver()) gameOver = true;
 
 		//if (manager != m) std::cout << "d manager changed\n";
 
 		/* Send updated data back to clients */
 		int statebufSize = manager->encodeState(sendbuf, 0);
 		int sendbufSize = manager->encodeScene(sendbuf, statebufSize);
+		//std::cout << "sending\n";
 
 		//if (manager != m) std::cout << "e manager changed\n";
 		//std::cout << "sendbufSize: " << sendbufSize << std::endl;

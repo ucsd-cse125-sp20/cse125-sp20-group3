@@ -39,8 +39,8 @@
 //length is z, width is x
 #define PLAYER_LENGTH 0.2f //checked
 #define PLAYER_WIDTH 0.5f
-#define BASE_LENGTH 1.0f
-#define BASE_WIDTH 1.0f
+#define BASE_LENGTH 0.5f
+#define BASE_WIDTH 0.5f
 #define MINION_LENGTH 0.5f //checked
 #define MINION_WIDTH 0.5f
 #define SUPER_MINION_LENGTH 0.9f //checked
@@ -87,7 +87,6 @@
 #define RESOURCE_ATTACK 0
 
 #define MINION_ATK_RANGE 7
-//#define MINION_MV_RANGE 20
 #define SUPER_MINION_ATK_RANGE 2
 #define LASER_FIRE_RANGE 20
 
@@ -106,12 +105,8 @@
 #define DUMPSTER_PLASTIC 3
 #define RECYCLING_BIN_METAL 2
 
-#define MINION_METAL_REQ 2
-#define MINION_PLASTIC_REQ 8
 #define SUPER_MINION_METAL_REQ 4
 #define SUPER_MINION_PLASTIC_REQ 12
-//#define TOWER_METAL_REQ 5
-//#define TOWER_PLASTIC_REQ 20
 #define LASER_METAL_REQ 0//2
 #define LASER_PLASTIC_REQ 0//4
 #define CLAW_METAL_REQ 8
@@ -131,5 +126,8 @@
 #define TEAM_TEXT "team_text"
 #define TEAM_BLUE_HEALTH "health_bar_blue"
 #define TEAM_RED_HEALTH "health_bar_red"
+
+#define HEALTH_BAR_BLUE_TEAM_DEDUCTED "health_bar_blue_deducted"
+#define HEALTH_BAR_RED_TEAM "health_bar_red"
 
 #endif

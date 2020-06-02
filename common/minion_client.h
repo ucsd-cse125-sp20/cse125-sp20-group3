@@ -14,7 +14,8 @@
 #define MINION_BULLET_OFFSET2 vec3(0.4f, 0.f, 0.f)
 #define MINION_BULLET_SPRITE "LaserParticle.png"
 #define MINION_BULLET_TIMEOUT 0.33f
-#define MINION_BULLET_SPEED 10.0f
+#define MINION_BULLET_SPEED 1.0f
+#define MINION_BULLET_LIFE 1.0f
 
 class Minion_Client : public Minion, public Entity_Client {
 public:

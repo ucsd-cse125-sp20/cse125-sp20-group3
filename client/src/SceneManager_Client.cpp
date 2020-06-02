@@ -87,7 +87,7 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	particleParams = {};
 	particleParams.spriteFile = MINION_BULLET_SPRITE;
 	particleParams.numParticles = 10;
-	particleParams.life = 0.5f;
+	particleParams.life = MINION_BULLET_LIFE;
 	particleParams.initializer = [](ParticleSystem::ParticleData* pd, ParticleSystem::ParticleAuxData* pad) {
 		float r = MathUtils::randfUniform(0, 0.05f);
 		float a = MathUtils::randfUniform(0, 2 * PI);
@@ -95,7 +95,7 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 
 		pd->position = float3(r * cos(a), r * sin(a), z);
 		pd->color = float4(1.0f, 1.0f, 0.5f, 1.0f);
-		pd->scale = float2(0.2f, 0.05f);
+		pd->scale = float2(0.1f, 0.05f);
 		pad->velocity = float3(0.f, 0.f, MINION_BULLET_SPEED);
 	};
 	particleGeodes[MINION_GEODE] = conf_new(ParticleSystemGeode, renderer, particleParams);
@@ -268,7 +268,7 @@ void SceneManager_Client::updateUI() {
 
 	// update base health
 	int red_health = red_team->getBaseHealth();
-	std::cout << "red health: " << red_health << "\n";
+	//std::cout << "red health: " << red_health << "\n";
 	int blue_health = blue_team->getBaseHealth();
 
 	//printf("%s %d %d\n", "base health red and blue", red_health, blue_health);
@@ -463,7 +463,7 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 		transforms.erase(id);
 	}
 
-	std::cout << "red base health: " << idMap[1000]->getHealth() << "\n";
+	//std::cout << "red base health: " << idMap[1000]->getHealth() << "\n";
 }
 
 void SceneManager_Client::updateFromInputBuf(float deltaTime)

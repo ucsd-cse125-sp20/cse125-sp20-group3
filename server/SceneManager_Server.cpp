@@ -187,7 +187,7 @@ void SceneManager_Server::update(float deltaTime) {
 		idEntPair.second->update(deltaTime);
 	}
 
-	std::cout << "red base health: " << red_base->getHealth() << "\n";
+	//std::cout << "red base health: " << red_base->getHealth() << "\n";
 }
 
 bool SceneManager_Server::getGameOver() {
@@ -195,10 +195,10 @@ bool SceneManager_Server::getGameOver() {
 }
 
 int SceneManager_Server::encodeState(char buf[], int start_index) {
-	std::cout << "encoding state\n";
+	//std::cout << "encoding state\n";
 	int i = start_index;
 
-	std::cout << "encoded red team base health: " << red_team->getBaseHealth() << "\n";
+	//std::cout << "encoded red team base health: " << red_team->getBaseHealth() << "\n";
 	i += red_team->writeData(buf, i);
 	buf[i] = DELIMITER;
 	i++;

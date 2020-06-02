@@ -9,12 +9,13 @@ namespace {
 
 Resource_Client::Resource_Client(char resourceType, GameObjectData data, int id, SceneManager_Client* sm_c, OzzGeode* geode, Transform* parent) : Resource(resourceType, data, id, nullptr), Entity_Client(sm_c)
 {
+	type = resourceType;
 	animator = conf_new(Animator, geode);
 	animator->SetClip(resourceType == DUMPSTER_TYPE ? dumpsterActions[0] : recyclingBinActions[0]);
 	if (type == DUMPSTER_TYPE) animator->SetLoop(false);
 	parent->addChild(animator);
 
-	type = resourceType;
+	printf("%d %s\n", animator->clipControllers[animator->currClip]->GetLoop(), animator->currClip.c_str());
 	active = false;
 }
 

@@ -70,7 +70,12 @@ VSOutput main(in uint vertexId : SV_VertexID, in uint instanceId : SV_InstanceID
     toScene[0][3] = particleInstanceBuffer[particleIndex * MAX_PARTICLES + instanceId].position.x;
     toScene[1][3] = particleInstanceBuffer[particleIndex * MAX_PARTICLES + instanceId].position.y;
     toScene[2][3] = particleInstanceBuffer[particleIndex * MAX_PARTICLES + instanceId].position.z;
-    float4x4 toWorld = mul(instanceBuffer[instanceIndex], toScene);
+    float4x4 toWorld = instanceBuffer[instanceIndex];
+    toWorld[3][0] = 0;
+    toWorld[3][1] = 0;
+    toWorld[3][2] = 0;
+    toWorld[3][3] = 1;
+    toWorld = mul(toWorld, toScene);
     float4x4 modelView = mul(view, toWorld);
 
     float4 vertPos;

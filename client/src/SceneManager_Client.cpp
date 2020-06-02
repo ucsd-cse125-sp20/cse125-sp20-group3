@@ -278,18 +278,18 @@ void SceneManager_Client::updateUI() {
 
 	if (red_health <= 0) {
 		if (trackedPlayerTeam->teamColor == RED_TEAM) {
-			UIUtils::createText("defeat_text", "Defeat", 640, 280, "large font", 0xff6655ff, 3);
+			UIUtils::editText(DEFEAT_TEXT, "Defeat", "large font", 0xff6655ff);
 		}
 		else {
-			UIUtils::createText("victory_text", "Victory", 600, 280, "large font", 0xff6655ff, 3);
+			UIUtils::editText(VICTORY_TEXT, "Victory", "large font", 0xff6655ff);
 		}
 	}
 	else if (blue_health <= 0) {
 		if (trackedPlayerTeam->teamColor == BLUE_TEAM) {
-			UIUtils::createText("defeat_text", "Defeat", 640, 280, "large font", 0xff6655ff, 3);
+			UIUtils::editText(DEFEAT_TEXT, "Defeat", "large font", 0xff6655ff);
 		}
 		else {
-			UIUtils::createText("victory_text", "Victory", 600, 280, "large font", 0xff6655ff, 3);
+			UIUtils::editText(VICTORY_TEXT, "Victory", "large font", 0xff6655ff);
 		}
 	}
 

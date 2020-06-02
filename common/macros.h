@@ -130,4 +130,7 @@
 #define HEALTH_BAR_BLUE_TEAM_DEDUCTED "health_bar_blue_deducted"
 #define HEALTH_BAR_RED_TEAM "health_bar_red"
 
+#define DEFEAT_TEXT "defeat_text"
+#define VICTORY_TEXT "victory_text"
+
 #endif

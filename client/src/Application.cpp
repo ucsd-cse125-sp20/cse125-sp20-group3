@@ -490,8 +490,8 @@ void Application::InitDebugGui()
 
 	// UIUtils::createText("defeat_text", "", 640, 280, "small font", 0xff6655ff, 4);
 	// UIUtils::createText("victory_text", "", 600, 280, "small font", 0xff6655ff, 4);
-	UIUtils::createImage("defeat_text", "text_placeholder.png", 640, 280, float2(1,1), 4);
-	UIUtils::createImage("victory_text", "victory.png", 640, 280, float2(1,1), 4);
+	UIUtils::createImage("defeat_text", "text_placeholder.png", 400, 250, float2(1, 1), 4);
+	UIUtils::createImage("victory_text", "text_placeholder.png", 400, 250, float2(1, 1), 5);
 
 	UIUtils::createText("waiting", "Waiting for players", 640, 280, "small font", 0xffffffff, 4);
 

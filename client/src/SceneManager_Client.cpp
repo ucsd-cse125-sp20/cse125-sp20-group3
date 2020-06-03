@@ -41,6 +41,8 @@ namespace {
 	const char* metalDir = "metal";
 	const char* plasticDir = "water-bottle";
 	const char* lootActions[3] = { "Dropped", "Idle", "Looted" };
+	const char* baseDirR = "base-A";
+	const char* baseActions[1] = { "Idle" };
 
 
 	//int counter = 1;
@@ -84,6 +86,9 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 
 	ozzGeodes[DUMPSTER_GEODE] = conf_new(OzzGeode, renderer, dumpsterDir);
 	((OzzObject*)ozzGeodes[DUMPSTER_GEODE]->obj)->SetClip(dumpsterActions[0]);
+
+	ozzGeodes[BASE_GEODE_R] = conf_new(OzzGeode, renderer, baseDirR);
+	((OzzObject*)ozzGeodes[DUMPSTER_GEODE]->obj)->SetClip(baseActions[0]); // Set a default action
 
 
 	ParticleSystem::ParticleSystemParams particleParams = {};
@@ -152,6 +157,18 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	this->addChild(t);
 	transforms[key] = t;
 	animators[key] = a;*/
+
+	// TODO This is a hard coded animation example. Remove this later (BASE A)
+	//int key = 8888888;
+	//ozzGeodes["blarf2"] = conf_new(OzzGeode, renderer, baseDirR);
+	//((OzzObject*)ozzGeodes["blarf2"]->obj)->SetClip(baseActions[0]);
+	//Transform* t = conf_new(Transform, mat4::translation(vec3(1, 0, 2)));
+	//Animator* a = conf_new(Animator, ozzGeodes["blarf2"]);
+	//a->SetClip(baseActions[0]);
+	//t->addChild(a);
+	//this->addChild(t);
+	//transforms[key] = t;
+	//animators[key] = a;
 
 	trackedPlayer_ID = NO_TRACKED_PLAYER;
 

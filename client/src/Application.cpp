@@ -191,13 +191,15 @@ SceneManager_Client* scene;
 
 bool connected = false;
 const int serverNameSize = 32;
-char serverName[serverNameSize] = "localhost";
+char serverName[serverNameSize] = SERVER_NAME;
 char sendbuf[DEFAULT_BUFLEN];
 //char recvbuf[SERVER_SENDBUFLEN];
 Client::UpData updateData;
 
 int Application::height = 0;
 int Application::width = 0;
+
+float volume = 0.5;
 
 // ======================================================================================================
 // ==============================================[ CODE STARTS HERE ]====================================
@@ -406,25 +408,34 @@ void Application::InitDebugGui()
 
 	GuiDesc guiDesc = {};
 	guiDesc.mStartSize = vec2(400.0f, 20.0f);
-	guiDesc.mStartPosition = vec2(100, 0);
+	guiDesc.mStartPosition = vec2(50, 0);
 	pDebugGui = gAppUI.AddGuiComponent("Client Settings", &guiDesc);
+	pDebugGui->mFlags |= GUI_COMPONENT_FLAGS_NO_TITLE_BAR;
 
-	CollapsingHeaderWidget NetworkWidgets("Network Settings", false, false);
+	CollapsingHeaderWidget SettingsWidgets("Settings");
+
+	CollapsingHeaderWidget NetworkWidgets("Network Settings");
 	NetworkWidgets.AddSubWidget(TextboxWidget("Server Name", serverName, serverNameSize));
 	CheckboxWidget toggleServerButtonWidget("Toggle Server Connection", &connected);
 	toggleServerButtonWidget.pOnEdited = Application::ToggleClient;
 	NetworkWidgets.AddSubWidget(toggleServerButtonWidget);
-	pDebugGui->AddWidget(NetworkWidgets);
+	SettingsWidgets.AddSubWidget(NetworkWidgets);
+
+	CollapsingHeaderWidget AudioWidgets("Audio Settings");
+	SliderFloatWidget globalAudioSlider("Volume", &volume, 0.f, 1.f);
+	globalAudioSlider.pOnEdited = Application::SetVolume;
+	AudioWidgets.AddSubWidget(globalAudioSlider);
+	SettingsWidgets.AddSubWidget(AudioWidgets);
 
 	CollapsingHeaderWidget PerformanceWidgets("Performance Settings");
 	PerformanceWidgets.AddSubWidget(CheckboxWidget("Toggle Culling", &bToggleCull));
 	PerformanceWidgets.AddSubWidget(CheckboxWidget("Toggle VSync", &bToggleVSync));
-	pDebugGui->AddWidget(PerformanceWidgets);
+	SettingsWidgets.AddSubWidget(PerformanceWidgets);
 
 	CollapsingHeaderWidget RenderWidgets("Render Settings");
 	RenderWidgets.AddSubWidget(CheckboxWidget("Enable FXAA", &bToggleFXAA));
 	RenderWidgets.AddSubWidget(CheckboxWidget("Enable Vignetting", &bVignetting));
-	pDebugGui->AddWidget(RenderWidgets);
+	SettingsWidgets.AddSubWidget(RenderWidgets);
 
 	CollapsingHeaderWidget LightWidgets("Lighting Settings");
 	LightWidgets.AddSubWidget(SliderFloatWidget("Light Azimuth", &gLightDirection.x, float(-180.0f), float(180.0f), float(0.001f)));
@@ -440,8 +451,6 @@ void Application::InitDebugGui()
 	LightColor1Intensity.AddSubWidget(SliderFloatWidget("Main Light Intensity", &gLightColorIntensity[0], 0.0f, 5.0f, 0.001f));
 	LightWidgets.AddSubWidget(LightColor1Intensity);
 
-	LightWidgets.AddSubWidget(SeparatorWidget());
-
 	CollapsingHeaderWidget AmbientLightColorPicker("Ambient Light Color");
 	AmbientLightColorPicker.AddSubWidget(ColorPickerWidget("Ambient Light Color", &gLightColor[3]));
 	LightWidgets.AddSubWidget(AmbientLightColorPicker);
@@ -449,12 +458,13 @@ void Application::InitDebugGui()
 	CollapsingHeaderWidget LightColor4Intensity("Ambient Light Intensity");
 	LightColor4Intensity.AddSubWidget(SliderFloatWidget("Light Intensity", &gLightColorIntensity[3], 0.0f, 5.0f, 0.001f));
 	LightWidgets.AddSubWidget(LightColor4Intensity);
-
-	pDebugGui->AddWidget(LightWidgets);
+	SettingsWidgets.AddSubWidget(LightWidgets);
 
 	CollapsingHeaderWidget GuiWidgets("GUI Settings");
 	GuiWidgets.AddSubWidget(SliderFloatWidget("BG Alpha", &bgAlpha, 0.01f, 1.0f, 0.001f));
-	pDebugGui->AddWidget(GuiWidgets);
+	SettingsWidgets.AddSubWidget(GuiWidgets);
+
+	pDebugGui->AddWidget(SettingsWidgets);
 
 	// Example usage
 	UIUtils::createImage("overlay", "why.png", 0, 0, float2((float)mSettings.mWidth / 1333, (float)mSettings.mHeight / 949), 10);
@@ -502,17 +512,9 @@ void Application::InitDebugGui()
 	UIUtils::createImage("start_button_red", "start.png", 600, 400, float2(1,1), 11);
 	UIUtils::addCallbackToImage("start_button_red", []() { 
 		UIUtils::removeImage("overlay");
-		UIUtils::removeImage("start_button_blue");
 		UIUtils::removeImage("start_button_red"); 
-		//TODO choose team
-	});
 
-	UIUtils::createImage("start_button_blue", "start.png", 1000, 400, float2(1,1), 11);
-	UIUtils::addCallbackToImage("start_button_blue", []() { 
-		UIUtils::removeImage("overlay");
-		UIUtils::removeImage("start_button_blue"); 
-		UIUtils::removeImage("start_button_red");
-		//TODO choose team
+		Application::ConnectClient();
 	});
 }
 
@@ -528,6 +530,17 @@ void Application::ToggleClient()
 		std::cout << "myPlayerID: " << myPlayerID << "\n";
 		scene->trackPlayer(myPlayerID);
 	}
+}
+
+void Application::ConnectClient()
+{
+	connected = true;
+	ToggleClient();
+}
+
+void Application::SetVolume()
+{
+	AudioManager::setGlobalVolume(volume);
 }
 
 // ======================================================================================================

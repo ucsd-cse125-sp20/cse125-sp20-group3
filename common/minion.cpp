@@ -112,22 +112,20 @@ void Minion::move(float deltaTime) {
 		float move_dist = std::min(remaining_move_dist, dest_dist); //this iteration, move full move_dist, or only to destNode if closer
 		vec3 move_vec = move_dist > 0 ? normalize(dest_vec) * move_dist : vec3(0); //move calculated distance along vector to destination
 
-		int move_attempts = 0;
 		mat4 oldModel = model;
-		mat4 bestModel = model;
-		float collisionDistances = -1;
-		int numCollisions = -1;
-		bool improvement = false;
-
 
 		auto other = ObjectDetection::getNearestObject(this, DETECTION_FLAG_COLLIDABLE, 1);
 		if (other) {
 			vec3 away = getPosition() - other->getPosition();
-			if (length(away) < 1.0f) {
-				print(away);
-				float noise = 0.25f * length(away);
-				away += noise * MathUtils::randfUniform(-1, 1) * vec3(-away[2], 0.f, -away[0]);
-				move_vec += move_dist * 0.5f * normalize(away);
+			float dist = length(away);
+			if (dist < 1.0f) {
+				//print(away);
+				vec3 perp = vec3(-away[2], 0.f, -away[0]);
+				if (abs(dot(perp, move_vec)) < 0.001f) {
+					away += MathUtils::randfUniform(-1, 1) * perp;
+				}
+				move_vec += move_dist * (0.5f / max(dist, 0.5f)) * normalize(away);
+				move_vec = move_dist * normalize(move_vec);
 			}
 		}
 

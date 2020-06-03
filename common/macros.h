@@ -1,6 +1,8 @@
 #ifndef _MACROS_H_
 #define _MACROS_H_
 
+#define SERVER_NAME "192.168.1.144"
+
 #define DEFAULT_BUFLEN 512
 #define SERVER_SENDBUFLEN 512000
 #define SERVER_TICKRATE 20 // times per second

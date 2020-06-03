@@ -17,6 +17,7 @@
 #include "../The-Forge/Common_3/ThirdParty/OpenSource/imgui/imgui.h"
 
 #include "../../common/client2server.h"
+#include "../../common/macros.h"
 
 
 #define IMAGE_COUNT 3
@@ -67,6 +68,8 @@ public:
 
 	void InitDebugGui();
 	static void ToggleClient();
+	static void ConnectClient();
+	static void SetVolume();
 
     bool Init() override;
 	void Exit() override;

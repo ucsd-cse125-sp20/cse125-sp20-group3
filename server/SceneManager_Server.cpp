@@ -638,8 +638,8 @@ void SceneManager_Server::populateWalls(){
 	wallNodes.push_back(new WallNode(11,8)); // New
 	wallNodes.push_back(new WallNode(11,9)); // New
 	wallNodes.push_back(new WallNode(11,10));
-	wallNodes.push_back(new WallNode(11,11));
-	wallNodes.push_back(new WallNode(11,12));
+	//wallNodes.push_back(new WallNode(11,11));
+	//wallNodes.push_back(new WallNode(11,12));
 	wallNodes.push_back(new WallNode(11,13));
 	wallNodes.push_back(new WallNode(11,14)); // New
 	wallNodes.push_back(new WallNode(11,16));

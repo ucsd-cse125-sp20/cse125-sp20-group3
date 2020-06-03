@@ -57,6 +57,9 @@ Client::Client(std::string servername) {
 
 	std::cout << "connection established with server\n";
 
+	//UIUtils::editText("waiting", "connected, waiting for other players", "small font", 0xffffffff);
+	UIUtils::changeImage("waiting_for_player", "waiting.png", float2(1,1));
+
 	freeaddrinfo(result);
 
 	if (ConnectSocket == INVALID_SOCKET) {

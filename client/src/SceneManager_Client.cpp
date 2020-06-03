@@ -312,18 +312,22 @@ void SceneManager_Client::updateUI() {
 
 	if (red_health <= 0) {
 		if (trackedPlayerTeam->teamColor == RED_TEAM) {
-			UIUtils::editText(DEFEAT_TEXT, "Defeat", "large font", 0xff6655ff);
+			// UIUtils::editText(DEFEAT_TEXT, "Defeat", "large font", 0xff6655ff);
+			UIUtils::changeImage(DEFEAT_TEXT, "defeat.png", float2(1,1));
 		}
 		else {
-			UIUtils::editText(VICTORY_TEXT, "Victory", "large font", 0xff6655ff);
+			// UIUtils::editText(VICTORY_TEXT, "Victory", "large font", 0xff6655ff);
+			UIUtils::changeImage(VICTORY_TEXT, "victory.png", float2(1,1));
 		}
 	}
 	else if (blue_health <= 0) {
 		if (trackedPlayerTeam->teamColor == BLUE_TEAM) {
-			UIUtils::editText(DEFEAT_TEXT, "Defeat", "large font", 0xff6655ff);
+			// UIUtils::editText(DEFEAT_TEXT, "Defeat", "large font", 0xff6655ff);
+			UIUtils::changeImage(DEFEAT_TEXT, "defeat.png", float2(1,1));
 		}
 		else {
-			UIUtils::editText(VICTORY_TEXT, "Victory", "large font", 0xff6655ff);
+			// UIUtils::editText(VICTORY_TEXT, "Victory", "large font", 0xff6655ff);
+			UIUtils::changeImage(VICTORY_TEXT, "victory.png", float2(1,1));
 		}
 	}
 
@@ -334,6 +338,9 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 	std::vector<int> deadEntities;
 
 	if (updateData.entUpdates.size() > 0) first_update = false;
+
+	//UIUtils::editText("waiting", "lolol", "small font", 0xffffffff);
+	UIUtils::changeImage("waiting_for_player", "text_placeholder.png", float2(1,1));
 
 	//std::cout << "updating from client buf of size " << updateData.entUpdates.size() << "\n";
 	for (Client::IDEntData data : updateData.entUpdates) {

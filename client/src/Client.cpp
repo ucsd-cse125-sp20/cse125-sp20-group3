@@ -136,7 +136,7 @@ Client::UpData Client::recvAndFormatData() {
 			}
 		}
 		bytes_to_receive = ((int*)size_int_buf)[0]; //save the bytes received as an int
-		//std::cout << "found " << bytes_to_receive << " bytes to receive\n";
+		std::cout << "found " << bytes_to_receive << " bytes to receive\n";
 
 		if (bytes_to_receive < 0) {
 			std::cout << "negative bytes to receive\n";
@@ -216,8 +216,14 @@ Client::UpData Client::recvAndFormatData() {
 			}
 			else if (state == 1) { //read bytes as an EntityData
 				char* recvData = &recvbuf[0];
-				ent_data = ((Entity::EntityData*)(recvData + i))[0];
-				i += (sizeof Entity::EntityData); //advance i to where delimiter should be
+				if (USE_SMALL_DATA) {
+					ent_data = Entity::decompressData(((Entity::EntityData_Small*)(recvData + i))[0]);
+					i += (sizeof Entity::EntityData_Small); //advance i to where delimiter should be
+				}
+				else {
+					ent_data = ((Entity::EntityData*)(recvData + i))[0];
+					i += (sizeof Entity::EntityData); //advance i to where delimiter should be
+				}
 
 				if (recvbuf[i] != DELIMITER) {
 					std::cout << "state 1 delimiter expected but not found, i: " << i << "\n";

@@ -5,6 +5,11 @@
 #include <vector>
 #include <iostream>
 
+#define MIN_MAP_X -5.0f
+#define MAX_MAP_X 140.0f
+#define MIN_MAP_Z 5.0f
+#define MAX_MAP_Z -105.0f
+
 struct SpatialCell;
 
 struct ObjDectData {
@@ -13,7 +18,7 @@ struct ObjDectData {
 	SpatialCell* cell;
 };
 
-class GameObject 
+class GameObject
 {
 protected:
 	mat4 model;
@@ -21,6 +26,11 @@ protected:
 public:
 	struct GameObjectData {
 		float x, z, rot;
+	};
+
+	struct GameObjectData_Small {
+		uint16_t x, z;
+		uint8_t rot;
 	};
 
 	ObjDectData objDectData = {};
@@ -35,6 +45,9 @@ public:
 
 	GameObjectData getData();
 	virtual int writeData(char buf[], int index);
+
+	static GameObjectData_Small compressData(GameObjectData data);
+	static GameObjectData decompressData(GameObjectData_Small data);
 };
 
 struct SpatialCell {

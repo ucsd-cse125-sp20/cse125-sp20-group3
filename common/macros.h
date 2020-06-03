@@ -1,13 +1,13 @@
 #ifndef _MACROS_H_
 #define _MACROS_H_
 
-#define SERVER_NAME "192.168.1.144"
+#define SERVER_NAME "137.110.111.249"
 
 #define DEFAULT_BUFLEN 512
 #define SERVER_SENDBUFLEN 512000
 #define SERVER_TICKRATE 20 // times per second
 #define DEFAULT_PORT "27015"
-#define NUM_PLAYERS 1 //change to 4 eventually //upper bound, no more than 15 (1 byte) because of Server recv
+#define NUM_PLAYERS 3 //change to 4 eventually //upper bound, no more than 15 (1 byte) because of Server recv
 #define DELIMITER ','
 
 #define NO_TARGET_ID -1
@@ -80,6 +80,9 @@
 #define METAL_RES_TYPE 'M'
 #define PLASTIC_RES_TYPE 'P'
 
+#define STARTING_METAL 5
+#define STARTING_PLASTIC 5
+
 #define PLAYER_HEALTH 200
 #define BASE_HEALTH 2000
 #define MINION_HEALTH 50
@@ -93,7 +96,7 @@
 #define BASE_ATTACK 0
 #define MINION_ATTACK 10
 #define SUPER_MINION_ATTACK 50
-#define LASER_TOWER_ATTACK 20
+#define LASER_TOWER_ATTACK 10
 #define CLAW_TOWER_ATTACK 0
 #define RESOURCE_ATTACK 0
 #define PICKUP_ATTACK 0
@@ -111,17 +114,17 @@
 #define MINION_VELOCITY 3.0
 #define SUPER_MINION_VELOCITY 2.0
 
-#define DUMPSTER_PLASTIC 3
+#define DUMPSTER_PLASTIC 2
 #define RECYCLING_BIN_METAL 2
 #define BOTTLE_PLASTIC 2
 #define IRON_METAL 1
 
-#define SUPER_MINION_METAL_REQ 0//4
-#define SUPER_MINION_PLASTIC_REQ 0//12
-#define LASER_METAL_REQ 0//2
-#define LASER_PLASTIC_REQ 0//4
-#define CLAW_METAL_REQ 0//8
-#define CLAW_PLASTIC_REQ 0//16
+#define SUPER_MINION_METAL_REQ 6
+#define SUPER_MINION_PLASTIC_REQ 10
+#define LASER_METAL_REQ 2
+#define LASER_PLASTIC_REQ 0
+#define CLAW_METAL_REQ 5
+#define CLAW_PLASTIC_REQ 5
 
 //drop chance 1/x
 #define MINION_IRON_DROP_CHANCE 4

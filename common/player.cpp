@@ -107,7 +107,7 @@ void Player::processInput(PlayerInput in) {
 				case SUPER_MINION:
 					if (team->checkResources(SUPER_MINION_TYPE))
 					{
-						team->buildEntity(SUPER_MINION);
+						team->buildEntity(SUPER_MINION_TYPE);
 						int id = manager->spawnEntity(SUPER_MINION_TYPE, buildPos.getX(), buildPos.getZ(), 0, this->team);
 						buildTarget->build(id);
 					} 

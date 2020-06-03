@@ -38,7 +38,7 @@ void Minion::update(float deltaTime) { //should they be able to switch attack ta
 	if (attackTarget != nullptr &&																//first, if targeting something
 			(!manager->checkEntityAlive(attackTargetID) ||										//but either target is dead
 			length(attackTarget->getPosition() - this->getPosition()) > this->attackRange)) {	//or target is out of range, null out ptr
-		std::cout << "minion " << id << " nulling out attackTarget\n";
+		//std::cout << "minion " << id << " nulling out attackTarget\n";
 		attackTarget = nullptr; //do this check here instead of after attacking in the case of multiple entities targeting one entity
 	}
 
@@ -56,7 +56,7 @@ void Minion::update(float deltaTime) { //should they be able to switch attack ta
 		if (attackTarget != nullptr) {
 			attackTargetID = attackTarget->getID();
 			timeElapsed = 0; //reset attack timer on acquiring new target
-			std::cout << "minion " << id<< " found target " << attackTarget->getID() << "\n";
+			//std::cout << "minion " << id<< " found target " << attackTarget->getID() << "\n";
 		}
 	}
 
@@ -71,7 +71,7 @@ void Minion::update(float deltaTime) { //should they be able to switch attack ta
 		model[2] = vec4(-forward, 0);
 
 		if (timeElapsed >= attackInterval) { //only attack on an interval
-			std::cout << "minion: " << id << " attacking that " << attackTargetID << "\n";
+			//std::cout << "minion: " << id << " attacking that " << attackTargetID << "\n";
 			this->attack();
 			timeElapsed = 0;
 		}
@@ -85,9 +85,9 @@ void Minion::update(float deltaTime) { //should they be able to switch attack ta
 
 void Minion::takeDamage(int damage) {
 	Entity::takeDamage(damage);
-	std::cout << "minion: " << id << " took " << damage << " damage | remaining health: " << health << "\n";
+	//std::cout << "minion: " << id << " took " << damage << " damage | remaining health: " << health << "\n";
 	if (health <= 0) {
-		std::cout << "minion " << id << " dying\n";
+		//std::cout << "minion " << id << " dying\n";
 		this->dropPickups();
 		team->decMinion(); 
 		ObjectDetection::removeObject(this);

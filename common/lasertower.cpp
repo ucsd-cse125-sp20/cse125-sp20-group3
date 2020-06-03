@@ -21,7 +21,7 @@ void LaserTower::update(float deltaTime) { //should they be able to switch attac
 	if (attackTarget != nullptr &&																//first, if targeting something
 			(!manager->checkEntityAlive(attackTargetID) ||										//but either target is dead
 			length(attackTarget->getPosition() - this->getPosition()) > this->attackRange)) {	//or target is out of range, null out ptr
-		std::cout << "laser " << id << " nulling out attackTarget\n";
+		//std::cout << "laser " << id << " nulling out attackTarget\n";
 		attackTarget = nullptr; //do this check here instead of after attacking in the case of multiple entities targeting one entity
 	}
 
@@ -39,7 +39,7 @@ void LaserTower::update(float deltaTime) { //should they be able to switch attac
 		if (attackTarget != nullptr) {
 			attackTargetID = attackTarget->getID();
 			timeElapsed = 0; //reset attack timer on acquiring new target
-			std::cout << "laser " << id << " found target " << attackTarget->getID() << "\n";
+			//std::cout << "laser " << id << " found target " << attackTarget->getID() << "\n";
 		}
 	}
 
@@ -48,7 +48,7 @@ void LaserTower::update(float deltaTime) { //should they be able to switch attac
 		actionState = ACTION_STATE_ATTACK;
 
 		if (timeElapsed >= attackInterval) { //only attack on an interval
-			std::cout << "laser " << id << " attacking " << attackTargetID << "\n";
+			//std::cout << "laser " << id << " attacking " << attackTargetID << "\n";
 			this->attack();
 			timeElapsed = 0;
 		}

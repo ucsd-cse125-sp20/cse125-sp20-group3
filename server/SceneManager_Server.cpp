@@ -431,9 +431,9 @@ void SceneManager_Server::populatePaths() {
 	pathNodes[39]->setNextRed(pathNodes[2]);
 	pathNodes[40]->setNextRed(pathNodes[41]);
 	pathNodes[41]->setNextRed(pathNodes[3]);
-	pathNodes[42]->setNextRed(pathNodes[2]);
-	pathNodes[43]->setNextRed(pathNodes[44]);
-	pathNodes[44]->setNextRed(pathNodes[4]);
+	pathNodes[42]->setNextRed(pathNodes[43]); // fix
+	pathNodes[43]->setNextRed(pathNodes[4]); // fix
+	// pathNodes[44]->setNextRed(pathNodes[4]); fix
 	pathNodes[45]->setNextRed(pathNodes[18]);
 	pathNodes[46]->setNextRed(pathNodes[45]);
 	pathNodes[47]->setNextRed(pathNodes[46]);
@@ -475,10 +475,14 @@ void SceneManager_Server::populatePaths() {
 	pathNodes[77]->setNextBlue(pathNodes[28]);
 	pathNodes[79]->setNextBlue(pathNodes[80]);
 	pathNodes[80]->setNextBlue(pathNodes[9]); // fix pathing
-	pathNodes[81]->setNextBlue(pathNodes[82]);
-	pathNodes[82]->setNextBlue(pathNodes[10]);
+	pathNodes[81]->setNextBlue(pathNodes[9]);
+	pathNodes[82]->setNextBlue(pathNodes[9]);
 	pathNodes[83]->setNextBlue(pathNodes[84]);
 	pathNodes[84]->setNextBlue(pathNodes[27]);
+
+	//fix pathing
+	pathNodes[23]->setNextRed(pathNodes[47]);
+	pathNodes[21]->setNextBlue(pathNodes[10])
 
 	//adding pathNodes for bases
 	pathNodes.push_back(new PathNode(1, 1)); //85

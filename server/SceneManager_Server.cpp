@@ -14,7 +14,9 @@ SceneManager_Server::SceneManager_Server() :
 	next_laser_id(ID_LASER_MIN),
 	next_claw_id(ID_CLAW_MIN),
 	next_dumpster_id(ID_DUMPSTER_MIN),
-	next_recycling_bin_id(ID_RECYCLING_BIN_MIN)
+	next_recycling_bin_id(ID_RECYCLING_BIN_MIN),
+	next_iron_id(ID_IRON_MIN),
+	next_bottle_id(ID_BOTTLE_MIN)
 {
 	red_team = new Team(RED_TEAM);
 	blue_team = new Team(BLUE_TEAM);
@@ -44,8 +46,8 @@ bool SceneManager_Server::addPlayer(int player_id) {
 		Team* team;
 		GameObject::GameObjectData data;
 		if (player_id == 0 || player_id == 2) {
-			team = blue_team;
-			data = blue_spawns[num_red++];
+			team = red_team;
+			data = red_spawns[num_red++];
 		}
 		else {
 			team = blue_team;
@@ -151,6 +153,30 @@ int SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, f
 				break;
 			}
 		} while (idMap.find(next_recycling_bin_id) != idMap.end());
+		break;
+	case IRON_TYPE:
+		id = next_iron_id;
+		ent = new Pickup(IRON_TYPE, data, id, this);
+
+		do {
+			next_iron_id = next_iron_id + 1 > ID_IRON_MAX ? ID_IRON_MIN : next_iron_id + 1;
+			if (next_iron_id == id) { //wrapped all the way around, all id's taken
+				std::cout << "maximum number of iron reached, consider expanding id ranges\n";
+				break;
+			}
+		} while (idMap.find(next_iron_id) != idMap.end());
+		break;
+	case BOTTLE_TYPE:
+		id = next_bottle_id;
+		ent = new Pickup(BOTTLE_TYPE, data, id, this);
+
+		do {
+			next_bottle_id = next_bottle_id + 1 > ID_BOTTLE_MAX ? ID_BOTTLE_MIN : next_bottle_id + 1;
+			if (next_bottle_id == id) { //wrapped all the way around, all id's taken
+				std::cout << "maximum number of bottles reached, consider expanding id ranges\n";
+				break;
+			}
+		} while (idMap.find(next_bottle_id) != idMap.end());
 		break;
 	default:
 		id = -1;
@@ -945,17 +971,17 @@ void SceneManager_Server::testAttacking() {
 	SuperMinion* sm2 = new SuperMinion(data, id, red_team, this);
 	idMap[id] = sm2;*/
 
-	/*id = next_claw_id;
+	id = next_claw_id;
 	next_claw_id++;
 	data = { 92.5, -82.5, 0 };
 	ClawTower* c1 = new ClawTower(data, id, red_team, this);
-	idMap[id] = c1;*/
+	idMap[id] = c1;
 
-	id = next_claw_id;
+	/*id = next_claw_id;
 	next_claw_id++;
 	data = { 32.5, -27.5, 0 };
 	ClawTower* c2 = new ClawTower(data, id, blue_team, this);
-	idMap[id] = c2;
+	idMap[id] = c2;*/
 
 	/*id = next_laser_id;
 	next_laser_id++;

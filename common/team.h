@@ -6,7 +6,6 @@
 
 class Team {
 private:
-	int winStatus;
 	int metalCount;
 	int plasticCount;
     int baseHealth;

@@ -35,6 +35,10 @@
 #define ID_DUMPSTER_MAX 6999
 #define ID_RECYCLING_BIN_MIN 7000
 #define ID_RECYCLING_BIN_MAX 7999
+#define ID_IRON_MIN 8000
+#define ID_IRON_MAX 8999
+#define ID_BOTTLE_MIN 9000
+#define ID_BOTTLE_MAX 9999
 
 //length is z, width is x
 #define PLAYER_LENGTH 0.2f //checked
@@ -53,6 +57,8 @@
 #define DUMPSTER_WIDTH 1.0f
 #define RECYCLING_BIN_LENGTH 0.4f //checked kinda
 #define RECYCLING_BIN_WIDTH 0.4f
+#define PICKUP_LENGTH 0.5f
+#define PICKUP_WIDTH 0.5f
 
 #define BUILD_CONFIRM 1
 #define BUILD_CANCEL -1
@@ -66,6 +72,8 @@
 #define CLAW_TYPE 'c'
 #define DUMPSTER_TYPE 'd'
 #define RECYCLING_BIN_TYPE 'r'
+#define IRON_TYPE 'i'
+#define BOTTLE_TYPE 'p' //p for plastic to avoid overlap
 
 #define METAL_RES_TYPE 'M'
 #define PLASTIC_RES_TYPE 'P'
@@ -77,6 +85,7 @@
 #define LASER_TOWER_HEALTH 500
 #define CLAW_TOWER_HEALTH 500
 #define RESOURCE_HEALTH 1
+#define PICKUP_HEALTH 1
 
 #define PLAYER_ATTACK 25
 #define BASE_ATTACK 0
@@ -85,6 +94,7 @@
 #define LASER_TOWER_ATTACK 20
 #define CLAW_TOWER_ATTACK 0
 #define RESOURCE_ATTACK 0
+#define PICKUP_ATTACK 0
 
 #define MINION_ATK_RANGE 7
 #define SUPER_MINION_ATK_RANGE 2
@@ -98,12 +108,10 @@
 #define MINION_VELOCITY 3.0
 #define SUPER_MINION_VELOCITY 2.0
 
-#define WIN_STATUS_NEUTRAL 0
-#define WIN_STATUS_WON 10
-#define	WIN_STATUS_LOST -10
-
 #define DUMPSTER_PLASTIC 3
 #define RECYCLING_BIN_METAL 2
+#define PICKUP_PLASTIC 1
+#define PICKUP_METAL 1
 
 #define SUPER_MINION_METAL_REQ 4
 #define SUPER_MINION_PLASTIC_REQ 12
@@ -111,6 +119,13 @@
 #define LASER_PLASTIC_REQ 0//4
 #define CLAW_METAL_REQ 8
 #define CLAW_PLASTIC_REQ 16
+
+#define MINION_DROP_IRON 1
+#define MINION_DROP_BOTTLE 1
+#define SUPER_MINION_DROP_IRON 1
+#define SUPER_MINION_DROP_BOTTLE 1
+
+#define DROP_RANGE 3
 
 #define PLASTIC_UI_ICON "resource_plastic"
 #define METAL_UI_ICON "resource_metal"

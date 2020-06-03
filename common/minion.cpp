@@ -98,13 +98,13 @@ void Minion::dropPickups() {
 	srand((unsigned int)time(NULL));
 	vec3 pos = this->getPosition();
 	if (rand() % MINION_IRON_DROP_CHANCE == 0) {
-		float x = pos.getX() + (((rand() % 100) / 100.0f) * DROP_RANGE);
-		float z = pos.getZ() + (((rand() % 100) / 100.0f) * DROP_RANGE);
+		float x = pos.getX() + ((float)pow(-1, rand() % 2) * (((rand() % 100) / 100.0f) * DROP_RANGE));
+		float z = pos.getZ() + ((float)pow(-1, rand() % 2) * (((rand() % 100) / 100.0f) * DROP_RANGE));
 		manager->spawnEntity(IRON_TYPE, x, z, 0, nullptr);
 	}
 	if (rand() % MINION_BOTTLE_DROP_CHANCE == 0) {
-		float x = pos.getX() + (((rand() % 100) / 100.0f) * DROP_RANGE);
-		float z = pos.getZ() + (((rand() % 100) / 100.0f) * DROP_RANGE);
+		float x = pos.getX() + ((float)pow(-1, rand() % 2) * (((rand() % 100) / 100.0f) * DROP_RANGE));
+		float z = pos.getZ() + ((float)pow(-1, rand() % 2) * (((rand() % 100) / 100.0f) * DROP_RANGE));
 		manager->spawnEntity(BOTTLE_TYPE, x, z, 0, nullptr);
 	}
 }

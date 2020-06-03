@@ -24,7 +24,7 @@ SceneManager_Server::SceneManager_Server() :
 	this->buildScene();
 
 	//this->testScene();
-	this->testAttacking();
+	//this->testAttacking();
 	//this->testBuilding();
 	//this->testWalls();
 }
@@ -949,8 +949,8 @@ void SceneManager_Server::testScene() { //testing only
 }
 
 void SceneManager_Server::testAttacking() {
-	int id;
-	GameObject::GameObjectData data;
+	//int id;
+	//GameObject::GameObjectData data;
 
 	/*id = next_minion_id;
 	next_minion_id++;
@@ -978,19 +978,19 @@ void SceneManager_Server::testAttacking() {
 	ClawTower* c1 = new ClawTower(data, id, red_team, this);
 	idMap[id] = c1;*/
 
-	id = next_claw_id;
+	/*id = next_claw_id;
 	next_claw_id++;
 	data = { 32.5, -27.5, 0 };
 	ClawTower* c2 = new ClawTower(data, id, blue_team, this);
-	idMap[id] = c2;
+	idMap[id] = c2;*/
 
 	/*id = next_laser_id;
 	next_laser_id++;
-	data = { 0, 10, 0 };
+	data = { 32.5, -27.5, 0 };
 	LaserTower* l1 = new LaserTower(data, id, blue_team, this);
-	idMap[id] = l1;
+	idMap[id] = l1;*/
 
-	id = next_laser_id;
+	/*id = next_laser_id;
 	next_laser_id++;
 	data = { 0, 20, 0 };
 	LaserTower* l2 = new LaserTower(data, id, red_team, this);

@@ -482,7 +482,7 @@ void SceneManager_Server::populatePaths() {
 
 	//fix pathing
 	pathNodes[23]->setNextRed(pathNodes[47]);
-	pathNodes[21]->setNextBlue(pathNodes[10])
+	pathNodes[21]->setNextBlue(pathNodes[10]);
 
 	//adding pathNodes for bases
 	pathNodes.push_back(new PathNode(1, 1)); //85

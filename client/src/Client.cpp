@@ -97,6 +97,13 @@ int Client::recvPlayerID() {
 Client::UpData Client::recvAndFormatData() {
 	//std::cout << "recvAndFormatData\n";
 	UpData data;
+	data.stateUpdate.redTeamData.baseHealth = 1;
+	data.stateUpdate.blueTeamData.baseHealth = 1;
+
+	/*UpData empty;
+	empty.stateUpdate.redTeamData = { 0, 0, 0, 1, 0, 0 };
+	empty.stateUpdate.blueTeamData = { 0, 0, 0, 1, 0, 0 };
+	empty.sceneUpdate.entUpdates.clear();*/
 
 	char size_int_buf[sizeof(int)];
 	int bytes_to_receive;
@@ -126,7 +133,12 @@ Client::UpData Client::recvAndFormatData() {
 			}
 		}
 		bytes_to_receive = ((int*)size_int_buf)[0]; //save the bytes received as an int
-		//std::cout << "found " << bytes_to_receive << " bytes to receive\n";
+		std::cout << "found " << bytes_to_receive << " bytes to receive\n";
+
+		if (bytes_to_receive < 0) {
+			std::cout << "negative bytes to receive\n";
+			continue;
+		}
 
 		recvbuf.resize(bytes_to_receive); //resize vector buffer to be the size of the incoming data
 
@@ -143,21 +155,37 @@ Client::UpData Client::recvAndFormatData() {
 		}
 		//std::cout << "received " << iResult << " bytes\n";
 
+		if (bytes_to_receive < 0 || bytes_to_receive > 30000) {
+			std::cout << "illogical bytes to receive found, skpping\n";
+			continue;
+		}
+
 		/* process and format data */
 		int i = 0;
 		char* recvData = &recvbuf[0];
 
-		data.stateUpdate.redTeamData = ((Team::TeamData*)(recvData + i))[0];
+		Team::TeamData redData = ((Team::TeamData*)(recvData + i))[0];
 		i += sizeof(Team::TeamData);
-		if (recvbuf[i] != DELIMITER) std::cout << "delimiter after redTeamData expected but not found\n";
+		if (recvbuf[i] != DELIMITER) {
+			std::cout << "delimiter after redTeamData expected but not found\n";
+			continue;
+		}
+		data.stateUpdate.redTeamData = redData;
 		i++;
 
-		data.stateUpdate.blueTeamData = ((Team::TeamData*)(recvData + i))[0];
+		Team::TeamData blueData = ((Team::TeamData*)(recvData + i))[0];
 		i += sizeof(Team::TeamData);
-		if (recvbuf[i] != DELIMITER) std::cout << "delimiter after blueTeamData expected but not found\n";
+		if (recvbuf[i] != DELIMITER) {
+			std::cout << "delimiter after blueTeamData expected but not found\n";
+			continue;
+		}
+		data.stateUpdate.blueTeamData = blueData;
 		i++;
 
-		if (recvbuf[i] != DELIMITER) std::cout << "closing delimiter for state expected but not found\n";
+		if (recvbuf[i] != DELIMITER) {
+			std::cout << "closing delimiter for state expected but not found\n";
+			continue;
+		}
 		i++;
 
 		int state = 0;
@@ -165,21 +193,22 @@ Client::UpData Client::recvAndFormatData() {
 		Entity::EntityData ent_data;
 		//std::cout << "processing\n";
 		for (; i < recvbuf.size(); i++) {
+			//if (i > 3500) break;
 			if (state == 0) { //read bytes as id int
-				if (recvbuf[i] == DELIMITER) { //delimiter found at beginning of state 0 must be closing delimiter, break out
+				if (recvbuf[i] == DELIMITER || i == recvbuf.size() - 1) { //delimiter found at beginning of state 0 must be closing delimiter, break out
 					break;
 				}
 				else {
 					id = ((int*)(recvData + i))[0];
 					i += sizeof(int); //advance i to where delimiter should be
 
-					if (recvbuf[i] == DELIMITER) {
-						//std::cout << "read id: " << id << " | state 0 delimiter at i: " << i << "\n";
-						state++; //end of id bytes found, advance to reading data
-					}
-					else {
+					if (recvbuf[i] != DELIMITER) {
 						std::cout << "state 0 delimiter expected but not found, i: " << i << "\n";
+						break;
 					}
+
+					//std::cout << "read id: " << id << " | state 0 delimiter at i: " << i << "\n";
+					state++; //end of id bytes found, advance to reading data
 				}
 			}
 			else if (state == 1) { //read bytes as an EntityData
@@ -187,35 +216,39 @@ Client::UpData Client::recvAndFormatData() {
 				ent_data = ((Entity::EntityData*)(recvData + i))[0];
 				i += (sizeof Entity::EntityData); //advance i to where delimiter should be
 
-				if (recvbuf[i] == DELIMITER) {
-					//std::cout << "state 1 delimiter at i: " << i << "\n";
-					char oldActionState;
-					int oldTargetID; //we want to preserve firing states in the case of multiple server ticks within one client update
-					if (idEntMap.find(id) != idEntMap.end()) {
-						oldActionState = idEntMap[id].actionState;
-						oldTargetID = idEntMap[id].targetID;
-					}
-					else {
-						oldActionState = ACTION_STATE_IDLE;
-						oldTargetID = -1;
-					}
+				if (recvbuf[i] != DELIMITER) {
+					std::cout << "state 1 delimiter expected but not found, i: " << i << "\n";
+					break;
+				}
 
-					idEntMap[id] = ent_data; //overwrite everything else
-					if (oldActionState == ACTION_STATE_FIRE) { //preserve firing states
-						idEntMap[id].actionState = ACTION_STATE_FIRE;
-						idEntMap[id].targetID = oldTargetID;
-					}
-					state = 0; //end of data confirmed, reset to reading id bytes
+				char oldActionState;
+				int oldTargetID; //we want to preserve firing states in the case of multiple server ticks within one client update
+				if (idEntMap.find(id) != idEntMap.end()) {
+					oldActionState = idEntMap[id].actionState;
+					oldTargetID = idEntMap[id].targetID;
 				}
 				else {
-					std::cout << "state 1 delimiter expected but not found, i: " << i << "\n";
+					oldActionState = ACTION_STATE_IDLE;
+					oldTargetID = -1;
 				}
+
+				idEntMap[id] = ent_data; //overwrite everything else
+				if (oldActionState == ACTION_STATE_FIRE) { //preserve firing states
+					idEntMap[id].actionState = ACTION_STATE_FIRE;
+					idEntMap[id].targetID = oldTargetID;
+				}
+				state = 0; //end of data confirmed, reset to reading id bytes
+
+				//if (recvbuf[i] == DELIMITER) {
+					//std::cout << "state 1 delimiter at i: " << i << "\n";
+				//}
+				
 			}
 		}
 		if (recvbuf[recvbuf.size() - 2] != DELIMITER || recvbuf[recvbuf.size() - 1] != DELIMITER) { //sanity check
 			std::cout << "double delimiter not found at end of recvbuf\n";
 			std::cout << "size: " << recvbuf.size() << "\n";
-			std::cout << "-2: " << recvbuf[recvbuf.size() - 2] << " 1: " << recvbuf[recvbuf.size() - 1] << "\n";
+			std::cout << "-2: " << recvbuf[recvbuf.size() - 2] << " -1: " << recvbuf[recvbuf.size() - 1] << "\n";
 		}
 	}
 

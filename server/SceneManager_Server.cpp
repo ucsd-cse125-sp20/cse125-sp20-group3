@@ -44,8 +44,8 @@ bool SceneManager_Server::addPlayer(int player_id) {
 		Team* team;
 		GameObject::GameObjectData data;
 		if (player_id == 0 || player_id == 2) {
-			team = blue_team;
-			data = blue_spawns[num_red++];
+			team = red_team;
+			data = red_spawns[num_red++];
 		}
 		else {
 			team = blue_team;

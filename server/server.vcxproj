@@ -104,6 +104,7 @@
     <ClCompile Include="..\common\clawtower.cpp" />
     <ClCompile Include="..\common\GameObject.cpp" />
     <ClCompile Include="..\common\lasertower.cpp" />
+    <ClCompile Include="..\common\MathUtils.cpp" />
     <ClCompile Include="..\common\minion.cpp" />
     <ClCompile Include="..\common\ObjectDetection.cpp" />
     <ClCompile Include="..\common\PathNode.cpp" />
@@ -126,6 +127,7 @@
     <ClInclude Include="..\common\GameObject.h" />
     <ClInclude Include="..\common\lasertower.h" />
     <ClInclude Include="..\common\macros.h" />
+    <ClInclude Include="..\common\MathUtils.h" />
     <ClInclude Include="..\common\ObjectDetection.h" />
     <ClInclude Include="..\common\player.h" />
     <ClInclude Include="..\common\player_client.h" />

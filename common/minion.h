@@ -6,6 +6,7 @@
 #include "team.h"
 #include "ObjectDetection.h"
 #include "pathNode.h"
+#include "MathUtils.h"
 #include <iostream>
 #include <chrono>
 #include <ctime>

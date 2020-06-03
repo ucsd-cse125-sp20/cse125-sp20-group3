@@ -78,6 +78,9 @@
     <ClCompile Include="..\common\WallNode.cpp">
       <Filter>Source Files\Map Nodes</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\MathUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Server.h">
@@ -136,6 +139,9 @@
     </ClInclude>
     <ClInclude Include="..\common\WallNode.h">
       <Filter>Header Files\Map Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\MathUtils.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -114,34 +114,37 @@ void Minion::move(float deltaTime) {
 
 		int move_attempts = 0;
 		mat4 oldModel = model;
-		while (move_attempts < MINION_MOVE_ATTEMPTS) { //attempt to move along dest_vec and check for collisions. if collision, adjust and try again
-			move_attempts++;
+		mat4 bestModel = model;
+		float collisionDistances = -1;
+		int numCollisions = -1;
+		bool improvement = false;
 
-			model[3][0] += move_vec[0];
-			model[3][2] += move_vec[2];
-			vec3 forward = normalize(vec3(model[3][0] - oldModel[3][0], 0, model[3][2] - oldModel[3][2]));
-			vec3 right = cross(forward, vec3(0, 1, 0));
-			model[0] = vec4(right, 0);
-			model[2] = vec4(-forward, 0);
 
-			std::vector<GameObject*> collisions = ObjectDetection::getCollisions(this, DETECTION_FLAG_COLLIDABLE);
-			if (collisions.size() > 0) {
-				//std::cout << "minion " << id << " detected collision on move_attempt " << move_attempts << "\n";
-				if (move_attempts != MINION_MOVE_ATTEMPTS) this->model = oldModel;
-				vec4 move_vec4 = vec4(move_vec, 0);
-				float rot_degrees = (float)pow(-1, move_attempts - 1) * ((float)move_attempts * 20); //20, -40, 60, -80, 100, -120, last one doesn't matter
-				move_vec = (mat4::rotationY(degToRad(rot_degrees)) * move_vec4).getXYZ();
-			}
-			else break;
-
-			if (move_attempts == MINION_MOVE_ATTEMPTS) {
-				remaining_move_dist = 0;
+		auto other = ObjectDetection::getNearestObject(this, DETECTION_FLAG_COLLIDABLE, 1);
+		if (other) {
+			vec3 away = getPosition() - other->getPosition();
+			if (length(away) < 1.0f) {
+				print(away);
+				float noise = 0.25f * length(away);
+				away += noise * MathUtils::randfUniform(-1, 1) * vec3(-away[2], 0.f, -away[0]);
+				move_vec += move_dist * 0.5f * normalize(away);
 			}
 		}
 
 		remaining_move_dist -= move_dist;
 
-		if (this->getPosition() == destNode->getPosition()) { //reached destNode with this iteration
+		model[3][0] += move_vec[0];
+		model[3][2] += move_vec[2];
+		vec3 forward = vec3(model[3][0] - oldModel[3][0], 0, model[3][2] - oldModel[3][2]);
+		if (length(forward) > 0.01f) {
+			forward = normalize(forward);
+			vec3 right = cross(forward, vec3(0, 1, 0));
+			model[0] = vec4(right, 0);
+			model[2] = vec4(-forward, 0);
+		}
+
+
+		if (length(this->getPosition() - destNode->getPosition()) < 0.5f) { //reached destNode with this iteration
 			PathNode* nextNode; //continue moving to the next node
 			if (this->team->teamColor == RED_TEAM) nextNode = this->destNode->next_red;
 			else nextNode = this->destNode->next_blue;

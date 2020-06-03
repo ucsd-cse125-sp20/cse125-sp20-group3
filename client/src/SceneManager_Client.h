@@ -26,6 +26,7 @@
 #include "../../common/lasertower_client.h"
 #include "../../common/clawtower_client.h"
 #include "../../common/resource_client.h"
+#include "../../common/pickup_client.h"
 #include "../../common/client2server.h"
 
 #define GROUND_KEY 111111

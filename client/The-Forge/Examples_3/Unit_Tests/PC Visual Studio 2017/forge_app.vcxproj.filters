@@ -285,15 +285,6 @@
     <ClCompile Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\speech\tts.cpp">
       <Filter>Header Files\Audio</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\..\common\BuildNode.cpp">
-      <Filter>Source Files\Server Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\common\PathNode.cpp">
-      <Filter>Source Files\Server Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\common\WallNode.cpp">
-      <Filter>Source Files\Server Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\..\common\superminion_client.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
@@ -304,6 +295,21 @@
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\common\base_client.cpp">
+      <Filter>Source Files\Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\BuildNode.cpp">
+      <Filter>Source Files\Server Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\PathNode.cpp">
+      <Filter>Source Files\Server Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\WallNode.cpp">
+      <Filter>Source Files\Server Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\pickup.cpp">
+      <Filter>Source Files\Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\pickup_client.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
   </ItemGroup>
@@ -634,15 +640,6 @@
     <ClInclude Include="..\..\..\Common_3\ThirdParty\OpenSource\soloud20181119\src\audiosource\tedsid\ted.h">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\common\BuildNode.h">
-      <Filter>Header Files\Server Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\common\PathNode.h">
-      <Filter>Header Files\Server Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\common\WallNode.h">
-      <Filter>Header Files\Server Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\..\common\superminion_client.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
@@ -660,6 +657,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\common\macros.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\BuildNode.h">
+      <Filter>Header Files\Server Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\PathNode.h">
+      <Filter>Header Files\Server Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\WallNode.h">
+      <Filter>Header Files\Server Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\pickup.h">
+      <Filter>Header Files\Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\pickup_client.h">
+      <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

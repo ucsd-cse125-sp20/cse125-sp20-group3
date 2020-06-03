@@ -16,7 +16,7 @@ Resource_Client::Resource_Client(char resourceType, GameObjectData data, int id,
 	if (type == DUMPSTER_TYPE) animator->SetLoop(false);
 	parent->addChild(animator);
 
-	printf("%d %s\n", animator->clipControllers[animator->currClip]->GetLoop(), animator->currClip.c_str());
+	//printf("%d %s\n", animator->clipControllers[animator->currClip]->GetLoop(), animator->currClip.c_str());
 	active = false;
 
 	particleTransform = conf_new(Transform);

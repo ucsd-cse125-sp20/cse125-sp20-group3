@@ -40,6 +40,8 @@
     <ClCompile Include="..\..\..\..\..\common\minion_client.cpp" />
     <ClCompile Include="..\..\..\..\..\common\ObjectDetection.cpp" />
     <ClCompile Include="..\..\..\..\..\common\PathNode.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\pickup.cpp" />
+    <ClCompile Include="..\..\..\..\..\common\pickup_client.cpp" />
     <ClCompile Include="..\..\..\..\..\common\player.cpp" />
     <ClCompile Include="..\..\..\..\..\common\player_client.cpp" />
     <ClCompile Include="..\..\..\..\..\common\resource.cpp" />
@@ -161,6 +163,8 @@
     <ClInclude Include="..\..\..\..\..\common\minion_client.h" />
     <ClInclude Include="..\..\..\..\..\common\ObjectDetection.h" />
     <ClInclude Include="..\..\..\..\..\common\PathNode.h" />
+    <ClInclude Include="..\..\..\..\..\common\pickup.h" />
+    <ClInclude Include="..\..\..\..\..\common\pickup_client.h" />
     <ClInclude Include="..\..\..\..\..\common\player.h" />
     <ClInclude Include="..\..\..\..\..\common\player_client.h" />
     <ClInclude Include="..\..\..\..\..\common\resource.h" />

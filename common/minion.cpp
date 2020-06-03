@@ -88,8 +88,24 @@ void Minion::takeDamage(int damage) {
 	std::cout << "minion: " << id << " took " << damage << " damage | remaining health: " << health << "\n";
 	if (health <= 0) {
 		std::cout << "minion " << id << " dying\n";
+		this->dropPickups();
 		team->decMinion(); 
 		ObjectDetection::removeObject(this);
+	}
+}
+
+void Minion::dropPickups() {
+	srand((unsigned int)time(NULL));
+	vec3 pos = this->getPosition();
+	if (rand() % MINION_IRON_DROP_CHANCE == 0) {
+		float x = pos.getX() + (((rand() % 100) / 100.0f) * DROP_RANGE);
+		float z = pos.getZ() + (((rand() % 100) / 100.0f) * DROP_RANGE);
+		manager->spawnEntity(IRON_TYPE, x, z, 0, nullptr);
+	}
+	if (rand() % MINION_BOTTLE_DROP_CHANCE == 0) {
+		float x = pos.getX() + (((rand() % 100) / 100.0f) * DROP_RANGE);
+		float z = pos.getZ() + (((rand() % 100) / 100.0f) * DROP_RANGE);
+		manager->spawnEntity(BOTTLE_TYPE, x, z, 0, nullptr);
 	}
 }
 

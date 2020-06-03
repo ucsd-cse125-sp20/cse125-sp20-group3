@@ -10,3 +10,18 @@ SuperMinion::SuperMinion(GameObjectData data, int id, Team* t, SceneManager_Serv
 		ObjectDetection::addObject(this, flags, -SUPER_MINION_WIDTH, SUPER_MINION_WIDTH, -SUPER_MINION_LENGTH, SUPER_MINION_LENGTH);
 	}
 }
+
+void SuperMinion::dropPickups() {
+	srand((unsigned int)time(NULL));
+	vec3 pos = this->getPosition();
+	if (rand() % SUPER_MINION_IRON_DROP_CHANCE == 0) {
+		float x = pos.getX() + (((rand() % 100) / 100.0f) * DROP_RANGE);
+		float z = pos.getZ() + (((rand() % 100) / 100.0f) * DROP_RANGE);
+		manager->spawnEntity(IRON_TYPE, x, z, 0, nullptr);
+	}
+	if (rand() % SUPER_MINION_BOTTLE_DROP_CHANCE == 0) {
+		float x = pos.getX() + (((rand() % 100) / 100.0f) * DROP_RANGE);
+		float z = pos.getZ() + (((rand() % 100) / 100.0f) * DROP_RANGE);
+		manager->spawnEntity(BOTTLE_TYPE, x, z, 0, nullptr);
+	}
+}

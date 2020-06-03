@@ -26,6 +26,7 @@
 #define DETECTION_FLAG_PATH_NODE 1 << 11
 #define DETECTION_FLAG_BUILD_NODE 1 << 12
 #define DETECTION_FLAG_WALL_NODE 1 << 13
+#define DETECTION_FLAG_PICKUP 1 << 14
 
 class ObjectDetection {
 private:

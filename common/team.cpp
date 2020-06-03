@@ -2,7 +2,6 @@
 
 Team::Team(char color) {
 	teamColor = color;
-	winStatus = WIN_STATUS_NEUTRAL;
 	metalCount = 0;
 	plasticCount = 0;
 	baseHealth = 100; //TODO pointer to base and getHealth()? or have base set baseHealth?

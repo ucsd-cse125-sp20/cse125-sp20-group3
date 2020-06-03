@@ -16,6 +16,7 @@
 #include "../common/lasertower.h"
 #include "../common/clawtower.h"
 #include "../common/resource.h"
+#include "../common/pickup.h"
 
 #include "../common/ObjectDetection.h"
 #include "../common/PathNode.h"
@@ -25,7 +26,7 @@
 class SceneManager_Server {
 private:
 		
-		int next_player_id, next_base_id, next_minion_id, next_super_minion_id, next_laser_id, next_claw_id, next_dumpster_id, next_recycling_bin_id;
+		int next_player_id, next_base_id, next_minion_id, next_super_minion_id, next_laser_id, next_claw_id, next_dumpster_id, next_recycling_bin_id, next_iron_id, next_bottle_id;
 		int num_red = 0, num_blue = 0;
 		Team *red_team, *blue_team;
 		Base *red_base, *blue_base;

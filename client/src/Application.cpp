@@ -470,8 +470,8 @@ void Application::InitDebugGui()
 	UIUtils::createImage("overlay", "why.png", 0, 0, float2((float)mSettings.mWidth / 1333, (float)mSettings.mHeight / 949), 10);
 
 
-	UIUtils::loadFont("default font", "TitilliumText/TitilliumText-Bold.otf", 128); // All fonts must be loaded beforehand
-	UIUtils::loadFont("large font", "TitilliumText/TitilliumText-Bold.otf", 300); // All fonts must be loaded beforehand
+	// UIUtils::loadFont("default font", "TitilliumText/TitilliumText-Bold.otf", 128); // All fonts must be loaded beforehand
+	// UIUtils::loadFont("large font", "TitilliumText/TitilliumText-Bold.otf", 300); // All fonts must be loaded beforehand
 	UIUtils::loadFont("small font", "TitilliumText/TitilliumText-Bold.otf", 25); // All fonts must be loaded beforehand
 
 	// display resources count
@@ -503,8 +503,13 @@ void Application::InitDebugGui()
 	UIUtils::createImage("health_bar_blue_deducted", "base_health_bars_blue.png", 702, 24, float2((float)1 / 2, (float)1 / 2), 3);
 	UIUtils::createImage("health_bar_red", "base_health_bars_red.png", 981, 24, float2((float)1/2, (float)1/2), 2);
 
-	UIUtils::createText("defeat_text", "", 640, 280, "small font", 0xff6655ff, 4);
-	UIUtils::createText("victory_text", "", 600, 280, "small font", 0xff6655ff, 4);
+	// UIUtils::createText("defeat_text", "", 640, 280, "small font", 0xff6655ff, 4);
+	// UIUtils::createText("victory_text", "", 600, 280, "small font", 0xff6655ff, 4);
+	UIUtils::createImage("defeat_text", "text_placeholder.png", 400, 250, float2(1, 1), 4);
+	UIUtils::createImage("victory_text", "text_placeholder.png", 400, 250, float2(1, 1), 5);
+
+	//UIUtils::createText("waiting", "Waiting for players", 640, 280, "small font", 0xffffffff, 4);
+	UIUtils::createImage("waiting_for_player", "text_placeholder.png",665, 220, float2(1,1), 4);
 
 	UIUtils::loadTexture("WeirdBox_halo.png"); // Preload textures
 

@@ -14,7 +14,9 @@ SceneManager_Server::SceneManager_Server() :
 	next_laser_id(ID_LASER_MIN),
 	next_claw_id(ID_CLAW_MIN),
 	next_dumpster_id(ID_DUMPSTER_MIN),
-	next_recycling_bin_id(ID_RECYCLING_BIN_MIN)
+	next_recycling_bin_id(ID_RECYCLING_BIN_MIN),
+	next_iron_id(ID_IRON_MIN),
+	next_bottle_id(ID_BOTTLE_MIN)
 {
 	red_team = new Team(RED_TEAM);
 	blue_team = new Team(BLUE_TEAM);
@@ -22,7 +24,7 @@ SceneManager_Server::SceneManager_Server() :
 	this->buildScene();
 
 	//this->testScene();
-	this->testAttacking();
+	//this->testAttacking();
 	//this->testBuilding();
 	//this->testWalls();
 }
@@ -151,6 +153,30 @@ int SceneManager_Server::spawnEntity(char spawnType, float pos_x, float pos_z, f
 				break;
 			}
 		} while (idMap.find(next_recycling_bin_id) != idMap.end());
+		break;
+	case IRON_TYPE:
+		id = next_iron_id;
+		ent = new Pickup(IRON_TYPE, data, id, this);
+
+		do {
+			next_iron_id = next_iron_id + 1 > ID_IRON_MAX ? ID_IRON_MIN : next_iron_id + 1;
+			if (next_iron_id == id) { //wrapped all the way around, all id's taken
+				std::cout << "maximum number of iron reached, consider expanding id ranges\n";
+				break;
+			}
+		} while (idMap.find(next_iron_id) != idMap.end());
+		break;
+	case BOTTLE_TYPE:
+		id = next_bottle_id;
+		ent = new Pickup(BOTTLE_TYPE, data, id, this);
+
+		do {
+			next_bottle_id = next_bottle_id + 1 > ID_BOTTLE_MAX ? ID_BOTTLE_MIN : next_bottle_id + 1;
+			if (next_bottle_id == id) { //wrapped all the way around, all id's taken
+				std::cout << "maximum number of bottles reached, consider expanding id ranges\n";
+				break;
+			}
+		} while (idMap.find(next_bottle_id) != idMap.end());
 		break;
 	default:
 		id = -1;
@@ -448,6 +474,7 @@ void SceneManager_Server::populatePaths() {
 	pathNodes[76]->setNextBlue(pathNodes[20]);
 	pathNodes[77]->setNextBlue(pathNodes[28]);
 	pathNodes[79]->setNextBlue(pathNodes[80]);
+	pathNodes[80]->setNextBlue(pathNodes[9]); // fix pathing
 	pathNodes[81]->setNextBlue(pathNodes[82]);
 	pathNodes[82]->setNextBlue(pathNodes[10]);
 	pathNodes[83]->setNextBlue(pathNodes[84]);
@@ -922,8 +949,8 @@ void SceneManager_Server::testScene() { //testing only
 }
 
 void SceneManager_Server::testAttacking() {
-	int id;
-	GameObject::GameObjectData data;
+	//int id;
+	//GameObject::GameObjectData data;
 
 	/*id = next_minion_id;
 	next_minion_id++;
@@ -951,19 +978,19 @@ void SceneManager_Server::testAttacking() {
 	ClawTower* c1 = new ClawTower(data, id, red_team, this);
 	idMap[id] = c1;*/
 
-	id = next_claw_id;
+	/*id = next_claw_id;
 	next_claw_id++;
 	data = { 32.5, -27.5, 0 };
 	ClawTower* c2 = new ClawTower(data, id, blue_team, this);
-	idMap[id] = c2;
+	idMap[id] = c2;*/
 
 	/*id = next_laser_id;
 	next_laser_id++;
-	data = { 0, 10, 0 };
+	data = { 32.5, -27.5, 0 };
 	LaserTower* l1 = new LaserTower(data, id, blue_team, this);
-	idMap[id] = l1;
+	idMap[id] = l1;*/
 
-	id = next_laser_id;
+	/*id = next_laser_id;
 	next_laser_id++;
 	data = { 0, 20, 0 };
 	LaserTower* l2 = new LaserTower(data, id, red_team, this);

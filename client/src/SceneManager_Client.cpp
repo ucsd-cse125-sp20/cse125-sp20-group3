@@ -15,6 +15,8 @@ namespace {
 	const char* superMinionFile = "minion-2-super.gltf";
 	const char* laserTowerFile = "tower-1-laser.gltf";
 	const char* clawTowerFile = "tower-3-claw-machine.gltf";
+	//const char* ironFile = "";
+	//const char* bottleFile = "";
 
 	//////////////////////////// Animations ///////////////////////////////////
 	// Animations
@@ -36,10 +38,12 @@ namespace {
 	const char* dumpsterActions[1] = { "OpenAndClose" };
 	const char* recyclingBinDir = "recycling-bin";
 	const char* recyclingBinActions[1] = { "Harvested" };
+	const char* ironDir = "";
+	const char* bottleDir = "";
 
 
-	int counter = 1;
-	int animCounter = 1;
+	//int counter = 1;
+	//int animCounter = 1;
 }
 
 bool SceneManager_Client::enableCulling = true;
@@ -185,6 +189,12 @@ SceneManager_Client::~SceneManager_Client()
 		if (ID_RECYCLING_BIN_MIN <= e.first && e.first <= ID_RECYCLING_BIN_MAX) {
 			conf_delete((Resource_Client*)e.second);
 		}
+		if (ID_IRON_MIN <= e.first && e.first <= ID_IRON_MAX) {
+			conf_delete((Pickup_Client*)e.second);
+		}
+		if (ID_BOTTLE_MIN <= e.first && e.first <= ID_BOTTLE_MAX) {
+			conf_delete((Pickup_Client*)e.second);
+		}
 	}
 	for (std::pair<int, Transform*> t : transforms) conf_delete(t.second);
 	for (std::pair<int, Animator*> t : animators) conf_delete(t.second);
@@ -312,18 +322,22 @@ void SceneManager_Client::updateUI() {
 
 	if (red_health <= 0) {
 		if (trackedPlayerTeam->teamColor == RED_TEAM) {
-			UIUtils::editText(DEFEAT_TEXT, "Defeat", "large font", 0xff6655ff);
+			// UIUtils::editText(DEFEAT_TEXT, "Defeat", "large font", 0xff6655ff);
+			UIUtils::changeImage(DEFEAT_TEXT, "defeat.png", float2(1,1));
 		}
 		else {
-			UIUtils::editText(VICTORY_TEXT, "Victory", "large font", 0xff6655ff);
+			// UIUtils::editText(VICTORY_TEXT, "Victory", "large font", 0xff6655ff);
+			UIUtils::changeImage(VICTORY_TEXT, "victory.png", float2(1,1));
 		}
 	}
 	else if (blue_health <= 0) {
 		if (trackedPlayerTeam->teamColor == BLUE_TEAM) {
-			UIUtils::editText(DEFEAT_TEXT, "Defeat", "large font", 0xff6655ff);
+			// UIUtils::editText(DEFEAT_TEXT, "Defeat", "large font", 0xff6655ff);
+			UIUtils::changeImage(DEFEAT_TEXT, "defeat.png", float2(1,1));
 		}
 		else {
-			UIUtils::editText(VICTORY_TEXT, "Victory", "large font", 0xff6655ff);
+			// UIUtils::editText(VICTORY_TEXT, "Victory", "large font", 0xff6655ff);
+			UIUtils::changeImage(VICTORY_TEXT, "victory.png", float2(1,1));
 		}
 	}
 
@@ -334,6 +348,9 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 	std::vector<int> deadEntities;
 
 	if (updateData.entUpdates.size() > 0) first_update = false;
+
+	//UIUtils::editText("waiting", "lolol", "small font", 0xffffffff);
+	UIUtils::changeImage("waiting_for_player", "text_placeholder.png", float2(1,1));
 
 	//std::cout << "updating from client buf of size " << updateData.entUpdates.size() << "\n";
 	for (Client::IDEntData data : updateData.entUpdates) {
@@ -423,6 +440,20 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 				idMap[data.id] = r_b_c;
 				wrapperMap[data.id] = r_b_c;
 			}
+			else if (ID_IRON_MIN <= data.id && data.id <= ID_IRON_MAX) {
+				std::cout << "creating new iron pickup id: " << data.id << "\n";
+				transforms[data.id] = conf_new(Transform, mat4::identity());
+				Pickup_Client* i_c = conf_new(Pickup_Client, IRON_TYPE, GO_data, data.id, this, ozzGeodes[MINION_GEODE_R], transforms[data.id]);
+				idMap[data.id] = i_c;
+				wrapperMap[data.id] = i_c;
+			}
+			else if (ID_BOTTLE_MIN <= data.id && data.id <= ID_BOTTLE_MAX) {
+				std::cout << "creating new bottle pickup id: " << data.id << "\n";
+				transforms[data.id] = conf_new(Transform, mat4::identity());
+				Pickup_Client* b_c = conf_new(Pickup_Client, BOTTLE_TYPE, GO_data, data.id, this, ozzGeodes[MINION_GEODE_B], transforms[data.id]);
+				idMap[data.id] = b_c;
+				wrapperMap[data.id] = b_c;
+			}
 
 			this->addChild(transforms[data.id]);
 		}
@@ -493,6 +524,12 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 		}
 		if (ID_RECYCLING_BIN_MIN <= id && id <= ID_RECYCLING_BIN_MAX) {
 			conf_delete((Resource_Client*)idMap[id]);
+		}
+		if (ID_IRON_MIN <= id && id <= ID_IRON_MAX) {
+			conf_delete((Pickup_Client*)idMap[id]);
+		}
+		if (ID_BOTTLE_MIN <= id && id <= ID_BOTTLE_MAX) {
+			conf_delete((Pickup_Client*)idMap[id]);
 		}
 
 		idMap.erase(id);

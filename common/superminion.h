@@ -6,6 +6,8 @@
 class SuperMinion : public Minion {
 public:
 	SuperMinion(GameObjectData data, int id, Team* t, SceneManager_Server* sm_server);
+
+	void dropPickups() override;
 };
 
 #endif

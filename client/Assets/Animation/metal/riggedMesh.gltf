@@ -1,0 +1,169 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 84,
+      "min": [-0.419426, -0.192295, -0.51393],
+      "max": [0.422729, 0.965234, 0.524045]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 84
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "type": "VEC2",
+      "count": 84
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5123,
+      "type": "VEC4",
+      "count": 84
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5126,
+      "type": "VEC4",
+      "count": 84
+    },
+    {
+      "bufferView": 5,
+      "componentType": 5123,
+      "type": "SCALAR",
+      "count": 144
+    },
+    {
+      "bufferView": 6,
+      "componentType": 5126,
+      "type": "MAT4",
+      "count": 1
+    }
+  ],
+  "asset": {
+    "generator": "Khronos glTF Blender I/O v1.1.46",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 1008
+    },
+    {
+      "buffer": 0,
+      "byteLength": 1008,
+      "byteOffset": 1008
+    },
+    {
+      "buffer": 0,
+      "byteLength": 672,
+      "byteOffset": 2016
+    },
+    {
+      "buffer": 0,
+      "byteLength": 672,
+      "byteOffset": 2688
+    },
+    {
+      "buffer": 0,
+      "byteLength": 1344,
+      "byteOffset": 3360
+    },
+    {
+      "buffer": 0,
+      "byteLength": 288,
+      "byteOffset": 4704
+    },
+    {
+      "buffer": 0,
+      "byteLength": 64,
+      "byteOffset": 4992
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "riggedMesh.bin",
+      "byteLength": 5056
+    }
+  ],
+  "images": [
+    {
+      "name": "metal_tex",
+      "uri": "metal_tex.png",
+      "mimeType": "image/png"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Cube",
+      "primitives": [
+        {
+          "indices": 5,
+          "material": 0,
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2,
+            "JOINTS_0": 3,
+            "WEIGHTS_0": 4
+          }
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "metal",
+      "doubleSided": true,
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        },
+        "metallicFactor": 0,
+        "roughnessFactor": 0.518519
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "name": "Bone",
+      "translation": [0.151222, 0.112968, 0.176946],
+      "rotation": [-0.268509, -0.109331, 0.264455, 0.91979],
+      "scale": [1, 1, 1]
+    },
+    {
+      "mesh": 0,
+      "name": "Cube",
+      "skin": 0
+    },
+    {
+      "children": [ 1, 0 ],
+      "name": "Armature"
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [ 2 ]
+    }
+  ],
+  "textures": [
+    {
+      "source": 0
+    }
+  ],
+  "skins": [
+    {
+      "inverseBindMatrices": 6,
+      "joints": [ 0 ],
+      "name": "Armature",
+      "extras": [ 1, ],
+    }
+  ]
+}

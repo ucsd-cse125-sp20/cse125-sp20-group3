@@ -38,8 +38,9 @@ namespace {
 	const char* dumpsterActions[1] = { "OpenAndClose" };
 	const char* recyclingBinDir = "recycling-bin";
 	const char* recyclingBinActions[1] = { "Harvested" };
-	const char* ironDir = "";
-	const char* bottleDir = "";
+	const char* metalDir = "metal";
+	const char* plasticDir = "water-bottle";
+	const char* lootActions[3] = { "Dropped", "Idle", "Looted" };
 
 
 	//int counter = 1;

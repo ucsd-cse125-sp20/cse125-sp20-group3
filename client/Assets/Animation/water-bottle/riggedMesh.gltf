@@ -1,0 +1,169 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 24641,
+      "min": [-0.182918, 0.00955501, -0.182918],
+      "max": [0.182918, 0.886408, 0.182918]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 24641
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "type": "VEC2",
+      "count": 24641
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5123,
+      "type": "VEC4",
+      "count": 24641
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5126,
+      "type": "VEC4",
+      "count": 24641
+    },
+    {
+      "bufferView": 5,
+      "componentType": 5123,
+      "type": "SCALAR",
+      "count": 115200
+    },
+    {
+      "bufferView": 6,
+      "componentType": 5126,
+      "type": "MAT4",
+      "count": 1
+    }
+  ],
+  "asset": {
+    "generator": "Khronos glTF Blender I/O v1.1.46",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 295692
+    },
+    {
+      "buffer": 0,
+      "byteLength": 295692,
+      "byteOffset": 295692
+    },
+    {
+      "buffer": 0,
+      "byteLength": 197128,
+      "byteOffset": 591384
+    },
+    {
+      "buffer": 0,
+      "byteLength": 197128,
+      "byteOffset": 788512
+    },
+    {
+      "buffer": 0,
+      "byteLength": 394256,
+      "byteOffset": 985640
+    },
+    {
+      "buffer": 0,
+      "byteLength": 230400,
+      "byteOffset": 1379896
+    },
+    {
+      "buffer": 0,
+      "byteLength": 64,
+      "byteOffset": 1610296
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "riggedMesh.bin",
+      "byteLength": 1610360
+    }
+  ],
+  "images": [
+    {
+      "name": "water_bottle_tex-01",
+      "uri": "water_bottle_tex-01.png",
+      "mimeType": "image/png"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Cylinder",
+      "primitives": [
+        {
+          "indices": 5,
+          "material": 0,
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2,
+            "JOINTS_0": 3,
+            "WEIGHTS_0": 4
+          }
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "water bottle tex",
+      "doubleSided": true,
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        },
+        "metallicFactor": 0,
+        "roughnessFactor": 0.5
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "name": "Bone",
+      "translation": [-0.0282635, 1.28316, -9.30376e-08],
+      "rotation": [-8.79038e-15, -1.22897e-07, 0.914689, 0.404159],
+      "scale": [0.041481, 0.041481, 0.041481]
+    },
+    {
+      "mesh": 0,
+      "name": "Cylinder",
+      "skin": 0
+    },
+    {
+      "children": [ 1, 0 ],
+      "name": "Armature"
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [ 2 ]
+    }
+  ],
+  "textures": [
+    {
+      "source": 0
+    }
+  ],
+  "skins": [
+    {
+      "inverseBindMatrices": 6,
+      "joints": [ 0 ],
+      "name": "Armature",
+      "extras": [ 1, ],
+    }
+  ]
+}

@@ -32,14 +32,22 @@
 #define NO_TRACKED_PLAYER -1
 
 #define ENV_GEODE "env_geometry"
-#define PLAYER_GEODE "player_geometry"
+#define PLAYER_GEODE_M_R "player_geometry_mr"
+#define PLAYER_GEODE_M_B "player_geometry_mb"
+#define PLAYER_GEODE_F_R "player_geometry_fr"
+#define PLAYER_GEODE_F_B "player_geometry_fb"
 #define BASE_GEODE "base_geometry"
-#define MINION_GEODE "minion_geometry"
-#define SUPER_MINION_GEODE "super_minion_geometry"
+#define MINION_GEODE_R "minion_geometry_r"
+#define MINION_GEODE_B "minion_geometry_b"
+#define SUPER_MINION_GEODE_R "super_minion_geometry_r"
+#define SUPER_MINION_GEODE_B "super_minion_geometry_b"
 #define LASER_TOWER_GEODE "laser_tower_geometry"
-#define CLAW_TOWER_GEODE "claw_tower_geometry"
+#define CLAW_TOWER_GEODE_R "claw_tower_geometry_r"
+#define CLAW_TOWER_GEODE_B "claw_tower_geometry_b"
 #define DUMPSTER_GEODE "dumpster_geometry"
 #define RECYCLING_BIN_GEODE "recycling_bin_geometry"
+#define FOUNTAIN_PARTICLES "fountain"
+#define BULLET_PARTICLES "bullets"
 
 class SceneManager_Client : public Transform
 {

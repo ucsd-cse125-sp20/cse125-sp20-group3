@@ -48,7 +48,8 @@ void Player::update(float deltaTime) {
 	//movement ok, check for pickups
 	std::vector<GameObject*> p = ObjectDetection::getCollisions(this, DETECTION_FLAG_PICKUP);
 	for (GameObject* pickup : p) {
-
+		std::pair<char, int> res = ((Pickup*)pickup)->pickup();
+		this->team->addResource(res.first, res.second);
 	}
 
 	vec3 forward = vec3(-sin(rotation_y), 0, cos(rotation_y));

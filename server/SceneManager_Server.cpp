@@ -972,17 +972,17 @@ void SceneManager_Server::testAttacking() {
 	SuperMinion* sm2 = new SuperMinion(data, id, red_team, this);
 	idMap[id] = sm2;*/
 
-	id = next_claw_id;
+	/*id = next_claw_id;
 	next_claw_id++;
 	data = { 92.5, -82.5, 0 };
 	ClawTower* c1 = new ClawTower(data, id, red_team, this);
-	idMap[id] = c1;
+	idMap[id] = c1;*/
 
-	/*id = next_claw_id;
+	id = next_claw_id;
 	next_claw_id++;
 	data = { 32.5, -27.5, 0 };
 	ClawTower* c2 = new ClawTower(data, id, blue_team, this);
-	idMap[id] = c2;*/
+	idMap[id] = c2;
 
 	/*id = next_laser_id;
 	next_laser_id++;

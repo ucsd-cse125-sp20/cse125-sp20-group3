@@ -133,7 +133,7 @@ Client::UpData Client::recvAndFormatData() {
 			}
 		}
 		bytes_to_receive = ((int*)size_int_buf)[0]; //save the bytes received as an int
-		std::cout << "found " << bytes_to_receive << " bytes to receive\n";
+		//std::cout << "found " << bytes_to_receive << " bytes to receive\n";
 
 		if (bytes_to_receive < 0) {
 			std::cout << "negative bytes to receive\n";

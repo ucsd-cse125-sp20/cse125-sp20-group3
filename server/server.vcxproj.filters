@@ -69,6 +69,9 @@
     <ClCompile Include="..\common\superminion.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\pickup.cpp">
+      <Filter>Source Files\Game Objects</Filter>
+    </ClCompile>
     <ClCompile Include="..\common\BuildNode.cpp">
       <Filter>Source Files\Map Nodes</Filter>
     </ClCompile>
@@ -77,9 +80,6 @@
     </ClCompile>
     <ClCompile Include="..\common\WallNode.cpp">
       <Filter>Source Files\Map Nodes</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\pickup.cpp">
-      <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -131,17 +131,17 @@
     <ClInclude Include="..\common\superminion.h">
       <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\pickup.h">
+      <Filter>Header Files\Game Objects</Filter>
+    </ClInclude>
     <ClInclude Include="..\common\BuildNode.h">
       <Filter>Header Files\Map Nodes</Filter>
     </ClInclude>
-    <ClInclude Include="..\common\player_client.h">
+    <ClInclude Include="..\common\PathNode.h">
       <Filter>Header Files\Map Nodes</Filter>
     </ClInclude>
     <ClInclude Include="..\common\WallNode.h">
       <Filter>Header Files\Map Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\common\pickup.h">
-      <Filter>Header Files\Game Objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

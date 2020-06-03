@@ -11,14 +11,24 @@ Pickup::Pickup(char resourceType, GameObjectData data, int id, SceneManager_Serv
 	}
 }
 
+void Pickup::update(float deltaTime) {
+	timeElapsed += deltaTime;
+
+	if (timeElapsed >= PICKUP_TIMEOUT_INTERVAL) {
+		active = false;
+		this->takeDamage(PICKUP_HEALTH);
+		std::cout << "pickup " << id << " timed out, despawning\n";
+	}
+}
+
 std::pair<char, int> Pickup::pickup() {
+	//in the case of multiple players colliding with this, first come first served
 	if (!active) return std::make_pair(METAL_RES_TYPE, 0); //if not active, return nothing
-	int value;
-	if (type == METAL_RES_TYPE)	value = PICKUP_METAL;
-	else if (type == PLASTIC_RES_TYPE) value = PICKUP_PLASTIC;
+
+	std::pair<char, int> drop;
+	if (type == IRON_TYPE) drop = std::make_pair(METAL_RES_TYPE, IRON_METAL);
+	else if (type == BOTTLE_TYPE) drop = std::make_pair(PLASTIC_RES_TYPE, BOTTLE_PLASTIC);
 	else std::cout << "invalid pickup type picked up\n";
-		
-	std::pair<char, int> drop = std::make_pair(type, value);
 
 	active = false;
 	this->takeDamage(PICKUP_HEALTH);

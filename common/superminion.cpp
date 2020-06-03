@@ -14,12 +14,12 @@ SuperMinion::SuperMinion(GameObjectData data, int id, Team* t, SceneManager_Serv
 void SuperMinion::dropPickups() {
 	srand((unsigned int)time(NULL));
 	vec3 pos = this->getPosition();
-	for (int i = 0; i < SUPER_MINION_DROP_IRON; i++) {
+	if (rand() % SUPER_MINION_IRON_DROP_CHANCE == 0) {
 		float x = pos.getX() + (((rand() % 100) / 100.0f) * DROP_RANGE);
 		float z = pos.getZ() + (((rand() % 100) / 100.0f) * DROP_RANGE);
 		manager->spawnEntity(IRON_TYPE, x, z, 0, nullptr);
 	}
-	for (int i = 0; i < SUPER_MINION_DROP_BOTTLE; i++) {
+	if (rand() % SUPER_MINION_BOTTLE_DROP_CHANCE == 0) {
 		float x = pos.getX() + (((rand() % 100) / 100.0f) * DROP_RANGE);
 		float z = pos.getZ() + (((rand() % 100) / 100.0f) * DROP_RANGE);
 		manager->spawnEntity(BOTTLE_TYPE, x, z, 0, nullptr);

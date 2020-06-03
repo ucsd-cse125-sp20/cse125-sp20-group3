@@ -1,13 +1,13 @@
 #ifndef _MACROS_H_
 #define _MACROS_H_
 
-#define SERVER_NAME "localhost"
+#define SERVER_NAME "137.110.111.249"
 
 #define DEFAULT_BUFLEN 512
 #define SERVER_SENDBUFLEN 512000
 #define SERVER_TICKRATE 20 // times per second
 #define DEFAULT_PORT "27015"
-#define NUM_PLAYERS 1 //change to 4 eventually //upper bound, no more than 15 (1 byte) because of Server recv
+#define NUM_PLAYERS 2 //change to 4 eventually //upper bound, no more than 15 (1 byte) because of Server recv
 #define DELIMITER ','
 
 #define NO_TARGET_ID -1
@@ -123,8 +123,8 @@
 #define SUPER_MINION_PLASTIC_REQ 10
 #define LASER_METAL_REQ 2
 #define LASER_PLASTIC_REQ 0
-#define CLAW_METAL_REQ 5
-#define CLAW_PLASTIC_REQ 5
+#define CLAW_METAL_REQ 0//5
+#define CLAW_PLASTIC_REQ 0//5
 
 //drop chance 1/x
 #define MINION_IRON_DROP_CHANCE 4

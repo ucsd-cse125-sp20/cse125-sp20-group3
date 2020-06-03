@@ -312,6 +312,9 @@
     <ClCompile Include="..\..\..\..\..\common\pickup_client.cpp">
       <Filter>Source Files\Game Objects</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\..\common\net_util.cpp">
+      <Filter>Source Files\Networking</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\src\Shaders\D3D12\basic.frag">
@@ -672,6 +675,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\common\pickup_client.h">
       <Filter>Header Files\Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\common\net_util.h">
+      <Filter>Header Files\Networking</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

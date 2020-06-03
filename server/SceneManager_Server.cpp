@@ -198,7 +198,7 @@ void SceneManager_Server::update(float deltaTime) {
 	for (std::pair<int, Entity*> idEntPair : idMap) { //first pass, check for anything that died last cycle
 		if (idEntPair.second == red_base || idEntPair.second == blue_base) continue; //skip bases
 		if (idEntPair.second->getHealth() <= 0) {	//entity reached 0 health last cycle, mark it for deletion
-			std::cout << "marking entity id " << idEntPair.first << " addr " << idEntPair.second << " to be deleted\n";
+			//std::cout << "marking entity id " << idEntPair.first << " addr " << idEntPair.second << " to be deleted\n";
 			deadIDs.push_back(idEntPair.first);
 			deadEntities.push_back(idEntPair.second);
 		}

@@ -106,6 +106,7 @@
     <ClCompile Include="..\common\lasertower.cpp" />
     <ClCompile Include="..\common\MathUtils.cpp" />
     <ClCompile Include="..\common\minion.cpp" />
+    <ClCompile Include="..\common\net_util.cpp" />
     <ClCompile Include="..\common\ObjectDetection.cpp" />
     <ClCompile Include="..\common\PathNode.cpp" />
     <ClCompile Include="..\common\pickup.cpp" />
@@ -129,6 +130,7 @@
     <ClInclude Include="..\common\lasertower.h" />
     <ClInclude Include="..\common\macros.h" />
     <ClInclude Include="..\common\MathUtils.h" />
+    <ClInclude Include="..\common\net_util.h" />
     <ClInclude Include="..\common\ObjectDetection.h" />
     <ClInclude Include="..\common\PathNode.h" />
     <ClInclude Include="..\common\pickup.h" />

@@ -9,6 +9,7 @@
 
 #include "../common/macros.h"
 #include "../common/client2server.h"
+#include "../common/net_util.h"
 #include "SceneManager_Server.h"
 #include <windows.h>
 #include <winsock2.h>
@@ -44,7 +45,6 @@ public:
 	Server(SceneManager_Server* manager); //set up server listening
 	bool gameInProgress();
 	void pushDataAll(char sendbuf[], int buflen, int flags); //send data to clients
-	unsigned char checksum(char buf[], int size);
 	//void pushDataPlayer(int conn_socket, char sendbuf[], int buflen, int flags);
 	std::vector<PlayerInput> pullData(); //recv data from clients
 	int cleanup(int how); //close all clients' connections with server

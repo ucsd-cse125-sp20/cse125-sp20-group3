@@ -84,6 +84,9 @@
     <ClCompile Include="..\common\MathUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\net_util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Server.h">
@@ -147,6 +150,9 @@
       <Filter>Header Files\Map Nodes</Filter>
     </ClInclude>
     <ClInclude Include="..\common\MathUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\net_util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

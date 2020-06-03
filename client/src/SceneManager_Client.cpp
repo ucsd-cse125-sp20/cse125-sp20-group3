@@ -88,7 +88,7 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	((OzzObject*)ozzGeodes[DUMPSTER_GEODE]->obj)->SetClip(dumpsterActions[0]);
 
 	ozzGeodes[BASE_GEODE_R] = conf_new(OzzGeode, renderer, baseDirR);
-	((OzzObject*)ozzGeodes[DUMPSTER_GEODE]->obj)->SetClip(baseActions[0]); // Set a default action
+	((OzzObject*)ozzGeodes[BASE_GEODE_R]->obj)->SetClip(baseActions[0]); // Set a default action
 
 
 	ParticleSystem::ParticleSystemParams particleParams = {};

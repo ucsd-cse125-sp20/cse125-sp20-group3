@@ -305,6 +305,9 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 
 	if (updateData.entUpdates.size() > 0) first_update = false;
 
+	//UIUtils::editText("waiting", "lolol", "small font", 0xffffffff);
+	UIUtils::changeImage("waiting_for_player", "text_placeholder.png", float2(1,1));
+
 	//std::cout << "updating from client buf of size " << updateData.entUpdates.size() << "\n";
 	for (Client::IDEntData data : updateData.entUpdates) {
 		if (idMap.find(data.id) == idMap.end()) { //new id encountered, spawn new object

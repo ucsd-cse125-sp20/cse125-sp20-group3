@@ -493,7 +493,8 @@ void Application::InitDebugGui()
 	UIUtils::createImage("defeat_text", "text_placeholder.png", 400, 250, float2(1, 1), 4);
 	UIUtils::createImage("victory_text", "text_placeholder.png", 400, 250, float2(1, 1), 5);
 
-	UIUtils::createText("waiting", "Waiting for players", 640, 280, "small font", 0xffffffff, 4);
+	//UIUtils::createText("waiting", "Waiting for players", 640, 280, "small font", 0xffffffff, 4);
+	UIUtils::createImage("waiting_for_player", "text_placeholder.png",665, 220, float2(1,1), 4);
 
 	UIUtils::loadTexture("WeirdBox_halo.png"); // Preload textures
 

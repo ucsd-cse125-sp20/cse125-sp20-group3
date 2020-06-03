@@ -69,13 +69,17 @@ int __cdecl main(void)
 		/* Send updated data back to clients */
 		int statebufSize = manager->encodeState(sendbuf, 0);
 		int sendbufSize = manager->encodeScene(sendbuf, statebufSize);
-		//std::cout << "sending\n";
+		unsigned char checksum = server->checksum(sendbuf, sendbufSize);
 
-		//if (manager != m) std::cout << "e manager changed\n";
+		//std::cout << "server_main sendbuf checksum: " << (int)checksum << "\n";
+
 		//std::cout << "sendbufSize: " << sendbufSize << std::endl;
 		char sizebuf[4];
 		((int*)sizebuf)[0] = sendbufSize; //push size of data packet to players
+		//std::cout << "server_main sizebuf checksum: " << (int)server->checksum(sizebuf, 4) << "\n";
 		server->pushDataAll(sizebuf, sizeof(int), 0); //and then push data packet
+		if (server->checksum(sendbuf, sendbufSize) != checksum) std::cout << "server_main sendbuf checksum changed after sending size\n";
+		//std::cout << "sending data\n";
 		server->pushDataAll(sendbuf, sendbufSize, 0);
 
 		//if (manager != m) std::cout << "f manager changed\n";

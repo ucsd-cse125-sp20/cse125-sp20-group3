@@ -124,15 +124,30 @@ bool Server::gameInProgress() {
 }
 
 void Server::pushDataAll(char sendbuf[], int buflen, int flags) {
+	unsigned char check = (int)this->checksum(sendbuf, buflen);
+	//std::cout << "pushing data, checksum: " << (int)check << "\n";
 	
 	for (int p = 0; p < NUM_PLAYERS; p++) { //append each byte in sendbuf to all the player outbound buffers
 		player_states_mtx[p].lock();
-		//std::cout << "pushing " << buflen << " bytes\n";
+
+		unsigned char sum = (int)this->checksum(sendbuf, buflen);
+		if (sum != check) std::cout << "checksum changed at p: " << p << " buflen: " << buflen << " check: " << (int)check << " sum: " << (int)sum << "\n";
+
 		for (int i = 0; i < buflen; i++) {
 			Player_States[p].out.push_back(sendbuf[i]);
 		}
 		player_states_mtx[p].unlock();
 	}
+}
+
+unsigned char Server::checksum(char buf[], int size) {
+	unsigned char checksum = 0x02;
+
+	for(int i = 0; i < size; i++) {
+		checksum ^= buf[i];
+	}
+	checksum ^= 0x03;
+	return checksum;
 }
 
 //void Server::pushDataPlayer(int conn_socket, char sendbuf[], int buflen, int flags) {

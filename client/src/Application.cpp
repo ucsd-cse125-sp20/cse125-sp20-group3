@@ -232,6 +232,11 @@ bool Application::InitSceneResources()
 	AudioManager::setGlobalVolume(0.5f);
 	AudioManager::loadWav("loop.wav", "bg");
 	AudioManager::loadWav("laser.wav", "laser");
+	AudioManager::loadWav("bullets.wav", "bullets");
+	AudioManager::loadWav("collect.wav", "collect");
+	AudioManager::loadWav("build.wav", "build");
+	AudioManager::loadWav("spawn.wav", "spawn");
+	AudioManager::loadWav("super_spawn.wav", "super_spawn");
 	AudioManager::setLoop("bg");
 
 	return true;

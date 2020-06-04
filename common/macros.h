@@ -5,7 +5,7 @@
 
 #define DEFAULT_BUFLEN 512
 #define SERVER_SENDBUFLEN 512000
-#define USE_SMALL_DATA true
+#define USE_SMALL_DATA
 #define SERVER_TICKRATE 20 // times per second
 #define DEFAULT_PORT "27015"
 #define NUM_PLAYERS 1 //change to 4 eventually //upper bound, no more than 15 (1 byte) because of Server recv
@@ -26,25 +26,25 @@
 #define NO_TEAM_SMALL 2
 
 #define ID_PLAYER_MIN 0
-#define ID_PLAYER_MAX 999
-#define ID_BASE_MIN 1000
-#define ID_BASE_MAX 1999
-#define ID_MINION_MIN 2000
-#define ID_MINION_MAX 2999
-#define ID_SUPER_MINION_MIN 3000
-#define ID_SUPER_MINION_MAX 3999
-#define ID_LASER_MIN 4000
-#define ID_LASER_MAX 4999
-#define ID_CLAW_MIN 5000
-#define ID_CLAW_MAX 5999
-#define ID_DUMPSTER_MIN 6000
-#define ID_DUMPSTER_MAX 6999
-#define ID_RECYCLING_BIN_MIN 7000
-#define ID_RECYCLING_BIN_MAX 7999
-#define ID_IRON_MIN 8000
-#define ID_IRON_MAX 8999
-#define ID_BOTTLE_MIN 9000
-#define ID_BOTTLE_MAX 9999
+#define ID_PLAYER_MAX 95
+#define ID_BASE_MIN 96
+#define ID_BASE_MAX 99
+#define ID_MINION_MIN 100
+#define ID_MINION_MAX 599
+#define ID_SUPER_MINION_MIN 600
+#define ID_SUPER_MINION_MAX 1099
+#define ID_LASER_MIN 1100
+#define ID_LASER_MAX 1299
+#define ID_CLAW_MIN 1300
+#define ID_CLAW_MAX 1499
+#define ID_DUMPSTER_MIN 1500
+#define ID_DUMPSTER_MAX 1699
+#define ID_RECYCLING_BIN_MIN 1700
+#define ID_RECYCLING_BIN_MAX 1899
+#define ID_IRON_MIN 1900
+#define ID_IRON_MAX 2199
+#define ID_BOTTLE_MIN 2200
+#define ID_BOTTLE_MAX 2499
 
 //length is z, width is x
 #define PLAYER_LENGTH 0.2f //checked
@@ -93,8 +93,8 @@
 #define SUPER_MINION_HEALTH 200
 #define LASER_TOWER_HEALTH 500
 #define CLAW_TOWER_HEALTH 500
-#define RESOURCE_HEALTH 1
-#define PICKUP_HEALTH 1
+#define RESOURCE_HEALTH 10
+#define PICKUP_HEALTH 10
 
 #define PLAYER_ATTACK 25
 #define BASE_ATTACK 0

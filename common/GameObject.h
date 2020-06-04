@@ -28,11 +28,6 @@ public:
 		float x, z, rot;
 	};
 
-	struct GameObjectData_Small {
-		uint16_t x, z;
-		uint8_t rot;
-	};
-
 	ObjDectData objDectData = {};
 
 	GameObject();
@@ -46,8 +41,8 @@ public:
 	GameObjectData getData();
 	virtual int writeData(char buf[], int index);
 
-	static GameObjectData_Small compressData(GameObjectData data);
-	static GameObjectData decompressData(GameObjectData_Small data);
+	static uint64_t compressData(GameObjectData data);
+	static GameObjectData decompressData(uint64_t data);
 };
 
 struct SpatialCell {

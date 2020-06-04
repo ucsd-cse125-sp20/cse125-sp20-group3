@@ -24,7 +24,7 @@ SceneManager_Server::SceneManager_Server() :
 	this->buildScene();
 
 	//this->testScene();
-	//this->testAttacking();
+	this->testAttacking();
 	//this->testBuilding();
 	//this->testWalls();
 }
@@ -248,20 +248,30 @@ int SceneManager_Server::encodeScene(char buf[], int start_index) {
 	int i = start_index;
 	for (std::pair<int, Entity*> idEntPair : idMap) { //iterate through all entities in scene
 		//std::cout << "writing id at i: " << i << "\n";
+#if defined(USE_SMALL_DATA)
+		((uint16_t*)(buf + i))[0] = (uint16_t)idEntPair.first;
+		i += sizeof(uint16_t);
+#else
 		((int*)(buf + i))[0] = idEntPair.first;
 		i += sizeof(int);
+#endif
 
+
+#if !defined(USE_SMALL_DATA)
 		//std::cout << "delimiter 1 at i: " << i << "\n";
 		buf[i] = DELIMITER; //write delimiter
 		i++;
+#endif
 
 		//std::cout << "writing data at i: " << i << "\n";
 		int bytes = idEntPair.second->writeData(buf, i); //write EntityData at i, increase i by number of bytes written
 		i += bytes;
 
+#if !defined(USE_SMALL_DATA)
 		//std::cout << "delimiter 2 at i: " << i << "\n";
 		buf[i] = DELIMITER; //write delimiter
 		i++;
+#endif
 	}
 	
 	//std::cout << "closing delimiter at i: " << i << "\n";
@@ -949,8 +959,8 @@ void SceneManager_Server::testScene() { //testing only
 }
 
 void SceneManager_Server::testAttacking() {
-	//int id;
-	//GameObject::GameObjectData data;
+	int id;
+	GameObject::GameObjectData data;
 
 	/*id = next_minion_id;
 	next_minion_id++;
@@ -978,11 +988,11 @@ void SceneManager_Server::testAttacking() {
 	ClawTower* c1 = new ClawTower(data, id, red_team, this);
 	idMap[id] = c1;*/
 
-	/*id = next_claw_id;
+	id = next_claw_id;
 	next_claw_id++;
 	data = { 32.5, -27.5, 0 };
 	ClawTower* c2 = new ClawTower(data, id, blue_team, this);
-	idMap[id] = c2;*/
+	idMap[id] = c2;
 
 	/*id = next_laser_id;
 	next_laser_id++;

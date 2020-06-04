@@ -24,7 +24,7 @@ SceneManager_Server::SceneManager_Server() :
 	this->buildScene();
 
 	//this->testScene();
-	//this->testAttacking();
+	this->testAttacking();
 	//this->testBuilding();
 	//this->testWalls();
 }
@@ -665,8 +665,8 @@ void SceneManager_Server::populateWalls(){
 	wallNodes.push_back(new WallNode(11,8)); // New
 	wallNodes.push_back(new WallNode(11,9)); // New
 	wallNodes.push_back(new WallNode(11,10));
-	//wallNodes.push_back(new WallNode(11,11));
-	//wallNodes.push_back(new WallNode(11,12));
+	wallNodes.push_back(new WallNode(11,11));
+	wallNodes.push_back(new WallNode(11,12));
 	wallNodes.push_back(new WallNode(11,13));
 	wallNodes.push_back(new WallNode(11,14)); // New
 	wallNodes.push_back(new WallNode(11,16));
@@ -949,8 +949,8 @@ void SceneManager_Server::testScene() { //testing only
 }
 
 void SceneManager_Server::testAttacking() {
-	//int id;
-	//GameObject::GameObjectData data;
+	int id;
+	GameObject::GameObjectData data;
 
 	/*id = next_minion_id;
 	next_minion_id++;
@@ -978,11 +978,11 @@ void SceneManager_Server::testAttacking() {
 	ClawTower* c1 = new ClawTower(data, id, red_team, this);
 	idMap[id] = c1;*/
 
-	/*id = next_claw_id;
+	id = next_claw_id;
 	next_claw_id++;
 	data = { 32.5, -27.5, 0 };
 	ClawTower* c2 = new ClawTower(data, id, blue_team, this);
-	idMap[id] = c2;*/
+	idMap[id] = c2;
 
 	/*id = next_laser_id;
 	next_laser_id++;

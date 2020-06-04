@@ -3,15 +3,15 @@
 #include "../client/src/AudioManager.h"
 
 namespace {
-	const char* pickupActions[1] = { "Spin?" };
+	const char* pickupActions[3] = { "Dropped", "Idle", "Looted" };
 }
 
 Pickup_Client::Pickup_Client(char resourceType, GameObjectData data, int id, SceneManager_Client* sm_c, OzzGeode* geode, Transform* parent) : Pickup(resourceType, data, id, nullptr), Entity_Client(sm_c)
 {
 	type = resourceType;
-	//animator = conf_new(Animator, geode);
-	//animator->SetClip(pickupActions[0]);
-	//parent->addChild(animator);
+	animator = conf_new(Animator, geode);
+	animator->SetClip(pickupActions[1]);
+	parent->addChild(animator);
 
 	//printf("%d %s\n", animator->clipControllers[animator->currClip]->GetLoop(), animator->currClip.c_str());
 
@@ -20,12 +20,12 @@ Pickup_Client::Pickup_Client(char resourceType, GameObjectData data, int id, Sce
 	//parent->addChild(particleTransform);
 	//particleTransform->active = false;
 
-	parent->addChild(geode);
+	//parent->addChild(geode);
 }
 
 Pickup_Client::~Pickup_Client()
 {
-	//conf_delete(animator);
+	conf_delete(animator);
 	//conf_delete(particleTransform);
 }
 

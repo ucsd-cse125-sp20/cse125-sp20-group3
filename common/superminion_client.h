@@ -12,6 +12,8 @@ class SuperMinion_Client : public SuperMinion, public Entity_Client {
 public:
 	Animator* animator;
 
+	bool audioFrame = true;
+
 	SuperMinion_Client(GameObjectData data, int id, Team* t, SceneManager_Client* sm, OzzGeode* geode, Transform* parent);
 	~SuperMinion_Client();
 

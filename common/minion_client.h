@@ -23,6 +23,7 @@ public:
 	TimedTransform* bulletTransform;
 	Transform *bulletTransform1, *bulletTransform2;
 
+	bool audioFrame = true;
 	Animator* animator;
 
 	Minion_Client(GameObjectData data, int id, Team* t, SceneManager_Client* sm_c, OzzGeode* geode, ParticleSystemGeode* bullets, Transform* parent);

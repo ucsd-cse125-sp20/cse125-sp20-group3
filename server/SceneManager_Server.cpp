@@ -24,7 +24,7 @@ SceneManager_Server::SceneManager_Server() :
 	this->buildScene();
 
 	//this->testScene();
-	this->testAttacking();
+	//this->testAttacking();
 	//this->testBuilding();
 	//this->testWalls();
 }

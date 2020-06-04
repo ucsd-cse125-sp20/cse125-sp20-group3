@@ -38,4 +38,5 @@ void SuperMinion_Client::attackAction() {
 
 void SuperMinion_Client::fireAction() {
 	if (audioFrame) AudioManager::playAudioSource(this->getPosition(), "thud", 0.75f);
+	audioFrame = false;
 }

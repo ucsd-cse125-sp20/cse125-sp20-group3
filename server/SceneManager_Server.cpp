@@ -498,6 +498,37 @@ void SceneManager_Server::populatePaths() {
 	pathNodes[0]->setNextBlue(pathNodes[85]);
 	pathNodes[86]->setNextBlue(pathNodes[11]);
 	pathNodes[11]->setNextRed(pathNodes[86]);
+
+	//adding pathNodes to go around the center
+	pathNodes.push_back(new PathNode(2, 9)); // 87
+	pathNodes.push_back(new PathNode(2, 12)); // 88
+	pathNodes.push_back(new PathNode(3, 12)); // 89
+	pathNodes[38]->setNextRed(pathNodes[87]);
+	pathNodes[39]->setNextRed(pathNodes[87]);
+	pathNodes[87]->setNextRed(pathNodes[88]);
+	pathNodes[88]->setNextRed(pathNodes[89]);
+	pathNodes[89]->setNextRed(pathNodes[18]);
+	pathNodes[18]->setNextRed(pathNodes[45]);
+	pathNodes[45]->setNextRed(pathNodes[46]);
+	pathNodes[46]->setNextRed(pathNodes[47]);
+	pathNodes[47]->setNextRed(pathNodes[23]);
+	pathNodes.push_back(new PathNode(15, 19)); // 90
+	pathNodes[23]->setNextRed(pathNodes[90]);
+	pathNodes.push_back(new PathNode(15, 14)); // 91
+	pathNodes[90]->setNextRed(pathNodes[91]);
+	pathNodes[91]->setNextRed(pathNodes[24]);
+	pathNodes[24]->setNextRed(pathNodes[19]);
+
+	pathNodes[84]->setNextBlue(pathNodes[83]);
+	pathNodes.push_back(new PathNode(25, 0)); // 92
+	pathNodes[83]->setNextBlue(pathNodes[92]);
+	pathNodes[92]->setNextBlue(pathNodes[75]);
+	pathNodes[26]->setNextBlue(pathNodes[15]);
+	pathNodes[15]->setNextBlue(pathNodes[59]);
+	pathNodes.push_back(new PathNode(7, 2)); // 93
+	pathNodes[59]->setNextBlue(pathNodes[93]);
+	pathNodes[93]->setNextBlue(pathNodes[12]);
+
 }
 
 void SceneManager_Server::populateWalls(){

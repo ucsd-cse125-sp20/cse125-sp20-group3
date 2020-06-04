@@ -77,11 +77,15 @@ int __cdecl main(void)
 		//std::cout << "sendbufSize: " << sendbufSize << std::endl;
 		char sizebuf[4];
 		((int*)sizebuf)[0] = sendbufSize; //push size of data packet to players
-		//std::cout << "server_main sizebuf checksum: " << (int)NetUtil::checksum(sizebuf, 4) << "\n";
-		server->pushDataAll(sizebuf, sizeof(int), 0); //and then push data packet
+		server->pushDataAll(sizebuf, sizeof(int), 0);
+		char sizechecksum = NetUtil::checksum(sizebuf, 4);
+		server->pushDataAll(&sizechecksum, 1, 0); //push checksum of data size for integrity
+
 		if (NetUtil::checksum(sendbuf, sendbufSize) != check) std::cout << "server_main sendbuf checksum changed after sending size\n";
 		//std::cout << "sending data\n";
 		server->pushDataAll(sendbuf, sendbufSize, 0);
+		char datachecksum = NetUtil::checksum(sendbuf, sendbufSize);
+		server->pushDataAll(&datachecksum, 1, 0);
 
 		//if (manager != m) std::cout << "f manager changed\n";
 

@@ -9,9 +9,9 @@ Tower::Tower(GameObjectData data, int id, int health, int attack, Team* t, Scene
 
 void Tower::takeDamage(int damage) {
 	Entity::takeDamage(damage);
-	std::cout << "tower: " << id << " took " << damage << " damage | remaining health: " << health << "\n";
+	//std::cout << "tower: " << id << " took " << damage << " damage | remaining health: " << health << "\n";
 	if (health <= 0) {
-		std::cout << "tower " << id << " dying\n";
+		//std::cout << "tower " << id << " dying\n";
 		team->decTower(); 
 		ObjectDetection::removeObject(this);
 	}

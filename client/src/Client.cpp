@@ -138,6 +138,18 @@ Client::UpData Client::recvAndFormatData() {
 		bytes_to_receive = ((int*)size_int_buf)[0]; //save the bytes received as an int
 		//std::cout << "found " << bytes_to_receive << " bytes to receive\n";
 
+		iResult = ioctlsocket(ConnectSocket, FIONBIO, &blocking); //if there is data on the recv queue, rest of calls should be blocking
+		if (iResult == SOCKET_ERROR) {
+			std::cout << "ioctlsocket before receiving data packet failed with error: " << WSAGetLastError() << "\n";
+		}
+
+		char recv_sizechecksum;
+		iResult = recv(ConnectSocket, &recv_sizechecksum, 1, 0);
+		unsigned char calc_sizechecksum = NetUtil::checksum(size_int_buf, sizeof(int));
+		if (calc_sizechecksum != (unsigned char)recv_sizechecksum) {
+			std::cout << "size checksum mismatch\n";
+		}
+
 		if (bytes_to_receive < 0) {
 			std::cout << "negative bytes to receive\n";
 			continue;
@@ -145,10 +157,7 @@ Client::UpData Client::recvAndFormatData() {
 
 		recvbuf.resize(bytes_to_receive); //resize vector buffer to be the size of the incoming data
 
-		iResult = ioctlsocket(ConnectSocket, FIONBIO, &blocking);
-		if (iResult == SOCKET_ERROR) {
-			std::cout << "ioctlsocket before receiving data packet failed with error: " << WSAGetLastError() << "\n";
-		}
+		
 		iResult = recv(ConnectSocket, &recvbuf[0], (int)recvbuf.size(), 0); //receive data block
 		if (iResult == SOCKET_ERROR) {
 			std::cout << "recv of data failed with error: " << WSAGetLastError() << std::endl;
@@ -157,6 +166,13 @@ Client::UpData Client::recvAndFormatData() {
 			return data;
 		}
 		//std::cout << "received " << iResult << " bytes\n";
+
+		char recv_datachecksum;
+		iResult = recv(ConnectSocket, &recv_datachecksum, 1, 0);
+		unsigned char calc_datachecksum = NetUtil::checksum(&recvbuf[0], (int)recvbuf.size());
+		if (calc_datachecksum != (unsigned char)recv_datachecksum) {
+			std::cout << "data checksum mismatch\n";
+		}
 
 		if (bytes_to_receive < 0 || bytes_to_receive > 30000) {
 			std::cout << "illogical bytes to receive found, skpping\n";

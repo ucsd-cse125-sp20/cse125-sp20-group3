@@ -485,8 +485,8 @@ void SceneManager_Server::populatePaths() {
 	pathNodes[77]->setNextBlue(pathNodes[28]);
 	pathNodes[79]->setNextBlue(pathNodes[80]);
 	pathNodes[80]->setNextBlue(pathNodes[9]); // fix pathing
-	pathNodes[81]->setNextBlue(pathNodes[82]);
-	pathNodes[82]->setNextBlue(pathNodes[10]);
+	pathNodes[81]->setNextBlue(pathNodes[9]); // fix pathing
+	pathNodes[82]->setNextBlue(pathNodes[9]); // fix pathing
 	pathNodes[83]->setNextBlue(pathNodes[84]);
 	pathNodes[84]->setNextBlue(pathNodes[27]);
 

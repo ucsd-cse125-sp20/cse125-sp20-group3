@@ -5,14 +5,7 @@ Team::Team(char color) {
 	metalCount = STARTING_METAL;
 	plasticCount = STARTING_PLASTIC;
 	baseHealth = 100; //TODO pointer to base and getHealth()? or have base set baseHealth?
-	minionCount = 0;
-	towerCount = 0;
 }
-
-void Team::incMinion() { minionCount++; }
-void Team::decMinion() { minionCount--; }
-void Team::incTower() { towerCount++; }
-void Team::decTower() { towerCount--; }
 
 int Team::getPlasticCount(){ return this->plasticCount; }
 int Team::getMetalCount(){ return this->metalCount; }
@@ -79,8 +72,6 @@ void Team::setData(TeamData data) {
 	this->metalCount = data.metalCount;
 	this->plasticCount = data.plasticCount;
 	this->baseHealth = data.baseHealth;
-	this->minionCount = data.minionCount;
-	this->towerCount = data.towerCount;
 
 	//print();
 }
@@ -91,12 +82,10 @@ int Team::writeData(char buf[], int index) {
 	data.metalCount = this->metalCount;
 	data.plasticCount = this->plasticCount;
 	data.baseHealth = this->baseHealth;
-	data.minionCount = this->minionCount;
-	data.towerCount = this->towerCount;
 	((TeamData*)(buf + index))[0] = data;
 	return sizeof(TeamData);
 }
 
 void Team::print() {
-	std::cout << "team color: " << teamColor << " metal: " << metalCount << " plastic: " << plasticCount << " baseHealth: " << baseHealth << " minionCount: " << minionCount << " towerCount: " << towerCount << "\n";
+	std::cout << "team color: " << teamColor << " metal: " << metalCount << " plastic: " << plasticCount << " baseHealth: " << baseHealth << "\n";
 }

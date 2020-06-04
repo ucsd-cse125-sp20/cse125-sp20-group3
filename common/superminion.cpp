@@ -84,3 +84,8 @@ void SuperMinion::dropPickups() {
 		manager->spawnEntity(BOTTLE_TYPE, x, z, 0, nullptr);
 	}
 }
+
+void SuperMinion::setEntData(EntityData data) {
+	Minion::setEntData(data);
+	//std::cout << "superminion " << id << " x: " << this->getPosition().getX() << " z: " << this->getPosition().getZ() << "\n";
+}

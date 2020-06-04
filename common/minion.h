@@ -29,7 +29,7 @@ public:
 	void update(float deltaTime) override;
 	void takeDamage(int damage) override;
 	virtual void dropPickups();
-	void move(float deltaTime);
+	virtual void move(float deltaTime);
 	void attack();
 
 	void setEntData(EntityData data) override;

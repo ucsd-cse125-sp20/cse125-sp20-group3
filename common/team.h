@@ -13,6 +13,17 @@ private:
     int towerCount;
 
 public:
+
+#if defined(USE_SMALL_DATA)
+	struct TeamData {
+		char teamColor;
+		uint16_t metalCount;
+		uint16_t plasticCount;
+		uint16_t baseHealth;
+		uint16_t minionCount;
+		uint16_t towerCount;
+	};
+#else
 	struct TeamData {
 		char teamColor;
 		int metalCount;
@@ -21,6 +32,7 @@ public:
 		int minionCount;
 		int towerCount;
 	};
+#endif
 
     char teamColor;
     Team(char color);

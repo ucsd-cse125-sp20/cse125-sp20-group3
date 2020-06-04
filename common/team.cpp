@@ -2,8 +2,8 @@
 
 Team::Team(char color) {
 	teamColor = color;
-	metalCount = 0;
-	plasticCount = 0;
+	metalCount = STARTING_METAL;
+	plasticCount = STARTING_PLASTIC;
 	baseHealth = 100; //TODO pointer to base and getHealth()? or have base set baseHealth?
 	minionCount = 0;
 	towerCount = 0;
@@ -68,7 +68,7 @@ void Team::buildEntity(char entityType){
 }
 
 void Team::addResource(char type, int amount) {
-	std::cout << teamColor << " team added " << amount << " of " << type << "\n";
+	//std::cout << teamColor << " team added " << amount << " of " << type << "\n";
 	if (type == METAL_RES_TYPE) metalCount += amount;
 	else if (type == PLASTIC_RES_TYPE) plasticCount += amount;
 	else std::cout << teamColor << " team tried to add resource type " << type << "\n";

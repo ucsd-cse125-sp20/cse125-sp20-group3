@@ -136,7 +136,7 @@ Client::UpData Client::recvAndFormatData() {
 			}
 		}
 		bytes_to_receive = ((int*)size_int_buf)[0]; //save the bytes received as an int
-		//std::cout << "found " << bytes_to_receive << " bytes to receive\n";
+		std::cout << "found " << bytes_to_receive << " bytes to receive\n";
 
 		if (bytes_to_receive < 0) {
 			std::cout << "negative bytes to receive\n";
@@ -202,13 +202,22 @@ Client::UpData Client::recvAndFormatData() {
 					break;
 				}
 				else {
+#if defined(USE_SMALL_DATA)
+					id = (int)((uint16_t*)(recvData + i))[0];
+					i += sizeof(uint16_t); //advance i to where delimiter should be
+#else
 					id = ((int*)(recvData + i))[0];
 					i += sizeof(int); //advance i to where delimiter should be
+#endif
 
+#if defined(USE_SMALL_DATA)
+					i--;
+#else
 					if (recvbuf[i] != DELIMITER) {
 						std::cout << "state 0 delimiter expected but not found, i: " << i << "\n";
 						break;
 					}
+#endif
 
 					//std::cout << "read id: " << id << " | state 0 delimiter at i: " << i << "\n";
 					state++; //end of id bytes found, advance to reading data
@@ -216,13 +225,23 @@ Client::UpData Client::recvAndFormatData() {
 			}
 			else if (state == 1) { //read bytes as an EntityData
 				char* recvData = &recvbuf[0];
+#if defined(USE_SMALL_DATA)
+				ent_data = Entity::decompressData(((uint64_t*)(recvData + i))[0]);
+				i += (sizeof uint64_t); //advance i to where delimiter should be
+#else
 				ent_data = ((Entity::EntityData*)(recvData + i))[0];
 				i += (sizeof Entity::EntityData); //advance i to where delimiter should be
+#endif
 
+
+#if defined(USE_SMALL_DATA)
+				i--;
+#else
 				if (recvbuf[i] != DELIMITER) {
 					std::cout << "state 1 delimiter expected but not found, i: " << i << "\n";
 					break;
 				}
+#endif
 
 				char oldActionState;
 				int oldTargetID; //we want to preserve firing states in the case of multiple server ticks within one client update
@@ -248,11 +267,19 @@ Client::UpData Client::recvAndFormatData() {
 				
 			}
 		}
+#if defined(USE_SMALL_DATA)
+		if (recvbuf[recvbuf.size() - 1] != DELIMITER) { //sanity check
+			std::cout << "delimiter not found at end of recvbuf\n";
+			std::cout << "size: " << recvbuf.size() << "\n";
+			std::cout << " -1: " << recvbuf[recvbuf.size() - 1] << "\n";
+		}
+#else
 		if (recvbuf[recvbuf.size() - 2] != DELIMITER || recvbuf[recvbuf.size() - 1] != DELIMITER) { //sanity check
 			std::cout << "double delimiter not found at end of recvbuf\n";
 			std::cout << "size: " << recvbuf.size() << "\n";
 			std::cout << "-2: " << recvbuf[recvbuf.size() - 2] << " -1: " << recvbuf[recvbuf.size() - 1] << "\n";
 		}
+#endif
 	}
 
 	for (std::pair<int, Entity::EntityData> idDataPair : idEntMap) {

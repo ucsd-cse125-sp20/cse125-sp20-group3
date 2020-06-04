@@ -248,20 +248,30 @@ int SceneManager_Server::encodeScene(char buf[], int start_index) {
 	int i = start_index;
 	for (std::pair<int, Entity*> idEntPair : idMap) { //iterate through all entities in scene
 		//std::cout << "writing id at i: " << i << "\n";
+#if defined(USE_SMALL_DATA)
+		((uint16_t*)(buf + i))[0] = (uint16_t)idEntPair.first;
+		i += sizeof(uint16_t);
+#else
 		((int*)(buf + i))[0] = idEntPair.first;
 		i += sizeof(int);
+#endif
 
+
+#if !defined(USE_SMALL_DATA)
 		//std::cout << "delimiter 1 at i: " << i << "\n";
 		buf[i] = DELIMITER; //write delimiter
 		i++;
+#endif
 
 		//std::cout << "writing data at i: " << i << "\n";
 		int bytes = idEntPair.second->writeData(buf, i); //write EntityData at i, increase i by number of bytes written
 		i += bytes;
 
+#if !defined(USE_SMALL_DATA)
 		//std::cout << "delimiter 2 at i: " << i << "\n";
 		buf[i] = DELIMITER; //write delimiter
 		i++;
+#endif
 	}
 	
 	//std::cout << "closing delimiter at i: " << i << "\n";

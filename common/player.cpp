@@ -107,7 +107,7 @@ void Player::processInput(PlayerInput in) {
 				case SUPER_MINION:
 					if (team->checkResources(SUPER_MINION_TYPE))
 					{
-						team->buildEntity(SUPER_MINION);
+						team->buildEntity(SUPER_MINION_TYPE);
 						int id = manager->spawnEntity(SUPER_MINION_TYPE, buildPos.getX(), buildPos.getZ(), 0, this->team);
 						buildTarget->build(id);
 					} 
@@ -189,6 +189,14 @@ int Player::writeData(char buf[], int index) {
 	entData.teamColor = team != nullptr ? team->teamColor : NO_TEAM;
 	entData.health = this->health;
 	entData.targetID = attackTarget != nullptr ? attackTargetID : NO_TARGET_ID;
+
+#if defined(USE_SMALL_DATA)
+	//printf("%d ", index);
+	((uint64_t*)(buf + index))[0] = Entity::compressData(entData);
+	return sizeof(uint64_t);
+#else
+	EntityData check = Entity::decompressData(Entity::compressData(entData));
 	((EntityData*)(buf + index))[0] = entData;
 	return sizeof(EntityData);
+#endif
 }

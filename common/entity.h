@@ -53,6 +53,28 @@ public:
 	void setHealth(int new_health) { health = new_health; }
 	virtual void takeDamage(int damage) { health = std::max(health - damage, 0);	}
 
+	static uint64_t compressData(EntityData data) {
+		uint64_t d = 0;
+		d |= GameObject::compressData(data.GO_data) << 24;
+		d |= (uint64_t)(data.health / 10) << 16;
+		d |= ((uint64_t)data.targetID & 0xFFF) << 4;
+		d |= (uint64_t)data.actionState << 2;
+		d |= data.teamColor == RED_TEAM ? RED_TEAM_SMALL : (data.teamColor == BLUE_TEAM ? BLUE_TEAM_SMALL : NO_TEAM_SMALL);
+		//printf("%llx\n", d);
+		return d;
+	}
+
+	static EntityData decompressData(uint64_t data) {
+		EntityData d = {};
+		d.GO_data = GameObject::decompressData(data >> 24);
+		d.health = (int)((data >> 16) & 0xFFL) * 10;
+		d.targetID = (int)((data >> 4) & 0xFFFL);
+		d.actionState = (int)((data >> 2) & 0x3L);
+		int team = (int)(data & 0x3L);
+		d.teamColor = team == RED_TEAM_SMALL ? RED_TEAM : (team == BLUE_TEAM_SMALL ? BLUE_TEAM : NO_TEAM);
+		return d;
+	}
+
 	virtual void setEntData(EntityData data) {
 		lastPosition = this->getPosition(); //save old position for velocity inference purposes
 		this->GameObject::setGOData(data.GO_data);
@@ -69,8 +91,15 @@ public:
 		entData.teamColor = team != nullptr ? team->teamColor : NO_TEAM;
 		entData.health = this->health;
 		entData.targetID = attackTarget != nullptr ? attackTargetID : NO_TARGET_ID;
+#if defined(USE_SMALL_DATA)
+		//printf("%d ", index);
+		((uint64_t*)(buf + index))[0] = Entity::compressData(entData);
+		return sizeof(uint64_t);
+#else
+		//EntityData check = Entity::decompressData(Entity::compressData(entData));
 		((EntityData*)(buf + index))[0] = entData;
 		return sizeof(EntityData);
+#endif
 	}
 };
 

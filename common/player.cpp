@@ -83,7 +83,7 @@ void Player::processInput(PlayerInput in) {
 			else flags = flags | DETECTION_FLAG_BLUE_TEAM;
 			BuildNode* buildTarget = (BuildNode*)ObjectDetection::getNearestObject(vec2(interactPos.getX(), interactPos.getZ()), flags, 0);
 			
-			if (buildTarget != nullptr && buildTarget->isOccupied() == false) {
+			if (buildTarget != nullptr && std::find(manager->buildNodes.begin(), manager->buildNodes.end(), buildTarget) != manager->buildNodes.end() && buildTarget->isOccupied() == false) {
 				vec3 buildPos = buildTarget->getPosition();
 				std::cout << "building at " << buildPos.getX() << " " << buildPos.getZ() << "\n";
 

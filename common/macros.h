@@ -8,7 +8,7 @@
 #define USE_SMALL_DATA
 #define SERVER_TICKRATE 20 // times per second
 #define DEFAULT_PORT "27015"
-#define NUM_PLAYERS 1 //change to 4 eventually //upper bound, no more than 15 (1 byte) because of Server recv
+#define NUM_PLAYERS 3 //change to 4 eventually //upper bound, no more than 15 (1 byte) because of Server recv
 #define DELIMITER ','
 
 #define NO_TARGET_ID -1
@@ -90,9 +90,9 @@
 #define PLAYER_HEALTH 200
 #define BASE_HEALTH 2000
 #define MINION_HEALTH 50
-#define SUPER_MINION_HEALTH 200
+#define SUPER_MINION_HEALTH 300
 #define LASER_TOWER_HEALTH 500
-#define CLAW_TOWER_HEALTH 500
+#define CLAW_TOWER_HEALTH 50
 #define RESOURCE_HEALTH 10
 #define PICKUP_HEALTH 10
 
@@ -100,18 +100,18 @@
 #define BASE_ATTACK 0
 #define MINION_ATTACK 10
 #define SUPER_MINION_ATTACK 50
-#define LASER_TOWER_ATTACK 10
+#define LASER_TOWER_ATTACK 20
 #define CLAW_TOWER_ATTACK 0
 #define RESOURCE_ATTACK 0
 #define PICKUP_ATTACK 0
 
 #define MINION_ATK_RANGE 7
 #define SUPER_MINION_ATK_RANGE 2
-#define LASER_FIRE_RANGE 20
+#define LASER_FIRE_RANGE 25
 
 #define MINION_ATK_INTERVAL 1.0f
 #define SUPER_MINION_ATK_INTERVAL 3.0f
-#define LASER_FIRE_INTERVAL 2.0f
+#define LASER_FIRE_INTERVAL 1.5f
 #define CLAW_SPAWN_INTERVAL 5.0f
 #define PICKUP_TIMEOUT_INTERVAL 15.0f
 
@@ -119,24 +119,24 @@
 #define SUPER_MINION_VELOCITY 2.0
 
 #define DUMPSTER_PLASTIC 2
-#define RECYCLING_BIN_METAL 2
-#define BOTTLE_PLASTIC 2
+#define RECYCLING_BIN_METAL 4
+#define BOTTLE_PLASTIC 1
 #define IRON_METAL 1
 
-#define SUPER_MINION_METAL_REQ 0//6
-#define SUPER_MINION_PLASTIC_REQ 0//10
-#define LASER_METAL_REQ 0//2
+#define SUPER_MINION_METAL_REQ 4
+#define SUPER_MINION_PLASTIC_REQ 10
+#define LASER_METAL_REQ 4
 #define LASER_PLASTIC_REQ 0
-#define CLAW_METAL_REQ 0//5
-#define CLAW_PLASTIC_REQ 0//5
+#define CLAW_METAL_REQ 5
+#define CLAW_PLASTIC_REQ 5
 
 //drop chance 1/x
-#define MINION_IRON_DROP_CHANCE 4
-#define MINION_BOTTLE_DROP_CHANCE 3
+#define MINION_IRON_DROP_CHANCE 8
+#define MINION_BOTTLE_DROP_CHANCE 10
 #define SUPER_MINION_IRON_DROP_CHANCE 2
-#define SUPER_MINION_BOTTLE_DROP_CHANCE 3
+#define SUPER_MINION_BOTTLE_DROP_CHANCE 2
 
-#define DROP_RANGE 3
+#define DROP_RANGE 2
 
 #define PLASTIC_UI_ICON "resource_plastic"
 #define METAL_UI_ICON "resource_metal"

@@ -42,6 +42,7 @@ namespace {
 	const char* plasticDir = "water-bottle";
 	const char* lootActions[3] = { "Dropped", "Idle", "Looted" };
 	const char* baseDirR = "base-A";
+	const char* baseDirB = "base-B";
 	const char* baseActions[1] = { "Idle" };
 
 
@@ -89,6 +90,9 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 
 	ozzGeodes[BASE_GEODE_R] = conf_new(OzzGeode, renderer, baseDirR);
 	((OzzObject*)ozzGeodes[BASE_GEODE_R]->obj)->SetClip(baseActions[0]); // Set a default action
+
+	ozzGeodes[BASE_GEODE_B] = conf_new(OzzGeode, renderer, baseDirB);
+	((OzzObject*)ozzGeodes[BASE_GEODE_B]->obj)->SetClip(baseActions[0]); // Set a default action
 
 	ozzGeodes[BOTTLE_GEODE] = conf_new(OzzGeode, renderer, plasticDir);
 	((OzzObject*)ozzGeodes[BOTTLE_GEODE]->obj)->SetClip(lootActions[0]); // Set a default action
@@ -163,18 +167,6 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	this->addChild(t);
 	transforms[key] = t;
 	animators[key] = a;*/
-
-	// TODO This is a hard coded animation example. Remove this later (BASE A)
-	//int key = 8888888;
-	//ozzGeodes["blarf2"] = conf_new(OzzGeode, renderer, baseDirR);
-	//((OzzObject*)ozzGeodes["blarf2"]->obj)->SetClip(baseActions[0]);
-	//Transform* t = conf_new(Transform, mat4::translation(vec3(1, 0, 2)));
-	//Animator* a = conf_new(Animator, ozzGeodes["blarf2"]);
-	//a->SetClip(baseActions[0]);
-	//t->addChild(a);
-	//this->addChild(t);
-	//transforms[key] = t;
-	//animators[key] = a;
 
 	trackedPlayer_ID = NO_TRACKED_PLAYER;
 
@@ -409,7 +401,7 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 				std::cout << "creating new base, id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				Transform* adjustment = conf_new(Transform, mat4::scale(vec3(2.0f)) * mat4::rotationY(team == red_team ? PI / 2 : -PI / 2));
-				Base_Client* b_c = conf_new(Base_Client, GO_data, data.id, team, this, ozzGeodes[team == red_team ? BASE_GEODE_R : BASE_GEODE_R], adjustment);
+				Base_Client* b_c = conf_new(Base_Client, GO_data, data.id, team, this, ozzGeodes[team == red_team ? BASE_GEODE_R : BASE_GEODE_B], adjustment);
 				transforms[data.id]->addChild(adjustment);
 				otherTransforms.push_back(adjustment);
 				idMap[data.id] = b_c;

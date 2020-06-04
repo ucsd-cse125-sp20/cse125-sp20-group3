@@ -1,0 +1,173 @@
+{
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 5569,
+      "min": [-3.77009, -0.00196695, -1.51511],
+      "max": [3.75873, 9.6671, 4.40194]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "type": "VEC3",
+      "count": 5569
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "type": "VEC2",
+      "count": 5569
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5123,
+      "type": "VEC4",
+      "count": 5569
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5126,
+      "type": "VEC4",
+      "count": 5569
+    },
+    {
+      "bufferView": 5,
+      "componentType": 5123,
+      "type": "SCALAR",
+      "count": 13764
+    },
+    {
+      "bufferView": 6,
+      "componentType": 5126,
+      "type": "MAT4",
+      "count": 2
+    }
+  ],
+  "asset": {
+    "generator": "Khronos glTF Blender I/O v1.1.46",
+    "version": "2.0"
+  },
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteLength": 66828
+    },
+    {
+      "buffer": 0,
+      "byteLength": 66828,
+      "byteOffset": 66828
+    },
+    {
+      "buffer": 0,
+      "byteLength": 44552,
+      "byteOffset": 133656
+    },
+    {
+      "buffer": 0,
+      "byteLength": 44552,
+      "byteOffset": 178208
+    },
+    {
+      "buffer": 0,
+      "byteLength": 89104,
+      "byteOffset": 222760
+    },
+    {
+      "buffer": 0,
+      "byteLength": 27528,
+      "byteOffset": 311864
+    },
+    {
+      "buffer": 0,
+      "byteLength": 128,
+      "byteOffset": 339392
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "riggedMesh.bin",
+      "byteLength": 339520
+    }
+  ],
+  "images": [
+    {
+      "name": "base_B_tex-01",
+      "uri": "base_B_tex-01.png",
+      "mimeType": "image/png"
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Cylinder.004",
+      "primitives": [
+        {
+          "indices": 5,
+          "material": 0,
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2,
+            "JOINTS_0": 3,
+            "WEIGHTS_0": 4
+          }
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "base A tex",
+      "doubleSided": true,
+      "pbrMetallicRoughness": {
+        "baseColorTexture": {
+          "index": 0
+        },
+        "metallicFactor": 0,
+        "roughnessFactor": 0.5
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "name": "Cat",
+      "translation": [0, 2.80846, 1.2423]
+    },
+    {
+      "children": [ 0 ],
+      "name": "All",
+      "translation": [0, 0.0197169, 0]
+    },
+    {
+      "mesh": 0,
+      "name": "Shrine with Tex",
+      "skin": 0
+    },
+    {
+      "children": [ 2, 1 ],
+      "name": "Armature",
+      "scale": [2.38002, 2.38002, 2.38002]
+    }
+  ],
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Scene",
+      "nodes": [ 3 ]
+    }
+  ],
+  "textures": [
+    {
+      "source": 0
+    }
+  ],
+  "skins": [
+    {
+      "inverseBindMatrices": 6,
+      "joints": [ 1, 0 ],
+      "name": "Armature",
+      "extras": [ 1, 2, ],
+    }
+  ]
+}

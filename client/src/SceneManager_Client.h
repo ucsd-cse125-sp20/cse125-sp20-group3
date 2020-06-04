@@ -52,6 +52,7 @@
 #define FOUNTAIN_PARTICLES "fountain"
 #define BULLET_PARTICLES "bullets"
 #define BASE_GEODE_R "base_geometry_r"
+#define BASE_GEODE_B "base_geometry_b"
 
 class SceneManager_Client : public Transform
 {

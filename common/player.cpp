@@ -83,7 +83,7 @@ void Player::processInput(PlayerInput in) {
 			else flags = flags | DETECTION_FLAG_BLUE_TEAM;
 			BuildNode* buildTarget = (BuildNode*)ObjectDetection::getNearestObject(vec2(interactPos.getX(), interactPos.getZ()), flags, 0);
 			
-			if (buildTarget != nullptr && buildTarget->isOccupied() == false) {
+			if (buildTarget != nullptr && std::find(manager->buildNodes.begin(), manager->buildNodes.end(), buildTarget) != manager->buildNodes.end() && buildTarget->isOccupied() == false) {
 				vec3 buildPos = buildTarget->getPosition();
 				std::cout << "building at " << buildPos.getX() << " " << buildPos.getZ() << "\n";
 
@@ -189,6 +189,14 @@ int Player::writeData(char buf[], int index) {
 	entData.teamColor = team != nullptr ? team->teamColor : NO_TEAM;
 	entData.health = this->health;
 	entData.targetID = attackTarget != nullptr ? attackTargetID : NO_TARGET_ID;
+
+#if defined(USE_SMALL_DATA)
+	//printf("%d ", index);
+	((uint64_t*)(buf + index))[0] = Entity::compressData(entData);
+	return sizeof(uint64_t);
+#else
+	EntityData check = Entity::decompressData(Entity::compressData(entData));
 	((EntityData*)(buf + index))[0] = entData;
 	return sizeof(EntityData);
+#endif
 }

@@ -248,20 +248,30 @@ int SceneManager_Server::encodeScene(char buf[], int start_index) {
 	int i = start_index;
 	for (std::pair<int, Entity*> idEntPair : idMap) { //iterate through all entities in scene
 		//std::cout << "writing id at i: " << i << "\n";
+#if defined(USE_SMALL_DATA)
+		((uint16_t*)(buf + i))[0] = (uint16_t)idEntPair.first;
+		i += sizeof(uint16_t);
+#else
 		((int*)(buf + i))[0] = idEntPair.first;
 		i += sizeof(int);
+#endif
 
+
+#if !defined(USE_SMALL_DATA)
 		//std::cout << "delimiter 1 at i: " << i << "\n";
 		buf[i] = DELIMITER; //write delimiter
 		i++;
+#endif
 
 		//std::cout << "writing data at i: " << i << "\n";
 		int bytes = idEntPair.second->writeData(buf, i); //write EntityData at i, increase i by number of bytes written
 		i += bytes;
 
+#if !defined(USE_SMALL_DATA)
 		//std::cout << "delimiter 2 at i: " << i << "\n";
 		buf[i] = DELIMITER; //write delimiter
 		i++;
+#endif
 	}
 	
 	//std::cout << "closing delimiter at i: " << i << "\n";
@@ -475,8 +485,8 @@ void SceneManager_Server::populatePaths() {
 	pathNodes[77]->setNextBlue(pathNodes[28]);
 	pathNodes[79]->setNextBlue(pathNodes[80]);
 	pathNodes[80]->setNextBlue(pathNodes[9]); // fix pathing
-	pathNodes[81]->setNextBlue(pathNodes[9]);
-	pathNodes[82]->setNextBlue(pathNodes[9]);
+	pathNodes[81]->setNextBlue(pathNodes[9]); // fix pathing
+	pathNodes[82]->setNextBlue(pathNodes[9]); // fix pathing
 	pathNodes[83]->setNextBlue(pathNodes[84]);
 	pathNodes[84]->setNextBlue(pathNodes[27]);
 
@@ -492,6 +502,37 @@ void SceneManager_Server::populatePaths() {
 	pathNodes[0]->setNextBlue(pathNodes[85]);
 	pathNodes[86]->setNextBlue(pathNodes[11]);
 	pathNodes[11]->setNextRed(pathNodes[86]);
+
+	//adding pathNodes to go around the center
+	pathNodes.push_back(new PathNode(2, 9)); // 87
+	pathNodes.push_back(new PathNode(2, 12)); // 88
+	pathNodes.push_back(new PathNode(3, 12)); // 89
+	pathNodes[38]->setNextRed(pathNodes[87]);
+	pathNodes[39]->setNextRed(pathNodes[87]);
+	pathNodes[87]->setNextRed(pathNodes[88]);
+	pathNodes[88]->setNextRed(pathNodes[89]);
+	pathNodes[89]->setNextRed(pathNodes[18]);
+	pathNodes[18]->setNextRed(pathNodes[45]);
+	pathNodes[45]->setNextRed(pathNodes[46]);
+	pathNodes[46]->setNextRed(pathNodes[47]);
+	pathNodes[47]->setNextRed(pathNodes[23]);
+	pathNodes.push_back(new PathNode(15, 19)); // 90
+	pathNodes[23]->setNextRed(pathNodes[90]);
+	pathNodes.push_back(new PathNode(15, 14)); // 91
+	pathNodes[90]->setNextRed(pathNodes[91]);
+	pathNodes[91]->setNextRed(pathNodes[24]);
+	pathNodes[24]->setNextRed(pathNodes[19]);
+
+	pathNodes[84]->setNextBlue(pathNodes[83]);
+	pathNodes.push_back(new PathNode(25, 0)); // 92
+	pathNodes[83]->setNextBlue(pathNodes[92]);
+	pathNodes[92]->setNextBlue(pathNodes[75]);
+	pathNodes[26]->setNextBlue(pathNodes[15]);
+	pathNodes[15]->setNextBlue(pathNodes[59]);
+	pathNodes.push_back(new PathNode(7, 2)); // 93
+	pathNodes[59]->setNextBlue(pathNodes[93]);
+	pathNodes[93]->setNextBlue(pathNodes[12]);
+
 }
 
 void SceneManager_Server::populateWalls(){
@@ -669,8 +710,8 @@ void SceneManager_Server::populateWalls(){
 	wallNodes.push_back(new WallNode(11,8)); // New
 	wallNodes.push_back(new WallNode(11,9)); // New
 	wallNodes.push_back(new WallNode(11,10));
-	//wallNodes.push_back(new WallNode(11,11));
-	//wallNodes.push_back(new WallNode(11,12));
+	wallNodes.push_back(new WallNode(11,11));
+	wallNodes.push_back(new WallNode(11,12));
 	wallNodes.push_back(new WallNode(11,13));
 	wallNodes.push_back(new WallNode(11,14)); // New
 	wallNodes.push_back(new WallNode(11,16));
@@ -953,8 +994,8 @@ void SceneManager_Server::testScene() { //testing only
 }
 
 void SceneManager_Server::testAttacking() {
-	//int id;
-	//GameObject::GameObjectData data;
+	int id;
+	GameObject::GameObjectData data;
 
 	/*id = next_minion_id;
 	next_minion_id++;
@@ -982,11 +1023,11 @@ void SceneManager_Server::testAttacking() {
 	ClawTower* c1 = new ClawTower(data, id, red_team, this);
 	idMap[id] = c1;*/
 
-	/*id = next_claw_id;
+	id = next_claw_id;
 	next_claw_id++;
 	data = { 32.5, -27.5, 0 };
 	ClawTower* c2 = new ClawTower(data, id, blue_team, this);
-	idMap[id] = c2;*/
+	idMap[id] = c2;
 
 	/*id = next_laser_id;
 	next_laser_id++;

@@ -8,8 +8,6 @@ Minion::Minion(GameObjectData data, int id, Team* t, SceneManager_Server* sm) : 
 	doneMoving = false;
 
 	if (sm != nullptr) { //only execute on server
-		t->incMinion();
-
 		destNode = (PathNode*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_PATH_NODE, 10);
 
 		int flags = DETECTION_FLAG_ENTITY | DETECTION_FLAG_COLLIDABLE | DETECTION_FLAG_MINION | 
@@ -27,8 +25,6 @@ Minion::Minion(GameObjectData data, int id, int health, int attack, int range, f
 	doneMoving = false;
 
 	if (sm != nullptr) { //only execute on server
-		t->incMinion();
-
 		destNode = (PathNode*)ObjectDetection::getNearestObject(this, DETECTION_FLAG_PATH_NODE, 10);
 	}
 }
@@ -89,7 +85,6 @@ void Minion::takeDamage(int damage) {
 	if (health <= 0) {
 		//std::cout << "minion " << id << " dying\n";
 		this->dropPickups();
-		team->decMinion(); 
 		ObjectDetection::removeObject(this);
 	}
 }

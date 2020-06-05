@@ -47,8 +47,11 @@
 #define CLAW_TOWER_GEODE_B "claw_tower_geometry_b"
 #define DUMPSTER_GEODE "dumpster_geometry"
 #define RECYCLING_BIN_GEODE "recycling_bin_geometry"
+#define BOTTLE_GEODE "bottle_geometry"
+#define METAL_GEODE "metal_geometry"
 #define FOUNTAIN_PARTICLES "fountain"
 #define BULLET_PARTICLES "bullets"
+#define BASE_GEODE_R "base_geometry_r"
 
 class SceneManager_Client : public Transform
 {

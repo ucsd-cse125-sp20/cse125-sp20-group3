@@ -1,5 +1,6 @@
 #include "superminion_client.h"
 #include "../client/src/SceneManager_Client.h"
+#include "../client/src/AudioManager.h"
 
 namespace {
 	const char* superMinionActions[2] = { "Walking", "Fighting" };
@@ -22,17 +23,20 @@ void SuperMinion_Client::updateAnimParticles() {
 }
 
 void SuperMinion_Client::idleAction() {
-
+	audioFrame = true;
 }
 
 void SuperMinion_Client::moveAction() {
 	animator->SetClip(superMinionActions[0]);
+	audioFrame = true;
 }
 
 void SuperMinion_Client::attackAction() {
 	animator->SetClip(superMinionActions[1]);
+	audioFrame = true;
 }
 
 void SuperMinion_Client::fireAction() {
-	
+	if (audioFrame) AudioManager::playAudioSource(this->getPosition(), "thud", 0.75f);
+	audioFrame = false;
 }

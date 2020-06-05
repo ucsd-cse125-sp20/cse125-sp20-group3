@@ -38,8 +38,11 @@ namespace {
 	const char* dumpsterActions[1] = { "OpenAndClose" };
 	const char* recyclingBinDir = "recycling-bin";
 	const char* recyclingBinActions[1] = { "Harvested" };
-	const char* ironDir = "";
-	const char* bottleDir = "";
+	const char* metalDir = "metal";
+	const char* plasticDir = "water-bottle";
+	const char* lootActions[3] = { "Dropped", "Idle", "Looted" };
+	const char* baseDirR = "base-A";
+	const char* baseActions[1] = { "Idle" };
 
 
 	//int counter = 1;
@@ -83,6 +86,15 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 
 	ozzGeodes[DUMPSTER_GEODE] = conf_new(OzzGeode, renderer, dumpsterDir);
 	((OzzObject*)ozzGeodes[DUMPSTER_GEODE]->obj)->SetClip(dumpsterActions[0]);
+
+	ozzGeodes[BASE_GEODE_R] = conf_new(OzzGeode, renderer, baseDirR);
+	((OzzObject*)ozzGeodes[BASE_GEODE_R]->obj)->SetClip(baseActions[0]); // Set a default action
+
+	ozzGeodes[BOTTLE_GEODE] = conf_new(OzzGeode, renderer, plasticDir);
+	((OzzObject*)ozzGeodes[BOTTLE_GEODE]->obj)->SetClip(lootActions[0]); // Set a default action
+
+	ozzGeodes[METAL_GEODE] = conf_new(OzzGeode, renderer, metalDir);
+	((OzzObject*)ozzGeodes[METAL_GEODE]->obj)->SetClip(lootActions[0]); // Set a default action
 
 
 	ParticleSystem::ParticleSystemParams particleParams = {};
@@ -151,6 +163,18 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	this->addChild(t);
 	transforms[key] = t;
 	animators[key] = a;*/
+
+	// TODO This is a hard coded animation example. Remove this later (BASE A)
+	//int key = 8888888;
+	//ozzGeodes["blarf2"] = conf_new(OzzGeode, renderer, baseDirR);
+	//((OzzObject*)ozzGeodes["blarf2"]->obj)->SetClip(baseActions[0]);
+	//Transform* t = conf_new(Transform, mat4::translation(vec3(1, 0, 2)));
+	//Animator* a = conf_new(Animator, ozzGeodes["blarf2"]);
+	//a->SetClip(baseActions[0]);
+	//t->addChild(a);
+	//this->addChild(t);
+	//transforms[key] = t;
+	//animators[key] = a;
 
 	trackedPlayer_ID = NO_TRACKED_PLAYER;
 
@@ -384,7 +408,10 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 			else if (ID_BASE_MIN <= data.id && data.id <= ID_BASE_MAX) {
 				std::cout << "creating new base, id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
-				Base_Client* b_c = conf_new(Base_Client, GO_data, data.id, team, this, ozzGeodes[team == red_team ? MINION_GEODE_R : MINION_GEODE_B], transforms[data.id]);
+				Transform* adjustment = conf_new(Transform, mat4::scale(vec3(2.0f)) * mat4::rotationY(team == red_team ? PI / 2 : -PI / 2));
+				Base_Client* b_c = conf_new(Base_Client, GO_data, data.id, team, this, ozzGeodes[team == red_team ? BASE_GEODE_R : BASE_GEODE_R], adjustment);
+				transforms[data.id]->addChild(adjustment);
+				otherTransforms.push_back(adjustment);
 				idMap[data.id] = b_c;
 				wrapperMap[data.id] = b_c;
 			}
@@ -415,10 +442,10 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 			else if (ID_CLAW_MIN <= data.id && data.id <= ID_CLAW_MAX) {
 				std::cout << "creating new claw tower, id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
-				Transform* adjustment = conf_new(Transform, mat4::scale(vec3(0.5f)) * mat4::translation(vec3(0, 5.5, 0)) * mat4::rotationX(PI));
-				transforms[data.id]->addChild(adjustment);
+				Transform* adjustment = conf_new(Transform, mat4::scale(vec3(0.5f)) * mat4::translation(vec3(0, 5.25, 0)) * mat4::rotationX(PI));
 				ClawTower_Client* c_c = conf_new(ClawTower_Client, GO_data, data.id, team, this, ozzGeodes[team == red_team ? CLAW_TOWER_GEODE_R : CLAW_TOWER_GEODE_B], adjustment);
 				AudioManager::playAudioSource(vec3(data.ent_data.GO_data.x, 0, data.ent_data.GO_data.z), "build");
+				transforms[data.id]->addChild(adjustment);
 				otherTransforms.push_back(adjustment);
 				idMap[data.id] = c_c;
 				wrapperMap[data.id] = c_c;
@@ -443,14 +470,14 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 			else if (ID_IRON_MIN <= data.id && data.id <= ID_IRON_MAX) {
 				std::cout << "creating new iron pickup id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
-				Pickup_Client* i_c = conf_new(Pickup_Client, IRON_TYPE, GO_data, data.id, this, ozzGeodes[MINION_GEODE_R], transforms[data.id]);
+				Pickup_Client* i_c = conf_new(Pickup_Client, IRON_TYPE, GO_data, data.id, this, ozzGeodes[METAL_GEODE], transforms[data.id]);
 				idMap[data.id] = i_c;
 				wrapperMap[data.id] = i_c;
 			}
 			else if (ID_BOTTLE_MIN <= data.id && data.id <= ID_BOTTLE_MAX) {
 				std::cout << "creating new bottle pickup id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
-				Pickup_Client* b_c = conf_new(Pickup_Client, BOTTLE_TYPE, GO_data, data.id, this, ozzGeodes[MINION_GEODE_B], transforms[data.id]);
+				Pickup_Client* b_c = conf_new(Pickup_Client, BOTTLE_TYPE, GO_data, data.id, this, ozzGeodes[BOTTLE_GEODE], transforms[data.id]);
 				idMap[data.id] = b_c;
 				wrapperMap[data.id] = b_c;
 			}

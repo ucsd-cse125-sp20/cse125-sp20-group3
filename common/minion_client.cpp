@@ -38,15 +38,17 @@ void Minion_Client::updateAnimParticles() {
 }
 
 void Minion_Client::idleAction() {
-
+	audioFrame = true;
 }
 
 void Minion_Client::moveAction() { 
 	animator->SetClip(smallMinionActions[0]);
+	audioFrame = true;
 }
 
 void Minion_Client::attackAction() { 
 	animator->SetClip(smallMinionActions[1]);
+	audioFrame = true;
 }
 
 void Minion_Client::fireAction() {
@@ -62,7 +64,8 @@ void Minion_Client::fireAction() {
 
 	bulletTransform->activate(MINION_BULLET_TIMEOUT);
 	animator->SetClip(smallMinionActions[1]);
-	AudioManager::playAudioSource(this->getPosition(), "bullets", 0.5f);
+	if (audioFrame) AudioManager::playAudioSource(this->getPosition(), "bullets", 0.5f);
+	audioFrame = false;
 }
 
 /* legacy code */

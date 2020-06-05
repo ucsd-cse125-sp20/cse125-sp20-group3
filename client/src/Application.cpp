@@ -239,6 +239,7 @@ bool Application::InitSceneResources()
 	AudioManager::loadWav("build.wav", "build");
 	AudioManager::loadWav("spawn.wav", "spawn");
 	AudioManager::loadWav("super_spawn.wav", "super_spawn");
+	AudioManager::loadWav("thud.wav", "thud");
 	AudioManager::setLoop("bg");
 
 	return true;

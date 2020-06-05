@@ -12,7 +12,7 @@
 
 class Pickup_Client : public Pickup, public Entity_Client {
 public:
-	//Animator* animator;
+	Animator* animator;
 	//Transform* particleTransform;
 
 	Pickup_Client(char resourceType, GameObjectData data, int id, SceneManager_Client* sm_c, OzzGeode* geode, Transform* parent);

@@ -35,6 +35,24 @@ int GameObject::writeData(char buf[], int index) {
 	return sizeof(GameObjectData);
 }
 
+uint64_t GameObject::compressData(GameObject::GameObjectData data)
+{
+	uint64_t d = 0;
+	d |= (uint64_t)(UINT16_MAX * (data.x - MIN_MAP_X) / (MAX_MAP_X - MIN_MAP_X)) << 24;
+	d |= (uint64_t)(UINT16_MAX * (data.z - MIN_MAP_Z) / (MAX_MAP_Z - MIN_MAP_Z)) << 8;
+	d |= (uint64_t)(UINT8_MAX * (data.rot + PI) / (2 * PI));
+	return d;
+}
+
+GameObject::GameObjectData GameObject::decompressData(uint64_t data)
+{
+	GameObject::GameObjectData d = {};
+	d.x = ((float)(data >> 24) / UINT16_MAX) * (MAX_MAP_X - MIN_MAP_X) + MIN_MAP_X;
+	d.z = ((float)((data >> 8) & 0xFFFF) / UINT16_MAX) * (MAX_MAP_Z - MIN_MAP_Z) + MIN_MAP_Z;
+	d.rot = ((float)(data & 0xFF) / UINT8_MAX) * (2 * PI) - PI;
+	return d;
+}
+
 GameObject::GameObjectData GameObject::getData() {
 	GameObjectData data = { model[3][0], model[3][2], atan2(-model[2][2], -model[2][0]) };
 	return data;

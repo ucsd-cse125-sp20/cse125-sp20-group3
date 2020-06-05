@@ -213,7 +213,7 @@ int Server::handle_player_inputs(player_state* state, int flags) {
 		if (state->out.size() > 0) { //if there's data in the outbound buffer, send it
 			//std::cout << "locking to send data\n";
 			player_states_mtx[state->player_id].lock();
-			//std::cout << "sending " << state->out.size() << " bytes\n";
+			std::cout << "sending " << state->out.size() << " bytes\n";
 
 			iResult = send(state->socket_fd, state->out.data(), state->out.size(), flags);
 			if (iResult == SOCKET_ERROR) {

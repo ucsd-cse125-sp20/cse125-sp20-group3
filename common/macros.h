@@ -1,7 +1,7 @@
 #ifndef _MACROS_H_
 #define _MACROS_H_
 
-#define SERVER_NAME "137.110.115.237"
+#define SERVER_NAME "137.110.111.142"
 
 #define DEFAULT_BUFLEN 512
 #define SERVER_SENDBUFLEN 512000

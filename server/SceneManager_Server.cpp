@@ -54,7 +54,7 @@ bool SceneManager_Server::addPlayer(int player_id) {
 			data = blue_spawns[num_blue++];
 		}
 		idMap[player_id] = new Player(data, player_id, team, this); //TODO assign players teams based on lobby choices
-		std::cout << "created new player id: " << player_id << " at " << idMap[player_id] << "\n";
+		//std::cout << "created new player id: " << player_id << " at " << idMap[player_id] << "\n";
 
 		return true; //return true that a player was added
 	}
@@ -198,7 +198,7 @@ void SceneManager_Server::update(float deltaTime) {
 	for (std::pair<int, Entity*> idEntPair : idMap) { //first pass, check for anything that died last cycle
 		if (idEntPair.second == red_base || idEntPair.second == blue_base) continue; //skip bases
 		if (idEntPair.second->getHealth() <= 0) {	//entity reached 0 health last cycle, mark it for deletion
-			std::cout << "marking entity id " << idEntPair.first << " addr " << idEntPair.second << " to be deleted\n";
+			//std::cout << "marking entity id " << idEntPair.first << " addr " << idEntPair.second << " to be deleted\n";
 			deadIDs.push_back(idEntPair.first);
 			deadEntities.push_back(idEntPair.second);
 		}

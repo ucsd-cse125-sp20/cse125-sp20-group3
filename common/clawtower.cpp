@@ -5,11 +5,9 @@ ClawTower::ClawTower(GameObjectData data, int id, Team* t, SceneManager_Server* 
 	spawnInterval = CLAW_SPAWN_INTERVAL; //interval between minion spawns
 
 	if (sm_server != nullptr) {
-		std::cout << "x: " << this->getPosition().getX() << " z: " << this->getPosition().getZ() << "\n";
-
 		GameObject* nearPathNode = ObjectDetection::getNearestObject(this, DETECTION_FLAG_PATH_NODE, 0);
 		if (nearPathNode == nullptr) std::cout << "claw tower " << id << " couldn't find a nearby path!\n";
-		else std::cout << "claw tower " << id << " using x: " << nearPathNode->getPosition().getX() << " z: " << nearPathNode->getPosition().getZ() << " as spawnPoint\n";
+		//else std::cout << "claw tower " << id << " using x: " << nearPathNode->getPosition().getX() << " z: " << nearPathNode->getPosition().getZ() << " as spawnPoint\n";
 		spawnPoint = nearPathNode->getPosition();
 		vec3 forward = normalize(spawnPoint - this->getPosition());
 		vec3 right = cross(forward, vec3(0, 1, 0));
@@ -28,7 +26,7 @@ void ClawTower::update(float deltaTime) {
 	timeElapsed += deltaTime;
 
 	if (timeElapsed >= spawnInterval) {
-		std::cout << "claw " << id << " spawning at x: " << spawnPoint.getX() << " z: " << spawnPoint.getZ() << "\n";
+		//std::cout << "claw " << id << " spawning at x: " << spawnPoint.getX() << " z: " << spawnPoint.getZ() << "\n";
 		manager->spawnEntity(MINION_TYPE, spawnPoint[0], spawnPoint[2], 0, this->team);
 		timeElapsed = 0;
 	}

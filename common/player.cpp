@@ -74,7 +74,6 @@ void Player::processInput(PlayerInput in) {
 
 	if (in.buildIntent == BUILD_CANCEL) {
 		buildMode = NEUTRAL;
-		std::cout << "canceling\n";
 	}
 	else {
 		if (in.buildIntent == BUILD_CONFIRM && buildMode != NEUTRAL) {
@@ -85,7 +84,7 @@ void Player::processInput(PlayerInput in) {
 			
 			if (buildTarget != nullptr && std::find(manager->buildNodes.begin(), manager->buildNodes.end(), buildTarget) != manager->buildNodes.end() && buildTarget->isOccupied() == false) {
 				vec3 buildPos = buildTarget->getPosition();
-				std::cout << "building at " << buildPos.getX() << " " << buildPos.getZ() << "\n";
+				//std::cout << "building at " << buildPos.getX() << " " << buildPos.getZ() << "\n";
 
 				switch (buildMode) { //build something based on buildMode
 				case LASER:
@@ -118,21 +117,18 @@ void Player::processInput(PlayerInput in) {
 
 				buildMode = NEUTRAL; //reset to neutral after building
 			}
-			else std::cout << "tried building but no BuildNode in front\n";
+			//else std::cout << "tried building but no BuildNode in front\n";
 		}
 		else {
 			buildMode = in.buildType == LASER_TYPE ? LASER : 
 						in.buildType == CLAW_TYPE ? CLAW : 
 						in.buildType == SUPER_MINION_TYPE ? SUPER_MINION : 
 						buildMode;
-			if(in.buildType != NO_BUILD_TYPE) std::cout << "setting buildMode to " << buildMode << "\n";
 		}
 	}
 
 	if (in.harvestResource) {
-		std::cout << "harvesting\n";
-		std::cout << "player at " << getPosition().getX() << " " << getPosition().getZ() << "\n";
-		std::cout << "interact at " << interactPos.getX() << " " << interactPos.getZ() << "\n";
+		//std::cout << "player at " << getPosition().getX() << " " << getPosition().getZ() << "\n";
 		Resource* res = (Resource*)ObjectDetection::getNearestObject(vec2(interactPos.getX(), interactPos.getZ()), DETECTION_FLAG_RESOURCE, 0);
 		if (res != nullptr && res->isActive()) {
 			std::pair<char, int> resCount = res->harvest();

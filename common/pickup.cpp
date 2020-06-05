@@ -17,7 +17,6 @@ void Pickup::update(float deltaTime) {
 	if (timeElapsed >= PICKUP_TIMEOUT_INTERVAL) {
 		active = false;
 		this->takeDamage(PICKUP_HEALTH);
-		std::cout << "pickup " << id << " timed out, despawning\n";
 	}
 }
 
@@ -32,7 +31,6 @@ std::pair<char, int> Pickup::pickup() {
 
 	active = false;
 	this->takeDamage(PICKUP_HEALTH);
-	std::cout << "pickup " << id << " of type " << type << " picked up\n";
 
 	return drop;
 }

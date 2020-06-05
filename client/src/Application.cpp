@@ -468,7 +468,7 @@ void Application::InitDebugGui()
 	pDebugGui->AddWidget(SettingsWidgets);
 
 	// Example usage
-	UIUtils::createImage("overlay", "splash_screen.png", 0, 0, float2(1,1), 10);
+	UIUtils::createImage("overlay", "splash_screen.png", 0, 0, float2(1, 1), 10);
 
 
 	// UIUtils::loadFont("default font", "TitilliumText/TitilliumText-Bold.otf", 128); // All fonts must be loaded beforehand
@@ -515,7 +515,7 @@ void Application::InitDebugGui()
 	UIUtils::loadTexture("WeirdBox_halo.png"); // Preload textures
 
 	// Join red/blue team button TODO REPLACE PICTURES
-	UIUtils::createImage("start_button_red", "start.png", 600, 400, float2(1,1), 11);
+	UIUtils::createImage("start_button_red", "start.png", 825, 825, float2(1,1), 11);
 	UIUtils::addCallbackToImage("start_button_red", []() { 
 		UIUtils::removeImage("overlay");
 		UIUtils::removeImage("start_button_red"); 

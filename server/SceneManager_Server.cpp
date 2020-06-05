@@ -54,7 +54,7 @@ bool SceneManager_Server::addPlayer(int player_id) {
 			data = blue_spawns[num_blue++];
 		}
 		idMap[player_id] = new Player(data, player_id, team, this); //TODO assign players teams based on lobby choices
-		std::cout << "created new player id: " << player_id << " at " << idMap[player_id] << "\n";
+		//std::cout << "created new player id: " << player_id << " at " << idMap[player_id] << "\n";
 
 		return true; //return true that a player was added
 	}
@@ -198,7 +198,7 @@ void SceneManager_Server::update(float deltaTime) {
 	for (std::pair<int, Entity*> idEntPair : idMap) { //first pass, check for anything that died last cycle
 		if (idEntPair.second == red_base || idEntPair.second == blue_base) continue; //skip bases
 		if (idEntPair.second->getHealth() <= 0) {	//entity reached 0 health last cycle, mark it for deletion
-			std::cout << "marking entity id " << idEntPair.first << " addr " << idEntPair.second << " to be deleted\n";
+			//std::cout << "marking entity id " << idEntPair.first << " addr " << idEntPair.second << " to be deleted\n";
 			deadIDs.push_back(idEntPair.first);
 			deadEntities.push_back(idEntPair.second);
 		}
@@ -441,9 +441,9 @@ void SceneManager_Server::populatePaths() {
 	pathNodes[39]->setNextRed(pathNodes[2]);
 	pathNodes[40]->setNextRed(pathNodes[41]);
 	pathNodes[41]->setNextRed(pathNodes[3]);
-	pathNodes[42]->setNextRed(pathNodes[2]);
-	pathNodes[43]->setNextRed(pathNodes[44]);
-	pathNodes[44]->setNextRed(pathNodes[4]);
+	pathNodes[42]->setNextRed(pathNodes[43]); // fix
+	pathNodes[43]->setNextRed(pathNodes[4]); // fix
+	// pathNodes[44]->setNextRed(pathNodes[4]); fix
 	pathNodes[45]->setNextRed(pathNodes[18]);
 	pathNodes[46]->setNextRed(pathNodes[45]);
 	pathNodes[47]->setNextRed(pathNodes[46]);
@@ -489,6 +489,10 @@ void SceneManager_Server::populatePaths() {
 	pathNodes[82]->setNextBlue(pathNodes[9]); // fix pathing
 	pathNodes[83]->setNextBlue(pathNodes[84]);
 	pathNodes[84]->setNextBlue(pathNodes[27]);
+
+	//fix pathing
+	pathNodes[23]->setNextRed(pathNodes[47]);
+	pathNodes[21]->setNextBlue(pathNodes[10]);
 
 	//adding pathNodes for bases
 	pathNodes.push_back(new PathNode(1, 1)); //85

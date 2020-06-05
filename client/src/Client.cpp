@@ -158,8 +158,8 @@ Client::UpData Client::recvAndFormatData() {
 		}
 		//std::cout << "received " << iResult << " bytes\n";
 
-		if (bytes_to_receive < 0 || bytes_to_receive > 30000) {
-			std::cout << "illogical bytes to receive found, skpping\n";
+		if (bytes_to_receive < 0 || bytes_to_receive > 10000) {
+			std::cout << "illogical bytes to receive found, skipping\n";
 			continue;
 		}
 
@@ -194,9 +194,7 @@ Client::UpData Client::recvAndFormatData() {
 		int state = 0;
 		int id;
 		Entity::EntityData ent_data;
-		//std::cout << "processing\n";
 		for (; i < recvbuf.size(); i++) {
-			//if (i > 3500) break;
 			if (state == 0) { //read bytes as id int
 				if (recvbuf[i] == DELIMITER || i == recvbuf.size() - 1) { //delimiter found at beginning of state 0 must be closing delimiter, break out
 					break;

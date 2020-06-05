@@ -20,7 +20,7 @@ void Resource::update(float deltaTime) {
 		active = true;
 		actionState = ACTION_STATE_ATTACK;
 		timeElapsed = 0;
-		std::cout << "resource " << id << " going active\n";
+		//std::cout << "resource " << id << " going active\n";
 	}
 }
 
@@ -29,8 +29,8 @@ bool Resource::isActive() {
 }
 
 std::pair<char, int> Resource::harvest() {
-	if (!active) std::cout << "resource " << id << " harvested when inactive\n";
-	else std::cout << "resource " << id << " harvested\n";
+	//if (!active) std::cout << "resource " << id << " harvested when inactive\n";
+	//else std::cout << "resource " << id << " harvested\n";
 	std::pair<char, int> res;
 	if (type == DUMPSTER_TYPE) {
 		res = std::make_pair(PLASTIC_RES_TYPE, DUMPSTER_PLASTIC);

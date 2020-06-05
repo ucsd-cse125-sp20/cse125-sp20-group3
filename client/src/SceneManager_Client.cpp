@@ -383,7 +383,7 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 			else team = nullptr;
 
 			if (ID_PLAYER_MIN <= data.id && data.id <= ID_PLAYER_MAX) {
-				std::cout << "creating new player, id: " << data.id << "\n";
+				//std::cout << "creating new player, id: " << data.id << "\n";
 
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				Transform* adjustment = conf_new(Transform, mat4::rotationY(-PI / 2));
@@ -403,7 +403,7 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 				p_c->setPreview(BUILD_MODE::LASER, gltfGeodes[LASER_TOWER_GEODE]);
 			}
 			else if (ID_BASE_MIN <= data.id && data.id <= ID_BASE_MAX) {
-				std::cout << "creating new base, id: " << data.id << "\n";
+				//std::cout << "creating new base, id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				Transform* adjustment = conf_new(Transform, mat4::scale(vec3(2.0f)) * mat4::rotationY(team == red_team ? PI / 2 : -PI / 2));
 				Base_Client* b_c = conf_new(Base_Client, GO_data, data.id, team, this, ozzGeodes[team == red_team ? BASE_GEODE_R : BASE_GEODE_B], adjustment);
@@ -413,7 +413,7 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 				wrapperMap[data.id] = b_c;
 			}
 			else if (ID_MINION_MIN <= data.id && data.id <= ID_MINION_MAX) {
-				std::cout << "creating new minion, id: " << data.id << "\n";
+				//std::cout << "creating new minion, id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				Minion_Client* m_c = conf_new(Minion_Client, GO_data, data.id, team, this, ozzGeodes[team == red_team ? MINION_GEODE_R : MINION_GEODE_B], particleGeodes[BULLET_PARTICLES], transforms[data.id]);
 				AudioManager::playAudioSource(vec3(data.ent_data.GO_data.x, 0, data.ent_data.GO_data.z), "spawn");
@@ -421,7 +421,7 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 				wrapperMap[data.id] = m_c;
 			}
 			else if (ID_SUPER_MINION_MIN <= data.id && data.id <= ID_SUPER_MINION_MAX) {
-				std::cout << "creating new super minion, id: " << data.id << "\n";
+				//std::cout << "creating new super minion, id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				SuperMinion_Client* s_m_c = conf_new(SuperMinion_Client, GO_data, data.id, team, this, ozzGeodes[team == red_team ? SUPER_MINION_GEODE_R : SUPER_MINION_GEODE_B], transforms[data.id]);
 				AudioManager::playAudioSource(vec3(data.ent_data.GO_data.x, 0, data.ent_data.GO_data.z), "super_spawn");
@@ -429,7 +429,7 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 				wrapperMap[data.id] = s_m_c;
 			}
 			else if (ID_LASER_MIN <= data.id && data.id <= ID_LASER_MAX) {
-				std::cout << "creating new laser tower, id: " << data.id << "\n";
+				//std::cout << "creating new laser tower, id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				LaserTower_Client* l_c = conf_new(LaserTower_Client, GO_data, data.id, team, this, gltfGeodes[LASER_TOWER_GEODE], particleGeodes[LASER_TOWER_GEODE], transforms[data.id]);
 				AudioManager::playAudioSource(vec3(data.ent_data.GO_data.x, 0, data.ent_data.GO_data.z), "build");
@@ -437,7 +437,7 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 				wrapperMap[data.id] = l_c;
 			}
 			else if (ID_CLAW_MIN <= data.id && data.id <= ID_CLAW_MAX) {
-				std::cout << "creating new claw tower, id: " << data.id << "\n";
+				//std::cout << "creating new claw tower, id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				Transform* adjustment = conf_new(Transform, mat4::scale(vec3(0.5f)) * mat4::translation(vec3(0, 5.25, 0)) * mat4::rotationX(PI));
 				ClawTower_Client* c_c = conf_new(ClawTower_Client, GO_data, data.id, team, this, ozzGeodes[team == red_team ? CLAW_TOWER_GEODE_R : CLAW_TOWER_GEODE_B], adjustment);
@@ -448,14 +448,14 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 				wrapperMap[data.id] = c_c;
 			}
 			else if (ID_DUMPSTER_MIN <= data.id && data.id <= ID_DUMPSTER_MAX) {
-				std::cout << "creating new dumpster, id: " << data.id << "\n";
+				//std::cout << "creating new dumpster, id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				Resource_Client* d_c = conf_new(Resource_Client, DUMPSTER_TYPE, GO_data, data.id, this, ozzGeodes[DUMPSTER_GEODE], particleGeodes[FOUNTAIN_PARTICLES], transforms[data.id]);
 				idMap[data.id] = d_c;
 				wrapperMap[data.id] = d_c;
 			}
 			else if (ID_RECYCLING_BIN_MIN <= data.id && data.id <= ID_RECYCLING_BIN_MAX) {
-				std::cout << "creating new recycling bin id: " << data.id << "\n";
+				//std::cout << "creating new recycling bin id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				Transform* adjustment = conf_new(Transform, mat4::scale(vec3(2.0f)));
 				transforms[data.id]->addChild(adjustment);
@@ -465,14 +465,14 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 				wrapperMap[data.id] = r_b_c;
 			}
 			else if (ID_IRON_MIN <= data.id && data.id <= ID_IRON_MAX) {
-				std::cout << "creating new iron pickup id: " << data.id << "\n";
+				//std::cout << "creating new iron pickup id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				Pickup_Client* i_c = conf_new(Pickup_Client, IRON_TYPE, GO_data, data.id, this, ozzGeodes[METAL_GEODE], transforms[data.id]);
 				idMap[data.id] = i_c;
 				wrapperMap[data.id] = i_c;
 			}
 			else if (ID_BOTTLE_MIN <= data.id && data.id <= ID_BOTTLE_MAX) {
-				std::cout << "creating new bottle pickup id: " << data.id << "\n";
+				//std::cout << "creating new bottle pickup id: " << data.id << "\n";
 				transforms[data.id] = conf_new(Transform, mat4::identity());
 				Pickup_Client* b_c = conf_new(Pickup_Client, BOTTLE_TYPE, GO_data, data.id, this, ozzGeodes[BOTTLE_GEODE], transforms[data.id]);
 				idMap[data.id] = b_c;

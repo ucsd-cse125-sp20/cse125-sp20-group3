@@ -468,7 +468,7 @@ void Application::InitDebugGui()
 	pDebugGui->AddWidget(SettingsWidgets);
 
 	// Example usage
-	UIUtils::createImage("overlay", "why.png", 0, 0, float2((float)mSettings.mWidth / 1333, (float)mSettings.mHeight / 949), 10);
+	UIUtils::createImage("overlay", "splash_screen.png", 0, 0, float2(1,1), 10);
 
 
 	// UIUtils::loadFont("default font", "TitilliumText/TitilliumText-Bold.otf", 128); // All fonts must be loaded beforehand

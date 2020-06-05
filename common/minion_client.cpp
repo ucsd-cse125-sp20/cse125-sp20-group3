@@ -65,6 +65,7 @@ void Minion_Client::fireAction() {
 	bulletTransform->activate(MINION_BULLET_TIMEOUT);
 	animator->SetClip(smallMinionActions[1]);
 	if (audioFrame) AudioManager::playAudioSource(this->getPosition(), "bullets", 0.5f);
+	audioFrame = false;
 }
 
 /* legacy code */

@@ -9,8 +9,6 @@ private:
 	int metalCount;
 	int plasticCount;
     int baseHealth;
-    int minionCount;
-    int towerCount;
 
 public:
 
@@ -20,8 +18,6 @@ public:
 		uint16_t metalCount;
 		uint16_t plasticCount;
 		uint16_t baseHealth;
-		uint16_t minionCount;
-		uint16_t towerCount;
 	};
 #else
 	struct TeamData {
@@ -29,17 +25,11 @@ public:
 		int metalCount;
 		int plasticCount;
 		int baseHealth;
-		int minionCount;
-		int towerCount;
 	};
 #endif
 
     char teamColor;
     Team(char color);
-	void incMinion();
-	void decMinion();
-    void incTower();
-	void decTower();
 	int getPlasticCount();
 	int getMetalCount();
 	void setBaseHealth(int health);

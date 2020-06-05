@@ -9,6 +9,8 @@ public:
 
 	void move(float deltaTime) override;
 	void dropPickups() override;
+
+	void setEntData(EntityData data) override;
 };
 
 #endif

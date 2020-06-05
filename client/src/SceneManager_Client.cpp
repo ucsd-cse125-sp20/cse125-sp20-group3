@@ -77,6 +77,11 @@ SceneManager_Client::SceneManager_Client(Renderer* renderer)
 	ozzGeodes[PLAYER_GEODE_M_B] = conf_new(OzzGeode, renderer, playerMaleDirB);
 	((OzzObject*)ozzGeodes[PLAYER_GEODE_M_B]->obj)->SetClip(playerActions[0]); // Set a default action
 
+	ozzGeodes[PLAYER_GEODE_F_R] = conf_new(OzzGeode, renderer, playerFemaleDirR);
+	((OzzObject*)ozzGeodes[PLAYER_GEODE_F_R]->obj)->SetClip(playerActions[0]); // Set a default action
+	ozzGeodes[PLAYER_GEODE_F_B] = conf_new(OzzGeode, renderer, playerFemaleDirB);
+	((OzzObject*)ozzGeodes[PLAYER_GEODE_F_B]->obj)->SetClip(playerActions[0]); // Set a default action
+
 	ozzGeodes[CLAW_TOWER_GEODE_R] = conf_new(OzzGeode, renderer, clawTowerDirR);
 	((OzzObject*)ozzGeodes[CLAW_TOWER_GEODE_R]->obj)->SetClip(clawTowerActions[0]);
 	ozzGeodes[CLAW_TOWER_GEODE_B] = conf_new(OzzGeode, renderer, clawTowerDirB);
@@ -386,7 +391,7 @@ void SceneManager_Client::updateScene(Client::SceneUpdateData updateData)
 
 				otherTransforms.push_back(adjustment); //save to be deleted upon closing
 
-				Player_Client* p_c = conf_new(Player_Client, GO_data, data.id, team, this, ozzGeodes[team == red_team ? PLAYER_GEODE_M_R : PLAYER_GEODE_M_B], adjustment);
+				Player_Client* p_c = conf_new(Player_Client, GO_data, data.id, team, this, ozzGeodes[team == red_team ? (data.id < 2 ? PLAYER_GEODE_M_R : PLAYER_GEODE_F_R) : (data.id < 2 ? PLAYER_GEODE_M_B : PLAYER_GEODE_F_B)], adjustment);
 				idMap[data.id] = p_c;
 				wrapperMap[data.id] = p_c;
 

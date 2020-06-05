@@ -136,7 +136,7 @@ void Minion::move(float deltaTime) {
 					away += MathUtils::randfUniform(-1, 1) * perp;
 				}
 				move_vec += move_dist * (0.5f / max(dist, 0.5f)) * normalize(away);
-				move_vec = move_dist * normalize(move_vec);
+				//move_vec = move_dist * normalize(move_vec);
 			}
 		}
 
